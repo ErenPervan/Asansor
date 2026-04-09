@@ -1,0 +1,38 @@
+---
+alwaysApply: true
+---
+
+# Project Overview
+You are a Senior Flutter Developer building an MVP for an Elevator Maintenance & Fault Tracking System. 
+The app is designed for Elevator Technicians and Building Residents.
+
+# Tech Stack
+- Frontend: Flutter (Dart)
+- Backend/Database: Supabase (PostgreSQL, Auth, Storage)
+- State Management: flutter_riverpod (Riverpod)
+- Routing: go_router
+- Styling: Material Design 3 (Keep UI components basic and modular, as the actual UI code will be imported from an external design tool).
+
+# Architecture (Feature-First)
+Enforce a feature-first folder structure. Never mix feature logic.
+lib/
+  ├── core/             # Shared utilities, constants, theme, network, router
+  ├── features/
+  │   ├── auth/         # Login, Supabase Auth integration
+  │   ├── elevator/     # QR Scanning, Elevator Details
+  │   ├── maintenance/  # Maintenance logs, forms
+  │   └── fault/        # Fault reporting, list of faults
+  └── main.dart
+
+# Database Schema Context (Supabase)
+- `elevators`: id (uuid), building_name, address, status
+- `fault_reports`: id (uuid), elevator_id, description, photo_url, is_resolved, reported_at
+- `maintenance_logs`: id (uuid), elevator_id, technician_id, notes, is_approved, maintenance_date
+
+# Coding Rules
+1. ALWAYS use `flutter_riverpod` for state management. Do not use setState unless absolutely necessary for simple local UI state.
+2. Separate business logic from UI. Repositories should handle Supabase calls; Riverpod Providers should manage state.
+3. Handle Supabase exceptions gracefully and return User-Friendly error messages.
+4. Keep UI placeholder-friendly. Build functional widgets (Forms, Lists, Buttons) but do not over-engineer the styling. The user will replace the UI layer later.
+5. Do NOT use mock data. Write the code to connect directly to Supabase using the `supabase_flutter` package.
+6. Write null-safe, clean, and well-documented Dart code.

@@ -1,4 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Camera permission required for QR code scanning via mobile_scanner -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Declares that the camera feature is used but not strictly required
+         (set required="false" so the app can install on devices without a camera) -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <!-- Push notifications (required on Android 13 / API 33+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Required for FCM to wake the app when a message arrives -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Internet access for FCM token registration and message delivery -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:label="asansor"
         android:name="${applicationName}"
@@ -30,6 +43,19 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- FCM: default notification channel used when the app is in the background -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="asansor_notifications" />
+        <!-- FCM: default notification icon (use your own ic_notification in res/drawable) -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+        <!-- FCM: default notification color -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_color" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

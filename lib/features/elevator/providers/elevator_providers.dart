@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/providers/connectivity_providers.dart';
 import '../models/elevator_model.dart';
 import '../repositories/elevator_repository.dart';
 
@@ -15,10 +16,35 @@ final elevatorRepositoryProvider = Provider<ElevatorRepository>((ref) {
 
 /// Fetches the full list of elevators from Supabase.
 ///
+/// Caching behaviour:
+/// - **Online**  : fetches fresh data → persists to `elevators_cache` → returns it.
+/// - **Offline** : skips the network call and returns the last cached snapshot.
+/// - **Network error while "online"** : falls back to cache; rethrows only when
+///   the cache is also empty (true first-time-offline with no prior data).
+///
 /// Re-fetch by calling `ref.invalidate(elevatorsProvider)`.
 final elevatorsProvider = FutureProvider<List<ElevatorModel>>((ref) async {
-  final repo = ref.watch(elevatorRepositoryProvider);
-  return repo.getAllElevators();
+  final isOnline = ref.read(isOnlineProvider);
+  final cache = ref.read(readCacheServiceProvider);
+
+  // ── Offline path ───────────────────────────────────────────────────────────
+  if (!isOnline) {
+    return cache.loadElevators();
+  }
+
+  // ── Online path ────────────────────────────────────────────────────────────
+  try {
+    final repo = ref.watch(elevatorRepositoryProvider);
+    final data = await repo.getAllElevators();
+    // Update the cache in the background — don't await so the UI isn't blocked.
+    cache.saveElevators(data);
+    return data;
+  } catch (e) {
+    // Network or Supabase error: serve stale cache so the screen doesn't crash.
+    final cached = cache.loadElevators();
+    if (cached.isNotEmpty) return cached;
+    rethrow;
+  }
 });
 
 /// Fetches a single elevator by [id].
@@ -48,6 +74,7 @@ class ElevatorCreateController
     String status = 'active',
     double? latitude,
     double? longitude,
+    int? maintenanceDay,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -58,6 +85,7 @@ class ElevatorCreateController
                 status: status,
                 latitude: latitude,
                 longitude: longitude,
+                maintenanceDay: maintenanceDay,
               );
       // Refresh the global elevator list so dashboards stay in sync.
       ref.invalidate(elevatorsProvider);

@@ -53,6 +53,55 @@ class ScheduleRepository {
     }
   }
 
+  /// Bulk-inserts a list of auto-generated periodic maintenance tasks.
+  ///
+  /// Each row in [rows] must contain at minimum:
+  ///   `elevator_id`, `scheduled_date`, `status`, `task_type`.
+  /// `technician_id` is omitted — these tasks are unassigned and visible in
+  /// the admin's "unassigned pool".
+  ///
+  /// Returns the number of rows actually inserted.
+  Future<int> bulkInsertPeriodicSchedules(
+    List<Map<String, dynamic>> rows,
+  ) async {
+    if (rows.isEmpty) return 0;
+    try {
+      final response =
+          await _client.from(_table).insert(rows).select('id');
+      return (response as List).length;
+    } on PostgrestException catch (e) {
+      throw Exception('Toplu ekleme başarısız: ${e.message}');
+    } catch (e) {
+      throw Exception('Beklenmeyen hata: $e');
+    }
+  }
+
+  /// Returns the set of elevator IDs that already have a periodic maintenance
+  /// task scheduled within the calendar month defined by [month].
+  Future<Set<String>> getScheduledElevatorIdsForMonth(DateTime month) async {
+    final start = DateTime.utc(month.year, month.month, 1);
+    final end = month.month < 12
+        ? DateTime.utc(month.year, month.month + 1, 1)
+        : DateTime.utc(month.year + 1, 1, 1);
+
+    try {
+      final response = await _client
+          .from(_table)
+          .select('elevator_id')
+          .eq('task_type', 'periodic_maintenance')
+          .gte('scheduled_date', start.toIso8601String())
+          .lt('scheduled_date', end.toIso8601String());
+
+      return (response as List)
+          .map((r) => (r as Map<String, dynamic>)['elevator_id'] as String)
+          .toSet();
+    } on PostgrestException catch (e) {
+      throw Exception('Mevcut periyodik görevler sorgulanamadı: ${e.message}');
+    } catch (e) {
+      throw Exception('Beklenmeyen hata: $e');
+    }
+  }
+
   // ── Read ───────────────────────────────────────────────────────────────────
 
   /// Returns all schedules assigned to [technicianId], ordered by date.

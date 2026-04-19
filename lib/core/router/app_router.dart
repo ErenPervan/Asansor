@@ -132,7 +132,7 @@ final GoRouter appRouter = GoRouter(
     // the edge function does not need to know the root path convention.
     GoRoute(
       path: '/home',
-      redirect: (_, __) => '/',
+      redirect: (_, _) => '/',
     ),
     GoRoute(path: '/elevators', builder: (context, _) => const ElevatorListView()),
     GoRoute(path: '/scan', builder: (context, state) => const ScannerView()),

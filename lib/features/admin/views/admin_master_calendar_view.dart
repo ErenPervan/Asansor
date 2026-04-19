@@ -43,6 +43,40 @@ class _AdminMasterCalendarViewState
     final allAsync = ref.watch(allSchedulesWithDetailsProvider);
     final filter = ref.watch(masterCalendarFilterProvider);
 
+    // Listen for auto-schedule results to show the result Snackbar.
+    ref.listen(autoScheduleControllerProvider, (prev, next) {
+      next.whenOrNull(
+        data: (result) {
+          if (result == null) return;
+          final msg = result.inserted > 0
+              ? '${result.inserted} adet asansörün bakımı takvime eklendi! ✅'
+              : 'Bu ay için tüm periyodik bakımlar zaten mevcut.';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(msg),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: result.inserted > 0
+                  ? const Color(0xFF166534)
+                  : const Color(0xFF475569),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        },
+        error: (e, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Hata: $e'),
+              backgroundColor: _primary,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+      );
+    });
+
+    final autoScheduleState = ref.watch(autoScheduleControllerProvider);
+    final isGenerating = autoScheduleState.isLoading;
+
     return Scaffold(
       backgroundColor: _background,
       appBar: AppBar(
@@ -88,6 +122,27 @@ class _AdminMasterCalendarViewState
             ),
           ),
         ],
+      ),
+      // ── FAB: "Bu Ayı Planla" ──────────────────────────────────────────────
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: isGenerating
+            ? null
+            : () => _confirmAutoSchedule(context, _focusedDay),
+        icon: isGenerating
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : const Icon(Icons.auto_fix_high_rounded),
+        label: Text(
+          isGenerating ? 'Oluşturuluyor…' : 'Bu Ayı Planla',
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        backgroundColor: isGenerating ? _outline : _primary,
       ),
       body: allAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -152,6 +207,79 @@ class _AdminMasterCalendarViewState
       backgroundColor: Colors.transparent,
       builder: (_) => _FilterSheet(allSchedules: all),
     );
+  }
+
+  /// Shows a confirmation dialog then triggers auto-scheduling for [month].
+  Future<void> _confirmAutoSchedule(
+    BuildContext context,
+    DateTime month,
+  ) async {
+    final monthLabel =
+        DateFormat('MMMM y', 'tr_TR').format(month);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.auto_fix_high_rounded,
+                  color: _primary, size: 20),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Otomatik Planlama',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          '$monthLabel ayı için eksik olan tüm periyodik bakımlar '
+          'otomatik oluşturulacak.\n\n'
+          'Onaylıyor musunuz?',
+          style: const TextStyle(
+            fontSize: 14,
+            height: 1.5,
+            color: _onSurfaceVariant,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text(
+              'İptal',
+              style: TextStyle(color: _onSurfaceVariant),
+            ),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: _primary,
+              minimumSize: const Size(90, 40),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Onayla'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await ref
+          .read(autoScheduleControllerProvider.notifier)
+          .generate(month);
+    }
   }
 
   // ── Pure helpers ────────────────────────────────────────────────────────
@@ -540,6 +668,12 @@ class _MasterTaskCard extends StatelessWidget {
                             ),
                             _PriorityBadge(priority: task.priority),
                             _TaskStatusBadge(status: task.status),
+                            if (task.isPeriodicMaintenance)
+                              const _Badge(
+                                label: 'PERİYODİK',
+                                bg: Color(0xFFEDE9FE),
+                                fg: Color(0xFF5B21B6),
+                              ),
                           ],
                         ),
 
@@ -813,10 +947,12 @@ class _FilterSheet extends ConsumerWidget {
     final notifier = ref.read(masterCalendarFilterProvider.notifier);
 
     // Build unique, alphabetically sorted technician list.
+    // Skip unassigned tasks (empty technicianId) — they would otherwise show
+    // up as an "Atanmamış" entry which doesn't make sense as a filter chip.
     final seen = <String>{};
     final technicians = <MapEntry<String, String>>[];
     for (final s in allSchedules) {
-      if (seen.add(s.technicianId)) {
+      if (s.technicianId.isNotEmpty && seen.add(s.technicianId)) {
         technicians.add(MapEntry(s.technicianId, s.technicianName));
       }
     }

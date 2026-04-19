@@ -43,6 +43,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
 
   String _status = 'active';
   bool _showLocation = false;
+  int? _maintenanceDay; // null = no contract configured
 
   @override
   void dispose() {
@@ -144,6 +145,19 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
             _StatusPicker(
               selected: _status,
               onChanged: (v) => setState(() => _status = v),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ── Periodic maintenance contract ─────────────────────────
+            _SectionHeader(
+              icon: Icons.event_repeat_outlined,
+              title: 'Periyodik Bakım Sözleşmesi',
+            ),
+            const SizedBox(height: 12),
+            _MaintenanceDayPicker(
+              selected: _maintenanceDay,
+              onChanged: (v) => setState(() => _maintenanceDay = v),
             ),
 
             const SizedBox(height: 20),
@@ -279,6 +293,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
           status: _status,
           latitude: lat,
           longitude: lng,
+          maintenanceDay: _maintenanceDay,
         );
   }
 
@@ -388,6 +403,73 @@ class _Field extends StatelessWidget {
             horizontal: 14, vertical: 14),
       ),
       validator: validator,
+    );
+  }
+}
+
+// ── Maintenance day picker ────────────────────────────────────────────────────
+
+/// Lets the admin pick a contract maintenance day (1–28) or leave it unset.
+///
+/// Displays as a labelled row with a DropdownButtonFormField.  Selecting
+/// "Seçilmedi" clears the value (null = no contract).
+class _MaintenanceDayPicker extends StatelessWidget {
+  const _MaintenanceDayPicker({
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final int? selected;
+  final ValueChanged<int?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<int?>(
+      initialValue: selected,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: 'Sözleşme Bakım Günü',
+        hintText: 'Ayın kaçında bakım yapılacak?',
+        prefixIcon: const Icon(
+          Icons.calendar_month_outlined,
+          size: 18,
+          color: _outline,
+        ),
+        filled: true,
+        fillColor: _surface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _outlineVariant),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _outlineVariant),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _primary, width: 1.5),
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      ),
+      style: const TextStyle(fontSize: 15, color: _onSurface),
+      items: [
+        // Unset option
+        const DropdownMenuItem<int?>(
+          value: null,
+          child: Text(
+            'Seçilmedi (sözleşme yok)',
+            style: TextStyle(color: _onSurfaceVariant),
+          ),
+        ),
+        // Days 1–28
+        for (int day = 1; day <= 28; day++)
+          DropdownMenuItem<int?>(
+            value: day,
+            child: Text('Her ayın $day. günü'),
+          ),
+      ],
+      onChanged: onChanged,
     );
   }
 }

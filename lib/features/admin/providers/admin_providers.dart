@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/providers/connectivity_providers.dart';
+import '../../../core/services/auto_schedule_service.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/providers/elevator_providers.dart';
 import '../models/profile_model.dart';
@@ -47,14 +51,59 @@ final myPendingSchedulesProvider =
 /// Real-time stream of **all** (non-cancelled) schedules for the currently
 /// logged-in technician. Re-emits whenever Supabase pushes a change.
 ///
+/// Caching behaviour:
+/// - **Online**  : streams live data from Supabase Realtime; each emission is
+///   written to `tasks_cache` so the data is available when offline later.
+/// - **Offline** : skips the Supabase connection and emits the cached snapshot
+///   once as a one-shot `Stream.value(...)`.
+/// - **Mid-session disconnect** : the `StreamController` catches stream errors
+///   and emits the cached snapshot instead of propagating an error to the UI.
+///
 /// Used by the Technician's Daily Agenda on [HomeView].
 final technicianScheduleStreamProvider =
     StreamProvider.autoDispose<List<ScheduleModel>>((ref) {
   final user = ref.watch(authControllerProvider).valueOrNull;
   if (user == null) return const Stream.empty();
-  return ref
+
+  final isOnline = ref.read(isOnlineProvider);
+  final cache = ref.read(readCacheServiceProvider);
+
+  // ── Offline path ───────────────────────────────────────────────────────────
+  if (!isOnline) {
+    return Stream.value(cache.loadMyTasks(user.id));
+  }
+
+  // ── Online path — proxy stream that also updates the cache ─────────────────
+  // A StreamController is used so that mid-session network errors can be
+  // converted into a cache-fallback emission rather than crashing the UI.
+  final controller = StreamController<List<ScheduleModel>>();
+
+  final subscription = ref
       .read(scheduleRepositoryProvider)
-      .getMyTasksStream(user.id);
+      .getMyTasksStream(user.id)
+      .listen(
+    (tasks) {
+      cache.saveMyTasks(user.id, tasks); // fire-and-forget cache write
+      if (!controller.isClosed) controller.add(tasks);
+    },
+    onError: (_) {
+      // Connection lost mid-session: serve stale cache once and stay open
+      // so the stream doesn't enter an error state in the UI.
+      final cached = cache.loadMyTasks(user.id);
+      if (!controller.isClosed) controller.add(cached);
+    },
+    onDone: () {
+      if (!controller.isClosed) controller.close();
+    },
+    cancelOnError: false,
+  );
+
+  ref.onDispose(() {
+    subscription.cancel();
+    controller.close();
+  });
+
+  return controller.stream;
 });
 
 // ── Write / action notifier ───────────────────────────────────────────────────
@@ -201,15 +250,70 @@ final allSchedulesWithDetailsProvider =
   return schedules.map((s) {
     final elev = elevMap[s.elevatorId];
     final prof = profMap[s.technicianId];
+    // Empty technicianId means the task is auto-generated and not yet
+    // assigned to anyone.  Show "Atanmamış" so admins can identify it.
+    final techName = s.isUnassigned
+        ? 'Atanmamış'
+        : (prof?.displayName ?? 'Teknisyen');
     return ScheduleWithDetails(
       schedule: s,
       buildingName: elev?.buildingName ?? 'Asansör',
       address: elev?.address,
-      technicianName: prof?.displayName ?? 'Teknisyen',
+      technicianName: techName,
       technicianId: s.technicianId,
     );
   }).toList();
 });
+
+// ── Auto-Schedule ─────────────────────────────────────────────────────────────
+
+/// Result value held by [autoScheduleControllerProvider].
+///
+/// - `null`  → initial / idle state (no run yet)
+/// - non-null → result of the last [AutoScheduleController.generate] call
+class AutoScheduleState {
+  const AutoScheduleState({required this.inserted, required this.skipped});
+
+  final int inserted;
+  final int skipped;
+}
+
+/// Notifier that runs [AutoScheduleService.generateMonthlyMaintenances] and
+/// exposes the result so the UI can show a meaningful Snackbar.
+///
+/// Usage:
+/// ```dart
+/// await ref.read(autoScheduleControllerProvider.notifier).generate(month);
+/// final state = ref.read(autoScheduleControllerProvider);
+/// state.whenData((result) => ...);
+/// ```
+class AutoScheduleController
+    extends AutoDisposeAsyncNotifier<AutoScheduleState?> {
+  @override
+  Future<AutoScheduleState?> build() async => null;
+
+  Future<void> generate(DateTime targetMonth) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final service = AutoScheduleService(Supabase.instance.client);
+      final result = await service.generateMonthlyMaintenances(targetMonth);
+
+      // Refresh all calendar providers so new tasks appear immediately.
+      ref.invalidate(allSchedulesProvider);
+      ref.invalidate(adminStatsProvider);
+
+      return AutoScheduleState(
+        inserted: result.inserted,
+        skipped: result.skipped,
+      );
+    });
+  }
+}
+
+final autoScheduleControllerProvider = AutoDisposeAsyncNotifierProvider<
+    AutoScheduleController, AutoScheduleState?>(
+  AutoScheduleController.new,
+);
 
 // ── Technician Management ─────────────────────────────────────────────────────
 

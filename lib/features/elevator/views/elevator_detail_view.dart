@@ -7,6 +7,7 @@ import '../../../core/services/pdf_report_service.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/models/elevator_model.dart';
 import '../../elevator/providers/elevator_providers.dart';
+import '../../fault/models/fault_report_model.dart';
 import '../../fault/providers/fault_providers.dart';
 import '../../maintenance/models/maintenance_log_model.dart';
 import '../../maintenance/providers/maintenance_providers.dart';
@@ -1226,17 +1227,30 @@ class _ReportFaultSheetState extends ConsumerState<_ReportFaultSheet> {
     ref.listen<AsyncValue<dynamic>>(faultControllerProvider, (previous, next) {
       if (previous?.isLoading != true) return;
       next.whenOrNull(
-        data: (fault) {
+        data: (raw) {
+          final fault = raw as FaultReportModel?;
           if (fault == null) return;
-          ref.invalidate(activeFaultsProvider);
-          ref.invalidate(faultsByElevatorProvider(widget.elevatorId));
+          if (!fault.isOfflineQueued) {
+            ref.invalidate(activeFaultsProvider);
+            ref.invalidate(faultsByElevatorProvider(widget.elevatorId));
+          }
           if (!context.mounted) return;
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Arıza başarıyla bildirildi.'),
+            SnackBar(
+              content: Text(
+                fault.isOfflineQueued
+                    ? 'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, '
+                        'bağlantı sağlandığında otomatik senkronize edilecek.'
+                    : 'Arıza başarıyla bildirildi.',
+              ),
               behavior: SnackBarBehavior.floating,
-              backgroundColor: Color(0xFF155724),
+              backgroundColor: fault.isOfflineQueued
+                  ? const Color(0xFFD97706)
+                  : const Color(0xFF155724),
+              duration: fault.isOfflineQueued
+                  ? const Duration(seconds: 5)
+                  : const Duration(seconds: 3),
             ),
           );
         },
@@ -1420,18 +1434,31 @@ class _LogMaintenanceSheetState extends ConsumerState<_LogMaintenanceSheet> {
     ) {
       if (previous?.isLoading != true) return;
       next.whenOrNull(
-        data: (log) {
+        data: (raw) {
+          final log = raw as MaintenanceLogModel?;
           if (log == null) return;
-          ref.invalidate(logsByElevatorProvider(widget.elevatorId));
-          ref.invalidate(pendingMaintenanceProvider);
-          ref.invalidate(completedTodayCountProvider);
+          if (!log.isOfflineQueued) {
+            ref.invalidate(logsByElevatorProvider(widget.elevatorId));
+            ref.invalidate(pendingMaintenanceProvider);
+            ref.invalidate(completedTodayCountProvider);
+          }
           if (!context.mounted) return;
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Bakım kaydı başarıyla eklendi.'),
+            SnackBar(
+              content: Text(
+                log.isOfflineQueued
+                    ? 'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, '
+                        'bağlantı sağlandığında otomatik senkronize edilecek.'
+                    : 'Bakım kaydı başarıyla eklendi.',
+              ),
               behavior: SnackBarBehavior.floating,
-              backgroundColor: Color(0xFF155724),
+              backgroundColor: log.isOfflineQueued
+                  ? const Color(0xFFD97706)
+                  : const Color(0xFF155724),
+              duration: log.isOfflineQueued
+                  ? const Duration(seconds: 5)
+                  : const Duration(seconds: 3),
             ),
           );
         },

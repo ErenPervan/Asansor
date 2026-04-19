@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/widgets/offline_banner.dart';
 import '../models/elevator_model.dart';
 import '../providers/elevator_providers.dart';
 
@@ -210,7 +211,13 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
       ),
 
       // ── Body ─────────────────────────────────────────────────────────────
-      body: elevatorsAsync.when(
+      body: Column(
+        children: [
+          // Shows an amber "offline / cached data" strip when there is no
+          // internet connection; renders nothing when online.
+          const OfflineBanner(),
+          Expanded(
+            child: elevatorsAsync.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: _primary),
         ),
@@ -251,6 +258,9 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
             ),
           );
         },
+            ),
+          ),
+        ],
       ),
     );
   }

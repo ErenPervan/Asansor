@@ -3,26 +3,21 @@
 /// A [ScheduleModel] represents a task assigned by a manager/admin to a
 /// specific technician for a given elevator on a scheduled date.
 ///
-/// Expected table schema:
-/// ```sql
-/// create table maintenance_schedules (
-///   id              uuid primary key default gen_random_uuid(),
-///   elevator_id     uuid not null references elevators(id),
-///   technician_id   uuid not null references auth.users(id),
-///   scheduled_date  timestamptz not null,
-///   status          text not null default 'pending',
-///   priority        text not null default 'normal',
-///   notes           text,
-///   created_by      uuid references auth.users(id),
-///   created_at      timestamptz default now()
-/// );
+/// [technicianId] is an empty string when the task is auto-generated and
+/// not yet assigned to anyone (task_type == 'periodic_maintenance').
 ///
-/// -- Migration (run once if the table already exists):
-/// alter table maintenance_schedules
-///   add column if not exists priority text not null default 'normal';
-///
-/// -- Enable real-time replication for the technician's live agenda:
-/// alter publication supabase_realtime add table maintenance_schedules;
+/// Expected table schema (see supabase/migrations/ for the full DDL):
+/// ```
+///   id              uuid
+///   elevator_id     uuid NOT NULL
+///   technician_id   uuid  (nullable — unassigned periodic tasks have no technician)
+///   scheduled_date  timestamptz NOT NULL
+///   status          text NOT NULL default 'pending'
+///   priority        text NOT NULL default 'normal'
+///   task_type       text NOT NULL default 'manual'
+///   notes           text
+///   created_by      uuid
+///   created_at      timestamptz
 /// ```
 class ScheduleModel {
   const ScheduleModel({
@@ -32,6 +27,7 @@ class ScheduleModel {
     required this.scheduledDate,
     required this.status,
     this.priority = 'normal',
+    this.taskType = 'manual',
     this.notes,
     this.createdBy,
     this.createdAt,
@@ -39,6 +35,8 @@ class ScheduleModel {
 
   final String id;
   final String elevatorId;
+
+  /// Empty string means the task is unassigned (auto-generated periodic task).
   final String technicianId;
 
   /// ISO-8601 timestamp for when the maintenance is scheduled.
@@ -50,9 +48,15 @@ class ScheduleModel {
   /// One of: 'low' | 'normal' | 'high' | 'emergency'
   final String priority;
 
+  /// One of: 'manual' | 'periodic_maintenance'
+  final String taskType;
+
   final String? notes;
   final String? createdBy;
   final DateTime? createdAt;
+
+  bool get isPeriodicMaintenance => taskType == 'periodic_maintenance';
+  bool get isUnassigned => technicianId.isEmpty;
 
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
     return ScheduleModel(
@@ -64,6 +68,7 @@ class ScheduleModel {
           : DateTime.fromMillisecondsSinceEpoch(0),
       status: (json['status'] as String?) ?? 'pending',
       priority: (json['priority'] as String?) ?? 'normal',
+      taskType: (json['task_type'] as String?) ?? 'manual',
       notes: json['notes'] as String?,
       createdBy: json['created_by'] as String?,
       createdAt: json['created_at'] != null
@@ -75,10 +80,11 @@ class ScheduleModel {
   Map<String, dynamic> toJson() => {
         'id': id,
         'elevator_id': elevatorId,
-        'technician_id': technicianId,
+        if (technicianId.isNotEmpty) 'technician_id': technicianId,
         'scheduled_date': scheduledDate.toIso8601String(),
         'status': status,
         'priority': priority,
+        'task_type': taskType,
         'notes': notes,
         'created_by': createdBy,
       };
@@ -90,6 +96,7 @@ class ScheduleModel {
     DateTime? scheduledDate,
     String? status,
     String? priority,
+    String? taskType,
     String? notes,
     String? createdBy,
     DateTime? createdAt,
@@ -101,6 +108,7 @@ class ScheduleModel {
       scheduledDate: scheduledDate ?? this.scheduledDate,
       status: status ?? this.status,
       priority: priority ?? this.priority,
+      taskType: taskType ?? this.taskType,
       notes: notes ?? this.notes,
       createdBy: createdBy ?? this.createdBy,
       createdAt: createdAt ?? this.createdAt,
@@ -110,5 +118,5 @@ class ScheduleModel {
   @override
   String toString() => 'ScheduleModel(id: $id, elevatorId: $elevatorId, '
       'technicianId: $technicianId, status: $status, priority: $priority, '
-      'scheduledDate: $scheduledDate)';
+      'taskType: $taskType, scheduledDate: $scheduledDate)';
 }

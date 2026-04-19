@@ -28,6 +28,8 @@ class ScheduleWithDetails {
 
   bool get isCompleted => schedule.status == 'completed';
   bool get isCancelled => schedule.status == 'cancelled';
+  bool get isPeriodicMaintenance => schedule.isPeriodicMaintenance;
+  bool get isUnassigned => schedule.isUnassigned;
 
   @override
   String toString() =>

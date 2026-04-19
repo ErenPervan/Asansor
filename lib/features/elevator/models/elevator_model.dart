@@ -13,6 +13,7 @@ class ElevatorModel {
     required this.status,
     this.latitude,
     this.longitude,
+    this.maintenanceDay,
   });
 
   final String id;
@@ -29,6 +30,10 @@ class ElevatorModel {
   final double? latitude;
   final double? longitude;
 
+  /// Contract-mandated day of the month (1–28) for periodic maintenance.
+  /// Null means no periodic contract has been configured yet.
+  final int? maintenanceDay;
+
   factory ElevatorModel.fromJson(Map<String, dynamic> json) {
     return ElevatorModel(
       id: json['id'] as String,
@@ -37,6 +42,7 @@ class ElevatorModel {
       status: (json['status'] as String?) ?? 'unknown',
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
+      maintenanceDay: json['maintenance_day'] as int?,
     );
   }
 
@@ -48,6 +54,7 @@ class ElevatorModel {
       'status': status,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
+      if (maintenanceDay != null) 'maintenance_day': maintenanceDay,
     };
   }
 
@@ -58,6 +65,7 @@ class ElevatorModel {
     String? status,
     double? latitude,
     double? longitude,
+    int? maintenanceDay,
   }) {
     return ElevatorModel(
       id: id ?? this.id,
@@ -66,11 +74,15 @@ class ElevatorModel {
       status: status ?? this.status,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      maintenanceDay: maintenanceDay ?? this.maintenanceDay,
     );
   }
 
   /// Returns true only when this elevator has valid map coordinates.
   bool get hasMappableLocation => latitude != null && longitude != null;
+
+  /// Returns true when a periodic maintenance contract day has been set.
+  bool get hasMaintenanceContract => maintenanceDay != null;
 
   @override
   String toString() =>

@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../services/read_cache_service.dart';
 import '../services/sync_queue_service.dart';
 
 // ── Connectivity ──────────────────────────────────────────────────────────────
@@ -24,6 +25,16 @@ final isOnlineProvider = Provider<bool>((ref) {
         loading: () => true,
         error: (e, st) => true,
       );
+});
+
+// ── Read Cache ────────────────────────────────────────────────────────────────
+
+/// Single shared [ReadCacheService] instance backed by the open Hive boxes.
+///
+/// The boxes (`elevators_cache` and `tasks_cache`) must be opened in `main.dart`
+/// before this provider is first read.
+final readCacheServiceProvider = Provider<ReadCacheService>((ref) {
+  return ReadCacheService();
 });
 
 // ── Sync Queue ────────────────────────────────────────────────────────────────
@@ -49,20 +60,31 @@ final pendingSyncCountProvider = Provider<int>((ref) {
 /// Watches the connectivity stream and automatically flushes the queue the
 /// moment the device comes back online.
 ///
-/// Must be kept alive by `ref.watch`-ing it somewhere in the widget tree
-/// (e.g. inside [HomeView]).
+/// Also flushes on the very first connectivity event (cold start / app resume)
+/// so items queued during a previous offline session are synced as soon as the
+/// app launches with an active connection — not only on offline→online
+/// transitions.
+///
+/// Kept alive at the app-root level (watched inside [AsansorApp]) so it runs
+/// for the full app lifetime regardless of which screen is visible.
 final autoSyncProvider = Provider<void>((ref) {
   ref.listen<AsyncValue<List<ConnectivityResult>>>(
     connectivityStreamProvider,
     (previous, next) {
       next.whenData((results) {
-        final wasOffline = previous?.valueOrNull
-                ?.every((r) => r == ConnectivityResult.none) ??
-            false;
         final isNowOnline =
             results.any((r) => r != ConnectivityResult.none);
+        if (!isNowOnline) return;
 
-        if (isNowOnline && wasOffline) {
+        // `previous == null` → first connectivity event after cold start.
+        // Treat it the same as "was offline" so any items queued in a prior
+        // offline session are flushed immediately on startup.
+        final wasOffline = previous == null ||
+          (previous.valueOrNull
+                    ?.every((r) => r == ConnectivityResult.none) ??
+                true);
+
+        if (wasOffline) {
           final queue = ref.read(syncQueueServiceProvider);
           if (queue.hasPending) {
             queue.flush(Supabase.instance.client);

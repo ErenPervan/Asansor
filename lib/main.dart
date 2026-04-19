@@ -10,8 +10,10 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/constants/supabase_constants.dart';
+import 'core/providers/connectivity_providers.dart';
 import 'core/router/app_router.dart'; // also exports: appRouter, navigatorKey
 import 'core/services/notification_service.dart';
+import 'core/services/read_cache_service.dart';
 import 'core/services/sync_queue_service.dart';
 
 // ── Brand palette (shared with all view-layer files) ──────────────────────────
@@ -59,13 +61,13 @@ Future<void> main() async {
   await FirebaseMessaging.instance.setAutoInitEnabled(true);
 
   // Print startup FCM token for quick verification in debug console.
-try {
+  try {
     final fcmToken = await FirebaseMessaging.instance.getToken();
-    print("====================================================");
-    print("🚀 EREN'İN FCM TOKEN'I:$fcmToken");
-    print("====================================================");
+    debugPrint('====================================================');
+    debugPrint("EREN'IN FCM TOKEN'I: $fcmToken");
+    debugPrint('====================================================');
   } catch (e) {
-    print("❌ Token alınırken hata oluştu: $e");
+    debugPrint('Token alinirken hata olustu: $e');
   }
 
   await Supabase.initialize(
@@ -73,9 +75,13 @@ try {
     anonKey: SupabaseConstants.supabaseAnonKey,
   );
 
-  // Initialise Hive and open the offline sync queue box.
+  // Initialise Hive and open all persistent boxes:
+  //   • sync queue  – write operations queued while offline
+  //   • read caches – last-known-good snapshots for offline reads
   await Hive.initFlutter();
   await Hive.openBox<String>(syncQueueBoxName);
+  await Hive.openBox<String>(elevatorsCacheBoxName);
+  await Hive.openBox<String>(tasksCacheBoxName);
 
   // Set up FCM permissions, notification channels, and message listeners.
   await NotificationService.instance.initialize();
@@ -89,14 +95,14 @@ try {
   );
 }
 
-class AsansorApp extends StatefulWidget {
+class AsansorApp extends ConsumerStatefulWidget {
   const AsansorApp({super.key});
 
   @override
-  State<AsansorApp> createState() => _AsansorAppState();
+  ConsumerState<AsansorApp> createState() => _AsansorAppState();
 }
 
-class _AsansorAppState extends State<AsansorApp> {
+class _AsansorAppState extends ConsumerState<AsansorApp> {
   @override
   void initState() {
     super.initState();
@@ -110,6 +116,12 @@ class _AsansorAppState extends State<AsansorApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Keep the auto-sync listener alive for the entire app lifetime so it
+    // fires regardless of which screen is currently shown.  Previously this
+    // was only watched inside HomeView, which meant the listener would die
+    // whenever the technician navigated to another screen via context.go().
+    ref.watch(autoSyncProvider);
+
     return MaterialApp.router(
       title: 'Asansor',
       debugShowCheckedModeBanner: false,

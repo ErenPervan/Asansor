@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase_flutter;
 
 import '../../../core/providers/connectivity_providers.dart';
+import '../../../core/widgets/offline_banner.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/models/elevator_model.dart';
 import '../../elevator/providers/elevator_providers.dart';
@@ -61,9 +62,6 @@ class HomeView extends ConsumerWidget {
     final elevators = ref.watch(elevatorsProvider);
     final completedCount = ref.watch(completedTodayCountProvider);
 
-    // Keep the auto-sync listener alive for the lifetime of this screen.
-    ref.watch(autoSyncProvider);
-
     final pendingCount = ref.watch(pendingSyncCountProvider);
     final isOnline = ref.watch(isOnlineProvider);
     final userEmail = authState.valueOrNull?.email ?? '';
@@ -80,6 +78,8 @@ class HomeView extends ConsumerWidget {
               onSignOut: () =>
                   ref.read(authControllerProvider.notifier).signOut(),
             ),
+            // Shown only when the device is offline; renders nothing otherwise.
+            const OfflineBanner(),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),

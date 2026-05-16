@@ -17,6 +17,8 @@ class FaultReportModel {
     this.resolvedAt,
     this.resolutionNotes,
     this.isOfflineQueued = false,
+    this.faultType,
+    this.priority,
   });
 
   final String id;
@@ -42,6 +44,12 @@ class FaultReportModel {
   /// local sync queue. It has no corresponding row in Supabase yet.
   final bool isOfflineQueued;
 
+  /// E.g. 'mechanic', 'electric', 'trapped'
+  final String? faultType;
+
+  /// E.g. 'emergency', 'high', 'normal'
+  final String? priority;
+
   factory FaultReportModel.fromJson(Map<String, dynamic> json) {
     return FaultReportModel(
       id: json['id'] as String,
@@ -56,6 +64,8 @@ class FaultReportModel {
           ? DateTime.parse(json['resolved_at'] as String)
           : null,
       resolutionNotes: json['resolution_notes'] as String?,
+      faultType: json['fault_type'] as String?,
+      priority: json['priority'] as String?,
     );
   }
 
@@ -69,6 +79,8 @@ class FaultReportModel {
       'reported_at': reportedAt.toIso8601String(),
       'resolved_at': resolvedAt?.toIso8601String(),
       'resolution_notes': resolutionNotes,
+      'fault_type': faultType,
+      'priority': priority,
     };
   }
 
@@ -82,6 +94,8 @@ class FaultReportModel {
     DateTime? resolvedAt,
     String? resolutionNotes,
     bool? isOfflineQueued,
+    String? faultType,
+    String? priority,
   }) {
     return FaultReportModel(
       id: id ?? this.id,
@@ -93,11 +107,14 @@ class FaultReportModel {
       resolvedAt: resolvedAt ?? this.resolvedAt,
       resolutionNotes: resolutionNotes ?? this.resolutionNotes,
       isOfflineQueued: isOfflineQueued ?? this.isOfflineQueued,
+      faultType: faultType ?? this.faultType,
+      priority: priority ?? this.priority,
     );
   }
 
   @override
   String toString() =>
       'FaultReportModel(id: $id, elevatorId: $elevatorId, '
-      'isResolved: $isResolved, reportedAt: $reportedAt)';
+      'isResolved: $isResolved, reportedAt: $reportedAt, '
+      'faultType: $faultType, priority: $priority)';
 }

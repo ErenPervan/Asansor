@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/providers/connectivity_providers.dart';
+import '../../../core/models/paginated_state.dart';
 import '../models/elevator_model.dart';
 import '../repositories/elevator_repository.dart';
 
@@ -14,33 +15,107 @@ final elevatorRepositoryProvider = Provider<ElevatorRepository>((ref) {
 
 // ── Data Providers ───────────────────────────────────────────────────────────
 
-/// Fetches the full list of elevators from Supabase.
-///
-/// Caching behaviour:
-/// - **Online**  : fetches fresh data → persists to `elevators_cache` → returns it.
-/// - **Offline** : skips the network call and returns the last cached snapshot.
-/// - **Network error while "online"** : falls back to cache; rethrows only when
-///   the cache is also empty (true first-time-offline with no prior data).
-///
-/// Re-fetch by calling `ref.invalidate(elevatorsProvider)`.
+// ── Data Providers ───────────────────────────────────────────────────────────
+
+final elevatorListProvider =
+    AsyncNotifierProvider<ElevatorListController, PaginatedState<ElevatorModel>>(
+        ElevatorListController.new);
+
+class ElevatorListController extends AsyncNotifier<PaginatedState<ElevatorModel>> {
+  static const _pageSize = 20;
+
+  @override
+  Future<PaginatedState<ElevatorModel>> build() async {
+    final isOnline = ref.watch(isOnlineProvider);
+    final cache = ref.read(readCacheServiceProvider);
+
+    if (!isOnline) {
+      final cachedItems = cache.loadElevators();
+      return PaginatedState(
+        items: cachedItems,
+        hasMore: false, // Assume we load everything from cache
+      );
+    }
+
+    try {
+      final repo = ref.watch(elevatorRepositoryProvider);
+      final items = await repo.getAllElevators(from: 0, to: _pageSize - 1);
+      
+      // Update cache with first page for now, or handle full sync separately
+      // For now, let's just save what we fetched
+      cache.saveElevators(items);
+      
+      return PaginatedState(
+        items: items,
+        hasMore: items.length == _pageSize,
+      );
+    } catch (e) {
+      final cached = cache.loadElevators();
+      if (cached.isNotEmpty) {
+        return PaginatedState(items: cached, hasMore: false);
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> loadMore() async {
+    final isOnline = ref.read(isOnlineProvider);
+    if (!isOnline) return;
+
+    final currentState = state.value;
+    if (currentState == null || !currentState.hasMore || currentState.isLoadingMore) {
+      return;
+    }
+
+    state = AsyncData(currentState.copyWith(isLoadingMore: true));
+
+    final nextFrom = currentState.items.length;
+    final nextTo = nextFrom + _pageSize - 1;
+
+    try {
+      final repo = ref.read(elevatorRepositoryProvider);
+      final newItems = await repo.getAllElevators(from: nextFrom, to: nextTo);
+
+      state = AsyncData(currentState.copyWith(
+        items: [...currentState.items, ...newItems],
+        hasMore: newItems.length == _pageSize,
+        isLoadingMore: false,
+      ));
+    } catch (e, stack) {
+      state = AsyncError(e, stack);
+    }
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final repo = ref.read(elevatorRepositoryProvider);
+      final items = await repo.getAllElevators(from: 0, to: _pageSize - 1);
+      ref.read(readCacheServiceProvider).saveElevators(items);
+      return PaginatedState(
+        items: items,
+        hasMore: items.length == _pageSize,
+      );
+    });
+  }
+}
+
+/// Provides all elevators without pagination. 
+/// Useful for lookups (ID -> Name) and admin views that need the full set.
 final elevatorsProvider = FutureProvider<List<ElevatorModel>>((ref) async {
-  final isOnline = ref.read(isOnlineProvider);
+  final isOnline = ref.watch(isOnlineProvider);
   final cache = ref.read(readCacheServiceProvider);
 
-  // ── Offline path ───────────────────────────────────────────────────────────
   if (!isOnline) {
     return cache.loadElevators();
   }
 
-  // ── Online path ────────────────────────────────────────────────────────────
   try {
     final repo = ref.watch(elevatorRepositoryProvider);
-    final data = await repo.getAllElevators();
-    // Update the cache in the background — don't await so the UI isn't blocked.
-    cache.saveElevators(data);
-    return data;
+    final items = await repo.fetchAllElevators();
+    cache.saveElevators(items);
+    return items;
   } catch (e) {
-    // Network or Supabase error: serve stale cache so the screen doesn't crash.
     final cached = cache.loadElevators();
     if (cached.isNotEmpty) return cached;
     rethrow;
@@ -88,7 +163,7 @@ class ElevatorCreateController
                 maintenanceDay: maintenanceDay,
               );
       // Refresh the global elevator list so dashboards stay in sync.
-      ref.invalidate(elevatorsProvider);
+      ref.invalidate(elevatorListProvider);
       return elevator;
     });
   }

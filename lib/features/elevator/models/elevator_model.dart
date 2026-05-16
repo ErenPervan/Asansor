@@ -14,6 +14,11 @@ class ElevatorModel {
     this.latitude,
     this.longitude,
     this.maintenanceDay,
+    this.model,
+    this.capacity,
+    this.lastInspectionDate,
+    this.nextInspectionDate,
+    this.inspectionStatus = 'none',
   });
 
   final String id;
@@ -34,6 +39,21 @@ class ElevatorModel {
   /// Null means no periodic contract has been configured yet.
   final int? maintenanceDay;
 
+  /// Manufacturer and model of the elevator.
+  final String? model;
+
+  /// Passenger/weight capacity.
+  final int? capacity;
+
+  /// The date when the last A-Type legal inspection occurred.
+  final DateTime? lastInspectionDate;
+
+  /// The date when the next A-Type legal inspection is due.
+  final DateTime? nextInspectionDate;
+
+  /// The current legal certification tag ('red', 'yellow', 'blue', 'green', 'none').
+  final String inspectionStatus;
+
   factory ElevatorModel.fromJson(Map<String, dynamic> json) {
     return ElevatorModel(
       id: json['id'] as String,
@@ -43,6 +63,15 @@ class ElevatorModel {
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       maintenanceDay: json['maintenance_day'] as int?,
+      model: json['model'] as String?,
+      capacity: json['capacity'] as int?,
+      lastInspectionDate: json['last_inspection_date'] != null
+          ? DateTime.parse(json['last_inspection_date'] as String).toLocal()
+          : null,
+      nextInspectionDate: json['next_inspection_date'] != null
+          ? DateTime.parse(json['next_inspection_date'] as String).toLocal()
+          : null,
+      inspectionStatus: (json['inspection_status'] as String?) ?? 'none',
     );
   }
 
@@ -55,6 +84,13 @@ class ElevatorModel {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       if (maintenanceDay != null) 'maintenance_day': maintenanceDay,
+      if (model != null) 'model': model,
+      if (capacity != null) 'capacity': capacity,
+      if (lastInspectionDate != null)
+        'last_inspection_date': lastInspectionDate!.toUtc().toIso8601String(),
+      if (nextInspectionDate != null)
+        'next_inspection_date': nextInspectionDate!.toUtc().toIso8601String(),
+      'inspection_status': inspectionStatus,
     };
   }
 
@@ -66,6 +102,11 @@ class ElevatorModel {
     double? latitude,
     double? longitude,
     int? maintenanceDay,
+    String? model,
+    int? capacity,
+    DateTime? lastInspectionDate,
+    DateTime? nextInspectionDate,
+    String? inspectionStatus,
   }) {
     return ElevatorModel(
       id: id ?? this.id,
@@ -75,6 +116,11 @@ class ElevatorModel {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       maintenanceDay: maintenanceDay ?? this.maintenanceDay,
+      model: model ?? this.model,
+      capacity: capacity ?? this.capacity,
+      lastInspectionDate: lastInspectionDate ?? this.lastInspectionDate,
+      nextInspectionDate: nextInspectionDate ?? this.nextInspectionDate,
+      inspectionStatus: inspectionStatus ?? this.inspectionStatus,
     );
   }
 
@@ -84,9 +130,25 @@ class ElevatorModel {
   /// Returns true when a periodic maintenance contract day has been set.
   bool get hasMaintenanceContract => maintenanceDay != null;
 
+  /// Calculates the days remaining until the next inspection.
+  /// Returns null if [nextInspectionDate] is not set.
+  int? get daysUntilNextInspection {
+    if (nextInspectionDate == null) return null;
+    final now = DateTime.now();
+    final difference = nextInspectionDate!.difference(now);
+    return difference.inDays;
+  }
+
+  /// Returns true if the next inspection is due in less than 30 days or is already overdue.
+  bool get isInspectionUrgent {
+    final days = daysUntilNextInspection;
+    if (days == null) return false;
+    return days < 30;
+  }
+
   @override
   String toString() =>
       'ElevatorModel(id: $id, buildingName: $buildingName, '
-      'address: $address, status: $status, '
-      'lat: $latitude, lng: $longitude)';
+      'status: $status, inspectionStatus: $inspectionStatus, '
+      'nextInspection: $nextInspectionDate)';
 }

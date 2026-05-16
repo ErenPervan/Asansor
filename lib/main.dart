@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
@@ -10,27 +11,48 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/constants/supabase_constants.dart';
+import 'core/models/sync_task.dart';
 import 'core/providers/connectivity_providers.dart';
 import 'core/router/app_router.dart'; // also exports: appRouter, navigatorKey
 import 'core/services/notification_service.dart';
 import 'core/services/read_cache_service.dart';
 import 'core/services/sync_queue_service.dart';
+import 'core/widgets/error_boundary.dart';
+import 'core/utils/error_handler.dart';
+import 'core/theme/app_colors.dart';
 
 // ── Brand palette (shared with all view-layer files) ──────────────────────────
 
-const kPrimary = Color(0xFFB91C1C);       // Red-700  – brand/headers
-const kPrimaryDark = Color(0xFF991B1B);   // Red-800  – gradient endpoint
-const kSecondary = Color(0xFFEF4444);     // Red-500  – bright accents/badges
-const kBackground = Color(0xFFF9FAFB);   // Slate-50  – scaffold bg
-const kSurface = Colors.white;            // card / sheet bg
-const kOnSurface = Color(0xFF0F172A);     // Slate-900 – primary text
-const kOnSurfaceVariant = Color(0xFF475569); // Slate-600 – secondary text
-const kOutline = Color(0xFF94A3B8);       // Slate-400 – disabled text
-const kOutlineVariant = Color(0xFFE2E8F0);// Slate-200 – borders/dividers
-const kSurfaceContainer = Color(0xFFF1F5F9); // Slate-100 – input/chip bg
+const kPrimary = AppColors.primary;
+const kPrimaryDark = AppColors.primaryDark;
+const kSecondary = AppColors.secondary;
+const kBackground = AppColors.background;
+const kSurface = AppColors.surface;
+const kOnSurface = AppColors.onSurface;
+const kOnSurfaceVariant = AppColors.onSurfaceVariant;
+const kOutline = AppColors.outline;
+const kOutlineVariant = AppColors.outlineVariant;
+const kSurfaceContainer = AppColors.surfaceContainer;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ── Error Handling Setup ──────────────────────────────────────────────────
+  
+  // 1. Catch Flutter errors (build/layout/etc)
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    ErrorHandler.handle(details.exception, details.stack);
+  };
+
+  // 2. Catch platform errors (asynchronous)
+  PlatformDispatcher.instance.onError = (error, stack) {
+    ErrorHandler.handle(error, stack);
+    return true; // Error is handled
+  };
+
+  // 3. Custom crash UI for widget crashes
+  ErrorWidget.builder = (details) => ErrorBoundaryScreen(details: details);
 
   // Lock to portrait to match the target device form-factor.
   await SystemChrome.setPreferredOrientations([
@@ -79,7 +101,10 @@ Future<void> main() async {
   //   • sync queue  – write operations queued while offline
   //   • read caches – last-known-good snapshots for offline reads
   await Hive.initFlutter();
-  await Hive.openBox<String>(syncQueueBoxName);
+  if (!Hive.isAdapterRegistered(SyncTask.typeId)) {
+    Hive.registerAdapter(SyncTaskAdapter());
+  }
+  await Hive.openBox<SyncTask>(syncQueueBoxName);
   await Hive.openBox<String>(elevatorsCacheBoxName);
   await Hive.openBox<String>(tasksCacheBoxName);
 
@@ -90,7 +115,9 @@ Future<void> main() async {
 
   runApp(
     const ProviderScope(
-      child: AsansorApp(),
+      child: ErrorBoundary(
+        child: AsansorApp(),
+      ),
     ),
   );
 }
@@ -140,12 +167,12 @@ ThemeData _buildTheme() {
 
   final base = ColorScheme.fromSeed(
     seedColor: seedColor,
-    brightness: Brightness.light,
+    brightness: Brightness.dark,
   ).copyWith(
     primary: primaryColor,
     onPrimary: Colors.white,
-    primaryContainer: const Color(0xFFFFE4E4), // very light red tint
-    onPrimaryContainer: kPrimaryDark,
+    primaryContainer: kPrimaryDark,
+    onPrimaryContainer: Colors.white,
     secondary: kSecondary,
     onSecondary: Colors.white,
     surface: kSurface,
@@ -153,14 +180,14 @@ ThemeData _buildTheme() {
     onSurfaceVariant: kOnSurfaceVariant,
     outline: kOutline,
     outlineVariant: kOutlineVariant,
-    error: const Color(0xFFDC2626),
+    error: AppColors.error,
     onError: Colors.white,
-    errorContainer: const Color(0xFFFEE2E2),
-    onErrorContainer: kPrimaryDark,
-    surfaceContainerLowest: Colors.white,
-    surfaceContainerLow: const Color(0xFFF8FAFC),
+    errorContainer: AppColors.errorContainer,
+    onErrorContainer: AppColors.onErrorContainer,
+    surfaceContainerLowest: AppColors.surfaceContainerLowest,
+    surfaceContainerLow: AppColors.background,
     surfaceContainer: kSurfaceContainer,
-    surfaceContainerHigh: const Color(0xFFE2E8F0),
+    surfaceContainerHigh: AppColors.surfaceLight,
   );
 
   return ThemeData(
@@ -225,7 +252,7 @@ ThemeData _buildTheme() {
       color: kSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: kOutlineVariant, width: 0.8),
+        side: const BorderSide(color: kOutlineVariant, width: 1.0),
       ),
       margin: EdgeInsets.zero,
     ),
@@ -233,7 +260,7 @@ ThemeData _buildTheme() {
     // ── Input fields ────────────────────────────────────────────────────────
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFFF8FAFC),
+      fillColor: kBackground,
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(

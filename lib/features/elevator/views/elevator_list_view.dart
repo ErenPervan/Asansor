@@ -5,23 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/widgets/offline_banner.dart';
 import '../models/elevator_model.dart';
 import '../providers/elevator_providers.dart';
-
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _error = Color(0xFFDC2626);
-const _errorContainer = Color(0xFFFEE2E2);
-const _success = Color(0xFF166534);
-const _successContainer = Color(0xFFDCFCE7);
-const _warning = Color(0xFF92400E);
-const _warningContainer = Color(0xFFFEF3C7);
-const _surfaceContainerLowest = Colors.white;
-const _surfaceContainer = Color(0xFFF1F5F9);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _background = Color(0xFFF9FAFB);
+import '../../../../core/theme/app_colors.dart';
 
 // ── Status helpers ────────────────────────────────────────────────────────────
 
@@ -38,46 +22,46 @@ _StatusStyle _statusStyle(String status) {
   switch (status.toLowerCase()) {
     case 'active':
       return (
-        bg: _successContainer,
-        fg: _success,
-        iconBg: const Color(0xFFDCFCE7),
-        iconFg: _success,
+        bg: AppColors.successContainer,
+        fg: AppColors.success,
+        iconBg: AppColors.successContainer.withValues(alpha: 0.1),
+        iconFg: AppColors.success,
         label: 'Aktif',
         icon: Icons.check_circle_outline,
       );
     case 'faulty':
       return (
-        bg: _errorContainer,
-        fg: _error,
-        iconBg: _errorContainer,
-        iconFg: _error,
+        bg: AppColors.errorContainer,
+        fg: AppColors.error,
+        iconBg: AppColors.errorContainer.withValues(alpha: 0.1),
+        iconFg: AppColors.error,
         label: 'Arızalı',
         icon: Icons.error_outline,
       );
     case 'under_maintenance':
       return (
-        bg: _warningContainer,
-        fg: _warning,
-        iconBg: _warningContainer,
-        iconFg: _warning,
+        bg: AppColors.warningContainer,
+        fg: AppColors.warning,
+        iconBg: AppColors.warningContainer.withValues(alpha: 0.1),
+        iconFg: AppColors.warning,
         label: 'Bakımda',
         icon: Icons.build_outlined,
       );
     case 'inactive':
       return (
-        bg: _surfaceContainer,
-        fg: _outline,
-        iconBg: _surfaceContainer,
-        iconFg: _outline,
+        bg: AppColors.surfaceLight,
+        fg: AppColors.textSecondary,
+        iconBg: AppColors.surfaceLight,
+        iconFg: AppColors.textSecondary,
         label: 'Pasif',
         icon: Icons.pause_circle_outline,
       );
     default:
       return (
-        bg: _surfaceContainer,
-        fg: _outline,
-        iconBg: _surfaceContainer,
-        iconFg: _outline,
+        bg: AppColors.surfaceLight,
+        fg: AppColors.textSecondary,
+        iconBg: AppColors.surfaceLight,
+        iconFg: AppColors.textSecondary,
         label: 'Bilinmiyor',
         icon: Icons.help_outline,
       );
@@ -93,171 +77,293 @@ class ElevatorListView extends ConsumerStatefulWidget {
   ConsumerState<ElevatorListView> createState() => _ElevatorListViewState();
 }
 
+// Null = "Tümü", diğer değerler: 'active', 'faulty', 'under_maintenance', 'inactive'
+typedef _FilterChip = ({String? status, String label, IconData icon});
+
+const _filterChips = <_FilterChip>[
+  (status: null, label: 'Tümü', icon: Icons.apps_rounded),
+  (status: 'active', label: 'Aktif', icon: Icons.check_circle_outline),
+  (status: 'faulty', label: 'Arızalı', icon: Icons.error_outline),
+  (status: 'under_maintenance', label: 'Bakımda', icon: Icons.build_outlined),
+  (status: 'inactive', label: 'Pasif', icon: Icons.pause_circle_outline),
+];
+
 class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
   final _searchController = TextEditingController();
+  final _scrollController = ScrollController();
   String _query = '';
+
+  /// Null = tüm durumlar
+  String? _statusFilter;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
+  void _onScroll() {
+    // Filtre aktifken sonsuz scroll'u devre dışı bırak (sunucu sayfalama yerine
+    // istemci tarafı filtreleme yapılıyor, daha fazla yüklemeye gerek yok).
+    if (_query.isNotEmpty || _statusFilter != null) return;
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      ref.read(elevatorListProvider.notifier).loadMore();
+    }
+  }
+
   List<ElevatorModel> _applyFilter(List<ElevatorModel> all) {
-    if (_query.trim().isEmpty) return all;
-    final q = _query.trim().toLowerCase();
-    return all.where((e) {
-      return e.buildingName.toLowerCase().contains(q) ||
-          (e.address?.toLowerCase().contains(q) ?? false);
-    }).toList();
+    var result = all;
+    // 1. Metin filtresi
+    if (_query.trim().isNotEmpty) {
+      final q = _query.trim().toLowerCase();
+      result = result.where((e) {
+        return e.buildingName.toLowerCase().contains(q) ||
+            (e.address?.toLowerCase().contains(q) ?? false);
+      }).toList();
+    }
+    // 2. Durum filtresi
+    if (_statusFilter != null) {
+      result = result
+          .where((e) => e.status.toLowerCase() == _statusFilter)
+          .toList();
+    }
+    return result;
   }
 
   @override
   Widget build(BuildContext context) {
-    final elevatorsAsync = ref.watch(elevatorsProvider);
+    final theme = Theme.of(context);
+    final elevatorsAsync = ref.watch(elevatorListProvider);
 
     return Scaffold(
-      backgroundColor: _background,
-      // ── App Bar ──────────────────────────────────────────────────────────
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: _primary,
-        foregroundColor: Colors.white,
         elevation: 0,
+        backgroundColor: theme.colorScheme.surface,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
+        title: Text(
           'Asansörlerim',
-          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.3),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: -0.5,
+          ),
         ),
         actions: [
-          // Show total count badge while data is available.
           elevatorsAsync.maybeWhen(
-            data: (all) => Center(
+            data: (paginated) => Center(
               child: Container(
                 margin: const EdgeInsets.only(right: 16),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Text(
-                  '${all.length} Asansör',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                  '${paginated.items.length}${paginated.hasMore ? "+" : ""} Asansör',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
               ),
             ),
             orElse: () => const SizedBox.shrink(),
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh_outlined),
-            tooltip: 'Yenile',
-            onPressed: () => ref.invalidate(elevatorsProvider),
-          ),
         ],
-        // ── Search bar lives inside the AppBar's bottom slot ─────────────
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(64),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (v) => setState(() => _query = v),
-              style: const TextStyle(
-                color: _onSurface,
-                fontSize: 14,
+          // Arama alanı 56 px + chip satırı 52 px + dikey boşluk = 120 px
+          preferredSize: const Size.fromHeight(120),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (v) => setState(() => _query = v),
+                  decoration: InputDecoration(
+                    hintText: 'Bina adı veya adres ile ara…',
+                    prefixIcon: const Icon(Icons.search, size: 20),
+                    suffixIcon: _query.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.close, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _query = '');
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.outlineVariant,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.outlineVariant,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              decoration: InputDecoration(
-                hintText: 'Bina adı veya adres ile ara…',
-                hintStyle: TextStyle(color: _outline.withValues(alpha: 0.8)),
-                prefixIcon:
-                    const Icon(Icons.search, color: _outline, size: 20),
-                suffixIcon: _query.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.close, size: 18, color: _outline),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _query = '');
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: _surfaceContainerLowest,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      BorderSide(color: _primary.withValues(alpha: 0.4)),
+              // ── Durum filtresi chip satırı ──────────────────────────────
+              SizedBox(
+                height: 44,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  itemCount: _filterChips.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (context, i) {
+                    final chip = _filterChips[i];
+                    final isSelected = _statusFilter == chip.status;
+                    final primary = theme.colorScheme.primary;
+                    return GestureDetector(
+                      onTap: () => setState(() => _statusFilter = chip.status),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected ? primary : AppColors.surfaceLight,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isSelected
+                                ? primary
+                                : theme.colorScheme.outlineVariant,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              chip.icon,
+                              size: 14,
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.textSecondary,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              chip.label,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),
-
-      // ── Body ─────────────────────────────────────────────────────────────
       body: Column(
         children: [
-          // Shows an amber "offline / cached data" strip when there is no
-          // internet connection; renders nothing when online.
           const OfflineBanner(),
           Expanded(
             child: elevatorsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: _primary),
-        ),
-        error: (e, _) => _ErrorBody(
-          message: e.toString().replaceFirst('Exception: ', ''),
-          onRetry: () => ref.invalidate(elevatorsProvider),
-        ),
-        data: (all) {
-          final items = _applyFilter(all);
-
-          if (all.isEmpty) {
-            return const _EmptyBody(
-              icon: Icons.elevator_outlined,
-              title: 'Asansör Bulunamadı',
-              subtitle:
-                  'Sisteme henüz asansör eklenmemiş.\nLütfen yöneticinizle iletişime geçin.',
-            );
-          }
-
-          if (items.isEmpty) {
-            return _EmptyBody(
-              icon: Icons.search_off_outlined,
-              title: 'Sonuç Yok',
-              subtitle: '"$_query" ile eşleşen asansör bulunamadı.',
-            );
-          }
-
-          return RefreshIndicator(
-            color: _primary,
-            onRefresh: () async => ref.invalidate(elevatorsProvider),
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-              itemCount: items.length,
-              itemBuilder: (context, i) => _ElevatorCard(
-                elevator: items[i],
-                onTap: () => context.push('/elevator/${items[i].id}'),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => _ErrorBody(
+                message: e.toString().replaceFirst('Exception: ', ''),
+                onRetry: () =>
+                    ref.read(elevatorListProvider.notifier).refresh(),
               ),
-            ),
-          );
-        },
+              data: (paginated) {
+                final items = _applyFilter(paginated.items);
+
+                if (paginated.items.isEmpty) {
+                  return const _EmptyBody(
+                    icon: Icons.elevator_outlined,
+                    title: 'Asansör Bulunamadı',
+                    subtitle: 'Sisteme henüz asansör eklenmemiş.',
+                  );
+                }
+
+                // Filtre sonucu boş
+                if (items.isEmpty) {
+                  final filterLabel = _statusFilter == null
+                      ? ''
+                      : _filterChips
+                            .firstWhere((c) => c.status == _statusFilter)
+                            .label;
+                  return _EmptyBody(
+                    icon: Icons.filter_list_off_rounded,
+                    title: 'Sonuç Bulunamadı',
+                    subtitle: _statusFilter != null
+                        ? '"$filterLabel" durumunda asansör yok.'
+                        : 'Arama kriterine uygun asansör bulunamadı.',
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () =>
+                      ref.read(elevatorListProvider.notifier).refresh(),
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16),
+                    // Filtre aktifken sonsuz scroll göstergesi gizlenir
+                    itemCount:
+                        items.length +
+                        (paginated.hasMore &&
+                                _query.isEmpty &&
+                                _statusFilter == null
+                            ? 1
+                            : 0),
+                    itemBuilder: (context, i) {
+                      if (i == items.length) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      return _ElevatorCard(
+                        elevator: items[i],
+                        onTap: () => context.push('/elevator/${items[i].id}'),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -265,8 +371,6 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
     );
   }
 }
-
-// ── Elevator Card ─────────────────────────────────────────────────────────────
 
 class _ElevatorCard extends StatelessWidget {
   const _ElevatorCard({required this.elevator, required this.onTap});
@@ -276,116 +380,98 @@ class _ElevatorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final style = _statusStyle(elevator.status);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Material(
-        color: _surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border:
-                  Border.all(color: _outlineVariant.withValues(alpha: 0.45)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
             child: Row(
               children: [
-                // ── Status icon ──────────────────────────────────────────
                 Container(
-                  width: 52,
-                  height: 52,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
                     color: style.iconBg,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(style.icon, color: style.iconFg, size: 26),
+                  child: Icon(style.icon, color: style.iconFg, size: 28),
                 ),
-                const SizedBox(width: 14),
-
-                // ── Name + address ───────────────────────────────────────
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         elevator.buildingName,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: _onSurface,
-                          letterSpacing: -0.2,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (elevator.address != null &&
-                          elevator.address!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on_outlined,
-                              size: 13,
-                              color: _onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 3),
-                            Expanded(
-                              child: Text(
-                                elevator.address!,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: _onSurfaceVariant,
-                                  height: 1.3,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 4),
+                      Text(
+                        elevator.address ?? 'Adres belirtilmemiş',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
                         ),
-                      ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 10),
-
-                // ── Status badge + chevron ───────────────────────────────
+                const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: style.bg,
+                        color: style.bg.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: style.bg.withValues(alpha: 0.2),
+                        ),
                       ),
                       child: Text(
                         style.label,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
+                        style: theme.textTheme.labelSmall?.copyWith(
                           color: style.fg,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 13,
-                      color: _outline,
+                    const SizedBox(height: 8),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.5,
+                      ),
                     ),
                   ],
                 ),
@@ -398,8 +484,6 @@ class _ElevatorCard extends StatelessWidget {
   }
 }
 
-// ── Error body ────────────────────────────────────────────────────────────────
-
 class _ErrorBody extends StatelessWidget {
   const _ErrorBody({required this.message, required this.onRetry});
 
@@ -408,25 +492,25 @@ class _ErrorBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 56, color: _error),
+            Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _onSurfaceVariant),
+              style: theme.textTheme.bodyLarge,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(backgroundColor: _primary),
             ),
           ],
         ),
@@ -434,8 +518,6 @@ class _ErrorBody extends StatelessWidget {
     );
   }
 }
-
-// ── Empty body ────────────────────────────────────────────────────────────────
 
 class _EmptyBody extends StatelessWidget {
   const _EmptyBody({
@@ -450,6 +532,7 @@ class _EmptyBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(48),
@@ -457,31 +540,27 @@ class _EmptyBody extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 88,
-              height: 88,
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
-                color: _surfaceContainer,
+                color: AppColors.surfaceLight,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 44, color: _outline),
+              child: Icon(icon, size: 48, color: theme.colorScheme.outline),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: _onSurface,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 13,
-                color: _onSurfaceVariant,
-                height: 1.5,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
               ),
             ),
           ],

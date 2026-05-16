@@ -1,7 +1,9 @@
 /**
- * Supabase Edge Function: send-notification
+ * Supabase Edge Function: send-notification (v2 — FCM HTTP v1 API)
  *
- * Sends a Firebase Cloud Messaging (FCM) push notification to a single user.
+ * Sends a Firebase Cloud Messaging push notification to a single user.
+ * Migrated from the deprecated FCM Legacy HTTP API to the modern HTTP v1 API
+ * using OAuth2 service-account authentication.
  *
  * Expected request body (JSON):
  * {
@@ -12,18 +14,33 @@
  * }
  *
  * Required environment variables (set via Supabase Dashboard → Settings → Edge Functions):
- *   SUPABASE_URL              – your project URL
- *   SUPABASE_SERVICE_ROLE_KEY – service-role key (bypasses RLS to read fcm_token)
- *   FCM_SERVER_KEY            – Firebase Cloud Messaging server key
- *                               (Firebase Console → Project Settings → Cloud Messaging
- *                                → Cloud Messaging API (Legacy) → Server key)
+ *   SUPABASE_URL                   – your project URL (auto-injected)
+ *   SUPABASE_SERVICE_ROLE_KEY      – service-role key (auto-injected, bypasses RLS)
+ *   FIREBASE_SERVICE_ACCOUNT_KEY   – full JSON from Firebase Console →
+ *                                    Project Settings → Service Accounts →
+ *                                    Generate new private key
  *
  * Deploy:
  *   supabase functions deploy send-notification --no-verify-jwt
  */
 
+/**
+ * Manually declare Deno namespace for IDE compatibility.
+ */
+declare namespace Deno {
+  export const env: {
+    get(key: string): string | undefined;
+  };
+}
+
+// @ts-ignore: Deno URL import
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+// @ts-ignore: Deno URL import
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  loadServiceAccount,
+  sendFcmV1Message,
+} from "../_shared/fcm_v1.ts";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -38,11 +55,23 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { to_user_id, title, body, data } = await req.json();
+    const bodyPayload = await req.json();
+    
+    // ── Handle both Direct RPC and Supabase Webhook envelopes ─────────────
+    // Webhook shape: { type: "INSERT", table: "notifications", record: { ... } }
+    // Direct shape : { to_user_id, title, body, data }
+    const isWebhook = !!bodyPayload.record;
+    const record = isWebhook ? bodyPayload.record : bodyPayload;
 
-    if (!to_user_id || !title || !body) {
+    const toUserId = record.user_id || record.to_user_id;
+    const title = record.title;
+    const body = record.body;
+    const data = record.data_payload || record.data;
+
+    if (!toUserId || !title || !body) {
+      console.error("[send-notification] Missing required fields:", { toUserId, title, body });
       return new Response(
-        JSON.stringify({ error: "to_user_id, title and body are required" }),
+        JSON.stringify({ error: "user_id, title and body are required" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
@@ -56,11 +85,11 @@ serve(async (req: Request) => {
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("fcm_token")
-      .eq("id", to_user_id)
+      .eq("id", toUserId)
       .maybeSingle();
 
     if (profileError) {
-      console.error("Profile lookup failed:", profileError.message);
+      console.error("[send-notification] Profile lookup failed:", profileError.message);
       return new Response(
         JSON.stringify({ error: "Profile lookup failed" }),
         { status: 500, headers: { "Content-Type": "application/json" } }
@@ -68,59 +97,61 @@ serve(async (req: Request) => {
     }
 
     if (!profile?.fcm_token) {
-      // User has not granted notification permission or hasn't logged in yet.
+      console.log(`[send-notification] No FCM token for user ${toUserId} — skipping push.`);
       return new Response(
         JSON.stringify({ skipped: true, reason: "No FCM token for user" }),
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // ── 2. Send via FCM Legacy HTTP API ───────────────────────────────────
-    const fcmKey = Deno.env.get("FCM_SERVER_KEY")!;
+    // ── 2. Save notification to database (only if NOT coming from a notifications table webhook) ──
+    // If isWebhook is true, we should check if the table is 'notifications'.
+    // If it is, we don't need to re-insert.
+    if (!isWebhook || bodyPayload.table !== "notifications") {
+      const { error: insertError } = await supabase
+        .from("notifications")
+        .insert({
+          user_id: toUserId,
+          title,
+          body,
+          data_payload: data || null,
+        });
 
-    const fcmPayload = {
-      to: profile.fcm_token,
-      priority: "high",
-      notification: {
-        title,
-        body,
-        sound: "default",
-        click_action: "FLUTTER_NOTIFICATION_CLICK",
-      },
-      data: {
-        ...(data ?? {}),
-        // Ensure all values are strings (FCM data payload requirement).
-        ...Object.fromEntries(
-          Object.entries(data ?? {}).map(([k, v]) => [k, String(v)])
-        ),
-      },
-    };
-
-    const fcmResponse = await fetch(
-      "https://fcm.googleapis.com/fcm/send",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `key=${fcmKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(fcmPayload),
+      if (insertError) {
+        console.error("[send-notification] Failed to save notification:", insertError.message);
       }
-    );
-
-    const fcmResult = await fcmResponse.json();
-
-    // FCM returns success:1 on success; log failures for debugging.
-    if (fcmResult.failure > 0) {
-      console.warn("FCM reported failure:", JSON.stringify(fcmResult));
     }
 
-    return new Response(JSON.stringify(fcmResult), {
-      status: 200,
+    // ── 3. Send via FCM HTTP v1 API ───────────────────────────────────────
+    const serviceAccount = loadServiceAccount();
+
+    // Ensure all data values are strings (FCM data payload requirement).
+    const stringifiedData: Record<string, string> = {};
+    if (data && typeof data === "object") {
+      for (const [k, v] of Object.entries(data)) {
+        stringifiedData[k] = String(v);
+      }
+    }
+
+    const result = await sendFcmV1Message(
+      serviceAccount,
+      profile.fcm_token,
+      { title, body },
+      Object.keys(stringifiedData).length > 0 ? stringifiedData : undefined,
+    );
+
+    if (!result.ok) {
+      console.error("[send-notification] FCM error:", JSON.stringify(result.body));
+    } else {
+      console.log("[send-notification] Notification sent to user", toUserId, "✅");
+    }
+
+    return new Response(JSON.stringify(result.body), {
+      status: result.status,
       headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
     });
   } catch (err) {
-    console.error("Unhandled error:", err);
+    console.error("[send-notification] Unhandled error:", err);
     return new Response(
       JSON.stringify({ error: (err as Error).message }),
       {

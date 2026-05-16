@@ -310,23 +310,47 @@ class NotificationService {
   ///   4. fallback                 → `/`
   void handleNotificationClick(Map<String, dynamic>? data) {
     if (data == null) return;
-
-    final type       = data['type']        as String?;
-    final elevatorId = data['elevator_id'] as String?;
-    final route      = data['route']       as String?;
-
-    final String destination;
-    if (type == 'task_assigned') {
-      destination = '/';
-    } else if (elevatorId != null && elevatorId.isNotEmpty) {
-      destination = '/elevator/$elevatorId';
-    } else if (route != null && route.isNotEmpty) {
-      destination = route; // `/home` also works — it redirects to `/`
-    } else {
-      destination = '/';
-    }
-
+    final destination = computeDestination(data);
     _scheduleNavigation(destination);
+  }
+
+  /// Extracted for unit testing: determines the target route based on payload data.
+  static String computeDestination(Map<String, dynamic> data) {
+    final type = data['type'] as String?;
+    final faultId = data['fault_id'] as String?;
+    final scheduleId = data['schedule_id'] as String?;
+    final elevatorId = data['elevator_id'] as String?;
+    final route = data['route'] as String?;
+
+    switch (type) {
+      case 'fault_reported':
+      case 'fault_updated':
+        if (faultId != null && faultId.isNotEmpty) {
+          return '/fault/$faultId';
+        } else {
+          return route ?? '/';
+        }
+      case 'task_assigned':
+        return '/';
+      case 'task_completed':
+        return route ?? '/admin/master-calendar';
+      case 'maintenance_reminder':
+        if (scheduleId != null && elevatorId != null) {
+          return '/maintenance-completion/$scheduleId/$elevatorId';
+        } else {
+          return '/';
+        }
+      default:
+        if (faultId != null && faultId.isNotEmpty) {
+          return '/fault/$faultId';
+        } else if (elevatorId != null && elevatorId.isNotEmpty) {
+          return '/elevator/$elevatorId';
+        } else if (route != null && route.isNotEmpty) {
+          return route;
+        } else {
+          return '/';
+        }
+    }
   }
 
   // ── Frame-safe navigation ─────────────────────────────────────────────────
@@ -361,10 +385,8 @@ class NotificationService {
 
     // If we are already between frames (idle), navigate immediately.
     // Otherwise wait for the next frame boundary.
-    if (
-      scheduler.SchedulerBinding.instance.schedulerPhase ==
-      scheduler.SchedulerPhase.idle
-    ) {
+    if (scheduler.SchedulerBinding.instance.schedulerPhase ==
+        scheduler.SchedulerPhase.idle) {
       attempt();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) => attempt());

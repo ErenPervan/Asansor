@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 
-import '../../../core/services/pdf_report_service.dart';
+import '../../../core/services/pdf_service.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/models/elevator_model.dart';
 import '../../elevator/providers/elevator_providers.dart';
@@ -11,6 +15,8 @@ import '../../fault/models/fault_report_model.dart';
 import '../../fault/providers/fault_providers.dart';
 import '../../maintenance/models/maintenance_log_model.dart';
 import '../../maintenance/providers/maintenance_providers.dart';
+import '../presentation/widgets/inspection_badge.dart';
+import '../presentation/widgets/update_inspection_sheet.dart';
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -133,6 +139,17 @@ class ElevatorDetailView extends ConsumerWidget {
               builder: (_) => _LogMaintenanceSheet(elevatorId: elevatorId),
             );
           },
+          onUpdateInspection: () {
+            showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              builder: (_) => UpdateInspectionSheet(elevator: elevator),
+            );
+          },
         ),
       ),
 
@@ -150,12 +167,14 @@ class _DetailScrollBody extends StatelessWidget {
     required this.elevatorId,
     required this.onReportFault,
     required this.onLogMaintenance,
+    required this.onUpdateInspection,
   });
 
   final ElevatorModel elevator;
   final String elevatorId;
   final VoidCallback onReportFault;
   final VoidCallback onLogMaintenance;
+  final VoidCallback onUpdateInspection;
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +195,14 @@ class _DetailScrollBody extends StatelessWidget {
           const SizedBox(height: 24),
 
           // 3 ── System monitor + next maintenance ─────────────────────────
-          const _SystemMonitorSection(),
+          _SystemMonitorSection(elevator: elevator),
+          const SizedBox(height: 24),
+
+          // 3.5 ── Legal Inspection monitor ────────────────────────────────
+          _InspectionSection(
+             elevator: elevator,
+             onUpdate: onUpdateInspection,
+          ),
           const SizedBox(height: 24),
 
           // 4 ── Maintenance history timeline ───────────────────────────────
@@ -284,8 +310,17 @@ class _HeaderCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              // Dynamic status badge
-              _StatusBadge(status: elevator.status),
+              // Dynamic status badges
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  _StatusBadge(status: elevator.status),
+                  if (elevator.inspectionStatus != 'none') ...[
+                    const SizedBox(height: 8),
+                    InspectionBadge(status: elevator.inspectionStatus),
+                  ],
+                ],
+              ),
             ],
           ),
 
@@ -294,19 +329,18 @@ class _HeaderCard extends StatelessWidget {
           Divider(height: 1, color: _outlineVariant.withValues(alpha: 0.15)),
           const SizedBox(height: 20),
 
-          // Static meta grid (Model + Capacity) — not in DB schema yet
+          // Static meta grid (Model + Capacity)
           Row(
             children: [
               Expanded(
-                child: _MetaCell(
-                  label: 'MODEL',
-                  value: '—', // TODO: add model field to DB schema
-                ),
+                child: _MetaCell(label: 'MODEL', value: elevator.model ?? '—'),
               ),
               Expanded(
                 child: _MetaCell(
                   label: 'KAPASİTE',
-                  value: '—', // TODO: add capacity field to DB schema
+                  value: elevator.capacity != null
+                      ? '${elevator.capacity} Kişi'
+                      : '—',
                 ),
               ),
             ],
@@ -500,18 +534,70 @@ class _ActionCard extends StatelessWidget {
   }
 }
 
-// ── 3. System Monitor Section (static) ───────────────────────────────────────
-// Stitch: <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-// No live data from our schema yet — rendered as static placeholders.
+// ── 3. System Monitor Section (──────────────────────────────────────────────
+// Reads real fault data via faultsByElevatorProvider and calculates the
+// next maintenance date from ElevatorModel.maintenanceDay.
 
-class _SystemMonitorSection extends StatelessWidget {
-  const _SystemMonitorSection();
+class _SystemMonitorSection extends ConsumerWidget {
+  const _SystemMonitorSection({required this.elevator});
+
+  final ElevatorModel elevator;
+
+  // ── Hesaplamalar ──────────────────────────────────────────────────
+
+  /// maintenanceDay (1-31) değerinden bu ay için sıradaki bakım tarihini
+  /// hesaplar. Eğer o gün geçmişse bir sonraki ayı kullanır.
+  static DateTime? _nextMaintenance(int? maintenanceDay) {
+    if (maintenanceDay == null) return null;
+    final now = DateTime.now();
+    // Bu ayın bakım tarihi
+    var candidate = DateTime(now.year, now.month, maintenanceDay);
+    if (candidate.isBefore(now)) {
+      // Ay taştıysa bir sonraki aya geç
+      candidate = DateTime(now.year, now.month + 1, maintenanceDay);
+    }
+    return candidate;
+  }
+
+  static String _formatDaysLeft(DateTime? date) {
+    if (date == null) return '—';
+    final diff = date.difference(DateTime.now()).inDays;
+    if (diff == 0) return 'Bugün';
+    if (diff == 1) return 'Yarın';
+    return '$diff gün sonra';
+  }
+
+  static String _formatDate(DateTime? date) {
+    if (date == null) return '—';
+    return DateFormat('d MMM y', 'tr_TR').format(date);
+  }
+
+  static String _faultAge(FaultReportModel? fault) {
+    if (fault == null) return '—';
+    final diff = DateTime.now().difference(fault.reportedAt);
+    if (diff.inDays > 0) return '${diff.inDays} gün önce';
+    if (diff.inHours > 0) return '${diff.inHours} saat önce';
+    return 'Az önce';
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final faultsAsync = ref.watch(faultsByElevatorProvider(elevator.id));
+    final nextDate = _nextMaintenance(elevator.maintenanceDay);
+
+    final latestFault = faultsAsync.valueOrNull
+        ?.where((f) => !f.isResolved)
+        .fold<FaultReportModel?>(
+          null,
+          (prev, curr) =>
+              prev == null || curr.reportedAt.isAfter(prev.reportedAt)
+                  ? curr
+                  : prev,
+        );
+
     return Column(
       children: [
-        // ── "Sistem İzleme" panel ──────────────────────────────────────────
+        // ── "Sistem İzleme" panel ────────────────────────────────────────────
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -532,7 +618,6 @@ class _SystemMonitorSection extends StatelessWidget {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  // Pulsing analytics icon (static representation)
                   Stack(
                     alignment: Alignment.center,
                     children: [
@@ -552,13 +637,12 @@ class _SystemMonitorSection extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(width: 24),
-                  // Status indicators
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _StatusIndicator(
                         label: 'Bağlantı Kararlı',
-                        color: const Color(0xFF10B981), // emerald-500
+                        color: const Color(0xFF10B981),
                       ),
                       const SizedBox(height: 8),
                       _StatusIndicator(
@@ -570,21 +654,34 @@ class _SystemMonitorSection extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              // Stat chips
+              // Stat chips — gerçek veri
               Row(
                 children: [
                   Expanded(
                     child: _StatChip(
-                      label: 'GÜNLÜK TUR',
-                      value: '—', // TODO: fetch from telemetry
-                      valueColor: _primary,
+                      label: 'AKTİF ARIZA',
+                      value: faultsAsync.when(
+                        data: (list) {
+                          final open = list.where((f) => !f.isResolved).length;
+                          return open == 0 ? 'Yok' : '$open Adet';
+                        },
+                        loading: () => '...',
+                        error: (e, _) => '—',
+                      ),
+                      valueColor: latestFault != null
+                          ? const Color(0xFFDC2626)
+                          : const Color(0xFF10B981),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _StatChip(
                       label: 'SON ARIZA',
-                      value: '—', // TODO: compute from fault_reports
+                      value: faultsAsync.when(
+                        data: (_) => _faultAge(latestFault),
+                        loading: () => '...',
+                        error: (e, _) => '—',
+                      ),
                       valueColor: _secondary,
                     ),
                   ),
@@ -596,7 +693,6 @@ class _SystemMonitorSection extends StatelessWidget {
         const SizedBox(height: 16),
 
         // ── "Sıradaki Bakım" panel ────────────────────────────────────────
-        // Stitch: bg-primary-container text-on-primary-container
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
@@ -606,7 +702,6 @@ class _SystemMonitorSection extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // Background icon
               Positioned(
                 right: -16,
                 bottom: -16,
@@ -629,16 +724,18 @@ class _SystemMonitorSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    '—',
-                    style: TextStyle(
+                  // Kaç gün kaldı
+                  Text(
+                    _formatDaysLeft(nextDate),
+                    style: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
                     ),
                   ),
+                  // Tarih
                   Text(
-                    '—', // TODO: add scheduled_maintenance table
+                    _formatDate(nextDate),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -647,27 +744,43 @@ class _SystemMonitorSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Periyodik Genel Revizyon',
+                    elevator.maintenanceDay != null
+                        ? 'Her ay ${elevator.maintenanceDay}. gün periyodik bakım'
+                        : 'Bakım takvimi henüz tanımlanmadı',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Randevu Düzenle',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                  GestureDetector(
+                    onTap: () {}, // Admin takvim sayfasına route eklenebilir
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.25),
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.calendar_month_outlined,
+                              size: 14, color: Colors.white),
+                          SizedBox(width: 6),
+                          Text(
+                            'Randevu Düzenle',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -782,7 +895,7 @@ class _MaintenanceHistorySectionState
     try {
       final repo = ref.read(maintenanceRepositoryProvider);
       final logs = await repo.getLogsForReport(widget.elevatorId);
-      final doc = await generateElevatorReport(widget.elevator, logs);
+      final doc = await PdfService().generateElevatorReport(widget.elevator, logs);
       final bytes = await doc.save();
       if (!mounted) return;
       await Printing.layoutPdf(onLayout: (_) async => bytes);
@@ -1205,11 +1318,43 @@ class _ReportFaultSheet extends ConsumerStatefulWidget {
 class _ReportFaultSheetState extends ConsumerState<_ReportFaultSheet> {
   final _formKey = GlobalKey<FormState>();
   final _descController = TextEditingController();
+  File? _imageFile;
+
+  // ── Ariza tipi ──────────────────────────────────────────────────────
+  /// 'mechanic' | 'electric' | 'trapped' | 'other'
+  String _faultType = 'mechanic';
+
+  static const _faultTypeOptions = [
+    (value: 'mechanic', label: 'Mekanik',  icon: Icons.settings_outlined),
+    (value: 'electric', label: 'Elektrik', icon: Icons.electrical_services_outlined),
+    (value: 'trapped',  label: 'Mahsur',   icon: Icons.person_off_outlined),
+    (value: 'other',    label: 'Diğer',    icon: Icons.more_horiz_outlined),
+  ];
+
+  // ── Öncelik ────────────────────────────────────────────────────────
+  /// 'urgent' | 'high' | 'normal'
+  String _priority = 'normal';
+
+  static const _priorityOptions = [
+    (value: 'urgent', label: '🔴 ACİL',    color: Color(0xFFDC2626)),
+    (value: 'high',   label: '🟡 Yüksek',  color: Color(0xFFD97706)),
+    (value: 'normal', label: '🟢 Normal',  color: Color(0xFF16A34A)),
+  ];
 
   @override
   void dispose() {
     _descController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source, imageQuality: 70);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
   }
 
   void _submit() {
@@ -1219,6 +1364,9 @@ class _ReportFaultSheetState extends ConsumerState<_ReportFaultSheet> {
         .reportFault(
           elevatorId: widget.elevatorId,
           description: _descController.text.trim(),
+          imageFile: _imageFile,
+          faultType: _faultType,
+          priority: _priority,
         );
   }
 
@@ -1241,7 +1389,7 @@ class _ReportFaultSheetState extends ConsumerState<_ReportFaultSheet> {
               content: Text(
                 fault.isOfflineQueued
                     ? 'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, '
-                        'bağlantı sağlandığında otomatik senkronize edilecek.'
+                          'bağlantı sağlandığında otomatik senkronize edilecek.'
                     : 'Arıza başarıyla bildirildi.',
               ),
               behavior: SnackBarBehavior.floating,
@@ -1326,6 +1474,115 @@ class _ReportFaultSheetState extends ConsumerState<_ReportFaultSheet> {
                   ],
                 ),
                 const SizedBox(height: 24),
+
+                // ── Arıza tipi seçimi ───────────────────────────────────
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'ARİZA TİPİ',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: _outline,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: _faultTypeOptions.map((opt) {
+                    final selected = _faultType == opt.value;
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _faultType = opt.value),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          margin: const EdgeInsets.only(right: 6),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: selected ? _primary : _outlineVariant.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: selected ? _primary : _outlineVariant,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                opt.icon,
+                                size: 18,
+                                color: selected ? Colors.white : _onSurfaceVariant,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                opt.label,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: selected ? Colors.white : _onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+
+                // ── Öncelik seçimi ────────────────────────────────────────
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'ÖNCELİK',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: _outline,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: _priorityOptions.map((opt) {
+                    final selected = _priority == opt.value;
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _priority = opt.value),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          margin: const EdgeInsets.only(right: 6),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? opt.color.withValues(alpha: 0.12)
+                                : _outlineVariant.withValues(alpha: 0.25),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: selected ? opt.color : _outlineVariant,
+                              width: selected ? 1.5 : 1.0,
+                            ),
+                          ),
+                          child: Text(
+                            opt.label,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: selected ? opt.color : _onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+
+                // ── Arıza açıklaması ─────────────────────────────────────
                 TextFormField(
                   controller: _descController,
                   maxLines: 4,
@@ -1348,6 +1605,48 @@ class _ReportFaultSheetState extends ConsumerState<_ReportFaultSheet> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
+
+                // Image picker section
+                if (_imageFile != null)
+                  Stack(
+                    alignment: Alignment.topRight,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          _imageFile!,
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.cancel, color: Colors.white),
+                        onPressed: () => setState(() => _imageFile = null),
+                      ),
+                    ],
+                  )
+                else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _pickImage(ImageSource.camera),
+                          icon: const Icon(Icons.camera_alt_outlined),
+                          label: const Text('Fotoğraf Çek'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _pickImage(ImageSource.gallery),
+                          icon: const Icon(Icons.photo_library_outlined),
+                          label: const Text('Galeriden Seç'),
+                        ),
+                      ),
+                    ],
+                  ),
                 const SizedBox(height: 20),
                 FilledButton(
                   onPressed: isLoading ? null : _submit,
@@ -1449,7 +1748,7 @@ class _LogMaintenanceSheetState extends ConsumerState<_LogMaintenanceSheet> {
               content: Text(
                 log.isOfflineQueued
                     ? 'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, '
-                        'bağlantı sağlandığında otomatik senkronize edilecek.'
+                          'bağlantı sağlandığında otomatik senkronize edilecek.'
                     : 'Bakım kaydı başarıyla eklendi.',
               ),
               behavior: SnackBarBehavior.floating,
@@ -1622,3 +1921,133 @@ class _ErrorBody extends StatelessWidget {
     );
   }
 }
+
+// ── 3.5 Inspection Monitor Section ──────────────────────────────────────────
+class _InspectionSection extends StatelessWidget {
+  const _InspectionSection({
+    required this.elevator,
+    required this.onUpdate,
+  });
+
+  final ElevatorModel elevator;
+  final VoidCallback onUpdate;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasInspection = elevator.lastInspectionDate != null;
+    final isUrgent = elevator.isInspectionUrgent;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isUrgent ? _errorContainer : _surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isUrgent ? _error.withValues(alpha: 0.3) : Colors.transparent,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'YASAL MUAYENE',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: isUrgent ? _onErrorContainer : _onSurfaceVariant,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              if (isUrgent)
+                const Icon(Icons.warning_amber_rounded, color: _error, size: 20)
+              else
+                Icon(Icons.verified_outlined, color: _onSurfaceVariant.withValues(alpha: 0.5), size: 20),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Son Kontrol',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isUrgent ? _onErrorContainer.withValues(alpha: 0.8) : _onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasInspection ? _fmtDate(elevator.lastInspectionDate!) : 'Kayıt Yok',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: isUrgent ? _onErrorContainer : _onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 40,
+                color: isUrgent ? _error.withValues(alpha: 0.2) : _outlineVariant,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Sonraki Muayene',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isUrgent ? _onErrorContainer.withValues(alpha: 0.8) : _onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      elevator.nextInspectionDate != null
+                          ? _fmtDate(elevator.nextInspectionDate!)
+                          : 'Planlanmadı',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: isUrgent ? _onErrorContainer : _onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: onUpdate,
+              icon: const Icon(Icons.edit_document, size: 18),
+              label: const Text('Etiket & Muayene Güncelle'),
+              style: FilledButton.styleFrom(
+                backgroundColor: isUrgent ? _error : _onSurface,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

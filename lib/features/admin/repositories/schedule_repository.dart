@@ -302,13 +302,22 @@ class ScheduleRepository {
   /// Called automatically after a technician submits a maintenance log.
   /// Errors are swallowed — this is a best-effort operation that must not
   /// block the primary log submission flow.
+  /// Marks the matching pending/in-progress schedule for an
+  /// [elevatorId]+[technicianId] pair on a specific [maintenanceDate] as **completed**.
+  ///
+  /// If [maintenanceDate] is null, it defaults to the current day.
+  ///
+  /// Called automatically after a technician submits a maintenance log.
+  /// Errors are swallowed — this is a best-effort operation that must not
+  /// block the primary log submission flow.
   Future<void> completeMatchingSchedule({
     required String elevatorId,
     required String technicianId,
+    DateTime? maintenanceDate,
   }) async {
     try {
-      final now = DateTime.now().toUtc();
-      final startOfDay = DateTime.utc(now.year, now.month, now.day);
+      final date = (maintenanceDate ?? DateTime.now()).toUtc();
+      final startOfDay = DateTime.utc(date.year, date.month, date.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
 
       final rows = await _client

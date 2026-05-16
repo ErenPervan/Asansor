@@ -42,6 +42,35 @@ class MaintenanceRepository {
     }
   }
 
+  /// Inserts a comprehensive maintenance log and marks the schedule as completed.
+  Future<void> completeMaintenance(String scheduleId, MaintenanceLogModel logModel) async {
+    try {
+      // 1. Insert the detailed log
+      await _client.from(_table).insert({
+        'elevator_id': logModel.elevatorId,
+        'technician_id': logModel.technicianId,
+        'notes': logModel.notes,
+        'is_approved': logModel.isApproved,
+        'maintenance_date': logModel.maintenanceDate.toUtc().toIso8601String(),
+        'checklist': logModel.checklist,
+        'photos': logModel.photos,
+        'signature_url': logModel.signatureUrl,
+        'pdf_url': logModel.pdfUrl,
+        'customer_signature_url': logModel.customerSignatureUrl,
+      });
+
+      // 2. Update the schedule status
+      await _client
+          .from('maintenance_schedules')
+          .update({'status': 'completed'})
+          .eq('id', scheduleId);
+    } on PostgrestException catch (e) {
+      throw Exception('Failed to complete maintenance: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error while completing maintenance: $e');
+    }
+  }
+
   /// Returns all pending (unapproved) maintenance logs across every elevator,
   /// ordered soonest-first so the most urgent work appears at the top.
   Future<List<MaintenanceLogModel>> getAllPendingLogs() async {
@@ -99,7 +128,7 @@ class MaintenanceRepository {
 
       final response = await _client
           .from(_table)
-          .select()
+          .select('*, profiles(full_name)')
           .eq('elevator_id', elevatorId)
           .gte('maintenance_date', since.toIso8601String())
           .order('maintenance_date', ascending: false);
@@ -128,7 +157,7 @@ class MaintenanceRepository {
     try {
       final response = await _client
           .from(_table)
-          .select()
+          .select('*, profiles(full_name)')
           .eq('elevator_id', elevatorId)
           .order('maintenance_date', ascending: false);
 

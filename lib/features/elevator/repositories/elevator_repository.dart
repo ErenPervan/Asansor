@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/elevator_model.dart';
+import '../models/inspection_history_model.dart';
 
 class ElevatorRepository {
   ElevatorRepository(this._client);
@@ -9,8 +10,27 @@ class ElevatorRepository {
 
   static const _table = 'elevators';
 
-  /// Returns every elevator record ordered by building name.
-  Future<List<ElevatorModel>> getAllElevators() async {
+  /// Returns a page of elevator records ordered by building name.
+  Future<List<ElevatorModel>> getAllElevators({int from = 0, int to = 19}) async {
+    try {
+      final response = await _client
+          .from(_table)
+          .select()
+          .order('building_name', ascending: true)
+          .range(from, to);
+
+      return (response as List<dynamic>)
+          .map((json) => ElevatorModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } on PostgrestException catch (e) {
+      throw Exception('Failed to load elevators: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error while loading elevators: $e');
+    }
+  }
+
+  /// Returns all elevators without pagination. Use for lookups and admin views.
+  Future<List<ElevatorModel>> fetchAllElevators() async {
     try {
       final response = await _client
           .from(_table)
@@ -21,9 +41,9 @@ class ElevatorRepository {
           .map((json) => ElevatorModel.fromJson(json as Map<String, dynamic>))
           .toList();
     } on PostgrestException catch (e) {
-      throw Exception('Failed to load elevators: ${e.message}');
+      throw Exception('Failed to fetch all elevators: ${e.message}');
     } catch (e) {
-      throw Exception('Unexpected error while loading elevators: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 
@@ -80,6 +100,78 @@ class ElevatorRepository {
       throw Exception('Failed to load elevator ($id): ${e.message}');
     } catch (e) {
       throw Exception('Unexpected error while loading elevator ($id): $e');
+    }
+  }
+
+  /// Updates an elevator's fields.
+  Future<ElevatorModel> updateElevator(ElevatorModel elevator) async {
+    try {
+      final response = await _client
+          .from(_table)
+          .update(elevator.toJson())
+          .eq('id', elevator.id)
+          .select()
+          .single();
+
+      return ElevatorModel.fromJson(response);
+    } on PostgrestException catch (e) {
+      throw Exception('Failed to update elevator: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error: $e');
+    }
+  }
+
+  /// Returns the inspection history for a specific elevator, ordered by newest first.
+  Future<List<InspectionHistoryModel>> getInspectionHistory(String elevatorId) async {
+    try {
+      final response = await _client
+          .from('inspection_history')
+          .select()
+          .eq('elevator_id', elevatorId)
+          .order('inspection_date', ascending: false);
+
+      return (response as List<dynamic>)
+          .map((json) => InspectionHistoryModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } on PostgrestException catch (e) {
+      throw Exception('Failed to load inspection history: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error: $e');
+    }
+  }
+
+  /// Adds a new inspection record and updates the elevator's inspection status.
+  Future<void> addInspection({
+    required String elevatorId,
+    required String technicianId,
+    required DateTime inspectionDate,
+    required String status,
+    String? inspectorName,
+    String? notes,
+    required DateTime nextInspectionDate,
+  }) async {
+    try {
+      // 1. Insert inspection history
+      await _client.from('inspection_history').insert({
+        'elevator_id': elevatorId,
+        'technician_id': technicianId,
+        'inspection_date': inspectionDate.toUtc().toIso8601String(),
+        'status': status,
+        'inspector_name': inspectorName,
+        'notes': notes,
+      });
+
+      // 2. Update elevator's current status and dates
+      await _client.from(_table).update({
+        'inspection_status': status,
+        'last_inspection_date': inspectionDate.toUtc().toIso8601String(),
+        'next_inspection_date': nextInspectionDate.toUtc().toIso8601String(),
+      }).eq('id', elevatorId);
+      
+    } on PostgrestException catch (e) {
+      throw Exception('Failed to add inspection: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error: $e');
     }
   }
 }

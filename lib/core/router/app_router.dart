@@ -21,6 +21,9 @@ import '../../features/elevator/views/elevator_detail_view.dart';
 import '../../features/elevator/views/elevator_list_view.dart';
 import '../../features/elevator/views/home_view.dart';
 import '../../features/elevator/views/scanner_view.dart';
+import '../../features/notification/presentation/notification_history_screen.dart';
+import '../../features/maintenance/presentation/maintenance_completion_screen.dart';
+import '../../features/maintenance/presentation/maintenance_operation_view.dart';
 
 // ── Auth-aware refresh notifier ──────────────────────────────────────────────
 
@@ -137,10 +140,33 @@ final GoRouter appRouter = GoRouter(
     GoRoute(path: '/elevators', builder: (context, _) => const ElevatorListView()),
     GoRoute(path: '/scan', builder: (context, state) => const ScannerView()),
     GoRoute(
+      path: '/notifications',
+      builder: (context, state) => const NotificationHistoryScreen(),
+    ),
+    GoRoute(
       path: '/elevator/:id',
       builder: (_, state) {
         final elevatorId = state.pathParameters['id'] ?? '';
         return ElevatorDetailView(elevatorId: elevatorId);
+      },
+    ),
+    GoRoute(
+      name: 'maintenance-completion',
+      path: '/maintenance-completion/:scheduleId/:elevatorId',
+      builder: (_, state) {
+        final scheduleId = state.pathParameters['scheduleId'] ?? '';
+        final elevatorId = state.pathParameters['elevatorId'] ?? '';
+        return MaintenanceCompletionScreen(
+          scheduleId: scheduleId,
+          elevatorId: elevatorId,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/maintenance/:elevatorId',
+      builder: (_, state) {
+        final elevatorId = state.pathParameters['elevatorId'] ?? '';
+        return MaintenanceOperationView(elevatorId: elevatorId);
       },
     ),
 

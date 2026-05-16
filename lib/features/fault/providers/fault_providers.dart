@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/providers/connectivity_providers.dart';
+import '../../../core/services/notification_service.dart';
+import '../../../core/services/storage_service.dart';
 import '../../../core/services/sync_queue_service.dart';
 import '../models/fault_report_model.dart';
 import '../repositories/fault_repository.dart';
@@ -51,24 +55,36 @@ class FaultController extends AsyncNotifier<FaultReportModel?> {
   Future<void> reportFault({
     required String elevatorId,
     required String description,
-    String? photoUrl,
+    File? imageFile,
+    String? faultType,
+    String? priority,
   }) async {
     state = const AsyncLoading();
 
     final isOnline = ref.read(isOnlineProvider);
 
     if (!isOnline) {
+      final payload = <String, dynamic>{
+        'elevator_id': elevatorId,
+        'description': description,
+        'is_resolved': false,
+        'reported_at': DateTime.now().toUtc().toIso8601String(),
+        'fault_type': faultType,
+        'priority': priority,
+      };
+
+      final localMediaPaths = <String>[];
+      if (imageFile != null) {
+        localMediaPaths.add(imageFile.path);
+        payload['_media_fields'] = const ['photo_url'];
+        payload['_media_bucket'] = 'fault-images';
+      }
+
       // ── Offline path ──────────────────────────────────────────────────────
-      // Note: photo uploads require connectivity and cannot be queued.
       await ref.read(syncQueueServiceProvider).enqueue(
-        type: SyncItemType.faultReport,
-        payload: {
-          'elevator_id': elevatorId,
-          'description': description,
-          'is_resolved': false,
-          'reported_at': DateTime.now().toUtc().toIso8601String(),
-          // photo_url intentionally omitted – upload requires network
-        },
+        endpoint: SyncEndpoint.insertFaultReport,
+        payload: payload,
+        localMediaPaths: localMediaPaths,
       );
 
       state = AsyncData(
@@ -79,22 +95,49 @@ class FaultController extends AsyncNotifier<FaultReportModel?> {
           isResolved: false,
           reportedAt: DateTime.now(),
           isOfflineQueued: true,
+          faultType: faultType,
+          priority: priority,
         ),
       );
       return;
     }
 
     // ── Online path ───────────────────────────────────────────────────────
-    state = await AsyncValue.guard(() {
+    state = await AsyncValue.guard(() async {
+      String? uploadedPhotoUrl;
+      
+      if (imageFile != null) {
+        uploadedPhotoUrl = await ref.read(storageServiceProvider).uploadImage(
+          imageFile,
+          'faults',
+        );
+      }
+
       return ref.read(faultRepositoryProvider).reportFault(
             elevatorId: elevatorId,
             description: description,
-            photoUrl: photoUrl,
+            photoUrl: uploadedPhotoUrl,
+            faultType: faultType,
+            priority: priority,
           );
     });
 
-    if (!state.hasError) {
+    if (!state.hasError && state.value != null) {
       ref.invalidate(activeFaultsProvider);
+      
+      // Notify all admins that a new fault has been reported.
+      final reportedFault = state.value!;
+      NotificationService.instance.notifyAllAdmins(
+        client: Supabase.instance.client,
+        title: 'Yeni Arıza Bildirimi',
+        body: reportedFault.description,
+        data: {
+          'type': 'fault_reported',
+          'fault_id': reportedFault.id,
+          'elevator_id': reportedFault.elevatorId,
+          'route': '/fault/${reportedFault.id}',
+        },
+      );
     }
   }
 }

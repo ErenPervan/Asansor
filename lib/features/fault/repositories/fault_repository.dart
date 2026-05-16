@@ -16,6 +16,8 @@ class FaultRepository {
     required String elevatorId,
     required String description,
     String? photoUrl,
+    String? faultType,
+    String? priority,
   }) async {
     try {
       final response = await _client
@@ -24,6 +26,8 @@ class FaultRepository {
             'elevator_id': elevatorId,
             'description': description,
             'photo_url': photoUrl,
+            'fault_type': faultType,
+            'priority': priority,
             'is_resolved': false,
             'reported_at': DateTime.now().toUtc().toIso8601String(),
           })
@@ -65,19 +69,6 @@ class FaultRepository {
 
       return FaultReportModel.fromJson(response);
     } on PostgrestException catch (e) {
-      // Fall back gracefully if optional columns don't exist yet.
-      if (e.message.contains('resolved_at') ||
-          e.message.contains('resolution_notes') ||
-          e.message.contains('column') ||
-          e.message.contains('schema cache')) {
-        final response = await _client
-            .from(_table)
-            .update({'is_resolved': true})
-            .eq('id', faultId)
-            .select()
-            .single();
-        return FaultReportModel.fromJson(response);
-      }
       throw Exception('Arıza onarılamadı: ${e.message}');
     } catch (e) {
       throw Exception('Beklenmeyen hata: $e');
@@ -96,16 +87,6 @@ class FaultRepository {
 
       return FaultReportModel.fromJson(response);
     } on PostgrestException catch (e) {
-      if (e.message.contains('resolved_at') ||
-          e.message.contains('schema cache')) {
-        final response = await _client
-            .from(_table)
-            .update({'is_resolved': false})
-            .eq('id', faultId)
-            .select()
-            .single();
-        return FaultReportModel.fromJson(response);
-      }
       throw Exception('Arıza yeniden açılamadı: ${e.message}');
     } catch (e) {
       throw Exception('Beklenmeyen hata: $e');

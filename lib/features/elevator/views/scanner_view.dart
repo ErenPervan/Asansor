@@ -62,11 +62,9 @@ class _ScannerViewState extends ConsumerState<ScannerView>
     ).hasMatch(rawValue);
 
     if (isValidUuid) {
-      // Route based on role:
-      //   admin / technician → elevator detail (maintenance actions visible)
-      //   customer → elevator detail (health report visible)
-      // The elevator detail view handles role-based content internally.
-      await context.push('/elevator/$rawValue');
+      // Route to the maintenance operation page for the scanned elevator.
+      // Technician will perform maintenance work there.
+      await context.push('/maintenance/$rawValue');
       if (mounted) {
         setState(() => _isProcessing = false);
         await _controller.start();

@@ -40,6 +40,10 @@ String _timeAgo(DateTime dt) {
   return '${diff.inDays} gün önce';
 }
 
+String _fmtDate(DateTime dt) {
+  return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
+}
+
 ElevatorModel? _findElevator(String id, List<ElevatorModel>? list) {
   if (list == null) return null;
   try {
@@ -94,6 +98,10 @@ class HomeView extends ConsumerWidget {
                     const SizedBox(height: 32),
                     _DailyAgendaSection(
                       mySchedules: mySchedules,
+                      elevators: elevators.valueOrNull,
+                    ),
+                    const SizedBox(height: 32),
+                    _UrgentInspectionsSection(
                       elevators: elevators.valueOrNull,
                     ),
                     const SizedBox(height: 32),
@@ -1132,7 +1140,18 @@ class _AgendaTaskCard extends ConsumerWidget {
                                       status: 'in_progress',
                                     );
                               }
-                              context.push('/elevator/${schedule.elevatorId}');
+                              // Route change depending on task type
+                              if (schedule.isPeriodicMaintenance) {
+                                context.pushNamed(
+                                  'maintenance-completion',
+                                  pathParameters: {
+                                    'scheduleId': schedule.id,
+                                    'elevatorId': schedule.elevatorId,
+                                  },
+                                );
+                              } else {
+                                context.push('/elevator/${schedule.elevatorId}');
+                              }
                             },
                             style: FilledButton.styleFrom(
                               backgroundColor: pColor,
@@ -1609,3 +1628,170 @@ class _EmptyCard extends StatelessWidget {
     );
   }
 }
+
+// ── Urgent Inspections Section ────────────────────────────────────────────────
+class _UrgentInspectionsSection extends StatelessWidget {
+  const _UrgentInspectionsSection({required this.elevators});
+
+  final List<ElevatorModel>? elevators;
+
+  @override
+  Widget build(BuildContext context) {
+    if (elevators == null) return const SizedBox.shrink();
+
+    // Filter elevators that have an urgent inspection or a 'red' tag
+    final urgentElevators = elevators!.where((e) {
+      if (e.isInspectionUrgent) return true;
+      if (e.inspectionStatus == 'red') return true;
+      return false;
+    }).toList();
+
+    if (urgentElevators.isEmpty) {
+      return const SizedBox.shrink(); // Don't show anything if there are no urgent inspections
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            const Text(
+              'Yaklaşan Muayeneler',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: _onSurface,
+                letterSpacing: -0.5,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD97706).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${urgentElevators.length} Acil',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFFD97706),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 140,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            padding: EdgeInsets.zero,
+            itemCount: urgentElevators.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemBuilder: (context, i) {
+              final elevator = urgentElevators[i];
+              return _UrgentInspectionCard(elevator: elevator);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _UrgentInspectionCard extends StatelessWidget {
+  const _UrgentInspectionCard({required this.elevator});
+
+  final ElevatorModel elevator;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push('/elevator/${elevator.id}'),
+      child: Container(
+        width: 260,
+        decoration: BoxDecoration(
+          color: _surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFFBEB),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFFD97706)),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'DİKKAT',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFFD97706),
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (elevator.nextInspectionDate != null)
+                    Text(
+                      _fmtDate(elevator.nextInspectionDate!),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFD97706),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    elevator.buildingName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: _onSurface,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    elevator.address ?? 'Adres belirtilmemiş',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: _onSurfaceVariant,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

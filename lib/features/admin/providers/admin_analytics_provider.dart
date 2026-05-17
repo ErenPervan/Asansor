@@ -168,10 +168,10 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
   }
 
   return AdminAnalyticsState(
-    activeFaults: activeFaultsRes.count ?? 0,
-    completedMaintenancesThisMonth: completedThisMonthRes.count ?? 0,
-    totalElevators: totalElevatorsRes.count ?? 0,
-    pendingMaintenances: pendingMaintenancesRes.count ?? 0,
+    activeFaults: activeFaultsRes.count,
+    completedMaintenancesThisMonth: completedThisMonthRes.count,
+    totalElevators: totalElevatorsRes.count,
+    pendingMaintenances: pendingMaintenancesRes.count,
     monthlyFaults: monthlyFaults,
     faultCategories: faultCategories.isEmpty 
         ? [const FaultCategoryData(label: 'Veri Yok', percent: 100, color: Color(0xFF94A3B8))] 

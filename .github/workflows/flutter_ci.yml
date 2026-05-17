@@ -23,13 +23,13 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
           cache: true
 
       - name: Cache Pub dependencies
@@ -42,6 +42,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Create dummy .env file
+        run: touch .env
 
       - name: Analyze code
         run: flutter analyze

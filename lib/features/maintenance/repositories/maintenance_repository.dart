@@ -122,13 +122,19 @@ class MaintenanceRepository {
   }
 
   /// Returns all maintenance logs for a given [elevatorId], newest first.
+  ///
+  /// Uses a relational select to join the `profiles` table and resolve each
+  /// technician's full name from their UUID.  The alias syntax
+  /// `profiles:technician_id(full_name)` tells PostgREST to follow the FK
+  /// `maintenance_logs.technician_id → profiles.id` and embed the result as
+  /// a nested `profiles` map on each row.
   Future<List<MaintenanceLogModel>> getLogsByElevatorId(
     String elevatorId,
   ) async {
     try {
       final response = await _client
           .from(_table)
-          .select()
+          .select('*, profiles:technician_id(full_name)')
           .eq('elevator_id', elevatorId)
           .order('maintenance_date', ascending: false);
 

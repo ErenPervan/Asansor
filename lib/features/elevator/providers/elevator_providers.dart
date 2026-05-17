@@ -12,6 +12,66 @@ final elevatorRepositoryProvider = Provider<ElevatorRepository>((ref) {
   return ElevatorRepository(Supabase.instance.client);
 });
 
+// ── Fault / Telemetry / Schedule Providers ───────────────────────────────────
+
+/// Returns the [DateTime] of the most recent fault report for this elevator,
+/// or `null` when no fault reports exist yet.
+///
+/// Queries `fault_reports.reported_at` (the timestamp written at fault
+/// creation time) ordered descending and takes only the first row.
+///
+/// Usage: `ref.watch(latestFaultDateProvider('some-uuid'))`
+final latestFaultDateProvider =
+    FutureProvider.family<DateTime?, String>((ref, elevatorId) async {
+  final client = Supabase.instance.client;
+  final response = await client
+      .from('fault_reports')
+      .select('reported_at')
+      .eq('elevator_id', elevatorId)
+      .order('reported_at', ascending: false)
+      .limit(1);
+
+  final rows = response as List<dynamic>;
+  if (rows.isEmpty) return null;
+
+  final raw = rows.first['reported_at'] as String?;
+  if (raw == null) return null;
+  return DateTime.parse(raw);
+});
+
+/// Returns the [DateTime] of the closest upcoming (pending) scheduled
+/// maintenance for this elevator, or `null` when none is scheduled.
+///
+/// Queries `maintenance_schedules.scheduled_date` where:
+///  - `elevator_id` matches
+///  - `status = 'pending'`
+///  - `scheduled_date` is in the future
+///
+/// Results are ordered ascending so the first row is the next appointment.
+///
+/// Usage: `ref.watch(nextScheduledMaintenanceProvider('some-uuid'))`
+final nextScheduledMaintenanceProvider =
+    FutureProvider.family<DateTime?, String>((ref, elevatorId) async {
+  final client = Supabase.instance.client;
+  final now = DateTime.now().toUtc().toIso8601String();
+
+  final response = await client
+      .from('maintenance_schedules')
+      .select('scheduled_date')
+      .eq('elevator_id', elevatorId)
+      .eq('status', 'pending')
+      .gte('scheduled_date', now)
+      .order('scheduled_date', ascending: true)
+      .limit(1);
+
+  final rows = response as List<dynamic>;
+  if (rows.isEmpty) return null;
+
+  final raw = rows.first['scheduled_date'] as String?;
+  if (raw == null) return null;
+  return DateTime.parse(raw);
+});
+
 // ── Data Providers ───────────────────────────────────────────────────────────
 
 /// Fetches the full list of elevators from Supabase.

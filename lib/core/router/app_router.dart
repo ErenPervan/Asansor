@@ -13,14 +13,17 @@ import '../../features/admin/views/technician_management_view.dart';
 import '../../features/elevator/views/add_elevator_view.dart';
 import '../../features/admin/views/admin_map_view.dart';
 import '../../features/admin/views/assign_view.dart';
+import '../../features/admin/views/checklist_management_view.dart';
 import '../../features/admin/views/user_management_view.dart';
 import '../../features/auth/views/login_view.dart';
+import '../../features/customer/views/customer_dashboard_view.dart';
 import '../../features/elevator/views/customer_no_elevator_view.dart';
 import '../../features/fault/views/fault_detail_view.dart';
 import '../../features/elevator/views/elevator_detail_view.dart';
 import '../../features/elevator/views/elevator_list_view.dart';
 import '../../features/elevator/views/home_view.dart';
 import '../../features/elevator/views/scanner_view.dart';
+import '../../features/admin/conflicts/admin_conflict_management_view.dart';
 
 // ── Auth-aware refresh notifier ──────────────────────────────────────────────
 
@@ -105,22 +108,21 @@ final GoRouter appRouter = GoRouter(
     if (role == 'customer') {
       final custElevatorId = routerRoleNotifier.elevatorId;
       final isOnNoElevatorPage = loc == '/customer/no-elevator';
-      final isOnTheirElevator = custElevatorId != null &&
-          loc == '/elevator/$custElevatorId';
+      final isOnDashboard = loc == '/customer/dashboard';
 
       // The customer is already on the correct page or navigating to a fault — let them through.
       final isOnFaultDetail = loc.startsWith('/fault/');
-      if (isOnTheirElevator || isOnNoElevatorPage || isOnFaultDetail) return null;
+      if (isOnDashboard || isOnNoElevatorPage || isOnFaultDetail) return null;
 
-      // Send them to their elevator, or to the "not yet assigned" page.
+      // Send them to their dashboard, or to the "not yet assigned" page.
       if (custElevatorId != null && custElevatorId.isNotEmpty) {
-        return '/elevator/$custElevatorId';
+        return '/customer/dashboard';
       }
       return '/customer/no-elevator';
     }
 
-    // Non-customers should never land on the no-elevator page.
-    if (loc == '/customer/no-elevator') return '/';
+    // Non-customers should never land on customer pages.
+    if (loc.startsWith('/customer/')) return '/';
 
     return null;
   },
@@ -160,6 +162,10 @@ final GoRouter appRouter = GoRouter(
       builder: (context, _) => const AdminDashboardView(),
     ),
     GoRoute(
+      path: '/admin/conflicts',
+      builder: (context, _) => const AdminConflictManagementView(),
+    ),
+    GoRoute(
       path: '/admin/assign',
       builder: (context, _) => const AssignView(),
     ),
@@ -184,6 +190,10 @@ final GoRouter appRouter = GoRouter(
       builder: (context, _) => const TechnicianManagementView(),
     ),
     GoRoute(
+      path: '/admin/checklists',
+      builder: (context, _) => const ChecklistManagementView(),
+    ),
+    GoRoute(
       path: '/admin/add-elevator',
       builder: (context, _) => const AddElevatorView(),
     ),
@@ -196,6 +206,10 @@ final GoRouter appRouter = GoRouter(
     ),
 
     // ── Customer routes ───────────────────────────────────────────────────
+    GoRoute(
+      path: '/customer/dashboard',
+      builder: (context, _) => const CustomerDashboardView(),
+    ),
     GoRoute(
       path: '/customer/no-elevator',
       builder: (context, _) => const CustomerNoElevatorView(),

@@ -1,0 +1,296 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../auth/providers/auth_providers.dart';
+import '../../elevator/models/elevator_model.dart';
+import '../../maintenance/models/maintenance_log_model.dart';
+import '../../elevator/views/elevator_detail_view.dart';
+import '../providers/customer_portal_provider.dart';
+
+class CustomerDashboardView extends ConsumerWidget {
+  const CustomerDashboardView({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final elevatorAsync = ref.watch(customerElevatorProvider);
+    final logsAsync = ref.watch(customerMaintenanceLogsProvider);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
+      appBar: AppBar(
+        title: const Text('Asansör Durumu', style: TextStyle(fontWeight: FontWeight.w700)),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.redAccent),
+            onPressed: () {
+              ref.read(authControllerProvider.notifier).signOut();
+            },
+          ),
+        ],
+      ),
+      body: elevatorAsync.when(
+        data: (elevator) {
+          if (elevator == null) {
+            return const Center(
+              child: Text(
+                'Size atanmış bir asansör bulunamadı.',
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+            );
+          }
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(customerElevatorProvider);
+              ref.invalidate(customerMaintenanceLogsProvider);
+            },
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                _ElevatorHealthCard(elevator: elevator),
+                const SizedBox(height: 24),
+                _ReportFaultButton(elevatorId: elevator.id),
+                const SizedBox(height: 32),
+                const Text(
+                  'Son Bakım Geçmişi',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _MaintenanceLogList(logsAsync: logsAsync),
+              ],
+            ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(child: Text('Hata: $err')),
+      ),
+    );
+  }
+}
+
+class _ElevatorHealthCard extends StatelessWidget {
+  const _ElevatorHealthCard({required this.elevator});
+
+  final ElevatorModel elevator;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isFaulty = elevator.status == 'faulty';
+    final bool isUnderMaintenance = elevator.status == 'under_maintenance';
+    
+    Color bgColor = const Color(0xFFDCFCE7); // Green bg
+    Color iconColor = const Color(0xFF166534); // Green text
+    IconData iconData = Icons.check_circle_outline;
+    String statusText = 'Aktif ve Sorunsuz';
+
+    if (isFaulty) {
+      bgColor = const Color(0xFFFEE2E2);
+      iconColor = const Color(0xFFDC2626);
+      iconData = Icons.warning_amber_rounded;
+      statusText = 'Arızalı';
+    } else if (isUnderMaintenance) {
+      bgColor = const Color(0xFFFEF3C7);
+      iconColor = const Color(0xFFD97706);
+      iconData = Icons.handyman_outlined;
+      statusText = 'Bakımda';
+    } else if (elevator.status == 'inactive') {
+      bgColor = const Color(0xFFF3F4F6);
+      iconColor = const Color(0xFF4B5563);
+      iconData = Icons.not_interested_rounded;
+      statusText = 'Devre Dışı';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: iconColor.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.5),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(iconData, size: 72, color: iconColor),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            elevator.buildingName.isNotEmpty ? elevator.buildingName : 'Asansör',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: iconColor.withValues(alpha: 0.9),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            statusText,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w900,
+              color: iconColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportFaultButton extends StatelessWidget {
+  const _ReportFaultButton({required this.elevatorId});
+
+  final String elevatorId;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.icon(
+      style: FilledButton.styleFrom(
+        backgroundColor: const Color(0xFFDC2626), // Red
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 4,
+      ),
+      onPressed: () {
+        showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          builder: (_) => ReportFaultSheet(elevatorId: elevatorId),
+        );
+      },
+      icon: const Icon(Icons.report_problem_outlined, size: 28),
+      label: const Text(
+        'Arıza Bildir',
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+      ),
+    );
+  }
+}
+
+class _MaintenanceLogList extends StatelessWidget {
+  const _MaintenanceLogList({required this.logsAsync});
+
+  final AsyncValue<List<MaintenanceLogModel>> logsAsync;
+
+  @override
+  Widget build(BuildContext context) {
+    return logsAsync.when(
+      data: (logs) {
+        if (logs.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            alignment: Alignment.center,
+            child: const Text(
+              'Henüz bakım kaydı bulunmuyor.',
+              style: TextStyle(color: Colors.black54),
+            ),
+          );
+        }
+
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: logs.length,
+          separatorBuilder: (_, _) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final log = logs[index];
+            final dateStr = DateFormat('dd MMMM yyyy').format(log.maintenanceDate.toLocal());
+            final hasPdf = log.pdfUrl != null && log.pdfUrl!.isNotEmpty;
+
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade200),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3F4F6),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.build_circle_outlined, color: Color(0xFF4B5563)),
+                ),
+                title: Text(
+                  dateStr,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                ),
+                subtitle: const Text(
+                  'Periyodik Bakım',
+                  style: TextStyle(color: Colors.black54),
+                ),
+                trailing: hasPdf
+                    ? IconButton(
+                        icon: const Icon(Icons.picture_as_pdf, color: Color(0xFFDC2626)),
+                        tooltip: 'Raporu İndir',
+                        onPressed: () async {
+                          final uri = Uri.parse(log.pdfUrl!);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('PDF açılamadı.')),
+                              );
+                            }
+                          }
+                        },
+                      )
+                    : null,
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (err, _) => Center(child: Text('Hata: $err')),
+    );
+  }
+}

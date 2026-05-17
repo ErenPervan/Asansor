@@ -14,6 +14,9 @@ class ElevatorModel {
     this.latitude,
     this.longitude,
     this.maintenanceDay,
+    this.model,
+    this.capacity,
+    this.version = 1,
   });
 
   final String id;
@@ -34,6 +37,18 @@ class ElevatorModel {
   /// Null means no periodic contract has been configured yet.
   final int? maintenanceDay;
 
+  /// Manufacturer and model name of the elevator unit (e.g. "Otis Gen2").
+  /// Null when not yet recorded in the database.
+  final String? model;
+
+  /// Passenger/weight capacity of the elevator in kilograms (e.g. 630).
+  /// Format for display in the UI as "${capacity} Kg".
+  /// Null when not yet recorded in the database.
+  final int? capacity;
+
+  /// OCC Version number
+  final int version;
+
   factory ElevatorModel.fromJson(Map<String, dynamic> json) {
     return ElevatorModel(
       id: json['id'] as String,
@@ -43,6 +58,9 @@ class ElevatorModel {
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       maintenanceDay: json['maintenance_day'] as int?,
+      model: json['model'] as String?,
+      capacity: json['capacity'] as int?,
+      version: json['version'] as int? ?? 1,
     );
   }
 
@@ -55,6 +73,9 @@ class ElevatorModel {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       if (maintenanceDay != null) 'maintenance_day': maintenanceDay,
+      if (model != null) 'model': model,
+      if (capacity != null) 'capacity': capacity,
+      'version': version,
     };
   }
 
@@ -66,6 +87,9 @@ class ElevatorModel {
     double? latitude,
     double? longitude,
     int? maintenanceDay,
+    String? model,
+    int? capacity,
+    int? version,
   }) {
     return ElevatorModel(
       id: id ?? this.id,
@@ -75,6 +99,9 @@ class ElevatorModel {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       maintenanceDay: maintenanceDay ?? this.maintenanceDay,
+      model: model ?? this.model,
+      capacity: capacity ?? this.capacity,
+      version: version ?? this.version,
     );
   }
 
@@ -88,5 +115,6 @@ class ElevatorModel {
   String toString() =>
       'ElevatorModel(id: $id, buildingName: $buildingName, '
       'address: $address, status: $status, '
-      'lat: $latitude, lng: $longitude)';
+      'model: $model, capacity: $capacity, '
+      'lat: $latitude, lng: $longitude, version: $version)';
 }

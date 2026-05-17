@@ -7,6 +7,7 @@ import '../../elevator/providers/elevator_providers.dart';
 import '../models/schedule_model.dart';
 import '../providers/admin_providers.dart';
 import '../repositories/admin_repository.dart';
+import '../../../core/providers/connectivity_providers.dart';
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -94,6 +95,7 @@ class AdminDashboardView extends ConsumerWidget {
     final stats = ref.watch(adminStatsProvider);
     final schedules = ref.watch(allSchedulesProvider);
     final elevators = ref.watch(elevatorsProvider);
+    final syncQueue = ref.watch(syncQueueServiceProvider);
 
     return Scaffold(
       backgroundColor: _background,
@@ -132,6 +134,13 @@ class AdminDashboardView extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (syncQueue.conflictCount > 0) ...[
+              _ConflictBanner(
+                count: syncQueue.conflictCount,
+                onTap: () => context.push('/admin/conflicts'),
+              ),
+              const SizedBox(height: 16),
+            ],
             _StatsGrid(stats: stats),
             const SizedBox(height: 16),
             _AddElevatorBanner(
@@ -148,6 +157,9 @@ class AdminDashboardView extends ConsumerWidget {
             const SizedBox(height: 12),
             _TechnicianDirCard(
                 onTap: () => context.push('/admin/technicians')),
+            const SizedBox(height: 12),
+            _ChecklistCard(
+                onTap: () => context.push('/admin/checklists')),
             const SizedBox(height: 32),
             _ScheduleList(
               schedules: schedules,
@@ -166,6 +178,91 @@ class AdminDashboardView extends ConsumerWidget {
         label: const Text(
           'Görev Ata',
           style: TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Conflict Banner ───────────────────────────────────────────────────────────
+
+class _ConflictBanner extends StatelessWidget {
+  const _ConflictBanner({required this.count, required this.onTap});
+
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: _errorContainer,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: _error.withValues(alpha: 0.3)),
+            boxShadow: [
+              BoxShadow(
+                color: _error.withValues(alpha: 0.1),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: _error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.warning_rounded,
+                  color: _error,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$count Senkronizasyon Çakışması',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: _onErrorContainer,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    const Text(
+                      'Çözülmemiş çakışmalar var, incelemek için dokunun',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _onErrorContainer,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: _error,
+                size: 14,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1171,6 +1268,90 @@ class _ErrorBanner extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Checklist Management Card ──────────────────────────────────────────────────
+
+class _ChecklistCard extends StatelessWidget {
+  const _ChecklistCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: _surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: _outlineVariant.withValues(alpha: 0.4)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: _primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.checklist_rounded,
+                  color: _primary,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Kontrol Listesi Yönetimi',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: _onSurface,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Bakım kontrol maddelerini ekle, düzenle ve yönet',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _onSurfaceVariant,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: _outline,
+                size: 14,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

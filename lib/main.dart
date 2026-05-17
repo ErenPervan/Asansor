@@ -111,6 +111,11 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
     // `navigatorKey.currentState` is guaranteed to be non-null.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       NotificationService.instance.handleInitialMessage();
+      
+      // Keep token synced if the user is already signed in on startup
+      if (Supabase.instance.client.auth.currentUser != null) {
+        NotificationService.instance.saveTokenToSupabase(Supabase.instance.client);
+      }
     });
   }
 

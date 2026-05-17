@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:printing/printing.dart';
 
-import '../../../core/services/pdf_report_service.dart';
+import '../../../core/services/pdf_service.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/models/elevator_model.dart';
 import '../../elevator/providers/elevator_providers.dart';
@@ -11,6 +11,13 @@ import '../../fault/models/fault_report_model.dart';
 import '../../fault/providers/fault_providers.dart';
 import '../../maintenance/models/maintenance_log_model.dart';
 import '../../maintenance/providers/maintenance_providers.dart';
+
+// ── Telemetry mock ────────────────────────────────────────────────────────────
+// IoT hardware is not yet integrated. Replace this constant with a real
+// stream subscription once the telemetry backend is available.
+// Integration point: subscribe to `elevator_telemetry` Supabase Realtime
+// channel and surface the `daily_trips` field from each payload.
+const String _kDailyTripsMock = '—'; // TODO(iot): replace with live telemetry
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -55,6 +62,14 @@ String _fmtDate(DateTime dt) {
   final local = dt.toLocal();
   return '${local.day.toString().padLeft(2, '0')} '
       '${_monthsTr[local.month - 1]} '
+      '${local.year}';
+}
+
+/// Formats a [DateTime] as `DD.MM.YYYY` for compact chip display.
+String _fmtDateCompact(DateTime dt) {
+  final local = dt.toLocal();
+  return '${local.day.toString().padLeft(2, '0')}.'
+      '${local.month.toString().padLeft(2, '0')}.'
       '${local.year}';
 }
 
@@ -118,7 +133,7 @@ class ElevatorDetailView extends ConsumerWidget {
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              builder: (_) => _ReportFaultSheet(elevatorId: elevatorId),
+              builder: (_) => ReportFaultSheet(elevatorId: elevatorId),
             );
           },
           onLogMaintenance: () {
@@ -176,7 +191,7 @@ class _DetailScrollBody extends StatelessWidget {
           const SizedBox(height: 24),
 
           // 3 ── System monitor + next maintenance ─────────────────────────
-          const _SystemMonitorSection(),
+          _SystemMonitorSection(elevatorId: elevatorId),
           const SizedBox(height: 24),
 
           // 4 ── Maintenance history timeline ───────────────────────────────
@@ -294,19 +309,21 @@ class _HeaderCard extends StatelessWidget {
           Divider(height: 1, color: _outlineVariant.withValues(alpha: 0.15)),
           const SizedBox(height: 20),
 
-          // Static meta grid (Model + Capacity) — not in DB schema yet
+          // Model + Capacity — read from DB columns added to elevators table
           Row(
             children: [
               Expanded(
                 child: _MetaCell(
                   label: 'MODEL',
-                  value: '—', // TODO: add model field to DB schema
+                  value: elevator.model ?? '—',
                 ),
               ),
               Expanded(
                 child: _MetaCell(
                   label: 'KAPASİTE',
-                  value: '—', // TODO: add capacity field to DB schema
+                  value: elevator.capacity != null
+                      ? '${elevator.capacity} Kg'
+                      : '—',
                 ),
               ),
             ],
@@ -500,15 +517,24 @@ class _ActionCard extends StatelessWidget {
   }
 }
 
-// ── 3. System Monitor Section (static) ───────────────────────────────────────
+// ── 3. System Monitor Section ────────────────────────────────────────────────
 // Stitch: <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-// No live data from our schema yet — rendered as static placeholders.
+// Watches two FutureProvider.family providers scoped to this elevator:
+//   • latestFaultDateProvider     → SON ARIZA chip
+//   • nextScheduledMaintenanceProvider → SIRADAKİ BAKIM panel
 
-class _SystemMonitorSection extends StatelessWidget {
-  const _SystemMonitorSection();
+class _SystemMonitorSection extends ConsumerWidget {
+  const _SystemMonitorSection({required this.elevatorId});
+
+  final String elevatorId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ── Live data ──────────────────────────────────────────────────────────
+    final latestFaultAsync = ref.watch(latestFaultDateProvider(elevatorId));
+    final nextMaintenanceAsync =
+        ref.watch(nextScheduledMaintenanceProvider(elevatorId));
+
     return Column(
       children: [
         // ── "Sistem İzleme" panel ──────────────────────────────────────────
@@ -573,18 +599,26 @@ class _SystemMonitorSection extends StatelessWidget {
               // Stat chips
               Row(
                 children: [
+                  // GÜNLÜK TUR: mock constant until IoT telemetry is integrated.
+                  // See _kDailyTripsMock at the top of this file.
                   Expanded(
                     child: _StatChip(
                       label: 'GÜNLÜK TUR',
-                      value: '—', // TODO: fetch from telemetry
+                      value: _kDailyTripsMock,
                       valueColor: _primary,
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // SON ARIZA: most recent fault_reports.reported_at for this elevator.
                   Expanded(
                     child: _StatChip(
                       label: 'SON ARIZA',
-                      value: '—', // TODO: compute from fault_reports
+                      value: latestFaultAsync.when(
+                        loading: () => '…',
+                        error: (e, s) => '!',
+                        data: (dt) =>
+                            dt != null ? _fmtDateCompact(dt) : '—',
+                      ),
                       valueColor: _secondary,
                     ),
                   ),
@@ -597,6 +631,7 @@ class _SystemMonitorSection extends StatelessWidget {
 
         // ── "Sıradaki Bakım" panel ────────────────────────────────────────
         // Stitch: bg-primary-container text-on-primary-container
+        // Data source: nextScheduledMaintenanceProvider (maintenance_schedules)
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
@@ -616,64 +651,115 @@ class _SystemMonitorSection extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.08),
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'SIRADAKİ BAKIM',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: _onPrimaryContainer.withValues(alpha: 0.8),
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    '—',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w900,
+              nextMaintenanceAsync.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: CircularProgressIndicator(
                       color: Colors.white,
+                      strokeWidth: 2,
                     ),
                   ),
-                  Text(
-                    '—', // TODO: add scheduled_maintenance table
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Periyodik Genel Revizyon',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Randevu Düzenle',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
+                error: (e, s) => const _NextMaintenanceContent(
+                  dayLabel: '!',
+                  dateLabel: 'Yüklenemedi',
+                ),
+                data: (nextDate) {
+                  if (nextDate == null) {
+                    return const _NextMaintenanceContent(
+                      dayLabel: '—',
+                      dateLabel: 'Planlanmadı',
+                    );
+                  }
+                  final local = nextDate.toLocal();
+                  final dayLabel =
+                      local.day.toString().padLeft(2, '0');
+                  final dateLabel =
+                      '${_monthsTr[local.month - 1]} ${local.year}';
+                  return _NextMaintenanceContent(
+                    dayLabel: dayLabel,
+                    dateLabel: dateLabel,
+                  );
+                },
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Next Maintenance Content widget ───────────────────────────────────────────
+// Renders the day number + month/year label inside the primary-container panel.
+// Extracted so the three AsyncValue states (loading, error, data) can each
+// hand it a pre-computed dayLabel and dateLabel string.
+
+class _NextMaintenanceContent extends StatelessWidget {
+  const _NextMaintenanceContent({
+    required this.dayLabel,
+    required this.dateLabel,
+  });
+
+  final String dayLabel;
+  final String dateLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'SIRADAKİ BAKIM',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: _onPrimaryContainer.withValues(alpha: 0.8),
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          dayLabel,
+          style: const TextStyle(
+            fontSize: 36,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+          ),
+        ),
+        Text(
+          dateLabel,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Periyodik Genel Revizyon',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.white.withValues(alpha: 0.7),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          alignment: Alignment.center,
+          child: const Text(
+            'Randevu Düzenle',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
           ),
         ),
       ],
@@ -782,7 +868,7 @@ class _MaintenanceHistorySectionState
     try {
       final repo = ref.read(maintenanceRepositoryProvider);
       final logs = await repo.getLogsForReport(widget.elevatorId);
-      final doc = await generateElevatorReport(widget.elevator, logs);
+      final doc = await PdfService().generateElevatorReport(widget.elevator, logs);
       final bytes = await doc.save();
       if (!mounted) return;
       await Printing.layoutPdf(onLayout: (_) async => bytes);
@@ -1038,11 +1124,14 @@ class _TimelineCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 3),
                     Text(
-                      // Only UUID is available; show shortened form.
-                      // TODO: resolve to display name from profiles table.
-                      log.technicianId.length > 8
-                          ? log.technicianId.substring(0, 8)
-                          : log.technicianId,
+                      // Display the technician's full name resolved via
+                      // a profiles JOIN in MaintenanceRepository.
+                      // Falls back to the first 8 chars of the UUID for
+                      // offline-queued records or missing profile rows.
+                      log.technicianName ??
+                          (log.technicianId.length > 8
+                              ? log.technicianId.substring(0, 8)
+                              : log.technicianId),
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w500,
@@ -1193,16 +1282,16 @@ class _NavItem extends StatelessWidget {
 
 // ── Report Fault Bottom Sheet ─────────────────────────────────────────────────
 
-class _ReportFaultSheet extends ConsumerStatefulWidget {
-  const _ReportFaultSheet({required this.elevatorId});
+class ReportFaultSheet extends ConsumerStatefulWidget {
+  const ReportFaultSheet({super.key, required this.elevatorId});
 
   final String elevatorId;
 
   @override
-  ConsumerState<_ReportFaultSheet> createState() => _ReportFaultSheetState();
+  ConsumerState<ReportFaultSheet> createState() => _ReportFaultSheetState();
 }
 
-class _ReportFaultSheetState extends ConsumerState<_ReportFaultSheet> {
+class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
   final _formKey = GlobalKey<FormState>();
   final _descController = TextEditingController();
 

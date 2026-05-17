@@ -103,6 +103,8 @@ class SyncQueueService extends ChangeNotifier {
 
   // ── Write ─────────────────────────────────────────────────────────────────
 
+  static int _idCounter = 0;
+
   /// Saves [payload] as a pending operation of the given [type].
   ///
   /// [type] must be one of the [SyncItemType] constants.
@@ -112,8 +114,9 @@ class SyncQueueService extends ChangeNotifier {
     required String type,
     required Map<String, dynamic> payload,
   }) async {
+    _idCounter++;
     final id =
-        DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+        '${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}_$_idCounter';
     final item = jsonEncode({
       'id': id,
       'type': type,

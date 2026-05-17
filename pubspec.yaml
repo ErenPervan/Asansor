@@ -54,6 +54,7 @@ dependencies:
   path_provider: ^2.1.5
 
   url_launcher: any
+  fl_chart: ^1.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

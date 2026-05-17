@@ -24,6 +24,7 @@ import '../../features/elevator/views/elevator_list_view.dart';
 import '../../features/elevator/views/home_view.dart';
 import '../../features/elevator/views/scanner_view.dart';
 import '../../features/admin/conflicts/admin_conflict_management_view.dart';
+import '../../features/admin/views/admin_statistics_dashboard.dart';
 
 // ── Auth-aware refresh notifier ──────────────────────────────────────────────
 
@@ -192,6 +193,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/admin/checklists',
       builder: (context, _) => const ChecklistManagementView(),
+    ),
+    GoRoute(
+      path: '/admin/statistics',
+      builder: (context, _) => const AdminStatisticsDashboard(),
     ),
     GoRoute(
       path: '/admin/add-elevator',

@@ -47,3 +47,10 @@ app.*.map.json
 # Environment secrets — never commit real credentials
 .env
 # .env.example is intentionally NOT ignored (safe reference file)
+
+# Firebase service account files
+asansor-efaed-firebase-adminsdk-*.json
+
+# Supabase local envs
+supabase/.env.local
+supabase/.env.local.*

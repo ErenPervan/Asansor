@@ -78,13 +78,13 @@ serve(async (req: Request) => {
       }
       targets = admins || [];
       console.log(`[Webhook] Broadcasting to ${targets.length} admins.`);
-    } 
+    }
     else if (reqBody.to_user_id && reqBody.title && reqBody.body) {
       // It's a direct API call from the app
       title = reqBody.title;
       bodyText = reqBody.body;
       const rawData = reqBody.data || {};
-      
+
       // Ensure data is all strings (FCM requirement)
       notificationData = Object.fromEntries(
         Object.entries(rawData).map(([k, v]) => [k, String(v)])
@@ -105,7 +105,7 @@ serve(async (req: Request) => {
         targets.push({ fcm_token: profile.fcm_token });
       }
       console.log(`[Direct Call] Target User ${reqBody.to_user_id}. Found token: ${!!profile?.fcm_token}`);
-    } 
+    }
     else {
       return new Response(
         JSON.stringify({ error: "Invalid payload format." }),
@@ -125,7 +125,7 @@ serve(async (req: Request) => {
     if (!saKeyStr) {
       throw new Error("FIREBASE_SERVICE_ACCOUNT secret is missing from Supabase environment.");
     }
-    
+
     const serviceAccount = JSON.parse(saKeyStr);
 
     const jwtClient = new JWT({
@@ -133,7 +133,7 @@ serve(async (req: Request) => {
       key: serviceAccount.private_key,
       scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
     });
-    
+
     const tokens = await jwtClient.getAccessToken();
     const accessToken = tokens.token;
     const projectId = serviceAccount.project_id;
@@ -181,7 +181,7 @@ serve(async (req: Request) => {
 
       const result = await fcmResponse.json();
       results.push(result);
-      
+
       if (!fcmResponse.ok) {
         console.warn(`FCM v1 failed for token ${target.fcm_token}:`, JSON.stringify(result));
       }

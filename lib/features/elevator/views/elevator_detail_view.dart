@@ -17,7 +17,7 @@ import '../../maintenance/providers/maintenance_providers.dart';
 // stream subscription once the telemetry backend is available.
 // Integration point: subscribe to `elevator_telemetry` Supabase Realtime
 // channel and surface the `daily_trips` field from each payload.
-const String _kDailyTripsMock = '—'; // TODO(iot): replace with live telemetry
+const String _kDailyTripsMock = '—'; // Replace with real data when IoT telemetry is integrated
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 

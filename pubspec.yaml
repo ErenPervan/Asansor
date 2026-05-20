@@ -55,6 +55,7 @@ dependencies:
 
   url_launcher: any
   fl_chart: ^1.2.0
+  signature: ^6.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -79,7 +80,8 @@ flutter:
   uses-material-design: true
 
   assets:
-    - .env
+    # Do not package production secrets into the app binary. Local .env should be
+    # kept out of version control and not bundled as an asset.
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

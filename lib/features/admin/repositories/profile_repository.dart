@@ -111,7 +111,8 @@ class ProfileRepository {
       return ProfileModel.fromJson(response);
     } on PostgrestException catch (e) {
       throw Exception(
-          'Failed to update elevator for customer $userId: ${e.message}');
+        'Failed to update elevator for customer $userId: ${e.message}',
+      );
     } catch (e) {
       throw Exception('Unexpected error updating customer elevator: $e');
     }

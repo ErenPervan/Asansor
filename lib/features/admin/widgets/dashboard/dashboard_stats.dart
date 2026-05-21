@@ -8,10 +8,7 @@ import 'package:asansor/features/admin/widgets/dashboard/dashboard_banners.dart'
 // ── Stats Grid ────────────────────────────────────────────────────────────────
 
 class DashboardStatsGrid extends StatelessWidget {
-  const DashboardStatsGrid({
-    super.key,
-    required this.stats,
-  });
+  const DashboardStatsGrid({super.key, required this.stats});
 
   final AsyncValue<AdminStats> stats;
 
@@ -24,9 +21,8 @@ class DashboardStatsGrid extends StatelessWidget {
           child: CircularProgressIndicator(color: AppColors.primary),
         ),
       ),
-      error: (e, _) => ErrorBanner(
-        message: e.toString().replaceFirst('Exception: ', ''),
-      ),
+      error: (e, _) =>
+          ErrorBanner(message: e.toString().replaceFirst('Exception: ', '')),
       data: (s) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -136,49 +132,50 @@ class DashboardStatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final (bg, iconBg, iconFg, valueFg, labelFg, gradient) = switch (variant) {
       StatVariant.brand => (
-          AppColors.primary,
-          Colors.white.withValues(alpha: 0.15),
-          Colors.white,
-          Colors.white,
-          Colors.white70,
-          const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFB91C1C), Color(0xFF7F1D1D)],
-          ) as Gradient?,
-        ),
+        AppColors.primary,
+        Colors.white.withValues(alpha: 0.15),
+        Colors.white,
+        Colors.white,
+        Colors.white70,
+        const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFB91C1C), Color(0xFF7F1D1D)],
+            )
+            as Gradient?,
+      ),
       StatVariant.critical => (
-          const Color(0xFFFFF1F2), // red-50
-          const Color(0xFFFFE4E4),
-          AppColors.error,
-          AppColors.error,
-          const Color(0xFF9F1239), // rose-800
-          null,
-        ),
+        const Color(0xFFFFF1F2), // red-50
+        const Color(0xFFFFE4E4),
+        AppColors.error,
+        AppColors.error,
+        const Color(0xFF9F1239), // rose-800
+        null,
+      ),
       StatVariant.success => (
-          const Color(0xFFF0FDF4), // green-50
-          const Color(0xFFDCFCE7),
-          AppColors.success,
-          AppColors.success,
-          const Color(0xFF14532D),
-          null,
-        ),
+        const Color(0xFFF0FDF4), // green-50
+        const Color(0xFFDCFCE7),
+        AppColors.success,
+        AppColors.success,
+        const Color(0xFF14532D),
+        null,
+      ),
       StatVariant.warning => (
-          const Color(0xFFFFFBEB), // amber-50
-          const Color(0xFFFEF3C7),
-          AppColors.warning,
-          AppColors.warning,
-          const Color(0xFF78350F),
-          null,
-        ),
+        const Color(0xFFFFFBEB), // amber-50
+        const Color(0xFFFEF3C7),
+        AppColors.warning,
+        AppColors.warning,
+        const Color(0xFF78350F),
+        null,
+      ),
       StatVariant.neutral => (
-          AppColors.surfaceContainerLowest,
-          AppColors.surfaceContainer,
-          AppColors.outline,
-          AppColors.onSurface,
-          AppColors.onSurfaceVariant,
-          null,
-        ),
+        AppColors.surfaceContainerLowest,
+        AppColors.surfaceContainer,
+        AppColors.outline,
+        AppColors.onSurface,
+        AppColors.onSurfaceVariant,
+        null,
+      ),
     };
 
     return Container(

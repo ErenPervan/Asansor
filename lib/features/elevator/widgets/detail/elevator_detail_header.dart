@@ -3,7 +3,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../models/elevator_model.dart';
 import '../../../../core/widgets/info_card.dart';
 
-
 class ElevatorDetailHeader extends StatelessWidget {
   const ElevatorDetailHeader({super.key, required this.elevator});
 
@@ -41,7 +40,8 @@ class ElevatorDetailHeader extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryFixed, // primary-fixed: #D6E3FF
+                          color:
+                              AppColors.primaryFixed, // primary-fixed: #D6E3FF
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -109,7 +109,10 @@ class ElevatorDetailHeader extends StatelessWidget {
 
           // Divider + static metadata grid
           const SizedBox(height: 20),
-          Divider(height: 1, color: AppColors.outlineVariant.withValues(alpha: 0.15)),
+          Divider(
+            height: 1,
+            color: AppColors.outlineVariant.withValues(alpha: 0.15),
+          ),
           const SizedBox(height: 20),
 
           // Model + Capacity — read from DB columns added to elevators table
@@ -187,13 +190,21 @@ class DetailStatusBadge extends StatelessWidget {
         const Color(0xFF059669), // emerald-600
         Colors.white,
       ),
-      'faulty' => ('DURUM: ARIZALI', AppColors.errorContainer, AppColors.onErrorContainer),
+      'faulty' => (
+        'DURUM: ARIZALI',
+        AppColors.errorContainer,
+        AppColors.onErrorContainer,
+      ),
       'under_maintenance' => (
         'DURUM: BAKIMDA',
         const Color(0xFFFFF3CD),
         const Color(0xFF856404),
       ),
-      'inactive' => ('DURUM: PASİF', AppColors.surfaceContainer, AppColors.outline),
+      'inactive' => (
+        'DURUM: PASİF',
+        AppColors.surfaceContainer,
+        AppColors.outline,
+      ),
       _ => ('DURUM: BİLİNMİYOR', AppColors.surfaceContainer, AppColors.outline),
     };
 

@@ -57,11 +57,10 @@ class ElevatorDetailView extends ConsumerWidget {
 
       // ── Body ─────────────────────────────────────────────────────────────
       body: elevatorAsync.when(
-        loading: () =>
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: LoadingState(isList: false),
-            ),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: LoadingState(isList: false),
+        ),
         error: (err, _) => _ErrorBody(
           message: err.toString().replaceFirst('Exception: ', ''),
           onRetry: () => ref.invalidate(elevatorByIdProvider(elevatorId)),
@@ -140,10 +139,7 @@ class _DetailScrollBody extends StatelessWidget {
           const SizedBox(height: 24),
 
           // 4 ── Maintenance history timeline ───────────────────────────────
-          MaintenanceHistorySection(
-            elevatorId: elevatorId,
-            elevator: elevator,
-          ),
+          MaintenanceHistorySection(elevatorId: elevatorId, elevator: elevator),
           const SizedBox(height: 16),
         ],
       ),

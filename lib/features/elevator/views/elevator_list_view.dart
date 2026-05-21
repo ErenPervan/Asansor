@@ -123,8 +123,10 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
             data: (all) => Center(
               child: Container(
                 margin: const EdgeInsets.only(right: 16),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(12),
@@ -155,18 +157,24 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
             child: TextField(
               controller: _searchController,
               onChanged: (v) => setState(() => _query = v),
-              style: const TextStyle(
-                color: AppColors.onSurface,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: AppColors.onSurface, fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'Bina adı veya adres ile ara…',
-                hintStyle: TextStyle(color: AppColors.outline.withValues(alpha: 0.8)),
-                prefixIcon:
-                    const Icon(Icons.search, color: AppColors.outline, size: 20),
+                hintStyle: TextStyle(
+                  color: AppColors.outline.withValues(alpha: 0.8),
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: AppColors.outline,
+                  size: 20,
+                ),
                 suffixIcon: _query.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.close, size: 18, color: AppColors.outline),
+                        icon: const Icon(
+                          Icons.close,
+                          size: 18,
+                          color: AppColors.outline,
+                        ),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _query = '');
@@ -175,8 +183,10 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                     : null,
                 filled: true,
                 fillColor: AppColors.surfaceContainerLowest,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -187,8 +197,9 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      BorderSide(color: AppColors.primary.withValues(alpha: 0.4)),
+                  borderSide: BorderSide(
+                    color: AppColors.primary.withValues(alpha: 0.4),
+                  ),
                 ),
               ),
             ),
@@ -204,54 +215,58 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           const OfflineBanner(),
           Expanded(
             child: elevatorsAsync.when(
-        loading: () => const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: LoadingState(count: 6),
-        ),
-        error: (e, _) => _ErrorBody(
-          message: e.toString().replaceFirst('Exception: ', ''),
-          onRetry: () => ref.invalidate(elevatorsProvider),
-        ),
-        data: (all) {
-          final items = _applyFilter(all);
+              loading: () => const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: LoadingState(count: 6),
+              ),
+              error: (e, _) => _ErrorBody(
+                message: e.toString().replaceFirst('Exception: ', ''),
+                onRetry: () => ref.invalidate(elevatorsProvider),
+              ),
+              data: (all) {
+                final items = _applyFilter(all);
 
-          if (all.isEmpty) {
-            return const _EmptyBody(
-              icon: Icons.elevator_outlined,
-              title: 'Asansör Bulunamadı',
-              subtitle:
-                  'Sisteme henüz asansör eklenmemiş.\nLütfen yöneticinizle iletişime geçin.',
-            );
-          }
+                if (all.isEmpty) {
+                  return const _EmptyBody(
+                    icon: Icons.elevator_outlined,
+                    title: 'Asansör Bulunamadı',
+                    subtitle:
+                        'Sisteme henüz asansör eklenmemiş.\nLütfen yöneticinizle iletişime geçin.',
+                  );
+                }
 
-          if (items.isEmpty) {
-            return _EmptyBody(
-              icon: Icons.search_off_outlined,
-              title: 'Sonuç Yok',
-              subtitle: '"$_query" ile eşleşen asansör bulunamadı.',
-            );
-          }
+                if (items.isEmpty) {
+                  return _EmptyBody(
+                    icon: Icons.search_off_outlined,
+                    title: 'Sonuç Yok',
+                    subtitle: '"$_query" ile eşleşen asansör bulunamadı.',
+                  );
+                }
 
-          return RefreshIndicator(
-            color: AppColors.primary,
-            onRefresh: () async => ref.invalidate(elevatorsProvider),
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: items.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final elevator = items[index];
-                return FadeInSlide(
-                  index: index,
-                  child: _ElevatorCard(
-                    elevator: elevator,
-                    onTap: () => context.push('/elevator/${elevator.id}'),
+                return RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () async => ref.invalidate(elevatorsProvider),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    itemCount: items.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final elevator = items[index];
+                      return FadeInSlide(
+                        index: index,
+                        child: _ElevatorCard(
+                          elevator: elevator,
+                          onTap: () => context.push('/elevator/${elevator.id}'),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
-            ),
-          );
-        },
             ),
           ),
         ],
@@ -284,8 +299,9 @@ class _ElevatorCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              border:
-                  Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.45)),
+              border: Border.all(
+                color: AppColors.outlineVariant.withValues(alpha: 0.45),
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.04),
@@ -370,7 +386,9 @@ class _ElevatorCard extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: style.bg,
                         borderRadius: BorderRadius.circular(8),

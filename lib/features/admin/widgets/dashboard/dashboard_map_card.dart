@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 // ── Map Preview Card ──────────────────────────────────────────────────────────
 
 class DashboardMapCard extends StatelessWidget {
-  const DashboardMapCard({
-    super.key,
-    required this.onTap,
-  });
+  const DashboardMapCard({super.key, required this.onTap});
 
   final VoidCallback onTap;
 

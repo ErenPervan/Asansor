@@ -78,13 +78,13 @@ class ProfileModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'email': email,
-        'full_name': fullName,
-        'phone': phone,
-        'role': role,
-        'elevator_id': elevatorId,
-      };
+    'id': id,
+    'email': email,
+    'full_name': fullName,
+    'phone': phone,
+    'role': role,
+    'elevator_id': elevatorId,
+  };
 
   ProfileModel copyWith({
     String? id,
@@ -109,7 +109,8 @@ class ProfileModel {
 
   /// Best-effort display name: fullName → email prefix → shortened id.
   String get displayName {
-    if (fullName != null && fullName!.trim().isNotEmpty) return fullName!.trim();
+    if (fullName != null && fullName!.trim().isNotEmpty)
+      return fullName!.trim();
     if (email != null && email!.isNotEmpty) return email!.split('@').first;
     return id.length >= 8 ? id.substring(0, 8) : id;
   }

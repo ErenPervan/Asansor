@@ -47,9 +47,7 @@ class ReadCacheService {
 
   /// Persists [elevators] as a JSON string.  Overwrites any previous value.
   Future<void> saveElevators(List<ElevatorModel> elevators) async {
-    final encoded = jsonEncode(
-      elevators.map((e) => e.toJson()).toList(),
-    );
+    final encoded = jsonEncode(elevators.map((e) => e.toJson()).toList());
     await _elevBox.put(_elevatorsKey, encoded);
   }
 
@@ -78,9 +76,7 @@ class ReadCacheService {
   /// Each [ScheduleModel] is serialised with its own `toJson()`.
   Future<void> saveMyTasks(String userId, List<ScheduleModel> tasks) async {
     if (userId.isEmpty) return;
-    final encoded = jsonEncode(
-      tasks.map((t) => t.toJson()).toList(),
-    );
+    final encoded = jsonEncode(tasks.map((t) => t.toJson()).toList());
     await _tasksBox.put(userId, encoded);
   }
 
@@ -103,14 +99,12 @@ class ReadCacheService {
   /// `true` when a task list has been cached for [userId].
   bool hasMyTasks(String userId) =>
       userId.isNotEmpty && _tasksBox.containsKey(userId);
-      
+
   // ── Checklists ────────────────────────────────────────────────────────────
 
   /// Persists the checklist items. Overwrites any previous value.
   Future<void> saveChecklistItems(List<dynamic> items) async {
-    final encoded = jsonEncode(
-      items.map((i) => i.toJson()).toList(),
-    );
+    final encoded = jsonEncode(items.map((i) => i.toJson()).toList());
     await _checklistBox.put(_checklistsKey, encoded);
   }
 
@@ -131,9 +125,7 @@ class ReadCacheService {
   /// Persists the past logs for [elevatorId]. Overwrites any previous value.
   Future<void> savePastLogs(String elevatorId, List<dynamic> logs) async {
     if (elevatorId.isEmpty) return;
-    final encoded = jsonEncode(
-      logs.map((l) => l.toJson()).toList(),
-    );
+    final encoded = jsonEncode(logs.map((l) => l.toJson()).toList());
     await _pastLogsBox.put(elevatorId, encoded);
   }
 

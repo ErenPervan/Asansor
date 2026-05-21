@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 import 'dart:io';
 
-
 void main() async {
   final baseDir = 'd:/Asansor/lib/features/admin';
   final filesToFix = [
@@ -16,7 +15,7 @@ void main() async {
     if (!await file.exists()) continue;
 
     var content = await file.readAsString();
-    
+
     // Replace function calls
     content = content.replaceAll('_priorityColor', 'getPriorityColor');
     content = content.replaceAll('_priorityLabel', 'getPriorityLabel');
@@ -25,15 +24,24 @@ void main() async {
     content = content.replaceAll('_fmtTime', 'formatTime');
 
     // Replace classes that were missed by split_calendar.dart
-    content = content.replaceAll('_ElevatorPickerDialog', 'ElevatorPickerDialog');
-    content = content.replaceAll('_TechnicianPickerDialog', 'TechnicianPickerDialog');
+    content = content.replaceAll(
+      '_ElevatorPickerDialog',
+      'ElevatorPickerDialog',
+    );
+    content = content.replaceAll(
+      '_TechnicianPickerDialog',
+      'TechnicianPickerDialog',
+    );
     content = content.replaceAll('_PrioritySelector', 'PrioritySelector');
     content = content.replaceAll('_PickerField', 'PickerField');
 
     // Add import to helpers if not there and it's a widget file
     if (path.contains('widgets/calendar')) {
       if (!content.contains("import 'calendar_helpers.dart';")) {
-        content = content.replaceFirst("import 'package:flutter/material.dart';", "import 'package:flutter/material.dart';\nimport 'calendar_helpers.dart';");
+        content = content.replaceFirst(
+          "import 'package:flutter/material.dart';",
+          "import 'package:flutter/material.dart';\nimport 'calendar_helpers.dart';",
+        );
       }
     }
 
@@ -46,7 +54,7 @@ void main() async {
   final lines = await viewFile.readAsLines();
   int startIdx = -1;
   int endIdx = -1;
-  
+
   for (int i = 0; i < lines.length; i++) {
     if (lines[i].startsWith('Color getPriorityColor(String p) {')) {
       startIdx = i;
@@ -59,10 +67,12 @@ void main() async {
   if (startIdx != -1 && endIdx != -1) {
     // Go back to remove the comment // ── Priority helpers ──
     int realStart = startIdx;
-    while (realStart > 0 && (lines[realStart - 1].trim().isEmpty || lines[realStart - 1].trim().startsWith('//'))) {
+    while (realStart > 0 &&
+        (lines[realStart - 1].trim().isEmpty ||
+            lines[realStart - 1].trim().startsWith('//'))) {
       realStart--;
     }
-    
+
     final newLines = [...lines.sublist(0, realStart), ...lines.sublist(endIdx)];
     await viewFile.writeAsString(newLines.join('\n'));
     print('Removed old helpers from admin_calendar_view.dart');

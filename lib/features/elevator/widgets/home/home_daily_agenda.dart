@@ -92,10 +92,12 @@ class DailyAgendaSection extends StatelessWidget {
             }
 
             // Split into today vs upcoming
-            final todayTasks =
-                schedules.where((s) => _isToday(s.scheduledDate)).toList();
-            final upcomingTasks =
-                schedules.where((s) => !_isToday(s.scheduledDate)).toList();
+            final todayTasks = schedules
+                .where((s) => _isToday(s.scheduledDate))
+                .toList();
+            final upcomingTasks = schedules
+                .where((s) => !_isToday(s.scheduledDate))
+                .toList();
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +125,9 @@ class DailyAgendaSection extends StatelessWidget {
                     highlight: false,
                   ),
                   const SizedBox(height: 8),
-                  ...upcomingTasks.take(3).map(
+                  ...upcomingTasks
+                      .take(3)
+                      .map(
                         (s) => AgendaTaskCard(
                           schedule: s,
                           elevator: findElevator(s.elevatorId, elevators),
@@ -237,8 +241,7 @@ class AgendaTaskCard extends ConsumerWidget {
     }
   }
 
-  static bool _isActive(String s) =>
-      s == 'pending' || s == 'in_progress';
+  static bool _isActive(String s) => s == 'pending' || s == 'in_progress';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -309,7 +312,9 @@ class AgendaTaskCard extends ConsumerWidget {
                           const Spacer(),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: pColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6),
@@ -328,8 +333,7 @@ class AgendaTaskCard extends ConsumerWidget {
                       const SizedBox(height: 8),
                       // Building name
                       Text(
-                        elevator?.buildingName ??
-                            'Asansör $shortElevatorId',
+                        elevator?.buildingName ?? 'Asansör $shortElevatorId',
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
@@ -364,8 +368,7 @@ class AgendaTaskCard extends ConsumerWidget {
                             ],
                           ),
                         ),
-                      if (schedule.notes != null &&
-                          schedule.notes!.isNotEmpty)
+                      if (schedule.notes != null && schedule.notes!.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
@@ -437,8 +440,8 @@ class AgendaTaskCard extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 color: schedule.status == 'completed'
-                                  ? const Color(0xFF2E7D32)
-                                  : AppColors.outline,
+                                    ? const Color(0xFF2E7D32)
+                                    : AppColors.outline,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

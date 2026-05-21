@@ -13,13 +13,22 @@ void main() {
     try {
       final file = File(fp);
       if (!file.existsSync()) continue;
-      
+
       String content = file.readAsStringSync();
 
-      content = content.replaceAll('\n          duration: AppDurations.snackBarError,', '');
-      content = content.replaceAll('\n          duration: AppDurations.snackBarSuccess,', '');
-      content = content.replaceAll('\n          duration: AppDurations.snackBarInfo,', '');
-      
+      content = content.replaceAll(
+        '\n          duration: AppDurations.snackBarError,',
+        '',
+      );
+      content = content.replaceAll(
+        '\n          duration: AppDurations.snackBarSuccess,',
+        '',
+      );
+      content = content.replaceAll(
+        '\n          duration: AppDurations.snackBarInfo,',
+        '',
+      );
+
       file.writeAsStringSync(content);
       print("Fixed $fp");
     } catch (e) {

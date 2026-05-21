@@ -13,7 +13,7 @@ void main() {
     final tempDir = Directory.systemTemp.createTempSync('hive_sync_test');
     Hive.init(tempDir.path);
     box = await Hive.openBox<String>(syncQueueBoxName);
-    
+
     registerFallbackValue(<String, dynamic>{});
   });
 
@@ -40,7 +40,7 @@ void main() {
       expect(service.pendingCount, 1);
       expect(service.conflictCount, 0);
       expect(box.length, 1);
-      
+
       final raw = box.getAt(0);
       expect(raw, isNotNull);
       final item = jsonDecode(raw!) as Map<String, dynamic>;
@@ -51,24 +51,30 @@ void main() {
   });
 
   group('SyncQueueService - Conflict Detection Properties', () {
-    test('conflictedItems and counts are updated when manual conflict data is injected', () async {
-      await box.put('conflict_1', jsonEncode({
-        'id': 'conflict_1',
-        'type': SyncItemType.elevatorUpdate,
-        'payload': {'id': 'e2'},
-        'queued_at': DateTime.now().toIso8601String(),
-        'status': 'conflict_detected',
-        'remote_state': {'id': 'e2', 'version': 5}
-      }));
+    test(
+      'conflictedItems and counts are updated when manual conflict data is injected',
+      () async {
+        await box.put(
+          'conflict_1',
+          jsonEncode({
+            'id': 'conflict_1',
+            'type': SyncItemType.elevatorUpdate,
+            'payload': {'id': 'e2'},
+            'queued_at': DateTime.now().toIso8601String(),
+            'status': 'conflict_detected',
+            'remote_state': {'id': 'e2', 'version': 5},
+          }),
+        );
 
-      expect(service.pendingCount, 0);
-      expect(service.conflictCount, 1);
-      
-      final conflicted = service.conflictedItems;
-      expect(conflicted.length, 1);
-      expect(conflicted.first['status'], 'conflict_detected');
-      expect(conflicted.first['remote_state']['version'], 5);
-    });
+        expect(service.pendingCount, 0);
+        expect(service.conflictCount, 1);
+
+        final conflicted = service.conflictedItems;
+        expect(conflicted.length, 1);
+        expect(conflicted.first['status'], 'conflict_detected');
+        expect(conflicted.first['remote_state']['version'], 5);
+      },
+    );
 
     test('resolveDiscard removes item from queue', () async {
       await service.enqueue(

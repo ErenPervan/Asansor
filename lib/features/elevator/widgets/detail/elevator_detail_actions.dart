@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/animations/animated_press_button.dart';
 
-
 class ElevatorDetailActions extends StatelessWidget {
   const ElevatorDetailActions({
     super.key,

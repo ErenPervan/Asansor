@@ -4,10 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 // ── Calendar Card ─────────────────────────────────────────────────────────────
 
 class DashboardCalendarCard extends StatelessWidget {
-  const DashboardCalendarCard({
-    super.key,
-    required this.onTap,
-  });
+  const DashboardCalendarCard({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -24,7 +21,9 @@ class DashboardCalendarCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.4)),
+            border: Border.all(
+              color: AppColors.outlineVariant.withValues(alpha: 0.4),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.03),
@@ -91,10 +90,7 @@ class DashboardCalendarCard extends StatelessWidget {
 // ── Master Calendar Card ──────────────────────────────────────────────────────
 
 class MasterCalendarCard extends StatelessWidget {
-  const MasterCalendarCard({
-    super.key,
-    required this.onTap,
-  });
+  const MasterCalendarCard({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -118,8 +114,7 @@ class MasterCalendarCard extends StatelessWidget {
               ],
             ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.2)),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.03),

@@ -4,10 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 // ── Checklist Management Card ──────────────────────────────────────────────────
 
 class ChecklistCard extends StatelessWidget {
-  const ChecklistCard({
-    super.key,
-    required this.onTap,
-  });
+  const ChecklistCard({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -24,7 +21,9 @@ class ChecklistCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.4)),
+            border: Border.all(
+              color: AppColors.outlineVariant.withValues(alpha: 0.4),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.03),
@@ -91,10 +90,7 @@ class ChecklistCard extends StatelessWidget {
 // ── Statistics Card ────────────────────────────────────────────────────────────
 
 class StatisticsCard extends StatelessWidget {
-  const StatisticsCard({
-    super.key,
-    required this.onTap,
-  });
+  const StatisticsCard({super.key, required this.onTap});
 
   final VoidCallback onTap;
 

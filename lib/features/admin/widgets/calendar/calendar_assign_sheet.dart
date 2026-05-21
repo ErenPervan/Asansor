@@ -10,7 +10,6 @@ import '../../providers/admin_providers.dart';
 import '../../providers/profile_providers.dart';
 import 'calendar_pickers.dart';
 
-
 // ── AssignTaskSheet ──────────────────────────────────────────────────────────
 
 class AssignTaskSheet extends ConsumerStatefulWidget {
@@ -20,7 +19,6 @@ class AssignTaskSheet extends ConsumerStatefulWidget {
   @override
   ConsumerState<AssignTaskSheet> createState() => AssignTaskSheetState();
 }
-
 
 class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
   ElevatorModel? _selectedElevator;
@@ -51,13 +49,8 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
   String get _formattedTime =>
       '${_time.hour.toString().padLeft(2, '0')}:${_time.minute.toString().padLeft(2, '0')}';
 
-  DateTime get _scheduledDateTime => DateTime(
-        _date.year,
-        _date.month,
-        _date.day,
-        _time.hour,
-        _time.minute,
-      );
+  DateTime get _scheduledDateTime =>
+      DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute);
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -123,7 +116,9 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
       return;
     }
 
-    await ref.read(scheduleControllerProvider.notifier).assignTask(
+    await ref
+        .read(scheduleControllerProvider.notifier)
+        .assignTask(
           elevatorId: _selectedElevator!.id,
           technicianId: _selectedTechnician!.id,
           scheduledDate: _scheduledDateTime,
@@ -136,9 +131,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
     if (ctrl.hasError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            ctrl.error.toString().replaceFirst('Exception: ', ''),
-          ),
+          content: Text(ctrl.error.toString().replaceFirst('Exception: ', '')),
           backgroundColor: AppColors.error,
         ),
       );
@@ -358,12 +351,16 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                                color: AppColors.outlineVariant, width: 1),
+                              color: AppColors.outlineVariant,
+                              width: 1,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                const BorderSide(color: AppColors.primary, width: 1.5),
+                            borderSide: const BorderSide(
+                              color: AppColors.primary,
+                              width: 1.5,
+                            ),
                           ),
                         ),
                       ),
@@ -415,7 +412,6 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
 }
 
 // ── PrioritySelector ─────────────────────────────────────────────────────────
-
 
 // ── PrioritySelector ─────────────────────────────────────────────────────────
 
@@ -493,7 +489,6 @@ class PrioritySelector extends StatelessWidget {
 
 // ── PickerField ──────────────────────────────────────────────────────────────
 
-
 // ── PickerField ──────────────────────────────────────────────────────────────
 
 class PickerField extends StatelessWidget {
@@ -525,7 +520,9 @@ class PickerField extends StatelessWidget {
           color: AppColors.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: hasValue ? AppColors.primary.withValues(alpha: 0.5) : AppColors.outlineVariant,
+            color: hasValue
+                ? AppColors.primary.withValues(alpha: 0.5)
+                : AppColors.outlineVariant,
             width: hasValue ? 1.5 : 1,
           ),
         ),
@@ -539,17 +536,17 @@ class PickerField extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: isLoading
-                  ? const SizedBox(
-                      height: 14,
-                      child: LinearProgressIndicator(),
-                    )
+                  ? const SizedBox(height: 14, child: LinearProgressIndicator())
                   : Text(
                       hasValue ? value! : hint,
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight:
-                            hasValue ? FontWeight.w600 : FontWeight.w400,
-                        color: hasValue ? AppColors.onSurface : AppColors.outline,
+                        fontWeight: hasValue
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: hasValue
+                            ? AppColors.onSurface
+                            : AppColors.outline,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

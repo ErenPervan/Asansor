@@ -15,9 +15,7 @@ class ConflictResolutionView extends ConsumerWidget {
     final conflicts = syncQueue.conflictedItems;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sync Conflicts'),
-      ),
+      appBar: AppBar(title: const Text('Sync Conflicts')),
       body: conflicts.isEmpty
           ? const Center(child: Text('No conflicts to resolve.'))
           : ListView.builder(
@@ -63,11 +61,17 @@ class _ConflictCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Your Changes', style: Theme.of(context).textTheme.titleSmall),
+                      Text(
+                        'Your Changes',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
                       const SizedBox(height: 4),
                       Text(
                         const JsonEncoder.withIndent('  ').convert(payload),
-                        style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -77,11 +81,17 @@ class _ConflictCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Remote State', style: Theme.of(context).textTheme.titleSmall),
+                      Text(
+                        'Remote State',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
                       const SizedBox(height: 4),
                       Text(
                         const JsonEncoder.withIndent('  ').convert(remoteState),
-                        style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -96,10 +106,15 @@ class _ConflictCard extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: () async {
                     try {
-                      await syncQueue.resolveForceUpdate(Supabase.instance.client, key);
+                      await syncQueue.resolveForceUpdate(
+                        Supabase.instance.client,
+                        key,
+                      );
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Update forced successfully.')),
+                          const SnackBar(
+                            content: Text('Update forced successfully.'),
+                          ),
                         );
                       }
                     } catch (e) {
@@ -116,16 +131,23 @@ class _ConflictCard extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: () async {
                     try {
-                      await syncQueue.resolveFlagDisputed(Supabase.instance.client, key);
+                      await syncQueue.resolveFlagDisputed(
+                        Supabase.instance.client,
+                        key,
+                      );
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Conflict reported for review.')),
+                          const SnackBar(
+                            content: Text('Conflict reported for review.'),
+                          ),
                         );
                       }
                     } catch (e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to report conflict: $e')),
+                          SnackBar(
+                            content: Text('Failed to report conflict: $e'),
+                          ),
                         );
                       }
                     }
@@ -138,13 +160,17 @@ class _ConflictCard extends StatelessWidget {
                     await syncQueue.resolveDiscard(key);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Local changes discarded.')),
+                        const SnackBar(
+                          content: Text('Local changes discarded.'),
+                        ),
                       );
                     }
                   },
                   icon: const Icon(Icons.delete),
                   label: const Text('Discard'),
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
                 ),
               ],
             ),

@@ -5,7 +5,6 @@ import '../../../elevator/models/elevator_model.dart';
 import '../../models/profile_model.dart';
 import '../../models/schedule_model.dart';
 
-
 // ── CalendarTaskCard ─────────────────────────────────────────────────────────
 
 class CalendarTaskCard extends StatelessWidget {
@@ -33,7 +32,9 @@ class CalendarTaskCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
+          border: Border.all(
+            color: AppColors.outlineVariant.withValues(alpha: 0.5),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -86,7 +87,8 @@ class CalendarTaskCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       // Elevator name
                       Text(
-                        elevator?.buildingName ?? 'Asansör ${schedule.elevatorId.substring(0, 6)}',
+                        elevator?.buildingName ??
+                            'Asansör ${schedule.elevatorId.substring(0, 6)}',
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
@@ -171,8 +173,9 @@ class CalendarTaskCard extends StatelessWidget {
                             onPressed: onCancel,
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.error,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
@@ -223,7 +226,6 @@ class PriorityBadge extends StatelessWidget {
     );
   }
 }
-
 
 class StatusBadge extends StatelessWidget {
   const StatusBadge({super.key, required this.label, required this.color});

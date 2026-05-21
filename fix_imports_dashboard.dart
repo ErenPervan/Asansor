@@ -1,11 +1,10 @@
 // ignore_for_file: avoid_print
 import 'dart:io';
 
-
 void main() async {
   final widgetsDir = 'd:/Asansor/lib/features/admin/widgets/dashboard';
   final dir = Directory(widgetsDir);
-  
+
   final commonImports = '''import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,7 +29,7 @@ import '../../models/profile_model.dart';
   await for (final file in dir.list()) {
     if (file is File && file.path.endsWith('.dart')) {
       final lines = await file.readAsLines();
-      
+
       int importEndIdx = 0;
       for (int i = 0; i < lines.length; i++) {
         if (lines[i].startsWith('import ')) {
@@ -38,10 +37,10 @@ import '../../models/profile_model.dart';
         } else if (lines[i].trim().isEmpty) {
           continue;
         } else {
-          break; 
+          break;
         }
       }
-      
+
       final content = lines.sublist(importEndIdx + 1).join('\n');
       await file.writeAsString('$commonImports\n$content');
       print('Fixed imports in ${file.path}');

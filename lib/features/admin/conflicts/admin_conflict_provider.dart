@@ -73,7 +73,8 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
         .inFilter('id', technicianIds);
 
     final profileMap = {
-      for (final p in profilesResponse) p['id'] as String: p['full_name'] as String?,
+      for (final p in profilesResponse)
+        p['id'] as String: p['full_name'] as String?,
     };
 
     return (rows as List).map((r) {
@@ -110,9 +111,7 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
 
       await _client
           .from('conflict_reports')
-          .update({
-            'status': 'resolved_forced',
-          })
+          .update({'status': 'resolved_forced'})
           .eq('id', report.id);
 
       state = AsyncData(await _fetchPending());
@@ -129,9 +128,7 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
     try {
       await _client
           .from('conflict_reports')
-          .update({
-            'status': 'resolved_discarded',
-          })
+          .update({'status': 'resolved_discarded'})
           .eq('id', report.id);
 
       state = AsyncData(await _fetchPending());

@@ -13,6 +13,7 @@ import '../models/schedule_with_details.dart';
 import '../providers/admin_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
+
 // Dot colours for calendar markers.
 const _dotRed = Color(0xFFDC2626);
 const _dotGreen = Color(0xFF16A34A);
@@ -84,8 +85,7 @@ class _AdminMasterCalendarViewState
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Yenile',
-            onPressed: () =>
-                ref.invalidate(allSchedulesWithDetailsProvider),
+            onPressed: () => ref.invalidate(allSchedulesWithDetailsProvider),
           ),
           // Filter with active indicator
           Padding(
@@ -163,8 +163,7 @@ class _AdminMasterCalendarViewState
                   _selectedDay = sel;
                   _focusedDay = foc;
                 }),
-                onPageChanged: (foc) =>
-                    setState(() => _focusedDay = foc),
+                onPageChanged: (foc) => setState(() => _focusedDay = foc),
               ),
 
               const Divider(height: 1, color: AppColors.outlineVariant),
@@ -179,8 +178,7 @@ class _AdminMasterCalendarViewState
                     : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
                         itemCount: dayTasks.length,
-                        separatorBuilder: (_, i) =>
-                            const SizedBox(height: 10),
+                        separatorBuilder: (_, i) => const SizedBox(height: 10),
                         itemBuilder: (_, i) =>
                             _MasterTaskCard(task: dayTasks[i]),
                       ),
@@ -192,10 +190,7 @@ class _AdminMasterCalendarViewState
     );
   }
 
-  void _showFilterSheet(
-    BuildContext context,
-    List<ScheduleWithDetails> all,
-  ) {
+  void _showFilterSheet(BuildContext context, List<ScheduleWithDetails> all) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -209,14 +204,12 @@ class _AdminMasterCalendarViewState
     BuildContext context,
     DateTime month,
   ) async {
-    final monthLabel =
-        DateFormat('MMMM y', 'tr_TR').format(month);
+    final monthLabel = DateFormat('MMMM y', 'tr_TR').format(month);
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
@@ -225,17 +218,17 @@ class _AdminMasterCalendarViewState
                 color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.auto_fix_high_rounded,
-                  color: AppColors.primary, size: 20),
+              child: const Icon(
+                Icons.auto_fix_high_rounded,
+                color: AppColors.primary,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             const Expanded(
               child: Text(
                 'Otomatik Planlama',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
               ),
             ),
           ],
@@ -271,9 +264,7 @@ class _AdminMasterCalendarViewState
     );
 
     if (confirmed == true && context.mounted) {
-      await ref
-          .read(autoScheduleControllerProvider.notifier)
-          .generate(month);
+      await ref.read(autoScheduleControllerProvider.notifier).generate(month);
     }
   }
 
@@ -285,8 +276,9 @@ class _AdminMasterCalendarViewState
   ) {
     var result = all;
     if (filter.technicianId != null) {
-      result =
-          result.where((s) => s.technicianId == filter.technicianId).toList();
+      result = result
+          .where((s) => s.technicianId == filter.technicianId)
+          .toList();
     }
     if (filter.status != null) {
       result = result.where((s) => s.status == filter.status).toList();
@@ -374,8 +366,7 @@ class _CalendarSection extends StatelessWidget {
           outsideDaysVisible: false,
           cellMargin: const EdgeInsets.all(5),
           // Marker decoration is overridden by calendarBuilders below.
-          markerDecoration:
-              const BoxDecoration(shape: BoxShape.circle),
+          markerDecoration: const BoxDecoration(shape: BoxShape.circle),
           markersMaxCount: 1,
         ),
         headerStyle: const HeaderStyle(
@@ -419,10 +410,7 @@ class _CalendarSection extends StatelessWidget {
               child: Container(
                 width: 6,
                 height: 6,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
             );
           },
@@ -437,13 +425,13 @@ class _CalendarSection extends StatelessWidget {
   /// GREEN → all active tasks are completed.
   /// AMBER → ≥1 pending/in-progress task.
   static Color? _markerColor(List<ScheduleWithDetails> events) {
-    final active =
-        events.where((e) => e.status != 'cancelled').toList();
+    final active = events.where((e) => e.status != 'cancelled').toList();
     if (active.isEmpty) return null;
 
-    if (active.any((e) =>
-        (e.priority == 'emergency' || e.priority == 'high') &&
-        !e.isCompleted)) {
+    if (active.any(
+      (e) =>
+          (e.priority == 'emergency' || e.priority == 'high') && !e.isCompleted,
+    )) {
       return _dotRed;
     }
     if (active.every((e) => e.isCompleted)) return _dotGreen;
@@ -461,16 +449,18 @@ class _DayHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label =
-        DateFormat('d MMMM y, EEEE', 'tr_TR').format(day);
+    final label = DateFormat('d MMMM y, EEEE', 'tr_TR').format(day);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       color: AppColors.surfaceContainer,
       child: Row(
         children: [
-          const Icon(Icons.calendar_today_outlined,
-              size: 15, color: AppColors.primary),
+          const Icon(
+            Icons.calendar_today_outlined,
+            size: 15,
+            color: AppColors.primary,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -483,8 +473,7 @@ class _DayHeader extends StatelessWidget {
             ),
           ),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
             decoration: BoxDecoration(
               color: taskCount > 0
                   ? AppColors.primary.withValues(alpha: 0.1)
@@ -496,8 +485,9 @@ class _DayHeader extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color:
-                    taskCount > 0 ? AppColors.primary : AppColors.onSurfaceVariant,
+                color: taskCount > 0
+                    ? AppColors.primary
+                    : AppColors.onSurfaceVariant,
               ),
             ),
           ),
@@ -516,8 +506,10 @@ class _MasterTaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final time = DateFormat('HH:mm', 'tr_TR')
-        .format(task.scheduledDate.toLocal());
+    final time = DateFormat(
+      'HH:mm',
+      'tr_TR',
+    ).format(task.scheduledDate.toLocal());
 
     return Material(
       color: AppColors.surface,
@@ -547,7 +539,8 @@ class _MasterTaskCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: _priorityStripeColor(task.priority),
                     borderRadius: const BorderRadius.horizontal(
-                        left: Radius.circular(14)),
+                      left: Radius.circular(14),
+                    ),
                   ),
                 ),
                 // Content
@@ -585,14 +578,19 @@ class _MasterTaskCard extends StatelessWidget {
                           const SizedBox(height: 3),
                           Row(
                             children: [
-                              const Icon(Icons.location_on_outlined,
-                                  size: 12, color: AppColors.outline),
+                              const Icon(
+                                Icons.location_on_outlined,
+                                size: 12,
+                                color: AppColors.outline,
+                              ),
                               const SizedBox(width: 3),
                               Expanded(
                                 child: Text(
                                   task.address!,
                                   style: const TextStyle(
-                                      fontSize: 12, color: AppColors.outline),
+                                    fontSize: 12,
+                                    color: AppColors.outline,
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -608,12 +606,12 @@ class _MasterTaskCard extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 11,
-                              backgroundColor:
-                                  AppColors.primary.withValues(alpha: 0.12),
+                              backgroundColor: AppColors.primary.withValues(
+                                alpha: 0.12,
+                              ),
                               child: Text(
                                 task.technicianName.isNotEmpty
-                                    ? task.technicianName[0]
-                                        .toUpperCase()
+                                    ? task.technicianName[0].toUpperCase()
                                     : '?',
                                 style: const TextStyle(
                                   fontSize: 10,
@@ -648,8 +646,11 @@ class _MasterTaskCard extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.schedule_rounded,
-                                    size: 13, color: AppColors.outline),
+                                const Icon(
+                                  Icons.schedule_rounded,
+                                  size: 13,
+                                  color: AppColors.outline,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   time,
@@ -673,8 +674,7 @@ class _MasterTaskCard extends StatelessWidget {
                         ),
 
                         // Notes
-                        if (task.notes != null &&
-                            task.notes!.isNotEmpty) ...[
+                        if (task.notes != null && task.notes!.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           Container(
                             width: double.infinity,
@@ -854,8 +854,11 @@ class _EmptyDayPlaceholder extends StatelessWidget {
                 color: AppColors.surfaceContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.event_available_outlined,
-                  size: 36, color: AppColors.outline),
+              child: const Icon(
+                Icons.event_available_outlined,
+                size: 36,
+                color: AppColors.outline,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -890,20 +893,27 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off_outlined,
-                size: 48, color: AppColors.outline),
+            const Icon(
+              Icons.cloud_off_outlined,
+              size: 48,
+              color: AppColors.outline,
+            ),
             const SizedBox(height: 12),
             const Text(
               'Veriler yüklenemedi',
               style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.onSurface),
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.onSurface,
+              ),
             ),
             const SizedBox(height: 6),
             Text(
               error.toString(),
-              style: const TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -1025,9 +1035,7 @@ class _FilterSheet extends ConsumerWidget {
                         label: tech.value,
                         selected: filter.technicianId == tech.key,
                         onSelected: () => notifier.setTechnician(
-                          filter.technicianId == tech.key
-                              ? null
-                              : tech.key,
+                          filter.technicianId == tech.key ? null : tech.key,
                         ),
                       ),
                   ],
@@ -1048,9 +1056,8 @@ class _FilterSheet extends ConsumerWidget {
                     _FilterChipItem(
                       label: lbl,
                       selected: (filter.status ?? '') == val,
-                      onSelected: () => notifier.setStatus(
-                        val.isEmpty ? null : val,
-                      ),
+                      onSelected: () =>
+                          notifier.setStatus(val.isEmpty ? null : val),
                     ),
                 ],
               ),
@@ -1108,7 +1115,9 @@ class _FilterChipItem extends StatelessWidget {
       selectedColor: AppColors.primary.withValues(alpha: 0.1),
       checkmarkColor: AppColors.primary,
       side: BorderSide(
-        color: selected ? AppColors.primary.withValues(alpha: 0.4) : AppColors.outlineVariant,
+        color: selected
+            ? AppColors.primary.withValues(alpha: 0.4)
+            : AppColors.outlineVariant,
       ),
       backgroundColor: AppColors.surface,
       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -1157,7 +1166,10 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 5),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant),
+          style: const TextStyle(
+            fontSize: 11,
+            color: AppColors.onSurfaceVariant,
+          ),
         ),
       ],
     );

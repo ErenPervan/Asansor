@@ -7,18 +7,27 @@ import 'package:asansor/core/services/pdf_service.dart';
 
 // Supabase Mocks
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGoTrueClient extends Mock implements GoTrueClient {}
+
 class MockSession extends Mock implements Session {}
+
 class MockUser extends Mock implements User {}
+
 class MockSupabaseQueryBuilder extends Mock implements SupabaseQueryBuilder {}
-class MockPostgrestFilterBuilder extends Mock implements PostgrestFilterBuilder {}
-class MockPostgrestTransformBuilder<T> extends Mock implements PostgrestTransformBuilder<T> {}
+
+class MockPostgrestFilterBuilder extends Mock
+    implements PostgrestFilterBuilder {}
+
+class MockPostgrestTransformBuilder<T> extends Mock
+    implements PostgrestTransformBuilder<T> {}
 
 // Hive Mocks
 class MockHiveBox<T> extends Mock implements Box<T> {}
 
 // Repository Mocks
 class MockElevatorRepository extends Mock implements ElevatorRepository {}
+
 class MockScheduleRepository extends Mock implements ScheduleRepository {}
 
 // Service Mocks

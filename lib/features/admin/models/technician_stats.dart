@@ -27,8 +27,7 @@ class TechnicianTask {
   final String? notes;
 
   bool get isCompleted => status == 'completed';
-  bool get isActive =>
-      status == 'pending' || status == 'in_progress';
+  bool get isActive => status == 'pending' || status == 'in_progress';
 }
 
 /// Aggregated stats for a single technician for the current day and month.
@@ -57,8 +56,7 @@ class TechnicianStats {
   int get todayPending => todayTotal - todayCompleted;
 
   /// `true` when the technician has at least one pending or in-progress task.
-  bool get hasActiveTasks =>
-      todayTasks.any((t) => t.isActive);
+  bool get hasActiveTasks => todayTasks.any((t) => t.isActive);
 
   /// 0.0–1.0 fraction for the workload progress bar.
   double get progressValue =>

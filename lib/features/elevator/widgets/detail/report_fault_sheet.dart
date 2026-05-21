@@ -5,7 +5,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../fault/models/fault_report_model.dart';
 import '../../../fault/providers/fault_providers.dart';
 
-
 class ReportFaultSheet extends ConsumerStatefulWidget {
   const ReportFaultSheet({super.key, required this.elevatorId});
 
@@ -55,7 +54,7 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
               content: Text(
                 fault.isOfflineQueued
                     ? 'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, '
-                        'bağlantı sağlandığında otomatik senkronize edilecek.'
+                          'bağlantı sağlandığında otomatik senkronize edilecek.'
                     : 'Arıza başarıyla bildirildi.',
               ),
               behavior: SnackBarBehavior.floating,
@@ -97,7 +96,9 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
         }
       },
       child: Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
@@ -146,7 +147,10 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
                           ),
                           Text(
                             'Gözlemlenen arızayı açıklayın.',
-                            style: TextStyle(fontSize: 13, color: AppColors.outline),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.outline,
+                            ),
                           ),
                         ],
                       ),

@@ -30,37 +30,37 @@ class FaultDetailView extends ConsumerWidget {
     final faultAsync = ref.watch(faultByIdProvider(faultId));
 
     return faultAsync.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
         appBar: AppBar(title: const Text('Arıza Detayı')),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.primary),
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: AppColors.primary,
+              ),
               const SizedBox(height: 12),
               Text(
                 'Arıza yüklenemedi',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: AppColors.onSurface),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: AppColors.onSurface),
               ),
               const SizedBox(height: 4),
               Text(
                 e.toString(),
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: AppColors.onSurfaceVariant),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
               FilledButton(
-                onPressed: () =>
-                    ref.invalidate(faultByIdProvider(faultId)),
+                onPressed: () => ref.invalidate(faultByIdProvider(faultId)),
                 child: const Text('Tekrar Dene'),
               ),
             ],
@@ -92,7 +92,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 2),
+    );
   }
 
   @override
@@ -118,328 +120,353 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
           CustomScrollView(
             slivers: [
               // ── App bar with status gradient ─────────────────────────────
-          SliverAppBar(
-            expandedHeight: 180,
-            pinned: true,
-            backgroundColor: fault.isResolved ? AppColors.success : AppColors.primary,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => context.pop(),
-            ),
-            actions: [
-              if (!fault.isResolved)
-                IconButton(
-                  tooltip: 'Asansöre Git',
-                  icon: const Icon(Icons.elevator_outlined,
-                      color: Colors.white),
-                  onPressed: () =>
-                      context.push('/elevator/${fault.elevatorId}'),
+              SliverAppBar(
+                expandedHeight: 180,
+                pinned: true,
+                backgroundColor: fault.isResolved
+                    ? AppColors.success
+                    : AppColors.primary,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => context.pop(),
                 ),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: _StatusHeader(
-                isResolved: fault.isResolved,
-                reportedAt: fault.reportedAt,
-                resolvedAt: fault.resolvedAt,
+                actions: [
+                  if (!fault.isResolved)
+                    IconButton(
+                      tooltip: 'Asansöre Git',
+                      icon: const Icon(
+                        Icons.elevator_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () =>
+                          context.push('/elevator/${fault.elevatorId}'),
+                    ),
+                ],
+                flexibleSpace: FlexibleSpaceBar(
+                  background: _StatusHeader(
+                    isResolved: fault.isResolved,
+                    reportedAt: fault.reportedAt,
+                    resolvedAt: fault.resolvedAt,
+                  ),
+                ),
+                title: const Text(
+                  'Arıza Detayı',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
-            ),
-            title: const Text(
-              'Arıza Detayı',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-            ),
-          ),
 
-          SliverToBoxAdapter(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Elevator info card ────────────────────────────────
-                  InfoCard(
-                    child: elevatorAsync.when(
-                      loading: () => const _SkeletonRow(),
-                      error: (e, st) => const _ElevatorErrorRow(),
-                      data: (elevator) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SectionLabel(
-                            icon: Icons.elevator_outlined,
-                            label: 'Asansör',
-                            uppercase: true,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            elevator.buildingName,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.onSurface,
-                            ),
-                          ),
-                          if (elevatorAddress.isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on_outlined,
-                                    size: 14, color: AppColors.outline),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    elevatorAddress,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: AppColors.onSurfaceVariant,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Elevator info card ────────────────────────────────
+                      InfoCard(
+                        child: elevatorAsync.when(
+                          loading: () => const _SkeletonRow(),
+                          error: (e, st) => const _ElevatorErrorRow(),
+                          data: (elevator) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SectionLabel(
+                                icon: Icons.elevator_outlined,
+                                label: 'Asansör',
+                                uppercase: true,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                elevator.buildingName,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.onSurface,
+                                ),
+                              ),
+                              if (elevatorAddress.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.location_on_outlined,
+                                      size: 14,
+                                      color: AppColors.outline,
                                     ),
-                                  ),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        elevatorAddress,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: AppColors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
+                              const SizedBox(height: 12),
+                              _StatusBadge(isResolved: fault.isResolved),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // ── Fault description ─────────────────────────────────
+                      InfoCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SectionLabel(
+                              icon: Icons.report_problem_outlined,
+                              label: 'Arıza Açıklaması',
+                              uppercase: true,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              fault.description.isNotEmpty
+                                  ? fault.description
+                                  : 'Açıklama girilmedi.',
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: AppColors.onSurface,
+                                height: 1.55,
+                              ),
                             ),
                           ],
-                          const SizedBox(height: 12),
-                          _StatusBadge(isResolved: fault.isResolved),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // ── Fault description ─────────────────────────────────
-                  InfoCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SectionLabel(
-                          icon: Icons.report_problem_outlined,
-                          label: 'Arıza Açıklaması',
-                          uppercase: true,
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          fault.description.isNotEmpty
-                              ? fault.description
-                              : 'Açıklama girilmedi.',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: AppColors.onSurface,
-                            height: 1.55,
+                      ),
+
+                      // ── Photo ─────────────────────────────────────────────
+                      if (fault.photoUrl != null &&
+                          fault.photoUrl!.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        _PhotoCard(photoUrl: fault.photoUrl!),
+                      ],
+
+                      // ── Resolution notes (if resolved) ────────────────────
+                      if (fault.isResolved &&
+                          fault.resolutionNotes != null &&
+                          fault.resolutionNotes!.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        InfoCard(
+                          accentColor: AppColors.success,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SectionLabel(
+                                icon: Icons.check_circle_outline,
+                                label: 'Çözüm Notu',
+                                color: AppColors.success,
+                                uppercase: true,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                fault.resolutionNotes!,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: AppColors.onSurface,
+                                  height: 1.55,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
-                    ),
-                  ),
 
-                  // ── Photo ─────────────────────────────────────────────
-                  if (fault.photoUrl != null &&
-                      fault.photoUrl!.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    _PhotoCard(photoUrl: fault.photoUrl!),
-                  ],
+                      // ── Timestamps row ────────────────────────────────────
+                      const SizedBox(height: 12),
+                      InfoCard(
+                        child: Column(
+                          children: [
+                            _TimeRow(
+                              icon: Icons.access_time_rounded,
+                              label: 'Bildirim Tarihi',
+                              time: fault.reportedAt,
+                            ),
+                            if (fault.isResolved &&
+                                fault.resolvedAt != null) ...[
+                              const Divider(
+                                height: 20,
+                                color: AppColors.outlineVariant,
+                              ),
+                              _TimeRow(
+                                icon: Icons.check_circle_outline,
+                                label: 'Onarım Tarihi',
+                                time: fault.resolvedAt!,
+                                color: AppColors.success,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
 
-                  // ── Resolution notes (if resolved) ────────────────────
-                  if (fault.isResolved &&
-                      fault.resolutionNotes != null &&
-                      fault.resolutionNotes!.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    InfoCard(
-                      accentColor: AppColors.success,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SectionLabel(
-                            icon: Icons.check_circle_outline,
-                            label: 'Çözüm Notu',
-                            color: AppColors.success,
-                            uppercase: true,
+                      // ── Action area ───────────────────────────────────────
+                      const SizedBox(height: 20),
+                      if (!fault.isResolved) ...[
+                        // Notes toggle
+                        AnimatedCrossFade(
+                          duration: const Duration(milliseconds: 250),
+                          crossFadeState: _notesExpanded
+                              ? CrossFadeState.showSecond
+                              : CrossFadeState.showFirst,
+                          firstChild: OutlinedButton.icon(
+                            icon: const Icon(Icons.note_add_outlined),
+                            label: const Text('Çözüm notu ekle (isteğe bağlı)'),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 48),
+                              side: const BorderSide(
+                                color: AppColors.outlineVariant,
+                              ),
+                              foregroundColor: AppColors.onSurfaceVariant,
+                            ),
+                            onPressed: () =>
+                                setState(() => _notesExpanded = true),
                           ),
-                          const SizedBox(height: 10),
-                          Text(
-                            fault.resolutionNotes!,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: AppColors.onSurface,
-                              height: 1.55,
+                          secondChild: TextField(
+                            controller: _notesController,
+                            maxLines: 3,
+                            decoration: InputDecoration(
+                              labelText: 'Çözüm Notu',
+                              hintText: 'Yapılan işlemleri kısaca açıklayın…',
+                              alignLabelWithHint: true,
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () {
+                                  _notesController.clear();
+                                  setState(() => _notesExpanded = false);
+                                },
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  // ── Timestamps row ────────────────────────────────────
-                  const SizedBox(height: 12),
-                  InfoCard(
-                    child: Column(
-                      children: [
-                        _TimeRow(
-                          icon: Icons.access_time_rounded,
-                          label: 'Bildirim Tarihi',
-                          time: fault.reportedAt,
                         ),
-                        if (fault.isResolved &&
-                            fault.resolvedAt != null) ...[
-                          const Divider(height: 20, color: AppColors.outlineVariant),
-                          _TimeRow(
-                            icon: Icons.check_circle_outline,
-                            label: 'Onarım Tarihi',
-                            time: fault.resolvedAt!,
-                            color: AppColors.success,
+
+                        const SizedBox(height: 12),
+
+                        // Resolve button
+                        FilledButton.icon(
+                          icon: updateState.isLoading
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.check_circle_outline),
+                          label: Text(
+                            updateState.isLoading
+                                ? 'Kaydediliyor…'
+                                : 'Arızayı Onar',
                           ),
-                        ],
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 52),
+                            backgroundColor: AppColors.success,
+                          ),
+                          onPressed: updateState.isLoading
+                              ? null
+                              : () => _handleResolve(context, ref, fault.id),
+                        ),
+                        const SizedBox(height: 8),
+
+                        // Navigate to elevator
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.elevator_outlined),
+                          label: Text('$elevatorName Detayına Git'),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 48),
+                            side: const BorderSide(
+                              color: AppColors.outlineVariant,
+                            ),
+                            foregroundColor: AppColors.onSurface,
+                          ),
+                          onPressed: () =>
+                              context.push('/elevator/${fault.elevatorId}'),
+                        ),
+                      ] else ...[
+                        // Reopen button
+                        OutlinedButton.icon(
+                          icon: updateState.isLoading
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.refresh),
+                          label: Text(
+                            updateState.isLoading
+                                ? 'İşleniyor…'
+                                : 'Arızayı Yeniden Aç',
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 48),
+                            side: BorderSide(
+                              color: updateState.isLoading
+                                  ? AppColors.outlineVariant
+                                  : AppColors.primary,
+                            ),
+                            foregroundColor: AppColors.primary,
+                          ),
+                          onPressed: updateState.isLoading
+                              ? null
+                              : () => _handleReopen(context, ref, fault.id),
+                        ),
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.elevator_outlined),
+                          label: Text('$elevatorName Detayına Git'),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 48),
+                            side: const BorderSide(
+                              color: AppColors.outlineVariant,
+                            ),
+                            foregroundColor: AppColors.onSurface,
+                          ),
+                          onPressed: () =>
+                              context.push('/elevator/${fault.elevatorId}'),
+                        ),
                       ],
-                    ),
+
+                      const SizedBox(height: 40),
+                    ],
                   ),
-
-                  // ── Action area ───────────────────────────────────────
-                  const SizedBox(height: 20),
-                  if (!fault.isResolved) ...[
-                    // Notes toggle
-                    AnimatedCrossFade(
-                      duration: const Duration(milliseconds: 250),
-                      crossFadeState: _notesExpanded
-                          ? CrossFadeState.showSecond
-                          : CrossFadeState.showFirst,
-                      firstChild: OutlinedButton.icon(
-                        icon: const Icon(Icons.note_add_outlined),
-                        label: const Text('Çözüm notu ekle (isteğe bağlı)'),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 48),
-                          side: const BorderSide(color: AppColors.outlineVariant),
-                          foregroundColor: AppColors.onSurfaceVariant,
-                        ),
-                        onPressed: () =>
-                            setState(() => _notesExpanded = true),
-                      ),
-                      secondChild: TextField(
-                        controller: _notesController,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          labelText: 'Çözüm Notu',
-                          hintText:
-                              'Yapılan işlemleri kısaca açıklayın…',
-                          alignLabelWithHint: true,
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              _notesController.clear();
-                              setState(() => _notesExpanded = false);
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Resolve button
-                    FilledButton.icon(
-                      icon: updateState.isLoading
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.check_circle_outline),
-                      label: Text(
-                        updateState.isLoading
-                            ? 'Kaydediliyor…'
-                            : 'Arızayı Onar',
-                      ),
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 52),
-                        backgroundColor: AppColors.success,
-                      ),
-                      onPressed: updateState.isLoading
-                          ? null
-                          : () => _handleResolve(context, ref, fault.id),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Navigate to elevator
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.elevator_outlined),
-                      label: Text('$elevatorName Detayına Git'),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 48),
-                        side: const BorderSide(color: AppColors.outlineVariant),
-                        foregroundColor: AppColors.onSurface,
-                      ),
-                      onPressed: () =>
-                          context.push('/elevator/${fault.elevatorId}'),
-                    ),
-                  ] else ...[
-                    // Reopen button
-                    OutlinedButton.icon(
-                      icon: updateState.isLoading
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.refresh),
-                      label: Text(
-                        updateState.isLoading ? 'İşleniyor…' : 'Arızayı Yeniden Aç',
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 48),
-                        side: BorderSide(
-                          color: updateState.isLoading
-                              ? AppColors.outlineVariant
-                              : AppColors.primary,
-                        ),
-                        foregroundColor: AppColors.primary,
-                      ),
-                      onPressed: updateState.isLoading
-                          ? null
-                          : () => _handleReopen(context, ref, fault.id),
-                    ),
-                    const SizedBox(height: 8),
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.elevator_outlined),
-                      label: Text('$elevatorName Detayına Git'),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 48),
-                        side: const BorderSide(color: AppColors.outlineVariant),
-                        foregroundColor: AppColors.onSurface,
-                      ),
-                      onPressed: () =>
-                          context.push('/elevator/${fault.elevatorId}'),
-                    ),
-                  ],
-
-                  const SizedBox(height: 40),
-                ]),
+                ),
               ),
-            ),
-          ],
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            emissionFrequency: 0.05,
-            numberOfParticles: 20,
-            maxBlastForce: 20,
-            minBlastForce: 8,
-            colors: const [
-              Colors.green,
-              Colors.blue,
-              Colors.pink,
-              Colors.orange,
-              Colors.purple
             ],
           ),
-        ),
-      ],
-    ),
-  );
-}
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              maxBlastForce: 20,
+              minBlastForce: 8,
+              colors: const [
+                Colors.green,
+                Colors.blue,
+                Colors.pink,
+                Colors.orange,
+                Colors.purple,
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<void> _handleResolve(
     BuildContext context,
@@ -448,7 +475,10 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
   ) async {
     final notes = _notesController.text.trim();
     final ctrl = ref.read(faultUpdateControllerProvider.notifier);
-    final ok = await ctrl.resolve(faultId, resolutionNotes: notes.isEmpty ? null : notes);
+    final ok = await ctrl.resolve(
+      faultId,
+      resolutionNotes: notes.isEmpty ? null : notes,
+    );
 
     if (ok) {
       _confettiController.play();
@@ -541,8 +571,9 @@ class _StatusHeader extends StatelessWidget {
             colors: [Color(0xFF991B1B), Color(0xFFDC2626)],
           );
 
-    final icon =
-        isResolved ? Icons.check_circle_rounded : Icons.warning_rounded;
+    final icon = isResolved
+        ? Icons.check_circle_rounded
+        : Icons.warning_rounded;
     final label = isResolved ? 'ÇÖZÜLDÜ' : 'AÇIK ARIZA';
     final sub = isResolved
         ? 'Onarıldı: ${_fmt(resolvedAt ?? reportedAt)}'
@@ -642,8 +673,11 @@ class _PhotoCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: const Center(
-            child: Icon(Icons.broken_image_outlined,
-                size: 40, color: AppColors.outline),
+            child: Icon(
+              Icons.broken_image_outlined,
+              size: 40,
+              color: AppColors.outline,
+            ),
           ),
         ),
       ),
@@ -665,7 +699,9 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isResolved ? AppColors.successContainer : const Color(0xFFFEE2E2),
+        color: isResolved
+            ? AppColors.successContainer
+            : const Color(0xFFFEE2E2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -712,8 +748,7 @@ class _TimeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = color ?? AppColors.onSurfaceVariant;
     final local = time.toLocal();
-    final formatted =
-        DateFormat('d MMMM y, HH:mm', 'tr_TR').format(local);
+    final formatted = DateFormat('d MMMM y, HH:mm', 'tr_TR').format(local);
     return Row(
       children: [
         Icon(icon, size: 16, color: c),

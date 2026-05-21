@@ -9,8 +9,9 @@ import '../services/sync_queue_service.dart';
 
 /// Streams the current list of [ConnectivityResult]s whenever the network
 /// state changes. `connectivity_plus` v6 returns a `List<>` per event.
-final connectivityStreamProvider =
-    StreamProvider<List<ConnectivityResult>>((ref) {
+final connectivityStreamProvider = StreamProvider<List<ConnectivityResult>>((
+  ref,
+) {
   return Connectivity().onConnectivityChanged;
 });
 
@@ -19,9 +20,10 @@ final connectivityStreamProvider =
 /// Defaults to `true` while the stream is loading to avoid false "offline"
 /// flickers on cold start.
 final isOnlineProvider = Provider<bool>((ref) {
-  return ref.watch(connectivityStreamProvider).when(
-        data: (results) =>
-            results.any((r) => r != ConnectivityResult.none),
+  return ref
+      .watch(connectivityStreamProvider)
+      .when(
+        data: (results) => results.any((r) => r != ConnectivityResult.none),
         loading: () => true,
         error: (e, st) => true,
       );
@@ -43,8 +45,9 @@ final readCacheServiceProvider = Provider<ReadCacheService>((ref) {
 ///
 /// Uses `ChangeNotifierProvider` so widgets watching
 /// [pendingSyncCountProvider] automatically rebuild when the queue changes.
-final syncQueueServiceProvider =
-    ChangeNotifierProvider<SyncQueueService>((ref) {
+final syncQueueServiceProvider = ChangeNotifierProvider<SyncQueueService>((
+  ref,
+) {
   return SyncQueueService();
 });
 
@@ -68,29 +71,28 @@ final pendingSyncCountProvider = Provider<int>((ref) {
 /// Kept alive at the app-root level (watched inside [AsansorApp]) so it runs
 /// for the full app lifetime regardless of which screen is visible.
 final autoSyncProvider = Provider<void>((ref) {
-  ref.listen<AsyncValue<List<ConnectivityResult>>>(
-    connectivityStreamProvider,
-    (previous, next) {
-      next.whenData((results) {
-        final isNowOnline =
-            results.any((r) => r != ConnectivityResult.none);
-        if (!isNowOnline) return;
+  ref.listen<AsyncValue<List<ConnectivityResult>>>(connectivityStreamProvider, (
+    previous,
+    next,
+  ) {
+    next.whenData((results) {
+      final isNowOnline = results.any((r) => r != ConnectivityResult.none);
+      if (!isNowOnline) return;
 
-        // `previous == null` → first connectivity event after cold start.
-        // Treat it the same as "was offline" so any items queued in a prior
-        // offline session are flushed immediately on startup.
-        final wasOffline = previous == null ||
-          (previous.valueOrNull
-                    ?.every((r) => r == ConnectivityResult.none) ??
-                true);
+      // `previous == null` → first connectivity event after cold start.
+      // Treat it the same as "was offline" so any items queued in a prior
+      // offline session are flushed immediately on startup.
+      final wasOffline =
+          previous == null ||
+          (previous.valueOrNull?.every((r) => r == ConnectivityResult.none) ??
+              true);
 
-        if (wasOffline) {
-          final queue = ref.read(syncQueueServiceProvider);
-          if (queue.hasPending) {
-            queue.flush(Supabase.instance.client);
-          }
+      if (wasOffline) {
+        final queue = ref.read(syncQueueServiceProvider);
+        if (queue.hasPending) {
+          queue.flush(Supabase.instance.client);
         }
-      });
-    },
-  );
+      }
+    });
+  });
 });

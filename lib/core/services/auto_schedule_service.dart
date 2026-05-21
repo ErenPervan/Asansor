@@ -6,10 +6,7 @@ import '../../features/admin/repositories/schedule_repository.dart';
 
 /// Result returned by [AutoScheduleService.generateMonthlyMaintenances].
 class AutoScheduleResult {
-  const AutoScheduleResult({
-    required this.inserted,
-    required this.skipped,
-  });
+  const AutoScheduleResult({required this.inserted, required this.skipped});
 
   /// Number of new periodic maintenance tasks created.
   final int inserted;
@@ -44,11 +41,12 @@ class AutoScheduleResult {
 /// print('${result.inserted} tasks created, ${result.skipped} already existed');
 /// ```
 class AutoScheduleService {
-  AutoScheduleService(SupabaseClient client, {
+  AutoScheduleService(
+    SupabaseClient client, {
     @visibleForTesting ElevatorRepository? elevatorRepo,
     @visibleForTesting ScheduleRepository? scheduleRepo,
-  })  : _elevatorRepo = elevatorRepo ?? ElevatorRepository(client),
-        _scheduleRepo = scheduleRepo ?? ScheduleRepository(client);
+  }) : _elevatorRepo = elevatorRepo ?? ElevatorRepository(client),
+       _scheduleRepo = scheduleRepo ?? ScheduleRepository(client);
 
   final ElevatorRepository _elevatorRepo;
   final ScheduleRepository _scheduleRepo;
@@ -65,24 +63,24 @@ class AutoScheduleService {
   ) async {
     // ── 1. Load all elevators that have a maintenance contract ────────────────
     final allElevators = await _elevatorRepo.getAllElevators();
-    final contractElevators =
-        allElevators.where((e) => e.maintenanceDay != null).toList();
+    final contractElevators = allElevators
+        .where((e) => e.maintenanceDay != null)
+        .toList();
 
     if (contractElevators.isEmpty) {
       return const AutoScheduleResult(inserted: 0, skipped: 0);
     }
 
     // ── 2. Find elevators already scheduled for this month ────────────────────
-    final alreadyScheduled =
-        await _scheduleRepo.getScheduledElevatorIdsForMonth(targetMonth);
+    final alreadyScheduled = await _scheduleRepo
+        .getScheduledElevatorIdsForMonth(targetMonth);
 
     // ── 3. Filter to only unscheduled elevators ───────────────────────────────
     final toSchedule = contractElevators
         .where((e) => !alreadyScheduled.contains(e.id))
         .toList();
 
-    final skippedCount =
-        contractElevators.length - toSchedule.length;
+    final skippedCount = contractElevators.length - toSchedule.length;
 
     if (toSchedule.isEmpty) {
       return AutoScheduleResult(inserted: 0, skipped: skippedCount);
@@ -101,11 +99,11 @@ class AutoScheduleService {
       );
 
       return <String, dynamic>{
-        'elevator_id':    elevator.id,
+        'elevator_id': elevator.id,
         'scheduled_date': scheduledDate.toIso8601String(),
-        'status':         'pending',
-        'priority':       'normal',
-        'task_type':      'periodic_maintenance',
+        'status': 'pending',
+        'priority': 'normal',
+        'task_type': 'periodic_maintenance',
         // technician_id is intentionally omitted — null in the DB means
         // "unassigned"; the admin will assign from the pool later.
       };

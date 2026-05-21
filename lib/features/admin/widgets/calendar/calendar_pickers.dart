@@ -3,7 +3,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../elevator/models/elevator_model.dart';
 import '../../models/profile_model.dart';
 
-
 // ── ElevatorPickerDialog ─────────────────────────────────────────────────────
 
 class ElevatorPickerDialog extends StatefulWidget {
@@ -19,7 +18,6 @@ class ElevatorPickerDialog extends StatefulWidget {
   @override
   State<ElevatorPickerDialog> createState() => ElevatorPickerDialogState();
 }
-
 
 class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
   String _query = '';
@@ -62,7 +60,10 @@ class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
                 autofocus: true,
                 decoration: InputDecoration(
                   hintText: 'Bina adı veya adres ara...',
-                  prefixIcon: const Icon(Icons.search, color: AppColors.outline),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppColors.outline,
+                  ),
                   filled: true,
                   fillColor: AppColors.surfaceContainer,
                   border: OutlineInputBorder(
@@ -95,14 +96,18 @@ class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
                       child: Icon(
                         Icons.elevator_outlined,
                         size: 18,
-                        color: isSelected ? AppColors.primary : AppColors.outline,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.outline,
                       ),
                     ),
                     title: Text(
                       e.buildingName,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? AppColors.primary : AppColors.onSurface,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.onSurface,
                       ),
                     ),
                     subtitle: e.address != null
@@ -110,12 +115,17 @@ class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
                             e.address!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style:
-                                const TextStyle(fontSize: 12, color: AppColors.outline),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.outline,
+                            ),
                           )
                         : null,
                     trailing: isSelected
-                        ? const Icon(Icons.check_circle, color: AppColors.primary)
+                        ? const Icon(
+                            Icons.check_circle,
+                            color: AppColors.primary,
+                          )
                         : null,
                     onTap: () => Navigator.pop(context, e),
                   );
@@ -148,10 +158,8 @@ class TechnicianPickerDialog extends StatefulWidget {
   final ProfileModel? selected;
 
   @override
-  State<TechnicianPickerDialog> createState() =>
-      TechnicianPickerDialogState();
+  State<TechnicianPickerDialog> createState() => TechnicianPickerDialogState();
 }
-
 
 class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
   String _query = '';
@@ -194,7 +202,10 @@ class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
                 autofocus: true,
                 decoration: InputDecoration(
                   hintText: 'Ad veya e-posta ara...',
-                  prefixIcon: const Icon(Icons.search, color: AppColors.outline),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppColors.outline,
+                  ),
                   filled: true,
                   fillColor: AppColors.surfaceContainer,
                   border: OutlineInputBorder(
@@ -234,7 +245,9 @@ class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: isSelected ? Colors.white : AppColors.onSurface,
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.onSurface,
                           ),
                         ),
                       ),
@@ -242,18 +255,25 @@ class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
                         p.displayName,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: isSelected ? AppColors.primary : AppColors.onSurface,
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.onSurface,
                         ),
                       ),
                       subtitle: p.phone != null
                           ? Text(
                               p.phone!,
-                              style:
-                                  const TextStyle(fontSize: 12, color: AppColors.outline),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.outline,
+                              ),
                             )
                           : null,
                       trailing: isSelected
-                          ? const Icon(Icons.check_circle, color: AppColors.primary)
+                          ? const Icon(
+                              Icons.check_circle,
+                              color: AppColors.primary,
+                            )
                           : null,
                       onTap: () => Navigator.pop(context, p),
                     );

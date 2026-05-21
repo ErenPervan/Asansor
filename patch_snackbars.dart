@@ -24,36 +24,46 @@ void main() {
         print("Skipping missing file: $fp");
         continue;
       }
-      
+
       String content = file.readAsStringSync();
 
       if (content.contains("duration: AppDurations")) {
         continue;
       }
 
-      final importStmt = "import 'package:asansor/core/constants/app_durations.dart';\n";
-      
+      final importStmt =
+          "import 'package:asansor/core/constants/app_durations.dart';\n";
+
       String newContent = content;
       newContent = newContent.replaceAll(
-          RegExp(r'(backgroundColor:\s*AppColors\.error,?)'), 
-          r'\1' '\n          duration: AppDurations.snackBarError,');
+        RegExp(r'(backgroundColor:\s*AppColors\.error,?)'),
+        r'\1'
+        '\n          duration: AppDurations.snackBarError,',
+      );
       newContent = newContent.replaceAll(
-          RegExp(r'(backgroundColor:\s*AppColors\.success,?)'), 
-          r'\1' '\n          duration: AppDurations.snackBarSuccess,');
+        RegExp(r'(backgroundColor:\s*AppColors\.success,?)'),
+        r'\1'
+        '\n          duration: AppDurations.snackBarSuccess,',
+      );
       newContent = newContent.replaceAll(
-          RegExp(r'(backgroundColor:\s*AppColors\.primary,?)'), 
-          r'\1' '\n          duration: AppDurations.snackBarInfo,');
-      
+        RegExp(r'(backgroundColor:\s*AppColors\.primary,?)'),
+        r'\1'
+        '\n          duration: AppDurations.snackBarInfo,',
+      );
+
       if (newContent != content) {
         if (!newContent.contains("app_durations.dart")) {
           int importIdx = newContent.indexOf('import ');
           if (importIdx != -1) {
-            newContent = newContent.substring(0, importIdx) + importStmt + newContent.substring(importIdx);
+            newContent =
+                newContent.substring(0, importIdx) +
+                importStmt +
+                newContent.substring(importIdx);
           } else {
             newContent = importStmt + newContent;
           }
         }
-        
+
         file.writeAsStringSync(newContent);
         print("Updated $fp");
       }

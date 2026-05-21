@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart' as supabase_flutter;
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/providers/connectivity_providers.dart';
 
-
 class TopAppBar extends StatelessWidget {
   const TopAppBar({
     super.key,
@@ -46,11 +45,7 @@ class TopAppBar extends StatelessWidget {
                 width: 2,
               ),
             ),
-            child: Icon(
-              Icons.person_outline,
-              color: colors.primary,
-              size: 20,
-            ),
+            child: Icon(Icons.person_outline, color: colors.primary, size: 20),
           ),
           const SizedBox(width: 12),
           // Status + greeting
@@ -102,10 +97,7 @@ class TopAppBar extends StatelessWidget {
             ),
           if (isAdmin) const SizedBox(width: 8),
           // Cloud sync status indicator
-          SyncStatusButton(
-            pendingCount: pendingSyncCount,
-            isOnline: isOnline,
-          ),
+          SyncStatusButton(pendingCount: pendingSyncCount, isOnline: isOnline),
           const SizedBox(width: 8),
           // Sign-out button
           Material(
@@ -118,7 +110,11 @@ class TopAppBar extends StatelessWidget {
               onTap: onSignOut,
               child: const Padding(
                 padding: EdgeInsets.all(10),
-                child: Icon(Icons.logout_outlined, color: AppColors.primary, size: 20),
+                child: Icon(
+                  Icons.logout_outlined,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
               ),
             ),
           ),
@@ -190,7 +186,12 @@ class SyncStatusButton extends ConsumerWidget {
                       child: ScaleTransition(scale: animation, child: child),
                     );
                   },
-                  child: Icon(icon, key: ValueKey(icon), color: color, size: 20),
+                  child: Icon(
+                    icon,
+                    key: ValueKey(icon),
+                    color: color,
+                    size: 20,
+                  ),
                 ),
                 if (hasPending)
                   Positioned(
@@ -199,7 +200,9 @@ class SyncStatusButton extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(2),
                       constraints: const BoxConstraints(
-                          minWidth: 14, minHeight: 14),
+                        minWidth: 14,
+                        minHeight: 14,
+                      ),
                       decoration: const BoxDecoration(
                         color: Color(0xFFD97706),
                         shape: BoxShape.circle,
@@ -234,8 +237,7 @@ class SyncStatusButton extends ConsumerWidget {
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (_) => SyncSheet(
         pendingCount: count,
@@ -246,10 +248,12 @@ class SyncStatusButton extends ConsumerWidget {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(result.hasFailures
-                      ? '${result.synced} senkronize edildi, '
-                          '${result.failed} baÅŸarÄ±sÄ±z'
-                      : '${result.synced} Ã¶ÄŸe baÅŸarÄ±yla senkronize edildi'),
+                  content: Text(
+                    result.hasFailures
+                        ? '${result.synced} senkronize edildi, '
+                              '${result.failed} baÅŸarÄ±sÄ±z'
+                        : '${result.synced} Ã¶ÄŸe baÅŸarÄ±yla senkronize edildi',
+                  ),
                   backgroundColor: result.hasFailures
                       ? AppColors.primary
                       : const Color(0xFF16A34A),
@@ -343,7 +347,7 @@ class SyncSheet extends StatelessWidget {
           Text(
             hasPending
                 ? '$pendingCount kayÄ±t Ã§evrimdÄ±ÅŸÄ± olarak saklandÄ±.'
-                    '${isOnline ? ' Åimdi senkronize edebilirsiniz.' : ' Ä°nternet baÄŸlantÄ±sÄ± gerekli.'}'
+                      '${isOnline ? ' Åimdi senkronize edebilirsiniz.' : ' Ä°nternet baÄŸlantÄ±sÄ± gerekli.'}'
                 : 'TÃ¼m bakÄ±m ve arÄ±za kayÄ±tlarÄ± Supabase ile senkronize.',
             textAlign: TextAlign.center,
             style: const TextStyle(
@@ -368,22 +372,27 @@ class SyncSheet extends StatelessWidget {
 
           if (!isOnline)
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: const Color(0xFFFEE2E2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: const [
-                  Icon(Icons.wifi_off_rounded,
-                      color: AppColors.primary, size: 18),
+                  Icon(
+                    Icons.wifi_off_rounded,
+                    color: AppColors.primary,
+                    size: 18,
+                  ),
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Ä°nternet baÄŸlantÄ±sÄ± yok. BaÄŸlantÄ± kurulduÄŸunda otomatik senkronize edilecek.',
                       style: TextStyle(
-                          fontSize: 12, color: AppColors.primary, height: 1.4),
+                        fontSize: 12,
+                        color: AppColors.primary,
+                        height: 1.4,
+                      ),
                     ),
                   ),
                 ],

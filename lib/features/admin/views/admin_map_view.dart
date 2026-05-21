@@ -21,6 +21,7 @@ import '../models/schedule_model.dart';
 import '../providers/admin_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
+
 // Marker colours (match Google Maps palette for familiarity)
 const _colorFault = Color(0xFFDB4437);
 const _colorMaintenance = Color(0xFFF4B400);
@@ -67,7 +68,7 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
     // Priority 1 – any unresolved fault → RED
     final hasFault =
         activeFaults.valueOrNull?.any((f) => f.elevatorId == elevatorId) ??
-            false;
+        false;
     if (hasFault) return _MarkerStatus.fault;
 
     // Priority 2 – pending maintenance scheduled for today → YELLOW
@@ -80,7 +81,7 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
               d.month == today.month &&
               d.day == today.day;
         }) ??
-            false;
+        false;
 
     return hasTodayMaintenance
         ? _MarkerStatus.maintenance
@@ -108,8 +109,9 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
         return;
       }
 
-      final points =
-          located.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
+      final points = located
+          .map((e) => LatLng(e.latitude!, e.longitude!))
+          .toList();
 
       _mapController.fitCamera(
         CameraFit.bounds(
@@ -229,8 +231,9 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
             allSchedules: allSchedules,
           );
 
-          final locatedCount =
-              elevators.where((e) => e.hasMappableLocation).length;
+          final locatedCount = elevators
+              .where((e) => e.hasMappableLocation)
+              .length;
           final unmappedCount = elevators.length - locatedCount;
 
           return Stack(
@@ -453,10 +456,7 @@ class _ElevatorSheet extends StatelessWidget {
                 icon: const Icon(Icons.open_in_new_rounded, size: 18),
                 label: const Text(
                   'Detayları Gör',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -613,8 +613,9 @@ class _LegendSheet extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.background,
                 borderRadius: BorderRadius.circular(8),
-                border:
-                    Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
+                border: Border.all(
+                  color: AppColors.outlineVariant.withValues(alpha: 0.5),
+                ),
               ),
               child: Row(
                 children: [

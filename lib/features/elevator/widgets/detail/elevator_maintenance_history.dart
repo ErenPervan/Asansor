@@ -34,7 +34,10 @@ class MaintenanceHistorySectionState
     try {
       final repo = ref.read(maintenanceRepositoryProvider);
       final logs = await repo.getLogsForReport(widget.elevatorId);
-      final doc = await PdfService().generateElevatorReport(widget.elevator, logs);
+      final doc = await PdfService().generateElevatorReport(
+        widget.elevator,
+        logs,
+      );
       final bytes = await doc.save();
       if (!mounted) return;
       await Printing.layoutPdf(onLayout: (_) async => bytes);
@@ -104,7 +107,11 @@ class MaintenanceHistorySectionState
                   tooltip: 'Yenile',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  icon: const Icon(Icons.refresh, size: 18, color: AppColors.outline),
+                  icon: const Icon(
+                    Icons.refresh,
+                    size: 18,
+                    color: AppColors.outline,
+                  ),
                   onPressed: () =>
                       ref.invalidate(logsByElevatorProvider(widget.elevatorId)),
                 ),
@@ -144,7 +151,11 @@ class MaintenanceHistorySectionState
                 child: const Center(
                   child: Column(
                     children: [
-                      Icon(Icons.history, size: 40, color: AppColors.outlineVariant),
+                      Icon(
+                        Icons.history,
+                        size: 40,
+                        color: AppColors.outlineVariant,
+                      ),
                       SizedBox(height: 12),
                       Text(
                         'Henüz bakım kaydı yok.',
@@ -181,11 +192,7 @@ class MaintenanceHistorySectionState
 // ── Timeline item ─────────────────────────────────────────────────────────────
 
 class TimelineItem extends StatelessWidget {
-  const TimelineItem({
-    super.key,
-    required this.log,
-    required this.isLast,
-  });
+  const TimelineItem({super.key, required this.log, required this.isLast});
 
   final MaintenanceLogModel log;
   final bool isLast;
@@ -209,7 +216,9 @@ class TimelineItem extends StatelessWidget {
                   height: 16,
                   decoration: BoxDecoration(
                     // Approved → primary dot; pending → outline-variant dot
-                    color: log.isApproved ? AppColors.primary : AppColors.outlineVariant,
+                    color: log.isApproved
+                        ? AppColors.primary
+                        : AppColors.outlineVariant,
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.background, width: 3),
                   ),
@@ -241,10 +250,7 @@ class TimelineItem extends StatelessWidget {
 }
 
 class TimelineCard extends StatelessWidget {
-  const TimelineCard({
-    super.key,
-    required this.log,
-  });
+  const TimelineCard({super.key, required this.log});
 
   final MaintenanceLogModel log;
 
@@ -334,10 +340,12 @@ class TimelineCard extends StatelessWidget {
               StatusChip(
                 label: log.isApproved ? 'ONAYLANDI' : 'BEKLİYOR',
                 bg: log.isApproved
-                    ? AppColors.errorContainer // secondary-container
+                    ? AppColors
+                          .errorContainer // secondary-container
                     : AppColors.surfaceContainer,
                 fg: log.isApproved
-                    ? AppColors.onErrorContainer // on-secondary-container
+                    ? AppColors
+                          .onErrorContainer // on-secondary-container
                     : AppColors.onSurfaceVariant,
               ),
             ],
@@ -382,8 +390,18 @@ class StatusChip extends StatelessWidget {
 }
 
 final List<String> _monthsTr = [
-  'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-  'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+  'Oca',
+  'Şub',
+  'Mar',
+  'Nis',
+  'May',
+  'Haz',
+  'Tem',
+  'Ağu',
+  'Eyl',
+  'Eki',
+  'Kas',
+  'Ara',
 ];
 
 String _fmtDate(DateTime dt) {

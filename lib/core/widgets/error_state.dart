@@ -3,11 +3,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 
 class ErrorState extends StatelessWidget {
-  const ErrorState({
-    super.key,
-    required this.message,
-    this.onRetry,
-  });
+  const ErrorState({super.key, required this.message, this.onRetry});
 
   final String message;
   final VoidCallback? onRetry;

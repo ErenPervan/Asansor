@@ -152,36 +152,36 @@ class SyncQueueService extends ChangeNotifier {
       // Sort keys so we replay in the order they were queued.
       final keys = _box.keys.cast<String>().toList()..sort();
 
-    int synced = 0;
-    int failed = 0;
+      int synced = 0;
+      int failed = 0;
 
-    for (final key in keys) {
-      final raw = _box.get(key);
-      if (raw == null) continue;
+      for (final key in keys) {
+        final raw = _box.get(key);
+        if (raw == null) continue;
 
-      try {
-        final item = jsonDecode(raw) as Map<String, dynamic>;
+        try {
+          final item = jsonDecode(raw) as Map<String, dynamic>;
 
-        if (item['status'] == _statusConflictDetected) {
+          if (item['status'] == _statusConflictDetected) {
+            failed++;
+            continue; // Skip conflicted items, they require manual resolution
+          }
+
+          await _process(client, item, key);
+          await _box.delete(key);
+          synced++;
+        } on ConflictException catch (e) {
+          final item = jsonDecode(raw) as Map<String, dynamic>;
+          item['status'] = _statusConflictDetected;
+          item['remote_state'] = e.remoteState;
+          await _box.put(key, jsonEncode(item));
           failed++;
-          continue; // Skip conflicted items, they require manual resolution
+        } catch (e, s) {
+          debugPrint('[SyncQueue] Unexpected error in flush: $e\n$s');
+          // Keep in the queue; will retry next time we're online.
+          failed++;
         }
-
-        await _process(client, item, key);
-        await _box.delete(key);
-        synced++;
-      } on ConflictException catch (e) {
-        final item = jsonDecode(raw) as Map<String, dynamic>;
-        item['status'] = _statusConflictDetected;
-        item['remote_state'] = e.remoteState;
-        await _box.put(key, jsonEncode(item));
-        failed++;
-      } catch (e, s) {
-        debugPrint('[SyncQueue] Unexpected error in flush: $e\n$s');
-        // Keep in the queue; will retry next time we're online.
-        failed++;
       }
-    }
 
       if (synced > 0 || failed == 0) {
         notifyListeners();
@@ -431,7 +431,9 @@ class SyncQueueService extends ChangeNotifier {
     if (elevatorId == null || technicianId == null) return;
 
     try {
-      final targetDate = maintenanceDate != null ? DateTime.parse(maintenanceDate) : DateTime.now();
+      final targetDate = maintenanceDate != null
+          ? DateTime.parse(maintenanceDate)
+          : DateTime.now();
       final start = DateTime(
         targetDate.year,
         targetDate.month,

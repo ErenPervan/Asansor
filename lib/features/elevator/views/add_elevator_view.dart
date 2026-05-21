@@ -85,7 +85,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
 
     return PopScope(
       canPop: !isLoading,
-        onPopInvokedWithResult: (didPop, _) {
+      onPopInvokedWithResult: (didPop, _) {
         if (!didPop && isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -109,243 +109,265 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 48),
             children: [
-            // ── Building info ─────────────────────────────────────────
-            SectionLabel(
-              icon: Icons.domain_outlined,
-              label: 'Bina Bilgileri',
-              color: AppColors.onSurfaceVariant,
-              uppercase: true,
-            ),
-            const SizedBox(height: 12),
+              // ── Building info ─────────────────────────────────────────
+              SectionLabel(
+                icon: Icons.domain_outlined,
+                label: 'Bina Bilgileri',
+                color: AppColors.onSurfaceVariant,
+                uppercase: true,
+              ),
+              const SizedBox(height: 12),
 
-            // Building name
-            _Field(
-              controller: _nameCtrl,
-              label: 'Bina Adı',
-              hint: 'örn. Merkez Plaza, Güneş Apt.',
-              icon: Icons.apartment_outlined,
-              required: true,
-              validator: (v) {
-                if (v == null || v.trim().length < 2) {
-                  return 'En az 2 karakter giriniz';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
+              // Building name
+              _Field(
+                controller: _nameCtrl,
+                label: 'Bina Adı',
+                hint: 'örn. Merkez Plaza, Güneş Apt.',
+                icon: Icons.apartment_outlined,
+                required: true,
+                validator: (v) {
+                  if (v == null || v.trim().length < 2) {
+                    return 'En az 2 karakter giriniz';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
 
-            // Address
-            _Field(
-              controller: _addressCtrl,
-              label: 'Adres',
-              hint: 'Cadde, Sokak, Mahalle',
-              icon: Icons.location_on_outlined,
-              maxLines: 2,
-            ),
-            const SizedBox(height: 12),
+              // Address
+              _Field(
+                controller: _addressCtrl,
+                label: 'Adres',
+                hint: 'Cadde, Sokak, Mahalle',
+                icon: Icons.location_on_outlined,
+                maxLines: 2,
+              ),
+              const SizedBox(height: 12),
 
-            // City
-            _Field(
-              controller: _cityCtrl,
-              label: 'Şehir',
-              hint: 'örn. Ankara, İstanbul',
-              icon: Icons.location_city_outlined,
-            ),
+              // City
+              _Field(
+                controller: _cityCtrl,
+                label: 'Şehir',
+                hint: 'örn. Ankara, İstanbul',
+                icon: Icons.location_city_outlined,
+              ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // ── Status ────────────────────────────────────────────────
-            SectionLabel(
-              icon: Icons.info_outline_rounded,
-              label: 'Durum',
-              color: AppColors.onSurfaceVariant,
-              uppercase: true,
-            ),
-            const SizedBox(height: 12),
-            _StatusPicker(
-              selected: _status,
-              onChanged: (v) => setState(() => _status = v),
-            ),
+              // ── Status ────────────────────────────────────────────────
+              SectionLabel(
+                icon: Icons.info_outline_rounded,
+                label: 'Durum',
+                color: AppColors.onSurfaceVariant,
+                uppercase: true,
+              ),
+              const SizedBox(height: 12),
+              _StatusPicker(
+                selected: _status,
+                onChanged: (v) => setState(() => _status = v),
+              ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // ── Periodic maintenance contract ─────────────────────────
-            SectionLabel(
-              icon: Icons.event_repeat_outlined,
-              label: 'Periyodik Bakım Sözleşmesi',
-              color: AppColors.onSurfaceVariant,
-              uppercase: true,
-            ),
-            const SizedBox(height: 12),
-            _MaintenanceDayPicker(
-              selected: _maintenanceDay,
-              onChanged: (v) => setState(() => _maintenanceDay = v),
-            ),
+              // ── Periodic maintenance contract ─────────────────────────
+              SectionLabel(
+                icon: Icons.event_repeat_outlined,
+                label: 'Periyodik Bakım Sözleşmesi',
+                color: AppColors.onSurfaceVariant,
+                uppercase: true,
+              ),
+              const SizedBox(height: 12),
+              _MaintenanceDayPicker(
+                selected: _maintenanceDay,
+                onChanged: (v) => setState(() => _maintenanceDay = v),
+              ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // ── Location (optional, collapsible) ─────────────────────
-            InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () => setState(() => _showLocation = !_showLocation),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.outlineVariant),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.my_location_rounded,
-                      size: 18,
-                      color: _showLocation ? AppColors.primary : AppColors.outline,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        _selectedLatLng == null
-                            ? 'GPS Konumu (İsteğe Bağlı)'
-                            : 'GPS Konumu • ${_selectedLatLng!.latitude.toStringAsFixed(5)}, '
-                                '${_selectedLatLng!.longitude.toStringAsFixed(5)}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: _showLocation
-                              ? AppColors.primary
-                              : AppColors.onSurfaceVariant,
+              // ── Location (optional, collapsible) ─────────────────────
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => setState(() => _showLocation = !_showLocation),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.outlineVariant),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.my_location_rounded,
+                        size: 18,
+                        color: _showLocation
+                            ? AppColors.primary
+                            : AppColors.outline,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          _selectedLatLng == null
+                              ? 'GPS Konumu (İsteğe Bağlı)'
+                              : 'GPS Konumu • ${_selectedLatLng!.latitude.toStringAsFixed(5)}, '
+                                    '${_selectedLatLng!.longitude.toStringAsFixed(5)}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: _showLocation
+                                ? AppColors.primary
+                                : AppColors.onSurfaceVariant,
+                          ),
                         ),
                       ),
-                    ),
-                    Icon(
-                      _showLocation
-                          ? Icons.expand_less_rounded
-                          : Icons.expand_more_rounded,
-                      color: AppColors.outline,
-                    ),
-                  ],
+                      Icon(
+                        _showLocation
+                            ? Icons.expand_less_rounded
+                            : Icons.expand_more_rounded,
+                        color: AppColors.outline,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            AnimatedSize(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: _showLocation
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Column(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: SizedBox(
-                              height: 200,
-                              child: FlutterMap(
-                                mapController: _mapController,
-                                options: MapOptions(
-                                  initialCenter: _selectedLatLng ??
-                                      const LatLng(39.9334, 32.8597),
-                                  initialZoom: 13,
-                                  onTap: (_, point) {
-                                    setState(() {
-                                      _selectedLatLng = point;
-                                      _latCtrl.text =
-                                          point.latitude.toStringAsFixed(6);
-                                      _lngCtrl.text =
-                                          point.longitude.toStringAsFixed(6);
-                                    });
-                                  },
-                                ),
-                                children: [
-                                  TileLayer(
-                                    urlTemplate:
-                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                    userAgentPackageName: 'com.asansor.app',
+              AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                child: _showLocation
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: SizedBox(
+                                height: 200,
+                                child: FlutterMap(
+                                  mapController: _mapController,
+                                  options: MapOptions(
+                                    initialCenter:
+                                        _selectedLatLng ??
+                                        const LatLng(39.9334, 32.8597),
+                                    initialZoom: 13,
+                                    onTap: (_, point) {
+                                      setState(() {
+                                        _selectedLatLng = point;
+                                        _latCtrl.text = point.latitude
+                                            .toStringAsFixed(6);
+                                        _lngCtrl.text = point.longitude
+                                            .toStringAsFixed(6);
+                                      });
+                                    },
                                   ),
-                                  if (_selectedLatLng != null)
-                                    MarkerLayer(
-                                      markers: [
-                                        Marker(
-                                          point: _selectedLatLng!,
-                                          width: 44,
-                                          height: 44,
-                                          child: const Icon(
-                                            Icons.location_pin,
-                                            color: AppColors.primary,
-                                            size: 36,
-                                          ),
-                                        ),
-                                      ],
+                                  children: [
+                                    TileLayer(
+                                      urlTemplate:
+                                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                      userAgentPackageName: 'com.asansor.app',
                                     ),
-                                ],
+                                    if (_selectedLatLng != null)
+                                      MarkerLayer(
+                                        markers: [
+                                          Marker(
+                                            point: _selectedLatLng!,
+                                            width: 44,
+                                            height: 44,
+                                            child: const Icon(
+                                              Icons.location_pin,
+                                              color: AppColors.primary,
+                                              size: 36,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Haritaya dokunarak konum pinini belirleyin.',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.onSurfaceVariant,
+                            const SizedBox(height: 8),
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Haritaya dokunarak konum pinini belirleyin.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.onSurfaceVariant,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          _Field(
-                            controller: _latCtrl,
-                            label: 'Enlem',
-                            hint: 'örn. 39.9334',
-                            icon: Icons.arrow_upward_rounded,
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true, signed: true),
-                            validator: _validateCoord(
-                                'Enlem', min: -90, max: 90),
-                          ),
-                          const SizedBox(height: 12),
-                          _Field(
-                            controller: _lngCtrl,
-                            label: 'Boylam',
-                            hint: 'örn. 32.8597',
-                            icon: Icons.arrow_forward_rounded,
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true, signed: true),
-                            validator: _validateCoord(
-                                'Boylam', min: -180, max: 180),
-                          ),
-                        ],
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
+                            const SizedBox(height: 12),
+                            _Field(
+                              controller: _latCtrl,
+                              label: 'Enlem',
+                              hint: 'örn. 39.9334',
+                              icon: Icons.arrow_upward_rounded,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                    signed: true,
+                                  ),
+                              validator: _validateCoord(
+                                'Enlem',
+                                min: -90,
+                                max: 90,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _Field(
+                              controller: _lngCtrl,
+                              label: 'Boylam',
+                              hint: 'örn. 32.8597',
+                              icon: Icons.arrow_forward_rounded,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                    signed: true,
+                                  ),
+                              validator: _validateCoord(
+                                'Boylam',
+                                min: -180,
+                                max: 180,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
 
-            FilledButton.icon(
-              icon: isLoading
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Icon(Icons.add_rounded),
-              label: Text(
-                isLoading ? 'Oluşturuluyor…' : 'Asansör Oluştur',
-                style: const TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.w700),
+              FilledButton.icon(
+                icon: isLoading
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.add_rounded),
+                label: Text(
+                  isLoading ? 'Oluşturuluyor…' : 'Asansör Oluştur',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 54),
+                  backgroundColor: AppColors.primary,
+                ),
+                onPressed: isLoading ? null : _submit,
               ),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 54),
-                backgroundColor: AppColors.primary,
-              ),
-              onPressed: isLoading ? null : _submit,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   void _submit() {
@@ -356,8 +378,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
       _addressCtrl.text.trim(),
       _cityCtrl.text.trim(),
     ].where((s) => s.isNotEmpty).toList();
-    final fullAddress =
-        addressParts.isEmpty ? null : addressParts.join(', ');
+    final fullAddress = addressParts.isEmpty ? null : addressParts.join(', ');
 
     final lat = _latCtrl.text.trim().isEmpty
         ? null
@@ -366,7 +387,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
         ? null
         : double.tryParse(_lngCtrl.text.trim());
 
-    ref.read(elevatorCreateControllerProvider.notifier).create(
+    ref
+        .read(elevatorCreateControllerProvider.notifier)
+        .create(
           buildingName: _nameCtrl.text.trim(),
           address: fullAddress,
           status: _status,
@@ -494,10 +517,7 @@ class _MaintenanceDayPicker extends StatelessWidget {
 // ── Status picker ─────────────────────────────────────────────────────────────
 
 class _StatusPicker extends StatelessWidget {
-  const _StatusPicker({
-    required this.selected,
-    required this.onChanged,
-  });
+  const _StatusPicker({required this.selected, required this.onChanged});
 
   final String selected;
   final ValueChanged<String> onChanged;
@@ -563,8 +583,7 @@ class _StatusChip extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight:
-                    isSelected ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: fg,
               ),
             ),

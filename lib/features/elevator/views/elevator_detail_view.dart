@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:go_router/go_router.dart';
+
 import 'package:printing/printing.dart';
 
 import '../../../core/services/pdf_service.dart';
+
 import '../../auth/providers/auth_providers.dart';
+
 import '../../elevator/models/elevator_model.dart';
+
 import '../../elevator/providers/elevator_providers.dart';
+
 import '../../fault/models/fault_report_model.dart';
+
 import '../../fault/providers/fault_providers.dart';
+
 import '../../maintenance/models/maintenance_log_model.dart';
+
 import '../../maintenance/providers/maintenance_providers.dart';
 
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/info_card.dart';
 // ── Telemetry mock ────────────────────────────────────────────────────────────
 // IoT hardware is not yet integrated. Replace this constant with a real
 // stream subscription once the telemetry backend is available.
@@ -19,27 +32,6 @@ import '../../maintenance/providers/maintenance_providers.dart';
 // channel and surface the `daily_trips` field from each payload.
 const String _kDailyTripsMock = '—'; // Replace with real data when IoT telemetry is integrated
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _primaryFixed = Color(0xFFFFE4E4);
-const _primaryContainer = Color(0xFF991B1B);
-const _onPrimaryContainer = Color(0xFFFFE4E4);
-const _secondary = Color(0xFFEF4444);
-const _secondaryContainer = Color(0xFFFEE2E2);
-const _onSecondaryContainer = Color(0xFF991B1B);
-const _error = Color(0xFFDC2626);
-const _errorContainer = Color(0xFFFEE2E2);
-const _onErrorContainer = Color(0xFF991B1B);
-const _surfaceContainerLowest = Colors.white;
-const _surfaceContainerLow = Color(0xFFF8FAFC);
-const _surfaceContainer = Color(0xFFF1F5F9);
-const _surfaceContainerHighest = Color(0xFFE2E8F0);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _background = Color(0xFFF9FAFB);
 
 // ── Turkish month abbreviations (avoids intl locale init) ────────────────────
 
@@ -85,14 +77,14 @@ class ElevatorDetailView extends ConsumerWidget {
     final elevatorAsync = ref.watch(elevatorByIdProvider(elevatorId));
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       // ── Top App Bar ──────────────────────────────────────────────────────
       appBar: AppBar(
-        backgroundColor: _background,
+        backgroundColor: AppColors.background,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: _primary),
+          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => context.pop(),
         ),
         title: const Text(
@@ -100,14 +92,14 @@ class ElevatorDetailView extends ConsumerWidget {
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 17,
-            color: _onSurface,
+            color: AppColors.onSurface,
             letterSpacing: -0.2,
           ),
         ),
         centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert, color: _primary),
+            icon: const Icon(Icons.more_vert, color: AppColors.primary),
             onPressed: () {},
           ),
         ],
@@ -116,7 +108,7 @@ class ElevatorDetailView extends ConsumerWidget {
       // ── Body ─────────────────────────────────────────────────────────────
       body: elevatorAsync.when(
         loading: () =>
-            const Center(child: CircularProgressIndicator(color: _primary)),
+            const Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (err, _) => _ErrorBody(
           message: err.toString().replaceFirst('Exception: ', ''),
           onRetry: () => ref.invalidate(elevatorByIdProvider(elevatorId)),
@@ -216,19 +208,18 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InfoCard(
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: _surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF191C1D).withValues(alpha: 0.04),
-            blurRadius: 32,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
+      radius: 16,
+      backgroundColor: AppColors.surfaceContainerLowest,
+      borderColor: Colors.transparent,
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFF191C1D).withValues(alpha: 0.04),
+          blurRadius: 32,
+          offset: const Offset(0, 12),
+        ),
+      ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -245,12 +236,12 @@ class _HeaderCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: _primaryFixed, // primary-fixed: #D6E3FF
+                        color: AppColors.primaryFixed, // primary-fixed: #D6E3FF
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
                         Icons.elevator_outlined,
-                        color: _primary,
+                        color: AppColors.primary,
                         size: 28,
                       ),
                     ),
@@ -265,7 +256,7 @@ class _HeaderCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: _onSurface,
+                              color: AppColors.onSurface,
                               letterSpacing: -0.3,
                             ),
                           ),
@@ -275,7 +266,7 @@ class _HeaderCard extends StatelessWidget {
                               const Icon(
                                 Icons.location_on_outlined,
                                 size: 14,
-                                color: _onSurfaceVariant,
+                                color: AppColors.onSurfaceVariant,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
@@ -284,7 +275,7 @@ class _HeaderCard extends StatelessWidget {
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
-                                    color: _onSurfaceVariant,
+                                    color: AppColors.onSurfaceVariant,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -306,7 +297,7 @@ class _HeaderCard extends StatelessWidget {
 
           // Divider + static metadata grid
           const SizedBox(height: 20),
-          Divider(height: 1, color: _outlineVariant.withValues(alpha: 0.15)),
+          Divider(height: 1, color: AppColors.outlineVariant.withValues(alpha: 0.15)),
           const SizedBox(height: 20),
 
           // Model + Capacity — read from DB columns added to elevators table
@@ -350,7 +341,7 @@ class _MetaCell extends StatelessWidget {
           style: const TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w700,
-            color: _outline,
+            color: AppColors.outline,
             letterSpacing: 1.2,
           ),
         ),
@@ -360,7 +351,7 @@ class _MetaCell extends StatelessWidget {
           style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: _onSurface,
+            color: AppColors.onSurface,
           ),
         ),
       ],
@@ -384,14 +375,14 @@ class _StatusBadge extends StatelessWidget {
         const Color(0xFF059669), // emerald-600
         Colors.white,
       ),
-      'faulty' => ('DURUM: ARIZALI', _errorContainer, _onErrorContainer),
+      'faulty' => ('DURUM: ARIZALI', AppColors.errorContainer, AppColors.onErrorContainer),
       'under_maintenance' => (
         'DURUM: BAKIMDA',
         const Color(0xFFFFF3CD),
         const Color(0xFF856404),
       ),
-      'inactive' => ('DURUM: PASİF', _surfaceContainer, _outline),
-      _ => ('DURUM: BİLİNMİYOR', _surfaceContainer, _outline),
+      'inactive' => ('DURUM: PASİF', AppColors.surfaceContainer, AppColors.outline),
+      _ => ('DURUM: BİLİNMİYOR', AppColors.surfaceContainer, AppColors.outline),
     };
 
     return Container(
@@ -433,12 +424,12 @@ class _ActionButtons extends StatelessWidget {
         Expanded(
           child: _ActionCard(
             onTap: onReportFault,
-            backgroundColor: _errorContainer,
-            iconContainerColor: _error.withValues(alpha: 0.12),
+            backgroundColor: AppColors.errorContainer,
+            iconContainerColor: AppColors.error.withValues(alpha: 0.12),
             icon: Icons.warning_rounded,
-            iconColor: _error,
+            iconColor: AppColors.error,
             label: 'Arıza Bildir',
-            labelColor: _onErrorContainer,
+            labelColor: AppColors.onErrorContainer,
           ),
         ),
         const SizedBox(width: 16),
@@ -446,7 +437,7 @@ class _ActionButtons extends StatelessWidget {
         Expanded(
           child: _ActionCard(
             onTap: onLogMaintenance,
-            backgroundColor: _primary,
+            backgroundColor: AppColors.primary,
             iconContainerColor: Colors.white.withValues(alpha: 0.12),
             icon: Icons.assignment_outlined,
             iconColor: Colors.white,
@@ -541,7 +532,7 @@ class _SystemMonitorSection extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: _surfaceContainerLow,
+            color: AppColors.surfaceContainerLow,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -552,7 +543,7 @@ class _SystemMonitorSection extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: _onSurface,
+                  color: AppColors.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -567,12 +558,12 @@ class _SystemMonitorSection extends ConsumerWidget {
                         height: 80,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: _primaryFixed.withValues(alpha: 0.4),
+                          color: AppColors.primaryFixed.withValues(alpha: 0.4),
                         ),
                       ),
                       const Icon(
                         Icons.analytics_outlined,
-                        color: _primary,
+                        color: AppColors.primary,
                         size: 40,
                       ),
                     ],
@@ -605,7 +596,7 @@ class _SystemMonitorSection extends ConsumerWidget {
                     child: _StatChip(
                       label: 'GÜNLÜK TUR',
                       value: _kDailyTripsMock,
-                      valueColor: _primary,
+                      valueColor: AppColors.primary,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -619,7 +610,7 @@ class _SystemMonitorSection extends ConsumerWidget {
                         data: (dt) =>
                             dt != null ? _fmtDateCompact(dt) : '—',
                       ),
-                      valueColor: _secondary,
+                      valueColor: AppColors.error,
                     ),
                   ),
                 ],
@@ -636,7 +627,7 @@ class _SystemMonitorSection extends ConsumerWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: _primaryContainer,
+            color: AppColors.primaryDark,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Stack(
@@ -715,7 +706,7 @@ class _NextMaintenanceContent extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: _onPrimaryContainer.withValues(alpha: 0.8),
+            color: AppColors.primaryFixed.withValues(alpha: 0.8),
             letterSpacing: 1.2,
           ),
         ),
@@ -788,7 +779,7 @@ class _StatusIndicator extends StatelessWidget {
           style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: _onSurface,
+            color: AppColors.onSurface,
           ),
         ),
       ],
@@ -812,7 +803,7 @@ class _StatChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: _surfaceContainerHighest,
+        color: AppColors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -823,7 +814,7 @@ class _StatChip extends StatelessWidget {
             style: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: _outline,
+              color: AppColors.outline,
             ),
           ),
           const SizedBox(height: 4),
@@ -880,7 +871,7 @@ class _MaintenanceHistorySectionState
             'PDF oluşturulamadı: ${e.toString().replaceFirst('Exception: ', '')}',
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: _error,
+          backgroundColor: AppColors.error,
         ),
       );
     } finally {
@@ -904,7 +895,7 @@ class _MaintenanceHistorySectionState
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: _onSurface,
+                color: AppColors.onSurface,
                 letterSpacing: -0.4,
               ),
             ),
@@ -919,7 +910,7 @@ class _MaintenanceHistorySectionState
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: _primary,
+                            color: AppColors.primary,
                           ),
                         )
                       : IconButton(
@@ -928,7 +919,7 @@ class _MaintenanceHistorySectionState
                           icon: const Icon(
                             Icons.picture_as_pdf_outlined,
                             size: 22,
-                            color: _primary,
+                            color: AppColors.primary,
                           ),
                           onPressed: _generateAndPreviewPdf,
                         ),
@@ -938,7 +929,7 @@ class _MaintenanceHistorySectionState
                   tooltip: 'Yenile',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  icon: const Icon(Icons.refresh, size: 18, color: _outline),
+                  icon: const Icon(Icons.refresh, size: 18, color: AppColors.outline),
                   onPressed: () =>
                       ref.invalidate(logsByElevatorProvider(widget.elevatorId)),
                 ),
@@ -953,18 +944,18 @@ class _MaintenanceHistorySectionState
           loading: () => const Center(
             child: Padding(
               padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(color: _primary),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
           ),
           error: (err, _) => Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _errorContainer,
+              color: AppColors.errorContainer,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               err.toString().replaceFirst('Exception: ', ''),
-              style: const TextStyle(color: _onErrorContainer),
+              style: const TextStyle(color: AppColors.onErrorContainer),
             ),
           ),
           data: (logs) {
@@ -972,18 +963,18 @@ class _MaintenanceHistorySectionState
               return Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: _surfaceContainerLow,
+                  color: AppColors.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Center(
                   child: Column(
                     children: [
-                      Icon(Icons.history, size: 40, color: _outlineVariant),
+                      Icon(Icons.history, size: 40, color: AppColors.outlineVariant),
                       SizedBox(height: 12),
                       Text(
                         'Henüz bakım kaydı yok.',
                         style: TextStyle(
-                          color: _outline,
+                          color: AppColors.outline,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1037,9 +1028,9 @@ class _TimelineItem extends StatelessWidget {
                   height: 16,
                   decoration: BoxDecoration(
                     // Approved → primary dot; pending → outline-variant dot
-                    color: log.isApproved ? _primary : _outlineVariant,
+                    color: log.isApproved ? AppColors.primary : AppColors.outlineVariant,
                     shape: BoxShape.circle,
-                    border: Border.all(color: _background, width: 3),
+                    border: Border.all(color: AppColors.background, width: 3),
                   ),
                 ),
                 // Connector line (hidden on last item)
@@ -1048,7 +1039,7 @@ class _TimelineItem extends StatelessWidget {
                     child: Container(
                       width: 2,
                       margin: const EdgeInsets.only(top: 4),
-                      color: _outlineVariant.withValues(alpha: 0.3),
+                      color: AppColors.outlineVariant.withValues(alpha: 0.3),
                     ),
                   ),
               ],
@@ -1077,19 +1068,18 @@ class _TimelineCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateStr = _fmtDate(log.maintenanceDate);
 
-    return Container(
+    return InfoCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: _surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      radius: 12,
+      backgroundColor: AppColors.surfaceContainerLowest,
+      borderColor: Colors.transparent,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.04),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
+        ),
+      ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1104,14 +1094,14 @@ class _TimelineCard extends StatelessWidget {
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   // Approved uses primary colour, pending uses outline
-                  color: log.isApproved ? _primary : _outline,
+                  color: log.isApproved ? AppColors.primary : AppColors.outline,
                   letterSpacing: 0.6,
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: _surfaceContainerLow,
+                  color: AppColors.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
@@ -1120,7 +1110,7 @@ class _TimelineCard extends StatelessWidget {
                     const Icon(
                       Icons.person_outline,
                       size: 12,
-                      color: _onSurfaceVariant,
+                      color: AppColors.onSurfaceVariant,
                     ),
                     const SizedBox(width: 3),
                     Text(
@@ -1135,7 +1125,7 @@ class _TimelineCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w500,
-                        color: _onSurfaceVariant,
+                        color: AppColors.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -1151,7 +1141,7 @@ class _TimelineCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: _onSurface,
+              color: AppColors.onSurface,
               fontStyle: FontStyle.italic,
               height: 1.4,
             ),
@@ -1164,11 +1154,11 @@ class _TimelineCard extends StatelessWidget {
               _Chip(
                 label: log.isApproved ? 'ONAYLANDI' : 'BEKLİYOR',
                 bg: log.isApproved
-                    ? _secondaryContainer // secondary-container
-                    : _surfaceContainer,
+                    ? AppColors.errorContainer // secondary-container
+                    : AppColors.surfaceContainer,
                 fg: log.isApproved
-                    ? _onSecondaryContainer // on-secondary-container
-                    : _onSurfaceVariant,
+                    ? AppColors.onErrorContainer // on-secondary-container
+                    : AppColors.onSurfaceVariant,
               ),
             ],
           ),
@@ -1260,7 +1250,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? _primary : const Color(0xFF94A3B8);
+    final color = isActive ? AppColors.primary : const Color(0xFF94A3B8);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1319,6 +1309,7 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
         data: (raw) {
           final fault = raw as FaultReportModel?;
           if (fault == null) return;
+          HapticFeedback.lightImpact();
           if (!fault.isOfflineQueued) {
             ref.invalidate(activeFaultsProvider);
             ref.invalidate(faultsByElevatorProvider(widget.elevatorId));
@@ -1345,11 +1336,12 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
         },
         error: (err, _) {
           if (!context.mounted) return;
+          HapticFeedback.heavyImpact();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(err.toString().replaceFirst('Exception: ', '')),
               behavior: SnackBarBehavior.floating,
-              backgroundColor: _error,
+              backgroundColor: AppColors.error,
             ),
           );
         },
@@ -1358,110 +1350,123 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
 
     final isLoading = ref.watch(faultControllerProvider).isLoading;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: _outlineVariant,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Container(
+    return PopScope(
+      canPop: !isLoading,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && isLoading) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Lütfen kayıt tamamlanana kadar bekleyin.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      },
+      child: Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
                       width: 40,
-                      height: 40,
+                      height: 4,
                       decoration: BoxDecoration(
-                        color: _errorContainer,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.warning_amber_outlined,
-                        color: _onErrorContainer,
+                        color: AppColors.outlineVariant,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Arıza Bildir',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: _onSurface,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.errorContainer,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.warning_amber_outlined,
+                          color: AppColors.onErrorContainer,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Arıza Bildir',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onSurface,
+                            ),
                           ),
-                        ),
-                        Text(
-                          'Gözlemlenen arızayı açıklayın.',
-                          style: TextStyle(fontSize: 13, color: _outline),
-                        ),
-                      ],
+                          Text(
+                            'Gözlemlenen arızayı açıklayın.',
+                            style: TextStyle(fontSize: 13, color: AppColors.outline),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  TextFormField(
+                    controller: _descController,
+                    maxLines: 4,
+                    minLines: 3,
+                    textInputAction: TextInputAction.newline,
+                    enabled: !isLoading,
+                    decoration: const InputDecoration(
+                      labelText: 'Arıza Açıklaması',
+                      hintText: 'Arızayı detaylı açıklayın...',
+                      alignLabelWithHint: true,
+                      border: OutlineInputBorder(),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _descController,
-                  maxLines: 4,
-                  minLines: 3,
-                  textInputAction: TextInputAction.newline,
-                  enabled: !isLoading,
-                  decoration: const InputDecoration(
-                    labelText: 'Arıza Açıklaması',
-                    hintText: 'Arızayı detaylı açıklayın...',
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(),
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return 'Lütfen bir açıklama girin.';
+                      }
+                      if (v.trim().length < 10) {
+                        return 'Açıklama en az 10 karakter olmalıdır.';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return 'Lütfen bir açıklama girin.';
-                    }
-                    if (v.trim().length < 10) {
-                      return 'Açıklama en az 10 karakter olmalıdır.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                FilledButton(
-                  onPressed: isLoading ? null : _submit,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: _error,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  const SizedBox(height: 20),
+                  FilledButton(
+                    onPressed: isLoading ? null : _submit,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Arızayı Gönder',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
                   ),
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text(
-                          'Arızayı Gönder',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
-                        ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -1496,11 +1501,12 @@ class _LogMaintenanceSheetState extends ConsumerState<_LogMaintenanceSheet> {
     if (!_formKey.currentState!.validate()) return;
     final userId = ref.read(authControllerProvider).valueOrNull?.id;
     if (userId == null) {
+      HapticFeedback.heavyImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Oturum bilgisi alınamadı. Lütfen tekrar giriş yapın.'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: _error,
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -1526,6 +1532,7 @@ class _LogMaintenanceSheetState extends ConsumerState<_LogMaintenanceSheet> {
         data: (raw) {
           final log = raw as MaintenanceLogModel?;
           if (log == null) return;
+          HapticFeedback.lightImpact();
           if (!log.isOfflineQueued) {
             ref.invalidate(logsByElevatorProvider(widget.elevatorId));
             ref.invalidate(pendingMaintenanceProvider);
@@ -1553,11 +1560,12 @@ class _LogMaintenanceSheetState extends ConsumerState<_LogMaintenanceSheet> {
         },
         error: (err, _) {
           if (!context.mounted) return;
+          HapticFeedback.heavyImpact();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(err.toString().replaceFirst('Exception: ', '')),
               behavior: SnackBarBehavior.floating,
-              backgroundColor: _error,
+              backgroundColor: AppColors.error,
             ),
           );
         },
@@ -1566,107 +1574,120 @@ class _LogMaintenanceSheetState extends ConsumerState<_LogMaintenanceSheet> {
 
     final isLoading = ref.watch(maintenanceControllerProvider).isLoading;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: _outlineVariant,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Container(
+    return PopScope(
+      canPop: !isLoading,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && isLoading) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Lütfen kayıt tamamlanana kadar bekleyin.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      },
+      child: Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
                       width: 40,
-                      height: 40,
+                      height: 4,
                       decoration: BoxDecoration(
-                        color: _primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.outlineVariant,
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                      child: const Icon(Icons.build_outlined, color: _primary),
                     ),
-                    const SizedBox(width: 12),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Bakım Ekle',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: _onSurface,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.build_outlined, color: AppColors.primary),
+                      ),
+                      const SizedBox(width: 12),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Bakım Ekle',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onSurface,
+                            ),
                           ),
-                        ),
-                        Text(
-                          'Yapılan bakımı kaydedin.',
-                          style: TextStyle(fontSize: 13, color: _outline),
-                        ),
-                      ],
+                          Text(
+                            'Yapılan bakımı kaydedin.',
+                            style: TextStyle(fontSize: 13, color: AppColors.outline),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  TextFormField(
+                    controller: _notesController,
+                    maxLines: 4,
+                    minLines: 3,
+                    textInputAction: TextInputAction.newline,
+                    enabled: !isLoading,
+                    decoration: const InputDecoration(
+                      labelText: 'Bakım Notları',
+                      hintText: 'Yapılan işlemleri açıklayın...',
+                      alignLabelWithHint: true,
+                      border: OutlineInputBorder(),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _notesController,
-                  maxLines: 4,
-                  minLines: 3,
-                  textInputAction: TextInputAction.newline,
-                  enabled: !isLoading,
-                  decoration: const InputDecoration(
-                    labelText: 'Bakım Notları',
-                    hintText: 'Yapılan işlemleri açıklayın...',
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(),
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return 'Lütfen bakım notları girin.';
+                      }
+                      if (v.trim().length < 10) {
+                        return 'Notlar en az 10 karakter olmalıdır.';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return 'Lütfen bakım notları girin.';
-                    }
-                    if (v.trim().length < 10) {
-                      return 'Notlar en az 10 karakter olmalıdır.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                FilledButton(
-                  onPressed: isLoading ? null : _submit,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: _primary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  const SizedBox(height: 20),
+                  FilledButton(
+                    onPressed: isLoading ? null : _submit,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Bakımı Kaydet',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
                   ),
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text(
-                          'Bakımı Kaydet',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
-                        ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -1691,19 +1712,19 @@ class _ErrorBody extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: _error),
+            const Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _onSurfaceVariant),
+              style: const TextStyle(color: AppColors.onSurfaceVariant),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(backgroundColor: _primary),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
             ),
           ],
         ),

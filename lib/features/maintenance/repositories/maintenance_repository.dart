@@ -15,11 +15,16 @@ class MaintenanceRepository {
   /// [technicianId] — UUID of the authenticated technician (auth.users).
   /// [notes] — free-text notes about the maintenance activity.
   /// [maintenanceDate] — date/time the maintenance was performed.
+  /// [checklist] — the checked states of checklist items.
   Future<MaintenanceLogModel> addLog({
     required String elevatorId,
     required String technicianId,
     required String notes,
     required DateTime maintenanceDate,
+    Map<String, dynamic>? checklist,
+    List<String>? photos,
+    String? signatureUrl,
+    String? customerSignatureUrl,
   }) async {
     try {
       final response = await _client
@@ -30,6 +35,10 @@ class MaintenanceRepository {
             'notes': notes,
             'is_approved': false,
             'maintenance_date': maintenanceDate.toUtc().toIso8601String(),
+            'checklist': ?checklist,
+            if (photos != null && photos.isNotEmpty) 'photos': photos,
+            'signature_url': ?signatureUrl,
+            'customer_signature_url': ?customerSignatureUrl,
           })
           .select()
           .single();
@@ -53,14 +62,17 @@ class MaintenanceRepository {
           .order('maintenance_date', ascending: true);
 
       return (response as List<dynamic>)
-          .map((json) =>
-              MaintenanceLogModel.fromJson(json as Map<String, dynamic>))
+          .map(
+            (json) =>
+                MaintenanceLogModel.fromJson(json as Map<String, dynamic>),
+          )
           .toList();
     } on PostgrestException catch (e) {
       throw Exception('Failed to load pending maintenance logs: ${e.message}');
     } catch (e) {
       throw Exception(
-          'Unexpected error while loading pending maintenance logs: $e');
+        'Unexpected error while loading pending maintenance logs: $e',
+      );
     }
   }
 
@@ -93,9 +105,9 @@ class MaintenanceRepository {
     int months = 6,
   }) async {
     try {
-      final since = DateTime.now()
-          .toUtc()
-          .subtract(Duration(days: months * 30));
+      final since = DateTime.now().toUtc().subtract(
+        Duration(days: months * 30),
+      );
 
       final response = await _client
           .from(_table)
@@ -136,7 +148,8 @@ class MaintenanceRepository {
           .from(_table)
           .select('*, profiles:technician_id(full_name)')
           .eq('elevator_id', elevatorId)
-          .order('maintenance_date', ascending: false);
+          .order('maintenance_date', ascending: false)
+          .limit(20);
 
       return (response as List<dynamic>)
           .map(

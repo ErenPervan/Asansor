@@ -36,6 +36,7 @@ class PdfService {
     String? technicianName,
     List<String>? mediaUrls,
     String? signatureUrl,
+    String? customerSignatureUrl,
   }) async {
     final pdf = pw.Document();
 
@@ -55,6 +56,17 @@ class PdfService {
     if (signatureUrl != null && signatureUrl.isNotEmpty) {
       try {
         signatureImageProvider = await networkImage(signatureUrl);
+      } catch (_) {
+        // Fallback to null if the signature image cannot be fetched
+      }
+    }
+
+    pw.ImageProvider? customerSignatureImageProvider;
+    if (customerSignatureUrl != null && customerSignatureUrl.isNotEmpty) {
+      try {
+        customerSignatureImageProvider = await networkImage(
+          customerSignatureUrl,
+        );
       } catch (_) {
         // Fallback to null if the signature image cannot be fetched
       }
@@ -320,30 +332,18 @@ class PdfService {
                   'End of Report\nGenerated securely by Asansor System',
                   style: pw.TextStyle(fontSize: 9, color: outlineColor),
                 ),
-                pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                pw.Row(
                   children: [
-                    if (signatureImageProvider != null)
-                      pw.Container(
-                        height: 60,
-                        width: 120,
-                        child: pw.Image(
-                          signatureImageProvider,
-                          fit: pw.BoxFit.contain,
-                        ),
-                      )
-                    else
-                      pw.SizedBox(height: 60),
-                    pw.SizedBox(height: 8),
-                    pw.Container(width: 160, height: 1, color: onSurface),
-                    pw.SizedBox(height: 4),
-                    pw.Text(
+                    _buildSignatureBlock(
+                      signatureImageProvider,
                       'Technician Signature',
-                      style: pw.TextStyle(
-                        fontWeight: pw.FontWeight.bold,
-                        fontSize: 10,
-                        color: onSurface,
-                      ),
+                      onSurface,
+                    ),
+                    pw.SizedBox(width: 24),
+                    _buildSignatureBlock(
+                      customerSignatureImageProvider,
+                      'Customer Signature',
+                      onSurface,
                     ),
                   ],
                 ),
@@ -382,6 +382,37 @@ class PdfService {
         pw.Text(
           value,
           style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _buildSignatureBlock(
+    pw.ImageProvider? imageProvider,
+    String label,
+    PdfColor lineColor,
+  ) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.center,
+      children: [
+        if (imageProvider != null)
+          pw.Container(
+            height: 60,
+            width: 120,
+            child: pw.Image(imageProvider, fit: pw.BoxFit.contain),
+          )
+        else
+          pw.SizedBox(height: 60),
+        pw.SizedBox(height: 8),
+        pw.Container(width: 140, height: 1, color: lineColor),
+        pw.SizedBox(height: 4),
+        pw.Text(
+          label,
+          style: pw.TextStyle(
+            fontWeight: pw.FontWeight.bold,
+            fontSize: 10,
+            color: lineColor,
+          ),
         ),
       ],
     );

@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:go_router/go_router.dart';
+
 import 'package:intl/intl.dart';
 
 import '../../elevator/providers/elevator_providers.dart';
+
 import '../models/fault_report_model.dart';
+
 import '../providers/fault_providers.dart';
 
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/info_card.dart';
+import '../../../core/widgets/section_label.dart';
 // ── Local colour tokens (matches global theme) ──────────────────────────────
-const _crimson = Color(0xFFB91C1C);
-const _crimsonDark = Color(0xFF991B1B);
-const _crimsonLight = Color(0xFFDC2626);
-const _success = Color(0xFF16A34A);
-const _successContainer = Color(0xFFDCFCE7);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _surface = Colors.white;
-const _background = Color(0xFFF9FAFB);
-const _surfaceContainer = Color(0xFFF1F5F9);
 
 class FaultDetailView extends ConsumerWidget {
   const FaultDetailView({super.key, required this.faultId});
@@ -40,14 +37,14 @@ class FaultDetailView extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: _crimson),
+              const Icon(Icons.error_outline, size: 48, color: AppColors.primary),
               const SizedBox(height: 12),
               Text(
                 'Arıza yüklenemedi',
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium
-                    ?.copyWith(color: _onSurface),
+                    ?.copyWith(color: AppColors.onSurface),
               ),
               const SizedBox(height: 4),
               Text(
@@ -55,7 +52,7 @@ class FaultDetailView extends ConsumerWidget {
                 style: Theme.of(context)
                     .textTheme
                     .bodySmall
-                    ?.copyWith(color: _onSurfaceVariant),
+                    ?.copyWith(color: AppColors.onSurfaceVariant),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -105,14 +102,14 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     final elevatorAddress = elevatorAsync.valueOrNull?.address ?? '';
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           // ── App bar with status gradient ─────────────────────────────
           SliverAppBar(
             expandedHeight: 180,
             pinned: true,
-            backgroundColor: fault.isResolved ? _success : _crimson,
+            backgroundColor: fault.isResolved ? AppColors.success : AppColors.primary,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => context.pop(),
@@ -148,16 +145,17 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ── Elevator info card ────────────────────────────────
-                  _InfoCard(
+                  InfoCard(
                     child: elevatorAsync.when(
                       loading: () => const _SkeletonRow(),
                       error: (e, st) => const _ElevatorErrorRow(),
                       data: (elevator) => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _SectionLabel(
+                          SectionLabel(
                             icon: Icons.elevator_outlined,
                             label: 'Asansör',
+                            uppercase: true,
                           ),
                           const SizedBox(height: 10),
                           Text(
@@ -165,7 +163,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: _onSurface,
+                              color: AppColors.onSurface,
                             ),
                           ),
                           if (elevatorAddress.isNotEmpty) ...[
@@ -173,14 +171,14 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                             Row(
                               children: [
                                 const Icon(Icons.location_on_outlined,
-                                    size: 14, color: _outline),
+                                    size: 14, color: AppColors.outline),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     elevatorAddress,
                                     style: const TextStyle(
                                       fontSize: 13,
-                                      color: _onSurfaceVariant,
+                                      color: AppColors.onSurfaceVariant,
                                     ),
                                   ),
                                 ),
@@ -197,13 +195,14 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                   const SizedBox(height: 12),
 
                   // ── Fault description ─────────────────────────────────
-                  _InfoCard(
+                  InfoCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SectionLabel(
+                        SectionLabel(
                           icon: Icons.report_problem_outlined,
                           label: 'Arıza Açıklaması',
+                          uppercase: true,
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -212,7 +211,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                               : 'Açıklama girilmedi.',
                           style: const TextStyle(
                             fontSize: 15,
-                            color: _onSurface,
+                            color: AppColors.onSurface,
                             height: 1.55,
                           ),
                         ),
@@ -232,22 +231,23 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                       fault.resolutionNotes != null &&
                       fault.resolutionNotes!.isNotEmpty) ...[
                     const SizedBox(height: 12),
-                    _InfoCard(
-                      accentColor: _success,
+                    InfoCard(
+                      accentColor: AppColors.success,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _SectionLabel(
+                          SectionLabel(
                             icon: Icons.check_circle_outline,
                             label: 'Çözüm Notu',
-                            color: _success,
+                            color: AppColors.success,
+                            uppercase: true,
                           ),
                           const SizedBox(height: 10),
                           Text(
                             fault.resolutionNotes!,
                             style: const TextStyle(
                               fontSize: 15,
-                              color: _onSurface,
+                              color: AppColors.onSurface,
                               height: 1.55,
                             ),
                           ),
@@ -258,7 +258,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
 
                   // ── Timestamps row ────────────────────────────────────
                   const SizedBox(height: 12),
-                  _InfoCard(
+                  InfoCard(
                     child: Column(
                       children: [
                         _TimeRow(
@@ -268,12 +268,12 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                         ),
                         if (fault.isResolved &&
                             fault.resolvedAt != null) ...[
-                          const Divider(height: 20, color: _outlineVariant),
+                          const Divider(height: 20, color: AppColors.outlineVariant),
                           _TimeRow(
                             icon: Icons.check_circle_outline,
                             label: 'Onarım Tarihi',
                             time: fault.resolvedAt!,
-                            color: _success,
+                            color: AppColors.success,
                           ),
                         ],
                       ],
@@ -294,8 +294,8 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                         label: const Text('Çözüm notu ekle (isteğe bağlı)'),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 48),
-                          side: const BorderSide(color: _outlineVariant),
-                          foregroundColor: _onSurfaceVariant,
+                          side: const BorderSide(color: AppColors.outlineVariant),
+                          foregroundColor: AppColors.onSurfaceVariant,
                         ),
                         onPressed: () =>
                             setState(() => _notesExpanded = true),
@@ -340,7 +340,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                       ),
                       style: FilledButton.styleFrom(
                         minimumSize: const Size(double.infinity, 52),
-                        backgroundColor: _success,
+                        backgroundColor: AppColors.success,
                       ),
                       onPressed: updateState.isLoading
                           ? null
@@ -354,8 +354,8 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                       label: Text('$elevatorName Detayına Git'),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 48),
-                        side: const BorderSide(color: _outlineVariant),
-                        foregroundColor: _onSurface,
+                        side: const BorderSide(color: AppColors.outlineVariant),
+                        foregroundColor: AppColors.onSurface,
                       ),
                       onPressed: () =>
                           context.push('/elevator/${fault.elevatorId}'),
@@ -377,10 +377,10 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                         minimumSize: const Size(double.infinity, 48),
                         side: BorderSide(
                           color: updateState.isLoading
-                              ? _outlineVariant
-                              : _crimson,
+                              ? AppColors.outlineVariant
+                              : AppColors.primary,
                         ),
-                        foregroundColor: _crimson,
+                        foregroundColor: AppColors.primary,
                       ),
                       onPressed: updateState.isLoading
                           ? null
@@ -392,8 +392,8 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                       label: Text('$elevatorName Detayına Git'),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 48),
-                        side: const BorderSide(color: _outlineVariant),
-                        foregroundColor: _onSurface,
+                        side: const BorderSide(color: AppColors.outlineVariant),
+                        foregroundColor: AppColors.onSurface,
                       ),
                       onPressed: () =>
                           context.push('/elevator/${fault.elevatorId}'),
@@ -421,21 +421,23 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
 
     if (!context.mounted) return;
     if (ok) {
+      HapticFeedback.lightImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Arıza başarıyla onarıldı olarak işaretlendi.'),
-          backgroundColor: _success,
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
       );
       // Refresh the fault data so the page re-renders to resolved state.
       ref.invalidate(faultByIdProvider(faultId));
     } else {
+      HapticFeedback.heavyImpact();
       final err = ref.read(faultUpdateControllerProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Hata: $err'),
-          backgroundColor: _crimson,
+          backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -452,6 +454,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
 
     if (!context.mounted) return;
     if (ok) {
+      HapticFeedback.lightImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Arıza yeniden açıldı.'),
@@ -460,11 +463,12 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
       );
       ref.invalidate(faultByIdProvider(faultId));
     } else {
+      HapticFeedback.heavyImpact();
       final err = ref.read(faultUpdateControllerProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Hata: $err'),
-          backgroundColor: _crimson,
+          backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -514,13 +518,27 @@ class _StatusHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
-                  shape: BoxShape.circle,
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                transitionBuilder: (child, animation) {
+                  final curved = CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.elasticOut,
+                  );
+                  return FadeTransition(
+                    opacity: animation,
+                    child: ScaleTransition(scale: curved, child: child),
+                  );
+                },
+                child: Container(
+                  key: ValueKey<bool>(isResolved),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 36),
                 ),
-                child: Icon(icon, color: Colors.white, size: 36),
               ),
               const SizedBox(height: 10),
               Text(
@@ -555,38 +573,6 @@ class _StatusHeader extends StatelessWidget {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({required this.child, this.accentColor});
-
-  final Widget child;
-  final Color? accentColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: accentColor != null
-              ? accentColor!.withValues(alpha: 0.3)
-              : _outlineVariant,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _PhotoCard extends StatelessWidget {
@@ -607,19 +593,19 @@ class _PhotoCard extends StatelessWidget {
           if (progress == null) return child;
           return Container(
             height: 220,
-            color: _surfaceContainer,
+            color: AppColors.surfaceContainer,
             child: const Center(child: CircularProgressIndicator()),
           );
         },
         errorBuilder: (context, error, stackTrace) => Container(
           height: 120,
           decoration: BoxDecoration(
-            color: _surfaceContainer,
+            color: AppColors.surfaceContainer,
             borderRadius: BorderRadius.circular(16),
           ),
           child: const Center(
             child: Icon(Icons.broken_image_outlined,
-                size: 40, color: _outline),
+                size: 40, color: AppColors.outline),
           ),
         ),
       ),
@@ -628,38 +614,6 @@ class _PhotoCard extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({
-    required this.icon,
-    required this.label,
-    this.color,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = color ?? _onSurfaceVariant;
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: c),
-        const SizedBox(width: 6),
-        Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: c,
-            letterSpacing: 1.2,
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -673,7 +627,7 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isResolved ? _successContainer : const Color(0xFFFEE2E2),
+        color: isResolved ? AppColors.successContainer : const Color(0xFFFEE2E2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -684,7 +638,7 @@ class _StatusBadge extends StatelessWidget {
                 ? Icons.check_circle_outline
                 : Icons.radio_button_unchecked,
             size: 13,
-            color: isResolved ? _success : _crimsonLight,
+            color: isResolved ? AppColors.success : AppColors.secondary,
           ),
           const SizedBox(width: 5),
           Text(
@@ -692,7 +646,7 @@ class _StatusBadge extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: isResolved ? _success : _crimsonDark,
+              color: isResolved ? AppColors.success : AppColors.primaryDark,
             ),
           ),
         ],
@@ -718,7 +672,7 @@ class _TimeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? _onSurfaceVariant;
+    final c = color ?? AppColors.onSurfaceVariant;
     final local = time.toLocal();
     final formatted =
         DateFormat('d MMMM y, HH:mm', 'tr_TR').format(local);
@@ -734,7 +688,7 @@ class _TimeRow extends StatelessWidget {
                 label,
                 style: const TextStyle(
                   fontSize: 11,
-                  color: _outline,
+                  color: AppColors.outline,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
                 ),
@@ -765,9 +719,9 @@ class _SkeletonRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(height: 14, width: 80, color: _outlineVariant),
+        Container(height: 14, width: 80, color: AppColors.outlineVariant),
         const SizedBox(height: 8),
-        Container(height: 20, width: 180, color: _outlineVariant),
+        Container(height: 20, width: 180, color: AppColors.outlineVariant),
       ],
     );
   }
@@ -780,11 +734,11 @@ class _ElevatorErrorRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        Icon(Icons.error_outline, size: 16, color: _outline),
+        Icon(Icons.error_outline, size: 16, color: AppColors.outline),
         SizedBox(width: 6),
         Text(
           'Asansör bilgisi yüklenemedi',
-          style: TextStyle(color: _outline),
+          style: TextStyle(color: AppColors.outline),
         ),
       ],
     );

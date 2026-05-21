@@ -1,25 +1,23 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:go_router/go_router.dart';
 
 import '../../elevator/models/elevator_model.dart';
+
 import '../../elevator/providers/elevator_providers.dart';
+
+import '../models/profile_model.dart';
+
 import '../providers/admin_providers.dart';
+import '../providers/profile_providers.dart';
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _error = Color(0xFFDC2626);
-const _errorContainer = Color(0xFFFEE2E2);
-const _onErrorContainer = Color(0xFF991B1B);
-const _surfaceContainerLowest = Colors.white;
-const _outlineVariant = Color(0xFFE2E8F0);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _background = Color(0xFFF9FAFB);
-
-// ── AssignView ────────────────────────────────────────────────────────────────
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/input_decorations.dart';
+import '../../../core/widgets/section_label.dart';
+// â”€â”€ AssignView â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Screen that allows a manager/admin to create a new maintenance schedule:
 ///  1. Select an elevator from the registered list.
@@ -39,6 +37,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
   final _notesController = TextEditingController();
 
   ElevatorModel? _selectedElevator;
+  ProfileModel? _selectedTechnician;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
@@ -49,7 +48,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
     super.dispose();
   }
 
-  // ── Date / time pickers ───────────────────────────────────────────────────
+  // â”€â”€ Date / time pickers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
@@ -62,7 +61,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme:
-                const ColorScheme.light(primary: _primary, onPrimary: Colors.white),
+                const ColorScheme.light(primary: AppColors.primary, onPrimary: Colors.white),
           ),
           child: child!,
         );
@@ -79,7 +78,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme:
-                const ColorScheme.light(primary: _primary, onPrimary: Colors.white),
+                const ColorScheme.light(primary: AppColors.primary, onPrimary: Colors.white),
           ),
           child: child!,
         );
@@ -89,26 +88,30 @@ class _AssignViewState extends ConsumerState<AssignView> {
   }
 
   String get _dateLabel {
-    if (_selectedDate == null) return 'Tarih Seç';
+    if (_selectedDate == null) return 'Tarih SeÃ§';
     final d = _selectedDate!;
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
 
   String get _timeLabel {
-    if (_selectedTime == null) return 'Saat Seç';
+    if (_selectedTime == null) return 'Saat SeÃ§';
     return '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}';
   }
 
-  // ── Submit ────────────────────────────────────────────────────────────────
+  // â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (_selectedElevator == null) {
-      _showSnack('Lütfen bir asansör seçin.', isError: true);
+      _showSnack('LÃ¼tfen bir asansÃ¶r seÃ§in.', isError: true);
+      return;
+    }
+    if (_selectedTechnician == null) {
+      _showSnack('LÃ¼tfen bir teknisyen seÃ§in.', isError: true);
       return;
     }
     if (_selectedDate == null || _selectedTime == null) {
-      _showSnack('Lütfen tarih ve saati seçin.', isError: true);
+      _showSnack('LÃ¼tfen tarih ve saati seÃ§in.', isError: true);
       return;
     }
 
@@ -136,57 +139,69 @@ class _AssignViewState extends ConsumerState<AssignView> {
         isError: true,
       );
     } else {
-      _showSnack('Görev başarıyla atandı!');
+      _showSnack('GÃ¶rev baÅŸarÄ±yla atandÄ±!');
+      HapticFeedback.lightImpact();
       if (mounted) context.pop();
     }
   }
 
   void _showSnack(String message, {bool isError = false}) {
     if (!mounted) return;
+    if (isError) {
+      HapticFeedback.heavyImpact();
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? _error : _primary,
+        backgroundColor: isError ? AppColors.error : AppColors.primary,
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
+  // â”€â”€ Build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   @override
   Widget build(BuildContext context) {
     final elevatorsAsync = ref.watch(elevatorsProvider);
+    final techniciansAsync = ref.watch(profilesByRoleProvider('technician'));
     final controllerState = ref.watch(scheduleControllerProvider);
     final isLoading = controllerState.isLoading;
 
-    return Scaffold(
-      backgroundColor: _background,
-      appBar: AppBar(
-        backgroundColor: _primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Görev Ata',
-          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.3),
+    return PopScope(
+      canPop: !isLoading,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && isLoading) {
+          _showSnack('LÃ¼tfen iÅŸlem tamamlanana kadar bekleyin.', isError: true);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          title: const Text(
+            'GÃ¶rev Ata',
+            style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.3),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Elevator Selector ─────────────────────────────────────────
-              _SectionLabel(
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+              // â”€â”€ Elevator Selector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              const SectionLabel(
                 icon: Icons.elevator_outlined,
-                label: 'Asansör Seç',
+                label: 'AsansÃ¶r SeÃ§',
               ),
               const SizedBox(height: 12),
               elevatorsAsync.when(
                 loading: () => const Center(
-                  child: CircularProgressIndicator(color: _primary),
+                  child: CircularProgressIndicator(color: AppColors.primary),
                 ),
                 error: (e, _) => _InlineError(
                   message: e.toString().replaceFirst('Exception: ', ''),
@@ -194,7 +209,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                 data: (elevators) {
                   if (elevators.isEmpty) {
                     return const _InlineError(
-                      message: 'Kayıtlı asansör bulunamadı.',
+                      message: 'KayÄ±tlÄ± asansÃ¶r bulunamadÄ±.',
                     );
                   }
                   return _ElevatorSelector(
@@ -207,39 +222,83 @@ class _AssignViewState extends ConsumerState<AssignView> {
 
               const SizedBox(height: 28),
 
-              // ── Technician UUID ───────────────────────────────────────────
-              _SectionLabel(
+              // â”€â”€ Technician UUID â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              const SectionLabel(
                 icon: Icons.person_search_outlined,
-                label: 'Teknisyen UUID',
+                label: 'Teknisyen SeÃ§',
               ),
               const SizedBox(height: 12),
-              TextFormField(
-                controller: _technicianIdController,
-                decoration: _inputDecoration(
-                  hint: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-                  helper:
-                      'Teknisyenin Supabase Auth kullanıcı UUID\'sini girin.',
+              techniciansAsync.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  ),
                 ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) {
-                    return 'Teknisyen UUID gereklidir.';
+                error: (e, _) => _InlineError(
+                  message: e.toString().replaceFirst('Exception: ', ''),
+                ),
+                data: (techs) {
+                  if (techs.isEmpty) {
+                    return const _InlineError(
+                      message: 'Teknisyen bulunamadÄ±.',
+                    );
                   }
-                  // Basic UUID format check (8-4-4-4-12 hex groups)
-                  final uuidRegex = RegExp(
-                    r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
-                    caseSensitive: false,
+
+                  return DropdownButtonFormField<ProfileModel>(
+                    initialValue: _selectedTechnician,
+                    decoration: appInputDecoration(
+                      hint: 'Teknisyen seÃ§in...',
+                      helper: 'Teknisyen seÃ§ildiÄŸinde UUID otomatik yazÄ±lÄ±r.',
+                    ),
+                    icon: const Icon(Icons.expand_more),
+                    isExpanded: true,
+                    items: techs
+                        .map(
+                          (t) => DropdownMenuItem<ProfileModel>(
+                            value: t,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  t.displayName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.onSurface,
+                                  ),
+                                ),
+                                if (t.email != null && t.email!.isNotEmpty)
+                                  Text(
+                                    t.email!,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: isLoading
+                        ? null
+                        : (tech) {
+                            setState(() {
+                              _selectedTechnician = tech;
+                              _technicianIdController.text = tech?.id ?? '';
+                            });
+                          },
+                    validator: (_) =>
+                        _selectedTechnician == null ? 'Teknisyen seÃ§in.' : null,
                   );
-                  if (!uuidRegex.hasMatch(v.trim())) {
-                    return 'Geçerli bir UUID girin (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).';
-                  }
-                  return null;
                 },
               ),
 
               const SizedBox(height: 28),
 
-              // ── Date & Time ───────────────────────────────────────────────
-              _SectionLabel(
+              // â”€â”€ Date & Time â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              const SectionLabel(
                 icon: Icons.event_outlined,
                 label: 'Tarih ve Saat',
               ),
@@ -268,30 +327,30 @@ class _AssignViewState extends ConsumerState<AssignView> {
 
               const SizedBox(height: 28),
 
-              // ── Notes (optional) ──────────────────────────────────────────
-              _SectionLabel(
+              // â”€â”€ Notes (optional) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              const SectionLabel(
                 icon: Icons.notes_outlined,
-                label: 'Notlar (İsteğe Bağlı)',
+                label: 'Notlar (Ä°steÄŸe BaÄŸlÄ±)',
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _notesController,
                 maxLines: 4,
-                decoration: _inputDecoration(
-                  hint: 'Bakım ile ilgili ek notlar...',
+                decoration: appInputDecoration(
+                  hint: 'BakÄ±m ile ilgili ek notlar...',
                 ),
               ),
 
               const SizedBox(height: 40),
 
-              // ── Submit Button ─────────────────────────────────────────────
+              // â”€â”€ Submit Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: FilledButton(
                   onPressed: isLoading ? null : _submit,
                   style: FilledButton.styleFrom(
-                    backgroundColor: _primary,
+                    backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -306,7 +365,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                           ),
                         )
                       : const Text(
-                          'Görevi Ata',
+                          'GÃ¶revi Ata',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -315,7 +374,8 @@ class _AssignViewState extends ConsumerState<AssignView> {
                 ),
               ),
               const SizedBox(height: 24),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -323,7 +383,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
   }
 }
 
-// ── Elevator Selector ─────────────────────────────────────────────────────────
+// â”€â”€ Elevator Selector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ElevatorSelector extends StatelessWidget {
   const _ElevatorSelector({
@@ -340,9 +400,9 @@ class _ElevatorSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: _surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<ElevatorModel>(
@@ -350,8 +410,8 @@ class _ElevatorSelector extends StatelessWidget {
           hint: const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              'Asansör seçin...',
-              style: TextStyle(color: _outline),
+              'AsansÃ¶r seÃ§in...',
+              style: TextStyle(color: AppColors.outline),
             ),
           ),
           isExpanded: true,
@@ -371,7 +431,7 @@ class _ElevatorSelector extends StatelessWidget {
                           e.buildingName,
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: _onSurface,
+                            color: AppColors.onSurface,
                           ),
                         ),
                         if (e.address != null)
@@ -379,7 +439,7 @@ class _ElevatorSelector extends StatelessWidget {
                             e.address!,
                             style: const TextStyle(
                               fontSize: 12,
-                              color: _outline,
+                              color: AppColors.outline,
                             ),
                           ),
                       ],
@@ -397,33 +457,7 @@ class _ElevatorSelector extends StatelessWidget {
   }
 }
 
-// ── Sub-widgets ───────────────────────────────────────────────────────────────
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: _primary),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: _onSurface,
-            letterSpacing: 0.1,
-          ),
-        ),
-      ],
-    );
-  }
-}
+// â”€â”€ Sub-widgets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _PickerButton extends StatelessWidget {
   const _PickerButton({
@@ -442,8 +476,8 @@ class _PickerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: hasValue
-          ? _primary.withValues(alpha: 0.07)
-          : _surfaceContainerLowest,
+          ? AppColors.primary.withValues(alpha: 0.07)
+          : AppColors.surfaceContainerLowest,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -453,7 +487,7 @@ class _PickerButton extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: hasValue ? _primary : _outlineVariant.withValues(alpha: 0.5),
+              color: hasValue ? AppColors.primary : AppColors.outlineVariant.withValues(alpha: 0.5),
               width: hasValue ? 1.5 : 1,
             ),
           ),
@@ -462,7 +496,7 @@ class _PickerButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 18,
-                color: hasValue ? _primary : _onSurfaceVariant,
+                color: hasValue ? AppColors.primary : AppColors.onSurfaceVariant,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -471,7 +505,7 @@ class _PickerButton extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
-                    color: hasValue ? _primary : _onSurfaceVariant,
+                    color: hasValue ? AppColors.primary : AppColors.onSurfaceVariant,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -494,18 +528,18 @@ class _InlineError extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: _errorContainer,
+        color: AppColors.errorContainer,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: _onErrorContainer, size: 18),
+          const Icon(Icons.error_outline, color: AppColors.onErrorContainer, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
               style: const TextStyle(
-                color: _onErrorContainer,
+                color: AppColors.onErrorContainer,
                 fontSize: 13,
               ),
             ),
@@ -514,35 +548,4 @@ class _InlineError extends StatelessWidget {
       ),
     );
   }
-}
-
-InputDecoration _inputDecoration({required String hint, String? helper}) {
-  return InputDecoration(
-    hintText: hint,
-    helperText: helper,
-    helperMaxLines: 2,
-    filled: true,
-    fillColor: _surfaceContainerLowest,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: BorderSide(color: _outlineVariant.withValues(alpha: 0.5)),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: BorderSide(color: _outlineVariant.withValues(alpha: 0.5)),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: _primary, width: 2),
-    ),
-    errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: _error),
-    ),
-    focusedErrorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: _error, width: 2),
-    ),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-  );
 }

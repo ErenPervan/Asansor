@@ -1,20 +1,16 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:go_router/go_router.dart';
 
 import '../providers/auth_providers.dart';
 
+import '../../../core/theme/app_colors.dart';
 // ── Brand palette ──────────────────────────────────────────────────────────────
-
-const _crimson = Color(0xFFB91C1C);
-const _crimsonDark = Color(0xFF991B1B);
-const _surface = Colors.white;
-const _onSurface = Color(0xFF0F172A);
-const _muted = Color(0xFF64748B);
-const _border = Color(0xFFE2E8F0);
-const _inputBg = Color(0xFFF8FAFC);
 
 // ── Industrial grid background painter ────────────────────────────────────────
 
@@ -169,6 +165,7 @@ class _LoginViewState extends ConsumerState<LoginView>
           if (user != null) context.go('/');
         },
         error: (error, _) {
+          HapticFeedback.heavyImpact();
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
@@ -176,7 +173,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                 content: Text(
                   error.toString().replaceFirst('Exception: ', ''),
                 ),
-                backgroundColor: const Color(0xFFDC2626),
+                backgroundColor: AppColors.error,
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -186,9 +183,10 @@ class _LoginViewState extends ConsumerState<LoginView>
 
     final isLoading = ref.watch(authControllerProvider).isLoading;
     final screenH = MediaQuery.of(context).size.height;
+    final colors = AppThemeColors.of(context);
 
     return Scaffold(
-      backgroundColor: _crimson,
+      backgroundColor: colors.primary,
       body: Column(
         children: [
           // ── Crimson header (brand section) ──────────────────────────────
@@ -203,7 +201,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [_crimsonDark, _crimson],
+                      colors: [AppColors.primaryDark, AppColors.primary],
                       stops: [0.0, 1.0],
                     ),
                   ),
@@ -291,12 +289,12 @@ class _LoginViewState extends ConsumerState<LoginView>
               child: FadeTransition(
                 opacity: _fadeAnim,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: _surface,
-                    borderRadius: BorderRadius.vertical(
+                  decoration: BoxDecoration(
+                    color: colors.surface,
+                    borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(32),
                     ),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Color(0x28000000),
                         blurRadius: 40,
@@ -312,21 +310,21 @@ class _LoginViewState extends ConsumerState<LoginView>
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // Card title
-                          const Text(
+                          Text(
                             'Giriş Yap',
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w800,
-                              color: _onSurface,
+                              color: colors.onSurface,
                               letterSpacing: -0.5,
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
+                          Text(
                             'Hesabınıza erişmek için bilgilerinizi girin.',
                             style: TextStyle(
                               fontSize: 13,
-                              color: _muted,
+                              color: colors.onSurfaceVariant,
                               height: 1.4,
                             ),
                           ),
@@ -341,14 +339,14 @@ class _LoginViewState extends ConsumerState<LoginView>
                             textInputAction: TextInputAction.next,
                             autocorrect: false,
                             enabled: !isLoading,
-                            style: const TextStyle(
-                              color: _onSurface,
+                            style: TextStyle(
+                              color: colors.onSurface,
                               fontSize: 15,
                             ),
                             decoration: InputDecoration(
                               hintText: 'ornek@sirket.com',
                               filled: true,
-                              fillColor: _inputBg,
+                              fillColor: colors.surfaceContainerLow,
                               prefixIcon: const Icon(
                                 Icons.email_outlined,
                                 size: 18,
@@ -356,22 +354,22 @@ class _LoginViewState extends ConsumerState<LoginView>
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide:
-                                    const BorderSide(color: _border),
+                                    BorderSide(color: colors.outlineVariant),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide:
-                                    const BorderSide(color: _border),
+                                    BorderSide(color: colors.outlineVariant),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: _crimson, width: 1.5),
+                                    color: AppColors.primary, width: 1.5),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: Color(0xFFDC2626)),
+                                    color: AppColors.error),
                               ),
                             ),
                             validator: (v) {
@@ -395,14 +393,14 @@ class _LoginViewState extends ConsumerState<LoginView>
                             textInputAction: TextInputAction.done,
                             enabled: !isLoading,
                             onFieldSubmitted: (_) => _submit(),
-                            style: const TextStyle(
-                              color: _onSurface,
+                            style: TextStyle(
+                              color: colors.onSurface,
                               fontSize: 15,
                             ),
                             decoration: InputDecoration(
                               hintText: '••••••••',
                               filled: true,
-                              fillColor: _inputBg,
+                              fillColor: colors.surfaceContainerLow,
                               prefixIcon: const Icon(
                                 Icons.lock_outlined,
                                 size: 18,
@@ -410,22 +408,22 @@ class _LoginViewState extends ConsumerState<LoginView>
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide:
-                                    const BorderSide(color: _border),
+                                    BorderSide(color: colors.outlineVariant),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide:
-                                    const BorderSide(color: _border),
+                                    BorderSide(color: colors.outlineVariant),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: _crimson, width: 1.5),
+                                    color: AppColors.primary, width: 1.5),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: Color(0xFFDC2626)),
+                                    color: AppColors.error),
                               ),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -457,9 +455,9 @@ class _LoginViewState extends ConsumerState<LoginView>
                             child: FilledButton(
                               onPressed: isLoading ? null : _submit,
                               style: FilledButton.styleFrom(
-                                backgroundColor: _crimson,
+                                backgroundColor: AppColors.primary,
                                 disabledBackgroundColor:
-                                    _crimson.withValues(alpha: 0.5),
+                                    AppColors.primary.withValues(alpha: 0.5),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),
@@ -493,28 +491,28 @@ class _LoginViewState extends ConsumerState<LoginView>
                               Container(
                                 width: 24,
                                 height: 1,
-                                color: _border,
+                                color: colors.outlineVariant,
                               ),
                               const SizedBox(width: 10),
-                              const Text(
+                              Text(
                                 'Güvenli Bağlantı',
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: _muted,
+                                  color: colors.onSurfaceVariant,
                                   letterSpacing: 0.3,
                                 ),
                               ),
                               const SizedBox(width: 5),
-                              const Icon(
+                              Icon(
                                 Icons.lock_outlined,
                                 size: 11,
-                                color: _muted,
+                                color: colors.onSurfaceVariant,
                               ),
                               const SizedBox(width: 10),
                               Container(
                                 width: 24,
                                 height: 1,
-                                color: _border,
+                                color: colors.outlineVariant,
                               ),
                             ],
                           ),
@@ -540,12 +538,13 @@ class _FormLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return Text(
       label,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: _onSurface,
+        color: colors.onSurface,
         letterSpacing: 0.1,
       ),
     );

@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/providers/auth_providers.dart';
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _background = Color(0xFFF9FAFB);
-const _surfaceContainer = Color(0xFFF1F5F9);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _warning = Color(0xFF92400E);
-const _warningContainer = Color(0xFFFEF3C7);
-
+import '../../../core/theme/app_colors.dart';
 // ── CustomerNoElevatorView ────────────────────────────────────────────────────
 
 /// Shown to customers who have the `customer` role but no `elevator_id`
@@ -28,7 +18,7 @@ class CustomerNoElevatorView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -45,7 +35,7 @@ class CustomerNoElevatorView extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: _primary,
+                        color: AppColors.primary,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -55,7 +45,7 @@ class CustomerNoElevatorView extends ConsumerWidget {
                       icon: const Icon(Icons.logout_outlined, size: 16),
                       label: const Text('Çıkış Yap'),
                       style: TextButton.styleFrom(
-                        foregroundColor: _outline,
+                        foregroundColor: AppColors.outline,
                         textStyle: const TextStyle(fontSize: 13),
                       ),
                     ),
@@ -70,13 +60,13 @@ class CustomerNoElevatorView extends ConsumerWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: _warningContainer,
+                  color: AppColors.warningContainer,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.elevator_outlined,
                   size: 52,
-                  color: _warning,
+                  color: AppColors.warning,
                 ),
               ),
               const SizedBox(height: 32),
@@ -87,7 +77,7 @@ class CustomerNoElevatorView extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: _onSurface,
+                  color: AppColors.onSurface,
                   letterSpacing: -0.5,
                 ),
                 textAlign: TextAlign.center,
@@ -100,7 +90,7 @@ class CustomerNoElevatorView extends ConsumerWidget {
                 'Lütfen bina yöneticiniz veya sistem adminiyle iletişime geçin.',
                 style: TextStyle(
                   fontSize: 15,
-                  color: _onSurfaceVariant,
+                  color: AppColors.onSurfaceVariant,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -111,16 +101,16 @@ class CustomerNoElevatorView extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: _surfaceContainer,
+                  color: AppColors.surfaceContainer,
                   borderRadius: BorderRadius.circular(14),
                   border:
-                      Border.all(color: _outlineVariant.withValues(alpha: 0.5)),
+                      Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
                 ),
                 child: const Row(
                   children: [
                     Icon(
                       Icons.info_outline,
-                      color: _primary,
+                      color: AppColors.primary,
                       size: 20,
                     ),
                     SizedBox(width: 12),
@@ -130,7 +120,7 @@ class CustomerNoElevatorView extends ConsumerWidget {
                         'bakım ve durum bilgilerinize erişebilirsiniz.',
                         style: TextStyle(
                           fontSize: 13,
-                          color: _onSurfaceVariant,
+                          color: AppColors.onSurfaceVariant,
                           height: 1.4,
                         ),
                       ),
@@ -151,7 +141,7 @@ class CustomerNoElevatorView extends ConsumerWidget {
                   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                 ),
                 style: FilledButton.styleFrom(
-                  backgroundColor: _primary,
+                  backgroundColor: AppColors.primary,
                   minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),

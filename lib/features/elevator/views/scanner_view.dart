@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+
+import '../../../core/theme/app_colors.dart';
 
 class ScannerView extends ConsumerStatefulWidget {
   const ScannerView({super.key});
@@ -62,16 +65,17 @@ class _ScannerViewState extends ConsumerState<ScannerView>
     ).hasMatch(rawValue);
 
     if (isValidUuid) {
+      HapticFeedback.mediumImpact();
       // Route based on role:
-      //   admin / technician → elevator detail (maintenance actions visible)
-      //   customer → elevator detail (health report visible)
-      // The elevator detail view handles role-based content internally.
-      await context.push('/elevator/$rawValue');
+      // Since customers are guarded from reaching this view, only
+      // technicians and admins will scan QR codes to start maintenance.
+      await context.push('/elevator/$rawValue/maintenance/new');
       if (mounted) {
         setState(() => _isProcessing = false);
         await _controller.start();
       }
     } else {
+      HapticFeedback.heavyImpact();
       // Invalid payload — show feedback and resume scanning.
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -81,7 +85,7 @@ class _ScannerViewState extends ConsumerState<ScannerView>
               'Geçersiz QR kod. Lütfen bir asansör QR kodu tarayın.',
             ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.red.shade700,
+            backgroundColor: AppColors.error,
           ),
         );
       setState(() => _isProcessing = false);
@@ -187,7 +191,7 @@ class _ScanOverlayPainter extends CustomPainter {
   static const double _radius = 16;
   static const double _bracketLen = 36;
   static const double _bracketStroke = 4;
-  static const Color _primary = Color(0xFFB91C1C);
+  static const Color _primary = AppColors.primary;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -273,17 +277,21 @@ class _CircleIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.black54,
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Icon(icon, color: Colors.white, size: 22),
+    return Semantics(
+      label: tooltip,
+      button: true,
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color: Colors.black54,
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Icon(icon, color: Colors.white, size: 22),
+            ),
           ),
         ),
       ),

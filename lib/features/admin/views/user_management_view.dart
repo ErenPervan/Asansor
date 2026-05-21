@@ -1,42 +1,32 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../elevator/models/elevator_model.dart';
+
 import '../../elevator/providers/elevator_providers.dart';
+
 import '../models/profile_model.dart';
+
 import '../providers/profile_providers.dart';
 
-// ── Design tokens (mirrors AdminDashboard palette) ────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _primaryContainer = Color(0xFF991B1B);
-const _error = Color(0xFFDC2626);
-const _success = Color(0xFF166534);
-const _successContainer = Color(0xFFDCFCE7);
-const _surfaceContainerLowest = Colors.white;
-const _surfaceContainer = Color(0xFFF1F5F9);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _background = Color(0xFFF9FAFB);
-
+import '../../../core/theme/app_colors.dart';
 // ── Role helpers ──────────────────────────────────────────────────────────────
 
 _RoleStyle _roleStyle(String role) {
   switch (role) {
     case 'admin':
       return const _RoleStyle(
-        bg: _primary,
+        bg: AppColors.primary,
         fg: Colors.white,
-        avatarBg: _primaryContainer,
+        avatarBg: AppColors.primaryDark,
         avatarFg: Colors.white,
         icon: Icons.admin_panel_settings_outlined,
       );
     case 'customer':
       return const _RoleStyle(
-        bg: _successContainer,
-        fg: _success,
+        bg: AppColors.successContainer,
+        fg: AppColors.success,
         avatarBg: Color(0xFF4CAF50),
         avatarFg: Colors.white,
         icon: Icons.person_outline,
@@ -44,8 +34,8 @@ _RoleStyle _roleStyle(String role) {
     default: // technician
       return _RoleStyle(
         bg: const Color(0xFFD6E3FF),
-        fg: _primary,
-        avatarBg: _primary.withValues(alpha: 0.80),
+        fg: AppColors.primary,
+        avatarBg: AppColors.primary.withValues(alpha: 0.80),
         avatarFg: Colors.white,
         icon: Icons.engineering_outlined,
       );
@@ -102,9 +92,9 @@ class _UserManagementViewState extends ConsumerState<UserManagementView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: _primary,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         title: const Text(
@@ -165,7 +155,7 @@ class _UserListTab extends ConsumerWidget {
 
     return profilesAsync.when(
       loading: () => const Center(
-        child: CircularProgressIndicator(color: _primary),
+        child: CircularProgressIndicator(color: AppColors.primary),
       ),
       error: (e, _) => _ErrorPane(
         message: e.toString().replaceFirst('Exception: ', ''),
@@ -185,7 +175,7 @@ class _UserListTab extends ConsumerWidget {
           );
         }
         return RefreshIndicator(
-          color: _primary,
+          color: AppColors.primary,
           onRefresh: () async => role == null
               ? ref.invalidate(allProfilesProvider)
               : ref.invalidate(profilesByRoleProvider(role!)),
@@ -218,7 +208,7 @@ class _CustomerTab extends ConsumerWidget {
 
     return profilesAsync.when(
       loading: () => const Center(
-        child: CircularProgressIndicator(color: _primary),
+        child: CircularProgressIndicator(color: AppColors.primary),
       ),
       error: (e, _) => _ErrorPane(
         message: e.toString().replaceFirst('Exception: ', ''),
@@ -233,7 +223,7 @@ class _CustomerTab extends ConsumerWidget {
         }
         final elevators = elevatorsAsync.valueOrNull ?? [];
         return RefreshIndicator(
-          color: _primary,
+          color: AppColors.primary,
           onRefresh: () async {
             ref.invalidate(profilesByRoleProvider('customer'));
             ref.invalidate(elevatorsProvider);
@@ -294,9 +284,9 @@ class _ProfileCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -341,7 +331,7 @@ class _ProfileCard extends StatelessWidget {
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 15,
-                        color: _onSurface,
+                        color: AppColors.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -352,7 +342,7 @@ class _ProfileCard extends StatelessWidget {
                         profile.email!,
                         style: const TextStyle(
                           fontSize: 12,
-                          color: _outline,
+                          color: AppColors.outline,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -365,14 +355,14 @@ class _ProfileCard extends StatelessWidget {
                           const Icon(
                             Icons.phone_outlined,
                             size: 12,
-                            color: _onSurfaceVariant,
+                            color: AppColors.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             profile.phone!,
                             style: const TextStyle(
                               fontSize: 12,
-                              color: _onSurfaceVariant,
+                              color: AppColors.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -412,14 +402,14 @@ class _ProfileCard extends StatelessWidget {
           // ── Customer: elevator assignment section ────────────────────
           if (profile.isCustomer) ...[
             const SizedBox(height: 12),
-            Divider(height: 1, color: _outlineVariant.withValues(alpha: 0.25)),
+            Divider(height: 1, color: AppColors.outlineVariant.withValues(alpha: 0.25)),
             const SizedBox(height: 12),
             Row(
               children: [
                 const Icon(
                   Icons.elevator_outlined,
                   size: 14,
-                  color: _onSurfaceVariant,
+                  color: AppColors.onSurfaceVariant,
                 ),
                 const SizedBox(width: 6),
                 Expanded(
@@ -432,7 +422,7 @@ class _ProfileCard extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: _onSurface,
+                                color: AppColors.onSurface,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -441,7 +431,7 @@ class _ProfileCard extends StatelessWidget {
                                 linkedElevator.address!,
                                 style: const TextStyle(
                                   fontSize: 11,
-                                  color: _outline,
+                                  color: AppColors.outline,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -451,7 +441,7 @@ class _ProfileCard extends StatelessWidget {
                           'Asansör bağlı değil',
                           style: TextStyle(
                             fontSize: 12,
-                            color: _outline,
+                            color: AppColors.outline,
                             fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -471,7 +461,7 @@ class _ProfileCard extends StatelessWidget {
                       style: const TextStyle(fontSize: 12),
                     ),
                     style: TextButton.styleFrom(
-                      foregroundColor: _primary,
+                      foregroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       minimumSize: Size.zero,
@@ -497,7 +487,7 @@ class _ProfileCard extends StatelessWidget {
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   style: TextButton.styleFrom(
-                    foregroundColor: _onSurfaceVariant,
+                    foregroundColor: AppColors.onSurfaceVariant,
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     minimumSize: Size.zero,
@@ -563,7 +553,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
             state.error.toString().replaceFirst('Exception: ', ''),
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: _error,
+          backgroundColor: AppColors.error,
         ),
       );
     } else {
@@ -575,7 +565,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
             '${_roleTr(_selectedRole)} olarak güncellendi.',
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: _success,
+          backgroundColor: AppColors.success,
         ),
       );
     }
@@ -602,7 +592,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: _outlineVariant,
+                    color: AppColors.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -616,12 +606,12 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: _primary.withValues(alpha: 0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       Icons.manage_accounts_outlined,
-                      color: _primary,
+                      color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -634,13 +624,13 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: _onSurface,
+                            color: AppColors.onSurface,
                           ),
                         ),
                         Text(
                           widget.profile.displayName,
                           style:
-                              const TextStyle(fontSize: 13, color: _outline),
+                              const TextStyle(fontSize: 13, color: AppColors.outline),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -675,7 +665,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? style.bg.withValues(alpha: 0.18)
-                            : _surfaceContainer,
+                            : AppColors.surfaceContainer,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: isSelected
@@ -690,7 +680,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: isSelected ? style.bg : _outlineVariant,
+                              color: isSelected ? style.bg : AppColors.outlineVariant,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(roleIcon,
@@ -707,14 +697,14 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 14,
-                                    color: isSelected ? style.fg : _onSurface,
+                                    color: isSelected ? style.fg : AppColors.onSurface,
                                   ),
                                 ),
                                 Text(
                                   roleSubtitle,
                                   style: const TextStyle(
                                     fontSize: 11,
-                                    color: _onSurfaceVariant,
+                                    color: AppColors.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -734,7 +724,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
               FilledButton(
                 onPressed: isLoading ? null : _save,
                 style: FilledButton.styleFrom(
-                  backgroundColor: _primary,
+                  backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -827,7 +817,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
             state.error.toString().replaceFirst('Exception: ', ''),
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: _error,
+          backgroundColor: AppColors.error,
         ),
       );
     } else {
@@ -845,7 +835,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                 : '${widget.customer.displayName} asansör bağlantısı kaldırıldı.',
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: _success,
+          backgroundColor: AppColors.success,
         ),
       );
     }
@@ -871,7 +861,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: _outlineVariant,
+                    color: AppColors.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -885,10 +875,10 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: _primary.withValues(alpha: 0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.elevator_outlined, color: _primary),
+                    child: const Icon(Icons.elevator_outlined, color: AppColors.primary),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -900,13 +890,13 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: _onSurface,
+                            color: AppColors.onSurface,
                           ),
                         ),
                         Text(
                           widget.customer.displayName,
                           style:
-                              const TextStyle(fontSize: 13, color: _outline),
+                              const TextStyle(fontSize: 13, color: AppColors.outline),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -917,7 +907,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
               const SizedBox(height: 16),
               Divider(
                 height: 1,
-                color: _outlineVariant.withValues(alpha: 0.3),
+                color: AppColors.outlineVariant.withValues(alpha: 0.3),
               ),
               const SizedBox(height: 8),
 
@@ -964,7 +954,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                   child: FilledButton(
                     onPressed: isLoading ? null : _save,
                     style: FilledButton.styleFrom(
-                      backgroundColor: _primary,
+                      backgroundColor: AppColors.primary,
                       minimumSize: const Size.fromHeight(50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -1016,7 +1006,7 @@ class _ElevatorOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = isDestructive ? _error : _primary;
+    final accentColor = isDestructive ? AppColors.error : AppColors.primary;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -1026,7 +1016,7 @@ class _ElevatorOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? accentColor.withValues(alpha: 0.08)
-              : _surfaceContainer,
+              : AppColors.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
@@ -1036,7 +1026,7 @@ class _ElevatorOption extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: isSelected ? accentColor : _outline, size: 20),
+            Icon(icon, color: isSelected ? accentColor : AppColors.outline, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -1047,12 +1037,12 @@ class _ElevatorOption extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
-                      color: isSelected ? accentColor : _onSurface,
+                      color: isSelected ? accentColor : AppColors.onSurface,
                     ),
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 11, color: _outline),
+                    style: const TextStyle(fontSize: 11, color: AppColors.outline),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -1082,12 +1072,12 @@ class _EmptyPane extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 56, color: _outlineVariant),
+            Icon(icon, size: 56, color: AppColors.outlineVariant),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _outline, fontWeight: FontWeight.w500),
+              style: const TextStyle(color: AppColors.outline, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -1109,19 +1099,19 @@ class _ErrorPane extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 56, color: _error),
+            const Icon(Icons.error_outline, size: 56, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _onSurfaceVariant),
+              style: const TextStyle(color: AppColors.onSurfaceVariant),
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(backgroundColor: _primary),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
             ),
           ],
         ),

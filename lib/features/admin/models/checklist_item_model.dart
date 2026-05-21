@@ -15,7 +15,7 @@ class ChecklistItemModel {
     return ChecklistItemModel(
       id: json['id'] as String,
       label: json['label'] as String,
-      description: json['description'] as String,
+      description: (json['description'] as String?) ?? '',
       isActive: json['is_active'] as bool? ?? true,
     );
   }

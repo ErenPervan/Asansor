@@ -1,61 +1,56 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:go_router/go_router.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase_flutter;
 
 import '../../../core/providers/connectivity_providers.dart';
+
 import '../../../core/widgets/offline_banner.dart';
+
+import '../../../core/utils/elevator_utils.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/error_state.dart';
+import '../../../core/widgets/loading_state.dart';
+
 import '../../auth/providers/auth_providers.dart';
+
 import '../../elevator/models/elevator_model.dart';
+
 import '../../elevator/providers/elevator_providers.dart';
+
 import '../../fault/models/fault_report_model.dart';
+
 import '../../fault/providers/fault_providers.dart';
+
 import '../../admin/models/schedule_model.dart';
+
 import '../../admin/providers/admin_providers.dart';
+
 import '../../admin/providers/profile_providers.dart';
+
 import '../../maintenance/providers/maintenance_providers.dart';
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _primaryContainer = Color(0xFF991B1B);
-const _error = Color(0xFFDC2626);
-const _errorContainer = Color(0xFFFEE2E2);
-const _onErrorContainer = Color(0xFF991B1B);
-const _surfaceContainerLowest = Colors.white;
-const _surfaceContainer = Color(0xFFF1F5F9);
-const _surfaceContainerHighest = Color(0xFFE2E8F0);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _background = Color(0xFFF9FAFB);
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
+import '../../../core/theme/app_colors.dart';
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 String _timeAgo(DateTime dt) {
   final diff = DateTime.now().difference(dt);
-  if (diff.inMinutes < 60) return '${diff.inMinutes} dk önce';
-  if (diff.inHours < 24) return '${diff.inHours} sa önce';
-  return '${diff.inDays} gün önce';
+  if (diff.inMinutes < 60) return '${diff.inMinutes} dk Ã¶nce';
+  if (diff.inHours < 24) return '${diff.inHours} sa Ã¶nce';
+  return '${diff.inDays} gÃ¼n Ã¶nce';
 }
 
-ElevatorModel? _findElevator(String id, List<ElevatorModel>? list) {
-  if (list == null) return null;
-  try {
-    return list.firstWhere((e) => e.id == id);
-  } catch (_) {
-    return null;
-  }
-}
-
-// ── HomeView ─────────────────────────────────────────────────────────────────
+// â”€â”€ HomeView â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class HomeView extends ConsumerWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppThemeColors.of(context);
     final authState = ref.watch(authControllerProvider);
     final activeFaults = ref.watch(activeFaultsProvider);
     final mySchedules = ref.watch(technicianScheduleStreamProvider);
@@ -67,7 +62,7 @@ class HomeView extends ConsumerWidget {
     final userEmail = authState.valueOrNull?.email ?? '';
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -121,7 +116,7 @@ class HomeView extends ConsumerWidget {
   }
 }
 
-// ── Top App Bar ───────────────────────────────────────────────────────────────
+// â”€â”€ Top App Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _TopAppBar extends StatelessWidget {
   const _TopAppBar({
@@ -138,12 +133,13 @@ class _TopAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     final displayName = userEmail.isNotEmpty
         ? userEmail.split('@').first
         : 'Teknisyen';
 
     return Container(
-      color: _background,
+      color: colors.background,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
         children: [
@@ -152,14 +148,18 @@ class _TopAppBar extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: _surfaceContainer,
+              color: colors.surfaceContainer,
               shape: BoxShape.circle,
               border: Border.all(
-                color: _primary.withValues(alpha: 0.12),
+                color: colors.primary.withValues(alpha: 0.12),
                 width: 2,
               ),
             ),
-            child: const Icon(Icons.person_outline, color: _primary, size: 20),
+            child: Icon(
+              Icons.person_outline,
+              color: colors.primary,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           // Status + greeting
@@ -168,21 +168,21 @@ class _TopAppBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'DURUM: AKTİF',
+                Text(
+                  'DURUM: AKTÄ°F',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: _outline,
+                    color: colors.outline,
                     letterSpacing: 1.1,
                   ),
                 ),
                 Text(
                   'Merhaba, $displayName',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
-                    color: _primary,
+                    color: colors.primary,
                     letterSpacing: -0.3,
                   ),
                 ),
@@ -191,7 +191,7 @@ class _TopAppBar extends StatelessWidget {
           ),
           // Admin panel shortcut (for testing)
           Material(
-            color: _surfaceContainerLowest,
+            color: colors.surfaceContainerLowest,
             shape: const CircleBorder(),
             elevation: 1,
             shadowColor: Colors.black12,
@@ -202,7 +202,7 @@ class _TopAppBar extends StatelessWidget {
                 padding: EdgeInsets.all(10),
                 child: Icon(
                   Icons.admin_panel_settings_outlined,
-                  color: _primary,
+                  color: AppColors.primary,
                   size: 20,
                 ),
               ),
@@ -217,7 +217,7 @@ class _TopAppBar extends StatelessWidget {
           const SizedBox(width: 8),
           // Sign-out button
           Material(
-            color: _surfaceContainerLowest,
+            color: colors.surfaceContainerLowest,
             shape: const CircleBorder(),
             elevation: 1,
             shadowColor: Colors.black12,
@@ -226,7 +226,7 @@ class _TopAppBar extends StatelessWidget {
               onTap: onSignOut,
               child: const Padding(
                 padding: EdgeInsets.all(10),
-                child: Icon(Icons.logout_outlined, color: _primary, size: 20),
+                child: Icon(Icons.logout_outlined, color: AppColors.primary, size: 20),
               ),
             ),
           ),
@@ -236,13 +236,13 @@ class _TopAppBar extends StatelessWidget {
   }
 }
 
-// ── Sync status button ────────────────────────────────────────────────────────
+// â”€â”€ Sync status button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Small button shown in the top bar to indicate cloud sync state.
 ///
-/// - Green cloud-done icon  → all data is synced.
-/// - Amber cloud-upload icon with a count badge → items are queued offline.
-/// - No network icon (red)  → device is currently offline.
+/// - Green cloud-done icon  â†’ all data is synced.
+/// - Amber cloud-upload icon with a count badge â†’ items are queued offline.
+/// - No network icon (red)  â†’ device is currently offline.
 class _SyncStatusButton extends ConsumerWidget {
   const _SyncStatusButton({
     required this.pendingCount,
@@ -262,22 +262,22 @@ class _SyncStatusButton extends ConsumerWidget {
 
     if (!isOnline) {
       icon = Icons.cloud_off_outlined;
-      color = _primary;
-      tooltip = 'Çevrimdışı';
+      color = AppColors.primary;
+      tooltip = 'Ã‡evrimdÄ±ÅŸÄ±';
     } else if (hasPending) {
       icon = Icons.cloud_upload_outlined;
       color = const Color(0xFFD97706); // amber-600
-      tooltip = '$pendingCount öğe senkronize bekleniyor';
+      tooltip = '$pendingCount Ã¶ÄŸe senkronize bekleniyor';
     } else {
       icon = Icons.cloud_done_outlined;
       color = const Color(0xFF16A34A); // green-600
-      tooltip = 'Tüm veriler senkronize';
+      tooltip = 'TÃ¼m veriler senkronize';
     }
 
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: _surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest,
         shape: const CircleBorder(),
         elevation: 1,
         shadowColor: Colors.black12,
@@ -346,10 +346,10 @@ class _SyncStatusButton extends ConsumerWidget {
                 SnackBar(
                   content: Text(result.hasFailures
                       ? '${result.synced} senkronize edildi, '
-                          '${result.failed} başarısız'
-                      : '${result.synced} öğe başarıyla senkronize edildi'),
+                          '${result.failed} baÅŸarÄ±sÄ±z'
+                      : '${result.synced} Ã¶ÄŸe baÅŸarÄ±yla senkronize edildi'),
                   backgroundColor: result.hasFailures
-                      ? _primary
+                      ? AppColors.primary
                       : const Color(0xFF16A34A),
                 ),
               );
@@ -387,7 +387,7 @@ class _SyncSheet extends StatelessWidget {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: _outlineVariant,
+              color: AppColors.outlineVariant,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -416,23 +416,23 @@ class _SyncSheet extends StatelessWidget {
           const SizedBox(height: 14),
 
           Text(
-            hasPending ? 'Bekleyen Senkronizasyon' : 'Tüm Veriler Senkronize',
+            hasPending ? 'Bekleyen Senkronizasyon' : 'TÃ¼m Veriler Senkronize',
             style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w800,
-              color: _onSurface,
+              color: AppColors.onSurface,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             hasPending
-                ? '$pendingCount kayıt çevrimdışı olarak saklandı.'
-                    '${isOnline ? ' Şimdi senkronize edebilirsiniz.' : ' İnternet bağlantısı gerekli.'}'
-                : 'Tüm bakım ve arıza kayıtları Supabase ile senkronize.',
+                ? '$pendingCount kayÄ±t Ã§evrimdÄ±ÅŸÄ± olarak saklandÄ±.'
+                    '${isOnline ? ' Åimdi senkronize edebilirsiniz.' : ' Ä°nternet baÄŸlantÄ±sÄ± gerekli.'}'
+                : 'TÃ¼m bakÄ±m ve arÄ±za kayÄ±tlarÄ± Supabase ile senkronize.',
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 13,
-              color: _onSurfaceVariant,
+              color: AppColors.onSurfaceVariant,
               height: 1.5,
             ),
           ),
@@ -442,7 +442,7 @@ class _SyncSheet extends StatelessWidget {
           if (hasPending && isOnline)
             FilledButton.icon(
               icon: const Icon(Icons.sync_rounded),
-              label: const Text('Şimdi Senkronize Et'),
+              label: const Text('Åimdi Senkronize Et'),
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF16A34A),
                 minimumSize: const Size(double.infinity, 50),
@@ -461,13 +461,13 @@ class _SyncSheet extends StatelessWidget {
               child: Row(
                 children: const [
                   Icon(Icons.wifi_off_rounded,
-                      color: _primary, size: 18),
+                      color: AppColors.primary, size: 18),
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'İnternet bağlantısı yok. Bağlantı kurulduğunda otomatik senkronize edilecek.',
+                      'Ä°nternet baÄŸlantÄ±sÄ± yok. BaÄŸlantÄ± kurulduÄŸunda otomatik senkronize edilecek.',
                       style: TextStyle(
-                          fontSize: 12, color: _primary, height: 1.4),
+                          fontSize: 12, color: AppColors.primary, height: 1.4),
                     ),
                   ),
                 ],
@@ -479,7 +479,7 @@ class _SyncSheet extends StatelessWidget {
   }
 }
 
-// ── Active Faults Section ─────────────────────────────────────────────────────
+// â”€â”€ Active Faults Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ActiveFaultsSection extends StatelessWidget {
   const _ActiveFaultsSection({
@@ -501,11 +501,11 @@ class _ActiveFaultsSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             const Text(
-              'Açık Arızalar',
+              'AÃ§Ä±k ArÄ±zalar',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: _onSurface,
+                color: AppColors.onSurface,
                 letterSpacing: -0.5,
               ),
             ),
@@ -513,7 +513,7 @@ class _ActiveFaultsSection extends StatelessWidget {
               data: (faults) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _primary.withValues(alpha: 0.06),
+                  color: AppColors.primary.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -521,7 +521,7 @@ class _ActiveFaultsSection extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: _primary,
+                    color: AppColors.primary,
                   ),
                 ),
               ),
@@ -533,17 +533,17 @@ class _ActiveFaultsSection extends StatelessWidget {
 
         // Content
         activeFaults.when(
-          loading: () => const _LoadingCard(),
+          loading: () => const LoadingState(),
           error: (e, _) =>
-              _ErrorCard(message: e.toString().replaceFirst('Exception: ', '')),
+              ErrorState(message: e.toString().replaceFirst('Exception: ', '')),
           data: (faults) {
             if (faults.isEmpty) {
-              return const _EmptyCard(
+              return const EmptyState(
                 icon: Icons.check_circle_outline,
-                message: 'Aktif arıza bulunmuyor.',
+                message: 'Aktif arÄ±za bulunmuyor.',
               );
             }
-            // Horizontal scroll — height sized to fit the card design.
+            // Horizontal scroll â€” height sized to fit the card design.
             return SizedBox(
               height: 190,
               child: ListView.separated(
@@ -553,13 +553,13 @@ class _ActiveFaultsSection extends StatelessWidget {
                 itemCount: faults.length,
                 separatorBuilder: (context, index) => const SizedBox(width: 16),
                 itemBuilder: (context, i) {
-                  final elevator = _findElevator(
+                  final elevator = findElevator(
                     faults[i].elevatorId,
                     elevators,
                   );
                   return _FaultCard(
                     fault: faults[i],
-                    buildingName: elevator?.buildingName ?? 'Asansör',
+                    buildingName: elevator?.buildingName ?? 'AsansÃ¶r',
                     address: elevator?.address ?? faults[i].description,
                     onTap: () => context.push('/fault/${faults[i].id}'),
                   );
@@ -573,7 +573,7 @@ class _ActiveFaultsSection extends StatelessWidget {
   }
 }
 
-class _FaultCard extends StatelessWidget {
+class _FaultCard extends StatefulWidget {
   const _FaultCard({
     required this.fault,
     required this.buildingName,
@@ -587,37 +587,73 @@ class _FaultCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
+  State<_FaultCard> createState() => _FaultCardState();
+}
+
+class _FaultCardState extends State<_FaultCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseCtrl;
+  late final Animation<double> _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1600),
+    )..repeat(reverse: true);
+    _pulse = CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut);
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Non-empty description for the card body.
-    final description = fault.description.isNotEmpty
-        ? fault.description
-        : 'Arıza bildirimi alındı.';
+    final description = widget.fault.description.isNotEmpty
+        ? widget.fault.description
+        : 'ArÄ±za bildirimi alÄ±ndÄ±.';
+    final isNew = DateTime.now()
+            .difference(widget.fault.reportedAt)
+            .inMinutes <
+        15;
 
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-      width: 264,
-      decoration: BoxDecoration(
-        color: _surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: _error.withValues(alpha: 0.12),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // ── Crimson header band ─────────────────────────────────────
+      onTap: widget.onTap,
+      child: AnimatedBuilder(
+        animation: _pulse,
+        builder: (context, child) {
+          final glowAlpha = isNew ? 0.08 + (_pulse.value * 0.14) : 0.06;
+          return Container(
+            width: 264,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerLowest,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.error.withValues(alpha: glowAlpha),
+                  blurRadius: 18,
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: child,
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+          // â”€â”€ Crimson header band â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: const BoxDecoration(
@@ -631,7 +667,7 @@ class _FaultCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // "ACİL" badge
+                // "ACÄ°L" badge
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -642,7 +678,7 @@ class _FaultCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 5),
                     const Text(
-                      'ACİL ARIZA',
+                      'ACÄ°L ARIZA',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
@@ -661,7 +697,7 @@ class _FaultCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    _timeAgo(fault.reportedAt),
+                    _timeAgo(widget.fault.reportedAt),
                     style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
@@ -673,7 +709,7 @@ class _FaultCard extends StatelessWidget {
             ),
           ),
 
-          // ── Card body ───────────────────────────────────────────────
+          // â”€â”€ Card body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -682,33 +718,33 @@ class _FaultCard extends StatelessWidget {
               children: [
                 // Building name
                 Text(
-                  buildingName,
+                  widget.buildingName,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: _onSurface,
+                    color: AppColors.onSurface,
                     letterSpacing: -0.3,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 // Address
-                if (address.isNotEmpty) ...[
+                if (widget.address.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Row(
                     children: [
                       const Icon(
                         Icons.location_on_outlined,
                         size: 13,
-                        color: _outline,
+                        color: AppColors.outline,
                       ),
                       const SizedBox(width: 3),
                       Expanded(
                         child: Text(
-                          address,
+                          widget.address,
                           style: const TextStyle(
                             fontSize: 12,
-                            color: _outline,
+                            color: AppColors.outline,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -723,14 +759,14 @@ class _FaultCard extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _surfaceContainer,
+                    color: AppColors.surfaceContainer,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     description,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: _onSurfaceVariant,
+                      color: AppColors.onSurfaceVariant,
                       height: 1.4,
                     ),
                     maxLines: 2,
@@ -740,14 +776,14 @@ class _FaultCard extends StatelessWidget {
               ],
             ),
           ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
 }
 
-// ── Daily Agenda Section (real-time) ─────────────────────────────────────────
+// â”€â”€ Daily Agenda Section (real-time) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _DailyAgendaSection extends StatelessWidget {
   const _DailyAgendaSection({
@@ -771,8 +807,8 @@ class _DailyAgendaSection extends StatelessWidget {
     final day = DateTime(local.year, local.month, local.day);
     final time =
         '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
-    if (day == today) return 'Bugün $time';
-    if (day == today.add(const Duration(days: 1))) return 'Yarın $time';
+    if (day == today) return 'BugÃ¼n $time';
+    if (day == today.add(const Duration(days: 1))) return 'YarÄ±n $time';
     return '${local.day}/${local.month}/${local.year} $time';
   }
 
@@ -788,16 +824,16 @@ class _DailyAgendaSection extends StatelessWidget {
             Row(
               children: [
                 const Text(
-                  'Günlük Ajanda',
+                  'GÃ¼nlÃ¼k Ajanda',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
-                    color: _onSurface,
+                    color: AppColors.onSurface,
                     letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(width: 8),
-                // Live dot — visible only when the stream is active
+                // Live dot â€” visible only when the stream is active
                 mySchedules.when(
                   loading: () => const SizedBox.shrink(),
                   error: (e, st) => const SizedBox.shrink(),
@@ -818,14 +854,14 @@ class _DailyAgendaSection extends StatelessWidget {
 
         // Content
         mySchedules.when(
-          loading: () => const _LoadingCard(),
+          loading: () => const LoadingState(),
           error: (e, _) =>
-              _ErrorCard(message: e.toString().replaceFirst('Exception: ', '')),
+              ErrorState(message: e.toString().replaceFirst('Exception: ', '')),
           data: (schedules) {
             if (schedules.isEmpty) {
-              return const _EmptyCard(
+              return const EmptyState(
                 icon: Icons.event_available_outlined,
-                message: 'Atanmış göreviniz bulunmuyor.',
+                message: 'AtanmÄ±ÅŸ gÃ¶reviniz bulunmuyor.',
               );
             }
 
@@ -840,7 +876,7 @@ class _DailyAgendaSection extends StatelessWidget {
               children: [
                 if (todayTasks.isNotEmpty) ...[
                   _AgendaGroupHeader(
-                    label: "Bugün",
+                    label: "BugÃ¼n",
                     count: todayTasks.length,
                     highlight: true,
                   ),
@@ -848,7 +884,7 @@ class _DailyAgendaSection extends StatelessWidget {
                   ...todayTasks.map(
                     (s) => _AgendaTaskCard(
                       schedule: s,
-                      elevator: _findElevator(s.elevatorId, elevators),
+                      elevator: findElevator(s.elevatorId, elevators),
                       dateLabel: _fmtScheduleDate(s.scheduledDate),
                     ),
                   ),
@@ -856,7 +892,7 @@ class _DailyAgendaSection extends StatelessWidget {
                 if (upcomingTasks.isNotEmpty) ...[
                   if (todayTasks.isNotEmpty) const SizedBox(height: 12),
                   _AgendaGroupHeader(
-                    label: "Yaklaşan",
+                    label: "YaklaÅŸan",
                     count: upcomingTasks.length,
                     highlight: false,
                   ),
@@ -864,7 +900,7 @@ class _DailyAgendaSection extends StatelessWidget {
                   ...upcomingTasks.take(3).map(
                         (s) => _AgendaTaskCard(
                           schedule: s,
-                          elevator: _findElevator(s.elevatorId, elevators),
+                          elevator: findElevator(s.elevatorId, elevators),
                           dateLabel: _fmtScheduleDate(s.scheduledDate),
                         ),
                       ),
@@ -872,10 +908,10 @@ class _DailyAgendaSection extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        '+${upcomingTasks.length - 3} daha görev var.',
+                        '+${upcomingTasks.length - 3} daha gÃ¶rev var.',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: _outline,
+                          color: AppColors.outline,
                         ),
                       ),
                     ),
@@ -909,7 +945,7 @@ class _AgendaGroupHeader extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: highlight ? _primary : _onSurfaceVariant,
+            color: highlight ? AppColors.primary : AppColors.onSurfaceVariant,
             letterSpacing: 0.3,
           ),
         ),
@@ -918,8 +954,8 @@ class _AgendaGroupHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
           decoration: BoxDecoration(
             color: highlight
-                ? _primary.withValues(alpha: 0.1)
-                : _surfaceContainer,
+                ? AppColors.primary.withValues(alpha: 0.1)
+                : AppColors.surfaceContainer,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
@@ -927,7 +963,7 @@ class _AgendaGroupHeader extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: highlight ? _primary : _outline,
+              color: highlight ? AppColors.primary : AppColors.outline,
             ),
           ),
         ),
@@ -956,18 +992,18 @@ class _AgendaTaskCard extends ConsumerWidget {
       case 'emergency':
         return const Color(0xFFBA1A1A);
       default:
-        return _primary;
+        return AppColors.primary;
     }
   }
 
   static String _priorityLabel(String p) {
     switch (p) {
       case 'low':
-        return 'Düşük';
+        return 'DÃ¼ÅŸÃ¼k';
       case 'high':
-        return 'Yüksek';
+        return 'YÃ¼ksek';
       case 'emergency':
-        return '⚠ Acil';
+        return 'âš  Acil';
       default:
         return 'Normal';
     }
@@ -990,12 +1026,12 @@ class _AgendaTaskCard extends ConsumerWidget {
         decoration: BoxDecoration(
           color: isEmergency
               ? const Color(0xFFFFDAD6).withValues(alpha: 0.4)
-              : _surfaceContainerLowest,
+              : AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isEmergency
                 ? const Color(0xFFBA1A1A).withValues(alpha: 0.3)
-                : _outlineVariant.withValues(alpha: 0.4),
+                : AppColors.outlineVariant.withValues(alpha: 0.4),
           ),
           boxShadow: [
             BoxShadow(
@@ -1065,11 +1101,11 @@ class _AgendaTaskCard extends ConsumerWidget {
                       // Building name
                       Text(
                         elevator?.buildingName ??
-                            'Asansör $shortElevatorId',
+                            'AsansÃ¶r $shortElevatorId',
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
-                          color: _onSurface,
+                          color: AppColors.onSurface,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1083,7 +1119,7 @@ class _AgendaTaskCard extends ConsumerWidget {
                               const Icon(
                                 Icons.location_on_outlined,
                                 size: 12,
-                                color: _outline,
+                                color: AppColors.outline,
                               ),
                               const SizedBox(width: 3),
                               Expanded(
@@ -1091,7 +1127,7 @@ class _AgendaTaskCard extends ConsumerWidget {
                                   elevator!.address!,
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: _outline,
+                                    color: AppColors.outline,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1108,7 +1144,7 @@ class _AgendaTaskCard extends ConsumerWidget {
                             schedule.notes!,
                             style: const TextStyle(
                               fontSize: 12,
-                              color: _onSurfaceVariant,
+                              color: AppColors.onSurfaceVariant,
                               fontStyle: FontStyle.italic,
                             ),
                             maxLines: 2,
@@ -1116,7 +1152,7 @@ class _AgendaTaskCard extends ConsumerWidget {
                           ),
                         ),
                       const SizedBox(height: 10),
-                      // İşe Başla button — only for active tasks
+                      // Ä°ÅŸe BaÅŸla button â€” only for active tasks
                       if (_isActive(schedule.status))
                         SizedBox(
                           width: double.infinity,
@@ -1145,7 +1181,7 @@ class _AgendaTaskCard extends ConsumerWidget {
                               size: 18,
                             ),
                             label: const Text(
-                              'İşe Başla',
+                              'Ä°ÅŸe BaÅŸla',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 13,
@@ -1163,18 +1199,18 @@ class _AgendaTaskCard extends ConsumerWidget {
                               size: 14,
                               color: schedule.status == 'completed'
                                   ? const Color(0xFF2E7D32)
-                                  : _outline,
+                                  : AppColors.outline,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               schedule.status == 'completed'
-                                  ? 'Tamamlandı'
-                                  : 'İptal Edildi',
+                                  ? 'TamamlandÄ±'
+                                  : 'Ä°ptal Edildi',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: schedule.status == 'completed'
                                     ? const Color(0xFF2E7D32)
-                                    : _outline,
+                                    : AppColors.outline,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -1192,7 +1228,7 @@ class _AgendaTaskCard extends ConsumerWidget {
   }
 }
 
-// ── Stats Section (Asymmetric Bento) ─────────────────────────────────────────
+// â”€â”€ Stats Section (Asymmetric Bento) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _StatsSection extends StatelessWidget {
   const _StatsSection({
@@ -1207,7 +1243,7 @@ class _StatsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Left — completed (primary background)
+        // Left â€” completed (primary background)
         Expanded(
           child: AspectRatio(
             aspectRatio: 1,
@@ -1217,7 +1253,7 @@ class _StatsSection extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [_primary, _primaryContainer],
+                  colors: [AppColors.primary, AppColors.primaryDark],
                 ),
                 borderRadius: BorderRadius.circular(32),
               ),
@@ -1233,6 +1269,25 @@ class _StatsSection extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                        children: const [
+                          Icon(
+                            Icons.check_circle,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'TamamlandÄ±',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
                       Text(
                         '$completedCount',
                         style: const TextStyle(
@@ -1258,14 +1313,14 @@ class _StatsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 16),
-        // Right — active faults (surface background)
+        // Right â€” active faults (surface background)
         Expanded(
           child: AspectRatio(
             aspectRatio: 1,
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: _surfaceContainerHighest,
+                color: AppColors.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(32),
               ),
               child: Column(
@@ -1274,26 +1329,45 @@ class _StatsSection extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.error_outline,
-                    color: _onSurfaceVariant,
+                    color: AppColors.onSurfaceVariant,
                     size: 32,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                        children: const [
+                          Icon(
+                            Icons.error_outline,
+                            size: 14,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'AÃ§Ä±k ArÄ±za',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
                       Text(
                         '$activeFaultCount',
                         style: const TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.w700,
-                          color: _onSurface,
+                          color: AppColors.onSurface,
                         ),
                       ),
                       const Text(
-                        'AÇIK ARIZA',
+                        'AÃ‡IK ARIZA',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
-                          color: _onSurfaceVariant,
+                          color: AppColors.onSurfaceVariant,
                           letterSpacing: 1.5,
                         ),
                       ),
@@ -1309,7 +1383,7 @@ class _StatsSection extends StatelessWidget {
   }
 }
 
-// ── Elevators Shortcut Card ───────────────────────────────────────────────────
+// â”€â”€ Elevators Shortcut Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ElevatorsShortcutCard extends StatelessWidget {
   const _ElevatorsShortcutCard({required this.onTap});
@@ -1329,12 +1403,12 @@ class _ElevatorsShortcutCard extends StatelessWidget {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [_primary, _primaryContainer],
+              colors: [AppColors.primary, AppColors.primaryDark],
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: _primary.withValues(alpha: 0.28),
+                color: AppColors.primary.withValues(alpha: 0.28),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -1363,7 +1437,7 @@ class _ElevatorsShortcutCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Asansörlerim',
+                        'AsansÃ¶rlerim',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -1373,7 +1447,7 @@ class _ElevatorsShortcutCard extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'Sistemdeki tüm asansörleri listele ve ara',
+                        'Sistemdeki tÃ¼m asansÃ¶rleri listele ve ara',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.white70,
@@ -1398,7 +1472,7 @@ class _ElevatorsShortcutCard extends StatelessWidget {
   }
 }
 
-// ── QR FAB ────────────────────────────────────────────────────────────────────
+// â”€â”€ QR FAB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _QrFab extends StatelessWidget {
   const _QrFab({required this.onPressed});
@@ -1414,15 +1488,15 @@ class _QrFab extends StatelessWidget {
         shape: BoxShape.circle,
         // White border that "cuts into" the BottomAppBar notch, matching the
         // Stitch design's `border-8 border-background` class.
-        border: Border.all(color: _background, width: 8),
+        border: Border.all(color: AppColors.background, width: 8),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [_primary, _primaryContainer],
+          colors: [AppColors.primary, AppColors.primaryDark],
         ),
         boxShadow: [
           BoxShadow(
-            color: _primary.withValues(alpha: 0.30),
+            color: AppColors.primary.withValues(alpha: 0.30),
             blurRadius: 32,
             offset: const Offset(0, 12),
           ),
@@ -1445,7 +1519,7 @@ class _QrFab extends StatelessWidget {
   }
 }
 
-// ── Bottom Navigation Bar ─────────────────────────────────────────────────────
+// â”€â”€ Bottom Navigation Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _BottomNavBar extends ConsumerWidget {
   const _BottomNavBar();
@@ -1474,7 +1548,7 @@ class _BottomNavBar extends ConsumerWidget {
             ),
             _NavItem(
               icon: Icons.error_outline,
-              label: 'Arızalar',
+              label: 'ArÄ±zalar',
               isActive: false,
             ),
             const SizedBox(width: 56), // spacer for the centre FAB
@@ -1486,7 +1560,7 @@ class _BottomNavBar extends ConsumerWidget {
                   ? () => context.push('/admin/master-calendar')
                   : null,
             ),
-            _NavItem(icon: Icons.history, label: 'Günlük', isActive: true),
+            _NavItem(icon: Icons.history, label: 'GÃ¼nlÃ¼k', isActive: true),
           ],
         ),
       ),
@@ -1509,7 +1583,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? _primary : const Color(0xFF94A3B8);
+    final color = isActive ? AppColors.primary : const Color(0xFF94A3B8);
     final child = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1535,76 +1609,6 @@ class _NavItem extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: child,
-      ),
-    );
-  }
-}
-
-// ── Shared state widgets ──────────────────────────────────────────────────────
-
-class _LoadingCard extends StatelessWidget {
-  const _LoadingCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: CircularProgressIndicator(color: _primary),
-      ),
-    );
-  }
-}
-
-class _ErrorCard extends StatelessWidget {
-  const _ErrorCard({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _errorContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: _onErrorContainer),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(color: _onErrorContainer),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyCard extends StatelessWidget {
-  const _EmptyCard({required this.icon, required this.message});
-
-  final IconData icon;
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: _surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: _outline),
-          const SizedBox(width: 12),
-          Text(message, style: const TextStyle(color: _outline)),
-        ],
       ),
     );
   }

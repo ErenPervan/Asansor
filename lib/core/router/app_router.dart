@@ -23,6 +23,7 @@ import '../../features/elevator/views/elevator_detail_view.dart';
 import '../../features/elevator/views/elevator_list_view.dart';
 import '../../features/elevator/views/home_view.dart';
 import '../../features/elevator/views/scanner_view.dart';
+import '../../features/maintenance/views/maintenance_log_entry_view.dart';
 import '../../features/admin/conflicts/admin_conflict_management_view.dart';
 import '../../features/admin/views/admin_statistics_dashboard.dart';
 
@@ -144,6 +145,13 @@ final GoRouter appRouter = GoRouter(
       builder: (_, state) {
         final elevatorId = state.pathParameters['id'] ?? '';
         return ElevatorDetailView(elevatorId: elevatorId);
+      },
+    ),
+    GoRoute(
+      path: '/elevator/:id/maintenance/new',
+      builder: (_, state) {
+        final elevatorId = state.pathParameters['id'] ?? '';
+        return MaintenanceLogEntryView(elevatorId: elevatorId);
       },
     ),
 

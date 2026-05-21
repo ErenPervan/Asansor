@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -14,6 +15,12 @@ import 'pdf_service.dart';
 
 /// The name of the Hive box that holds unsynced operations.
 const syncQueueBoxName = 'pending_sync';
+
+const _maintenancePhotosBucket = 'maintenance-photos';
+const _maintenanceReportsBucket = 'maintenance-reports';
+const _statusPending = 'pending';
+const _statusPdfPending = 'pdf_pending';
+const _statusConflictDetected = 'conflict_detected';
 
 /// Supported operation types that can be queued.
 abstract final class SyncItemType {
@@ -65,40 +72,43 @@ class SyncQueueService extends ChangeNotifier {
 
   /// Number of items currently waiting to be synced.
   int get pendingCount => _box.values.where((raw) {
-        try {
-          final item = jsonDecode(raw) as Map<String, dynamic>;
-          return item['status'] != 'conflict_detected';
-        } catch (_) {
-          return true;
-        }
-      }).length;
+    try {
+      final item = jsonDecode(raw) as Map<String, dynamic>;
+      return item['status'] != _statusConflictDetected;
+    } catch (_) {
+      return true;
+    }
+  }).length;
 
   /// Number of items with conflicts.
   int get conflictCount => _box.values.where((raw) {
-        try {
-          final item = jsonDecode(raw) as Map<String, dynamic>;
-          return item['status'] == 'conflict_detected';
-        } catch (_) {
-          return false;
-        }
-      }).length;
+    try {
+      final item = jsonDecode(raw) as Map<String, dynamic>;
+      return item['status'] == _statusConflictDetected;
+    } catch (_) {
+      return false;
+    }
+  }).length;
 
   /// Whether there are items waiting in the queue.
   bool get hasPending => pendingCount > 0;
 
   /// Get conflicted items
   List<Map<String, dynamic>> get conflictedItems {
-    return _box.keys.map((key) {
-      final raw = _box.get(key);
-      if (raw == null) return null;
-      try {
-        final item = jsonDecode(raw) as Map<String, dynamic>;
-        if (item['status'] == 'conflict_detected') {
-          return {'key': key, ...item};
-        }
-      } catch (_) {}
-      return null;
-    }).whereType<Map<String, dynamic>>().toList();
+    return _box.keys
+        .map((key) {
+          final raw = _box.get(key);
+          if (raw == null) return null;
+          try {
+            final item = jsonDecode(raw) as Map<String, dynamic>;
+            if (item['status'] == _statusConflictDetected) {
+              return {'key': key, ...item};
+            }
+          } catch (_) {}
+          return null;
+        })
+        .whereType<Map<String, dynamic>>()
+        .toList();
   }
 
   // ── Write ─────────────────────────────────────────────────────────────────
@@ -122,7 +132,7 @@ class SyncQueueService extends ChangeNotifier {
       'type': type,
       'payload': payload,
       'queued_at': DateTime.now().toIso8601String(),
-      'status': 'pending',
+      'status': _statusPending,
     });
     await _box.put(id, item);
     notifyListeners();
@@ -147,18 +157,18 @@ class SyncQueueService extends ChangeNotifier {
 
       try {
         final item = jsonDecode(raw) as Map<String, dynamic>;
-        
-        if (item['status'] == 'conflict_detected') {
+
+        if (item['status'] == _statusConflictDetected) {
           failed++;
           continue; // Skip conflicted items, they require manual resolution
         }
 
-        await _process(client, item);
+        await _process(client, item, key);
         await _box.delete(key);
         synced++;
       } on ConflictException catch (e) {
         final item = jsonDecode(raw) as Map<String, dynamic>;
-        item['status'] = 'conflict_detected';
+        item['status'] = _statusConflictDetected;
         item['remote_state'] = e.remoteState;
         await _box.put(key, jsonEncode(item));
         failed++;
@@ -179,14 +189,16 @@ class SyncQueueService extends ChangeNotifier {
   // ── Internal ──────────────────────────────────────────────────────────────
 
   Future<void> _process(
-      SupabaseClient client, Map<String, dynamic> item) async {
+    SupabaseClient client,
+    Map<String, dynamic> item,
+    String key,
+  ) async {
     final type = item['type'] as String;
-    final payload =
-        Map<String, dynamic>.from(item['payload'] as Map);
+    final payload = Map<String, dynamic>.from(item['payload'] as Map);
 
     switch (type) {
       case SyncItemType.maintenanceLog:
-        await _syncMaintenanceLog(client, payload);
+        await _syncMaintenanceLog(client, payload, item, key);
         break;
       case SyncItemType.faultReport:
         await _syncFaultReport(client, payload);
@@ -200,33 +212,113 @@ class SyncQueueService extends ChangeNotifier {
   }
 
   Future<void> _syncMaintenanceLog(
-      SupabaseClient client, Map<String, dynamic> payload) async {
+    SupabaseClient client,
+    Map<String, dynamic> payload,
+    Map<String, dynamic> queueItem,
+    String key,
+  ) async {
     // Strip internal metadata before inserting.
     final elevatorId = payload['elevator_id'] as String?;
     final technicianId = payload['technician_id'] as String?;
 
+    if (queueItem['status'] == _statusPdfPending) {
+      await _generateUploadAndAttachPdf(
+        client,
+        _pdfPendingRemoteState(queueItem),
+      );
+      await _completeMatchingSchedule(
+        client,
+        elevatorId: elevatorId,
+        technicianId: technicianId,
+      );
+      return;
+    }
+
     final row = Map<String, dynamic>.from(payload)
       ..remove('_complete_schedule');
 
-    final response = await client.from('maintenance_logs').insert(row).select().maybeSingle();
+    final rawPhotos = row['photos'];
+    if (rawPhotos is List) {
+      final photoPaths = rawPhotos.whereType<String>().toList();
+      if (photoPaths.isNotEmpty) {
+        final uploadedUrls = await _resolveMaintenancePhotos(
+          client,
+          photoPaths,
+          elevatorId: elevatorId,
+          technicianId: technicianId,
+        );
+        if (uploadedUrls.isNotEmpty) {
+          row['photos'] = uploadedUrls;
+        } else {
+          row.remove('photos');
+        }
+      } else {
+        row.remove('photos');
+      }
+    } else {
+      row.remove('photos');
+    }
 
+    final sigPath = row['signature_url'] as String?;
+    if (sigPath != null) {
+      final url = await _resolveMaintenanceSignature(
+        client,
+        sigPath,
+        elevatorId: elevatorId,
+        technicianId: technicianId,
+      );
+      row['signature_url'] = url;
+    }
+
+    final custSigPath = row['customer_signature_url'] as String?;
+    if (custSigPath != null) {
+      final url = await _resolveMaintenanceSignature(
+        client,
+        custSigPath,
+        elevatorId: elevatorId,
+        technicianId: technicianId,
+      );
+      row['customer_signature_url'] = url;
+    }
+
+    final response = await client
+        .from('maintenance_logs')
+        .insert(row)
+        .select()
+        .maybeSingle();
+    if (response == null) {
+      throw StateError('Maintenance log insert returned no row.');
+    }
+    queueItem['status'] = _statusPdfPending;
+    queueItem['payload'] = row;
+    queueItem['remote_state'] = response;
+    await _box.put(key, jsonEncode(queueItem));
+
+    // ignore: unnecessary_null_comparison
     if (response != null) {
       try {
         // ── Step 1: Generate the PDF ──────────────────────────────────────────
         final logModel = MaintenanceLogModel.fromJson(response);
         final pdfFile = await PdfService().generateMaintenanceReport(
           log: logModel,
-          checklistDetails: [], // Checklist mapping verified: currently not in schema, placeholder used
+          checklistDetails:
+              [], // Checklist mapping verified: currently not in schema, placeholder used
+          mediaUrls: logModel.photos,
+          signatureUrl: logModel.signatureUrl,
+          customerSignatureUrl: logModel.customerSignatureUrl,
         );
 
         // ── Step 2: Upload to Supabase Storage ───────────────────────────────
         final fileName =
             'report_${logModel.elevatorId}_${DateTime.now().millisecondsSinceEpoch}.pdf';
-        await client.storage.from('maintenance-reports').upload(fileName, pdfFile);
+        await client.storage
+            .from(_maintenanceReportsBucket)
+            .upload(fileName, pdfFile);
 
         // ── Step 3: Write the public URL back to maintenance_logs.pdf_url ────
-        final publicUrl =
-            client.storage.from('maintenance-reports').getPublicUrl(fileName);
+        final publicUrl = client.storage
+            .from(_maintenanceReportsBucket)
+            .getPublicUrl(fileName);
         await client
             .from('maintenance_logs')
             .update({'pdf_url': publicUrl})
@@ -251,57 +343,243 @@ class SyncQueueService extends ChangeNotifier {
                 'title': 'Bakım Tamamlandı ✓',
                 'body':
                     'Asansörünüzün periyodik bakımı tamamlandı. Rapora göz atabilirsiniz.',
-                'data': {
-                  'route': '/customer',
-                  'pdf_url': publicUrl,
-                },
+                'data': {'route': '/customer', 'pdf_url': publicUrl},
               },
             );
-            debugPrint('[SyncQueue] Customer notification sent to: $customerId');
+            debugPrint(
+              '[SyncQueue] Customer notification sent to: $customerId',
+            );
           } else {
             debugPrint(
-                '[SyncQueue] No customer profile found for elevator ${logModel.elevatorId}. Skipping notification.');
+              '[SyncQueue] No customer profile found for elevator ${logModel.elevatorId}. Skipping notification.',
+            );
           }
         } catch (notifErr) {
           // Notification failure must never crash the sync — log and continue.
-          debugPrint('[SyncQueue] Customer notification failed (non-fatal): $notifErr');
+          debugPrint(
+            '[SyncQueue] Customer notification failed (non-fatal): $notifErr',
+          );
         }
       } catch (e) {
         debugPrint('[SyncQueue] Failed to generate or upload PDF report: $e');
+        // Throw so that the flush loop knows this item is not fully synced
+        throw Exception('PDF generation/upload failed');
       }
-
     }
 
-    // After a successful log, complete any matching pending schedule.
-    if (elevatorId != null && technicianId != null) {
-      try {
-        final today = DateTime.now();
-        final start =
-            DateTime(today.year, today.month, today.day).toIso8601String();
-        final end = DateTime(today.year, today.month, today.day, 23, 59, 59)
-            .toIso8601String();
+    await _completeMatchingSchedule(
+      client,
+      elevatorId: elevatorId,
+      technicianId: technicianId,
+    );
+  }
 
-        await client
-            .from('maintenance_schedules')
-            .update({'status': 'completed'})
-            .eq('elevator_id', elevatorId)
-            .eq('technician_id', technicianId)
-            .inFilter('status', ['pending', 'in_progress'])
-            .gte('scheduled_date', start)
-            .lte('scheduled_date', end);
-      } catch (_) {
-        // Schedule completion is best-effort; don't fail the whole sync.
+  Map<String, dynamic> _pdfPendingRemoteState(Map<String, dynamic> queueItem) {
+    final remoteState = queueItem['remote_state'];
+    if (remoteState is Map<String, dynamic>) {
+      return remoteState;
+    }
+    if (remoteState is Map) {
+      return Map<String, dynamic>.from(remoteState);
+    }
+
+    throw StateError('Maintenance log is pdf_pending without remote_state.');
+  }
+
+  Future<void> _generateUploadAndAttachPdf(
+    SupabaseClient client,
+    Map<String, dynamic> response,
+  ) async {
+    try {
+      final logModel = MaintenanceLogModel.fromJson(response);
+      final pdfFile = await PdfService().generateMaintenanceReport(
+        log: logModel,
+        checklistDetails: [],
+        mediaUrls: logModel.photos,
+        signatureUrl: logModel.signatureUrl,
+        customerSignatureUrl: logModel.customerSignatureUrl,
+      );
+
+      final fileName =
+          'report_${logModel.elevatorId}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      await client.storage
+          .from(_maintenanceReportsBucket)
+          .upload(fileName, pdfFile);
+
+      final publicUrl = client.storage
+          .from(_maintenanceReportsBucket)
+          .getPublicUrl(fileName);
+      await client
+          .from('maintenance_logs')
+          .update({'pdf_url': publicUrl})
+          .eq('id', logModel.id);
+      debugPrint('[SyncQueue] PDF uploaded & linked: $publicUrl');
+
+      try {
+        final customerData = await client
+            .from('profiles')
+            .select('id')
+            .eq('elevator_id', logModel.elevatorId)
+            .eq('role', 'customer')
+            .maybeSingle();
+
+        if (customerData != null) {
+          final customerId = customerData['id'] as String;
+          await client.functions.invoke(
+            'send-notification',
+            body: {
+              'to_user_id': customerId,
+              'title': 'BakÄ±m TamamlandÄ± âœ“',
+              'body':
+                  'AsansÃ¶rÃ¼nÃ¼zÃ¼n periyodik bakÄ±mÄ± tamamlandÄ±. Rapora gÃ¶z atabilirsiniz.',
+              'data': {'route': '/customer', 'pdf_url': publicUrl},
+            },
+          );
+          debugPrint('[SyncQueue] Customer notification sent to: $customerId');
+        } else {
+          debugPrint(
+            '[SyncQueue] No customer profile found for elevator ${logModel.elevatorId}. Skipping notification.',
+          );
+        }
+      } catch (notifErr) {
+        debugPrint(
+          '[SyncQueue] Customer notification failed (non-fatal): $notifErr',
+        );
       }
+    } catch (e) {
+      debugPrint('[SyncQueue] Failed to generate or upload PDF report: $e');
+      throw Exception('PDF generation/upload failed');
     }
   }
 
+  Future<String> _resolveMaintenanceSignature(
+    SupabaseClient client,
+    String path, {
+    required String? elevatorId,
+    required String? technicianId,
+  }) async {
+    if (_isRemoteUrl(path)) return path;
+
+    final file = File(path);
+    if (!await file.exists()) {
+      throw FileSystemException('Maintenance signature is missing', path);
+    }
+
+    final urls = await _resolveMaintenancePhotos(
+      client,
+      [path],
+      elevatorId: elevatorId,
+      technicianId: technicianId,
+    );
+    if (urls.isEmpty) {
+      throw FileSystemException(
+        'Maintenance signature could not be uploaded',
+        path,
+      );
+    }
+
+    return urls.first;
+  }
+
+  Future<void> _completeMatchingSchedule(
+    SupabaseClient client, {
+    required String? elevatorId,
+    required String? technicianId,
+  }) async {
+    if (elevatorId == null || technicianId == null) return;
+
+    try {
+      final today = DateTime.now();
+      final start = DateTime(
+        today.year,
+        today.month,
+        today.day,
+      ).toIso8601String();
+      final end = DateTime(
+        today.year,
+        today.month,
+        today.day,
+        23,
+        59,
+        59,
+      ).toIso8601String();
+
+      await client
+          .from('maintenance_schedules')
+          .update({'status': 'completed'})
+          .eq('elevator_id', elevatorId)
+          .eq('technician_id', technicianId)
+          .inFilter('status', ['pending', 'in_progress'])
+          .gte('scheduled_date', start)
+          .lte('scheduled_date', end);
+    } catch (_) {
+      // Schedule completion is best-effort; don't fail the whole sync.
+    }
+  }
+
+  Future<List<String>> _resolveMaintenancePhotos(
+    SupabaseClient client,
+    List<String> photoPaths, {
+    required String? elevatorId,
+    required String? technicianId,
+  }) async {
+    final storage = client.storage.from(_maintenancePhotosBucket);
+    final uploadedUrls = <String>[];
+    var index = 0;
+
+    for (final path in photoPaths) {
+      if (_isRemoteUrl(path)) {
+        uploadedUrls.add(path);
+        continue;
+      }
+
+      final file = File(path);
+      if (!await file.exists()) {
+        debugPrint('[SyncQueue] Missing photo at $path; skipping.');
+        continue;
+      }
+
+      final extension = _safeExtension(path);
+      final fileName =
+          'maintenance_logs/${elevatorId ?? 'unknown'}/${technicianId ?? 'unknown'}_${DateTime.now().millisecondsSinceEpoch}_$index.$extension';
+      index++;
+
+      await storage.upload(fileName, file);
+      uploadedUrls.add(storage.getPublicUrl(fileName));
+    }
+
+    return uploadedUrls;
+  }
+
+  bool _isRemoteUrl(String path) {
+    return path.startsWith('http://') || path.startsWith('https://');
+  }
+
+  String _safeExtension(String path) {
+    final dotIndex = path.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == path.length - 1) {
+      return 'jpg';
+    }
+
+    final extension = path.substring(dotIndex + 1).toLowerCase();
+    if (extension.length > 5) {
+      return 'jpg';
+    }
+
+    return extension;
+  }
+
   Future<void> _syncFaultReport(
-      SupabaseClient client, Map<String, dynamic> payload) async {
+    SupabaseClient client,
+    Map<String, dynamic> payload,
+  ) async {
     await client.from('fault_reports').insert(payload);
   }
 
   Future<void> _syncElevatorUpdate(
-      SupabaseClient client, Map<String, dynamic> payload) async {
+    SupabaseClient client,
+    Map<String, dynamic> payload,
+  ) async {
     final id = payload['id'] as String;
     final baseVersion = payload['base_version'] as int;
     final changes = Map<String, dynamic>.from(payload)
@@ -318,7 +596,11 @@ class SyncQueueService extends ChangeNotifier {
 
     if (response == null) {
       // Version mismatch or deleted
-      final remote = await client.from('elevators').select().eq('id', id).maybeSingle();
+      final remote = await client
+          .from('elevators')
+          .select()
+          .eq('id', id)
+          .maybeSingle();
       if (remote != null) {
         throw ConflictException(remoteState: remote);
       } else {
@@ -334,18 +616,22 @@ class SyncQueueService extends ChangeNotifier {
   Future<void> resolveForceUpdate(SupabaseClient client, String key) async {
     final raw = _box.get(key);
     if (raw == null) return;
-    
+
     final item = jsonDecode(raw) as Map<String, dynamic>;
     final payload = item['payload'] as Map<String, dynamic>;
     final id = payload['id'] as String;
 
-    final remote = await client.from('elevators').select('version').eq('id', id).maybeSingle();
+    final remote = await client
+        .from('elevators')
+        .select('version')
+        .eq('id', id)
+        .maybeSingle();
     if (remote != null) {
       payload['base_version'] = remote['version'];
-      item['status'] = 'pending';
+      item['status'] = _statusPending;
       item.remove('remote_state');
       await _box.put(key, jsonEncode(item));
-      
+
       // Try to flush this item specifically
       await flush(client);
     }
@@ -367,7 +653,7 @@ class SyncQueueService extends ChangeNotifier {
       'technician_id': client.auth.currentUser!.id,
       'local_payload': payload,
       'remote_payload': remoteState,
-      'status': 'pending',
+      'status': _statusPending,
     });
 
     await _box.delete(key);

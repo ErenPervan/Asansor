@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 void main() {
   var pdfServicePath = 'd:/Asansor/lib/core/services/pdf_service.dart';
@@ -23,10 +23,10 @@ void main() {
   // Just inject reportLogic at the end of the PdfService class, before the last '}'
   var lastBraceIndex = pdfServiceContent.lastIndexOf('}');
   
-  var newContent = pdfServiceContent.substring(0, lastBraceIndex) + '\n\n  // --- Migrated from pdf_report_service.dart ---\n\n' + reportLogic.replaceAll('\n', '\n  ') + '\n}\n';
+  var newContent = '${pdfServiceContent.substring(0, lastBraceIndex)}\n\n  // --- Migrated from pdf_report_service.dart ---\n\n${reportLogic.replaceAll('\n', '\n  ')}\n}\n';
   
   // Add the elevator import
-  newContent = newContent.replaceFirst('import \'../../features/maintenance/models/maintenance_log_model.dart\';', 'import \'../../features/maintenance/models/maintenance_log_model.dart\';\n' + elevatorImport);
+  newContent = newContent.replaceFirst('import \'../../features/maintenance/models/maintenance_log_model.dart\';', 'import \'../../features/maintenance/models/maintenance_log_model.dart\';\n$elevatorImport');
   
   File(pdfServicePath).writeAsStringSync(newContent);
 }

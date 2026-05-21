@@ -1,4 +1,4 @@
-import 'dart:io';
+ï»¿import 'dart:io';
 
 void main() {
   var pdfServicePath = 'd:/Asansor/lib/core/services/pdf_service.dart';
@@ -11,7 +11,7 @@ void main() {
   var elevatorImport = "import '../../features/elevator/models/elevator_model.dart';\n";
   
   // Extract the functions and constants from pdf_report_service
-  var reportLogic = pdfReportContent.substring(pdfReportContent.indexOf('// ¦¦ Corporate colour palette'));
+  var reportLogic = pdfReportContent.substring(pdfReportContent.indexOf('// Â¦Â¦ Corporate colour palette'));
   
   // Remove the 'Future<pw.Document> generateElevatorReport(' and replace with 'Future<pw.Document> generateElevatorReport(' inside class? No, let's keep them as methods of PdfService.
   // Actually, keeping them top-level is fine, but the user expects PdfService().generateElevatorReport based on the prompt's Call the updated PdfService().generateMaintenanceReport(...) which implies instance methods. But wait, ElevatorDetailView is currently calling generateElevatorReport(widget.elevator, logs). If we make it PdfService().generateElevatorReport, we need it inside the class.

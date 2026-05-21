@@ -5,8 +5,18 @@ import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 
 // Pending(IoT): Re-enable daily trips mock or remove when telemetry is live
 final List<String> _monthsTr = [
-  'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-  'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+  'Oca',
+  'Şub',
+  'Mar',
+  'Nis',
+  'May',
+  'Haz',
+  'Tem',
+  'Ağu',
+  'Eyl',
+  'Eki',
+  'Kas',
+  'Ara',
 ];
 
 String _fmtDateCompact(DateTime dt) {
@@ -14,10 +24,7 @@ String _fmtDateCompact(DateTime dt) {
 }
 
 class SystemMonitorSection extends ConsumerWidget {
-  const SystemMonitorSection({
-    super.key,
-    required this.elevatorId,
-  });
+  const SystemMonitorSection({super.key, required this.elevatorId});
 
   final String elevatorId;
 
@@ -25,8 +32,9 @@ class SystemMonitorSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // ── Live data ──────────────────────────────────────────────────────────
     final latestFaultAsync = ref.watch(latestFaultDateProvider(elevatorId));
-    final nextMaintenanceAsync =
-        ref.watch(nextScheduledMaintenanceProvider(elevatorId));
+    final nextMaintenanceAsync = ref.watch(
+      nextScheduledMaintenanceProvider(elevatorId),
+    );
 
     return Column(
       children: [
@@ -60,8 +68,7 @@ class SystemMonitorSection extends ConsumerWidget {
                       value: latestFaultAsync.when(
                         loading: () => '…',
                         error: (e, s) => '!',
-                        data: (dt) =>
-                            dt != null ? _fmtDateCompact(dt) : '—',
+                        data: (dt) => dt != null ? _fmtDateCompact(dt) : '—',
                       ),
                       valueColor: AppColors.error,
                     ),
@@ -115,8 +122,7 @@ class SystemMonitorSection extends ConsumerWidget {
                     );
                   }
                   final local = nextDate.toLocal();
-                  final dayLabel =
-                      local.day.toString().padLeft(2, '0');
+                  final dayLabel = local.day.toString().padLeft(2, '0');
                   final dateLabel =
                       '${_monthsTr[local.month - 1]} ${local.year}';
                   return NextMaintenanceContent(

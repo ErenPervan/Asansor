@@ -4,10 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 // ── User Management Card ──────────────────────────────────────────────────────
 
 class UserManagementCard extends StatelessWidget {
-  const UserManagementCard({
-    super.key,
-    required this.onTap,
-  });
+  const UserManagementCard({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -24,7 +21,9 @@ class UserManagementCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.4)),
+            border: Border.all(
+              color: AppColors.outlineVariant.withValues(alpha: 0.4),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.03),
@@ -91,10 +90,7 @@ class UserManagementCard extends StatelessWidget {
 // ── Technician Directory Card ─────────────────────────────────────────────────
 
 class TechnicianDirCard extends StatelessWidget {
-  const TechnicianDirCard({
-    super.key,
-    required this.onTap,
-  });
+  const TechnicianDirCard({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -111,7 +107,9 @@ class TechnicianDirCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.4)),
+            border: Border.all(
+              color: AppColors.outlineVariant.withValues(alpha: 0.4),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.03),

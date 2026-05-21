@@ -33,8 +33,7 @@ class TechnicianManagementView extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Yenile',
-            onPressed: () =>
-                ref.invalidate(technicianManagementProvider),
+            onPressed: () => ref.invalidate(technicianManagementProvider),
           ),
         ],
       ),
@@ -208,10 +207,7 @@ class _StatPill extends StatelessWidget {
 // ── Technician card ───────────────────────────────────────────────────────────
 
 class _TechnicianCard extends StatelessWidget {
-  const _TechnicianCard({
-    required this.stats,
-    required this.onTap,
-  });
+  const _TechnicianCard({required this.stats, required this.onTap});
 
   final TechnicianStats stats;
   final VoidCallback onTap;
@@ -219,8 +215,7 @@ class _TechnicianCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profile = stats.profile;
-    final allDone =
-        stats.todayTotal > 0 && stats.progressValue >= 1.0;
+    final allDone = stats.todayTotal > 0 && stats.progressValue >= 1.0;
     final barColor = allDone ? AppColors.success : AppColors.primary;
 
     return Material(
@@ -256,8 +251,9 @@ class _TechnicianCard extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 28,
-                          backgroundColor:
-                              AppColors.primary.withValues(alpha: 0.12),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.12,
+                          ),
                           child: Text(
                             profile.initials,
                             style: const TextStyle(
@@ -279,7 +275,9 @@ class _TechnicianCard extends StatelessWidget {
                                   : AppColors.outline,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                  color: AppColors.surface, width: 2),
+                                color: AppColors.surface,
+                                width: 2,
+                              ),
                             ),
                           ),
                         ),
@@ -293,8 +291,7 @@ class _TechnicianCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
                                 child: Text(
@@ -310,8 +307,7 @@ class _TechnicianCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              _MonthlyBadge(
-                                  count: stats.monthlyCompleted),
+                              _MonthlyBadge(count: stats.monthlyCompleted),
                             ],
                           ),
                           if (profile.email != null &&
@@ -320,16 +316,18 @@ class _TechnicianCard extends StatelessWidget {
                             Row(
                               children: [
                                 const Icon(
-                                    Icons.email_outlined,
-                                    size: 12,
-                                    color: AppColors.outline),
+                                  Icons.email_outlined,
+                                  size: 12,
+                                  color: AppColors.outline,
+                                ),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     profile.email!,
                                     style: const TextStyle(
-                                        fontSize: 12,
-                                        color: AppColors.outline),
+                                      fontSize: 12,
+                                      color: AppColors.outline,
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -342,13 +340,18 @@ class _TechnicianCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Row(
                               children: [
-                                const Icon(Icons.phone_outlined,
-                                    size: 12, color: AppColors.outline),
+                                const Icon(
+                                  Icons.phone_outlined,
+                                  size: 12,
+                                  color: AppColors.outline,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   profile.phone!,
                                   style: const TextStyle(
-                                      fontSize: 12, color: AppColors.outline),
+                                    fontSize: 12,
+                                    color: AppColors.outline,
+                                  ),
                                 ),
                               ],
                             ),
@@ -391,8 +394,7 @@ class _TechnicianCard extends StatelessWidget {
                       value: stats.progressValue,
                       minHeight: 7,
                       backgroundColor: AppColors.outlineVariant,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(barColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(barColor),
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -403,9 +405,7 @@ class _TechnicianCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       color: allDone ? AppColors.success : AppColors.outline,
-                      fontWeight: allDone
-                          ? FontWeight.w700
-                          : FontWeight.normal,
+                      fontWeight: allDone ? FontWeight.w700 : FontWeight.normal,
                     ),
                   ),
                 ] else
@@ -426,15 +426,21 @@ class _TechnicianCard extends StatelessWidget {
                     _ActionButton(
                       icon: Icons.phone_outlined,
                       label: 'Ara',
-                      onTap: () => _handleCall(context, profile.phone,
-                          profile.displayName),
+                      onTap: () => _handleCall(
+                        context,
+                        profile.phone,
+                        profile.displayName,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     _ActionButton(
                       icon: Icons.chat_bubble_outline_rounded,
                       label: 'Mesaj',
                       onTap: () => _handleMessage(
-                          context, profile.phone, profile.displayName),
+                        context,
+                        profile.phone,
+                        profile.displayName,
+                      ),
                     ),
                     const Spacer(),
                     TextButton.icon(
@@ -448,7 +454,9 @@ class _TechnicianCard extends StatelessWidget {
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.primary,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
                       ),
                       onPressed: onTap,
                     ),
@@ -462,8 +470,7 @@ class _TechnicianCard extends StatelessWidget {
     );
   }
 
-  void _handleCall(
-      BuildContext context, String? phone, String name) {
+  void _handleCall(BuildContext context, String? phone, String name) {
     if (phone == null || phone.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -483,8 +490,7 @@ class _TechnicianCard extends StatelessWidget {
     );
   }
 
-  void _handleMessage(
-      BuildContext context, String? phone, String name) {
+  void _handleMessage(BuildContext context, String? phone, String name) {
     if (phone == null || phone.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -553,8 +559,7 @@ class _ActionButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
           color: AppColors.surfaceContainer,
           borderRadius: BorderRadius.circular(8),
@@ -597,8 +602,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
         return Container(
           decoration: const BoxDecoration(
             color: AppColors.surface,
-            borderRadius:
-                BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
@@ -623,8 +627,9 @@ class _TechnicianDetailSheet extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 22,
-                      backgroundColor:
-                          AppColors.primary.withValues(alpha: 0.12),
+                      backgroundColor: AppColors.primary.withValues(
+                        alpha: 0.12,
+                      ),
                       child: Text(
                         stats.profile.initials,
                         style: const TextStyle(
@@ -651,7 +656,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
                             stats.todayTotal == 0
                                 ? 'Bugün görev yok'
                                 : '${stats.todayTotal} görev — '
-                                    '${stats.todayCompleted} tamamlandı',
+                                      '${stats.todayCompleted} tamamlandı',
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.onSurfaceVariant,
@@ -676,8 +681,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
                     ? _SheetEmptyView(name: stats.profile.displayName)
                     : ListView.builder(
                         controller: scrollController,
-                        padding: const EdgeInsets.fromLTRB(
-                            16, 0, 16, 32),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
                         itemCount: stats.todayTasks.length,
                         itemBuilder: (_, i) => _TimelineTaskItem(
                           task: stats.todayTasks[i],
@@ -714,8 +718,10 @@ class _TimelineTaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final time = DateFormat('HH:mm', 'tr_TR')
-        .format(task.scheduledTime.toLocal());
+    final time = DateFormat(
+      'HH:mm',
+      'tr_TR',
+    ).format(task.scheduledTime.toLocal());
 
     return IntrinsicHeight(
       child: Row(
@@ -728,7 +734,9 @@ class _TimelineTaskItem extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 6, vertical: 4),
+                    horizontal: 6,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: task.isCompleted
                         ? AppColors.successContainer
@@ -740,7 +748,9 @@ class _TimelineTaskItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
-                      color: task.isCompleted ? AppColors.success : AppColors.primary,
+                      color: task.isCompleted
+                          ? AppColors.success
+                          : AppColors.primary,
                     ),
                   ),
                 ),
@@ -749,8 +759,7 @@ class _TimelineTaskItem extends StatelessWidget {
                     child: Center(
                       child: Container(
                         width: 2,
-                        margin:
-                            const EdgeInsets.symmetric(vertical: 4),
+                        margin: const EdgeInsets.symmetric(vertical: 4),
                         color: AppColors.outlineVariant,
                       ),
                     ),
@@ -777,25 +786,23 @@ class _TimelineTaskItem extends StatelessWidget {
                     ),
                     child: IntrinsicHeight(
                       child: Row(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.stretch,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // Priority stripe
                           Container(
                             width: 4,
                             decoration: BoxDecoration(
                               color: _priorityColor(task.priority),
-                              borderRadius:
-                                  const BorderRadius.horizontal(
-                                      left: Radius.circular(12)),
+                              borderRadius: const BorderRadius.horizontal(
+                                left: Radius.circular(12),
+                              ),
                             ),
                           ),
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(12),
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // Building name
                                   Text(
@@ -824,11 +831,11 @@ class _TimelineTaskItem extends StatelessWidget {
                                           child: Text(
                                             task.address!,
                                             style: const TextStyle(
-                                                fontSize: 12,
-                                                color: AppColors.outline),
+                                              fontSize: 12,
+                                              color: AppColors.outline,
+                                            ),
                                             maxLines: 1,
-                                            overflow:
-                                                TextOverflow.ellipsis,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       ],
@@ -855,10 +862,8 @@ class _TimelineTaskItem extends StatelessWidget {
                                     spacing: 6,
                                     runSpacing: 4,
                                     children: [
-                                      _SmallBadge.status(
-                                          task.status),
-                                      _SmallBadge.priority(
-                                          task.priority),
+                                      _SmallBadge.status(task.status),
+                                      _SmallBadge.priority(task.priority),
                                     ],
                                   ),
                                 ],
@@ -904,11 +909,7 @@ class _TimelineTaskItem extends StatelessWidget {
 // ── Small badge ───────────────────────────────────────────────────────────────
 
 class _SmallBadge extends StatelessWidget {
-  const _SmallBadge({
-    required this.label,
-    required this.bg,
-    required this.fg,
-  });
+  const _SmallBadge({required this.label, required this.bg, required this.fg});
 
   final String label;
   final Color bg;
@@ -916,9 +917,21 @@ class _SmallBadge extends StatelessWidget {
 
   factory _SmallBadge.status(String s) {
     final (lbl, bg, fg) = switch (s) {
-      'completed' => ('TAMAMLANDI', const Color(0xFFDCFCE7), const Color(0xFF166534)),
-      'in_progress' => ('DEVAM', const Color(0xFFFFF7ED), const Color(0xFF92400E)),
-      'cancelled' => ('İPTAL', const Color(0xFFF1F5F9), const Color(0xFF64748B)),
+      'completed' => (
+        'TAMAMLANDI',
+        const Color(0xFFDCFCE7),
+        const Color(0xFF166534),
+      ),
+      'in_progress' => (
+        'DEVAM',
+        const Color(0xFFFFF7ED),
+        const Color(0xFF92400E),
+      ),
+      'cancelled' => (
+        'İPTAL',
+        const Color(0xFFF1F5F9),
+        const Color(0xFF64748B),
+      ),
       _ => ('BEKLİYOR', const Color(0xFFF1F5F9), const Color(0xFF475569)),
     };
     return _SmallBadge(label: lbl, bg: bg, fg: fg);
@@ -969,17 +982,23 @@ class _EmptyBody extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(22),
             decoration: const BoxDecoration(
-                color: AppColors.surfaceContainer, shape: BoxShape.circle),
-            child: const Icon(Icons.engineering_outlined,
-                size: 40, color: AppColors.outline),
+              color: AppColors.surfaceContainer,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.engineering_outlined,
+              size: 40,
+              color: AppColors.outline,
+            ),
           ),
           const SizedBox(height: 16),
           const Text(
             'Henüz teknisyen kaydı yok',
             style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: AppColors.onSurface),
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: AppColors.onSurface,
+            ),
           ),
           const SizedBox(height: 4),
           const Text(
@@ -1007,21 +1026,27 @@ class _ErrorBody extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off_outlined,
-                size: 48, color: AppColors.outline),
+            const Icon(
+              Icons.cloud_off_outlined,
+              size: 48,
+              color: AppColors.outline,
+            ),
             const SizedBox(height: 12),
             const Text(
               'Veriler yüklenemedi',
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.onSurface),
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: AppColors.onSurface,
+              ),
             ),
             const SizedBox(height: 6),
             Text(
               error.toString(),
               style: const TextStyle(
-                  fontSize: 12, color: AppColors.onSurfaceVariant),
+                fontSize: 12,
+                color: AppColors.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -1052,8 +1077,11 @@ class _SheetEmptyView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.event_available_outlined,
-                size: 36, color: AppColors.outline),
+            const Icon(
+              Icons.event_available_outlined,
+              size: 36,
+              color: AppColors.outline,
+            ),
             const SizedBox(height: 12),
             Text(
               '$name için bugün\nplanlanmış görev yok',

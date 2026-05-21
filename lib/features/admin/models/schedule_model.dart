@@ -78,16 +78,16 @@ class ScheduleModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'elevator_id': elevatorId,
-        if (technicianId.isNotEmpty) 'technician_id': technicianId,
-        'scheduled_date': scheduledDate.toIso8601String(),
-        'status': status,
-        'priority': priority,
-        'task_type': taskType,
-        'notes': notes,
-        'created_by': createdBy,
-      };
+    'id': id,
+    'elevator_id': elevatorId,
+    if (technicianId.isNotEmpty) 'technician_id': technicianId,
+    'scheduled_date': scheduledDate.toIso8601String(),
+    'status': status,
+    'priority': priority,
+    'task_type': taskType,
+    'notes': notes,
+    'created_by': createdBy,
+  };
 
   ScheduleModel copyWith({
     String? id,
@@ -116,7 +116,8 @@ class ScheduleModel {
   }
 
   @override
-  String toString() => 'ScheduleModel(id: $id, elevatorId: $elevatorId, '
+  String toString() =>
+      'ScheduleModel(id: $id, elevatorId: $elevatorId, '
       'technicianId: $technicianId, status: $status, priority: $priority, '
       'taskType: $taskType, scheduledDate: $scheduledDate)';
 }

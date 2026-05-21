@@ -66,8 +66,7 @@ class ScheduleRepository {
   ) async {
     if (rows.isEmpty) return 0;
     try {
-      final response =
-          await _client.from(_table).insert(rows).select('id');
+      final response = await _client.from(_table).insert(rows).select('id');
       return (response as List).length;
     } on PostgrestException catch (e) {
       throw Exception('Toplu ekleme başarısız: ${e.message}');
@@ -215,8 +214,7 @@ class ScheduleRepository {
   /// Used by the Technician Management view to compute per-technician workloads.
   Future<List<ScheduleModel>> getTodayAllSchedules() async {
     final now = DateTime.now();
-    final start =
-        DateTime(now.year, now.month, now.day).toUtc();
+    final start = DateTime(now.year, now.month, now.day).toUtc();
     final end = start.add(const Duration(days: 1));
 
     try {
@@ -228,8 +226,7 @@ class ScheduleRepository {
           .order('scheduled_date');
 
       return (response as List)
-          .map((json) =>
-              ScheduleModel.fromJson(json as Map<String, dynamic>))
+          .map((json) => ScheduleModel.fromJson(json as Map<String, dynamic>))
           .toList();
     } on PostgrestException catch (e) {
       throw Exception('Bugünkü görevler yüklenemedi: ${e.message}');
@@ -259,8 +256,7 @@ class ScheduleRepository {
       final counts = <String, int>{};
       for (final row in response as List) {
         final id =
-            (row as Map<String, dynamic>)['technician_id'] as String? ??
-                '';
+            (row as Map<String, dynamic>)['technician_id'] as String? ?? '';
         if (id.isNotEmpty) counts[id] = (counts[id] ?? 0) + 1;
       }
       return counts;

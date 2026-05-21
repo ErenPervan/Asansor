@@ -7,10 +7,7 @@ import 'package:asansor/features/maintenance/providers/maintenance_providers.dar
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 
 class LogMaintenanceSheet extends ConsumerStatefulWidget {
-  const LogMaintenanceSheet({
-    super.key,
-    required this.elevatorId,
-  });
+  const LogMaintenanceSheet({super.key, required this.elevatorId});
 
   final String elevatorId;
 
@@ -77,7 +74,7 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
               content: Text(
                 log.isOfflineQueued
                     ? 'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, '
-                        'bağlantı sağlandığında otomatik senkronize edilecek.'
+                          'bağlantı sağlandığında otomatik senkronize edilecek.'
                     : 'Bakım kaydı başarıyla eklendi.',
               ),
               behavior: SnackBarBehavior.floating,
@@ -119,7 +116,9 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
         }
       },
       child: Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
@@ -149,7 +148,10 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                           color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.build_outlined, color: AppColors.primary),
+                        child: const Icon(
+                          Icons.build_outlined,
+                          color: AppColors.primary,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       const Column(
@@ -165,7 +167,10 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                           ),
                           Text(
                             'Yapılan bakımı kaydedin.',
-                            style: TextStyle(fontSize: 13, color: AppColors.outline),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.outline,
+                            ),
                           ),
                         ],
                       ),

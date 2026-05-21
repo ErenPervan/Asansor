@@ -120,9 +120,15 @@ class _UserManagementViewState extends ConsumerState<UserManagementView>
             letterSpacing: 0.2,
           ),
           tabs: const [
-            Tab(icon: Icon(Icons.engineering_outlined, size: 18), text: 'Teknisyenler'),
+            Tab(
+              icon: Icon(Icons.engineering_outlined, size: 18),
+              text: 'Teknisyenler',
+            ),
             Tab(icon: Icon(Icons.person_outline, size: 18), text: 'Müşteriler'),
-            Tab(icon: Icon(Icons.groups_outlined, size: 18), text: 'Tüm Kullanıcılar'),
+            Tab(
+              icon: Icon(Icons.groups_outlined, size: 18),
+              text: 'Tüm Kullanıcılar',
+            ),
           ],
         ),
       ),
@@ -239,10 +245,10 @@ class _CustomerTab extends ConsumerWidget {
               onEditRole: () => _showEditRoleSheet(context, customers[i]),
               onAssignElevator: currentRole == 'admin'
                   ? () => _showAssignElevatorSheet(
-                        context,
-                        customers[i],
-                        elevators,
-                      )
+                      context,
+                      customers[i],
+                      elevators,
+                    )
                   : null,
             ),
           ),
@@ -276,8 +282,9 @@ class _ProfileCard extends StatelessWidget {
     ElevatorModel? linkedElevator;
     if (profile.elevatorId != null && elevators != null) {
       try {
-        linkedElevator =
-            elevators!.firstWhere((e) => e.id == profile.elevatorId);
+        linkedElevator = elevators!.firstWhere(
+          (e) => e.id == profile.elevatorId,
+        );
       } catch (_) {}
     }
 
@@ -286,7 +293,9 @@ class _ProfileCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(
+          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -374,8 +383,10 @@ class _ProfileCard extends StatelessWidget {
               const SizedBox(width: 8),
               // Role badge
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: style.bg,
                   borderRadius: BorderRadius.circular(8),
@@ -402,7 +413,10 @@ class _ProfileCard extends StatelessWidget {
           // ── Customer: elevator assignment section ────────────────────
           if (profile.isCustomer) ...[
             const SizedBox(height: 12),
-            Divider(height: 1, color: AppColors.outlineVariant.withValues(alpha: 0.25)),
+            Divider(
+              height: 1,
+              color: AppColors.outlineVariant.withValues(alpha: 0.25),
+            ),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -463,7 +477,9 @@ class _ProfileCard extends StatelessWidget {
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -488,8 +504,10 @@ class _ProfileCard extends StatelessWidget {
                   ),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.onSurfaceVariant,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
@@ -549,9 +567,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
     if (state.hasError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            state.error.toString().replaceFirst('Exception: ', ''),
-          ),
+          content: Text(state.error.toString().replaceFirst('Exception: ', '')),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.error,
         ),
@@ -576,9 +592,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
     final isLoading = ref.watch(profileUpdateControllerProvider).isLoading;
 
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.viewInsetsOf(context).bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
@@ -629,8 +643,10 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                         ),
                         Text(
                           widget.profile.displayName,
-                          style:
-                              const TextStyle(fontSize: 13, color: AppColors.outline),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.outline,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -642,12 +658,24 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
 
               // Role options
               ...[
-                ('admin', 'Admin', Icons.admin_panel_settings_outlined,
-                    'Tüm yetkilere sahip yönetici'),
-                ('technician', 'Teknisyen', Icons.engineering_outlined,
-                    'Asansör bakım ve arıza yönetimi'),
-                ('customer', 'Müşteri', Icons.person_outline,
-                    'Bina sakini / asansör kullanıcısı'),
+                (
+                  'admin',
+                  'Admin',
+                  Icons.admin_panel_settings_outlined,
+                  'Tüm yetkilere sahip yönetici',
+                ),
+                (
+                  'technician',
+                  'Teknisyen',
+                  Icons.engineering_outlined,
+                  'Asansör bakım ve arıza yönetimi',
+                ),
+                (
+                  'customer',
+                  'Müşteri',
+                  Icons.person_outline,
+                  'Bina sakini / asansör kullanıcısı',
+                ),
               ].map((item) {
                 final (roleValue, roleLabel, roleIcon, roleSubtitle) = item;
                 final style = _roleStyle(roleValue);
@@ -680,12 +708,16 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: isSelected ? style.bg : AppColors.outlineVariant,
+                              color: isSelected
+                                  ? style.bg
+                                  : AppColors.outlineVariant,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(roleIcon,
-                                size: 18,
-                                color: isSelected ? style.fg : Colors.white),
+                            child: Icon(
+                              roleIcon,
+                              size: 18,
+                              color: isSelected ? style.fg : Colors.white,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -697,7 +729,9 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 14,
-                                    color: isSelected ? style.fg : AppColors.onSurface,
+                                    color: isSelected
+                                        ? style.fg
+                                        : AppColors.onSurface,
                                   ),
                                 ),
                                 Text(
@@ -711,8 +745,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                             ),
                           ),
                           if (isSelected)
-                            Icon(Icons.check_circle,
-                                color: style.fg, size: 20),
+                            Icon(Icons.check_circle, color: style.fg, size: 20),
                         ],
                       ),
                     ),
@@ -769,18 +802,13 @@ void _showAssignElevatorSheet(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
-    builder: (_) => _AssignElevatorSheet(
-      customer: customer,
-      elevators: elevators,
-    ),
+    builder: (_) =>
+        _AssignElevatorSheet(customer: customer, elevators: elevators),
   );
 }
 
 class _AssignElevatorSheet extends ConsumerStatefulWidget {
-  const _AssignElevatorSheet({
-    required this.customer,
-    required this.elevators,
-  });
+  const _AssignElevatorSheet({required this.customer, required this.elevators});
   final ProfileModel customer;
   final List<ElevatorModel> elevators;
 
@@ -813,9 +841,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
     if (state.hasError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            state.error.toString().replaceFirst('Exception: ', ''),
-          ),
+          content: Text(state.error.toString().replaceFirst('Exception: ', '')),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.error,
         ),
@@ -825,8 +851,8 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
       final elevator = _selectedElevatorId == null
           ? null
           : widget.elevators
-              .where((e) => e.id == _selectedElevatorId)
-              .firstOrNull;
+                .where((e) => e.id == _selectedElevatorId)
+                .firstOrNull;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -878,7 +904,10 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.elevator_outlined, color: AppColors.primary),
+                    child: const Icon(
+                      Icons.elevator_outlined,
+                      color: AppColors.primary,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -895,8 +924,10 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                         ),
                         Text(
                           widget.customer.displayName,
-                          style:
-                              const TextStyle(fontSize: 13, color: AppColors.outline),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.outline,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -925,23 +956,24 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                       isDestructive: true,
                       onTap: isLoading
                           ? null
-                          : () =>
-                              setState(() => _selectedElevatorId = null),
+                          : () => setState(() => _selectedElevatorId = null),
                     ),
                     const SizedBox(height: 6),
-                    ...widget.elevators.map((e) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: _ElevatorOption(
-                            label: e.buildingName,
-                            subtitle: e.address ?? 'Adres belirtilmemiş',
-                            icon: Icons.elevator_outlined,
-                            isSelected: _selectedElevatorId == e.id,
-                            onTap: isLoading
-                                ? null
-                                : () => setState(
-                                    () => _selectedElevatorId = e.id),
-                          ),
-                        )),
+                    ...widget.elevators.map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: _ElevatorOption(
+                          label: e.buildingName,
+                          subtitle: e.address ?? 'Adres belirtilmemiş',
+                          icon: Icons.elevator_outlined,
+                          isSelected: _selectedElevatorId == e.id,
+                          onTap: isLoading
+                              ? null
+                              : () =>
+                                    setState(() => _selectedElevatorId = e.id),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 80),
                   ],
                 ),
@@ -1026,7 +1058,11 @@ class _ElevatorOption extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: isSelected ? accentColor : AppColors.outline, size: 20),
+            Icon(
+              icon,
+              color: isSelected ? accentColor : AppColors.outline,
+              size: 20,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -1042,7 +1078,10 @@ class _ElevatorOption extends StatelessWidget {
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 11, color: AppColors.outline),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.outline,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -1077,7 +1116,10 @@ class _EmptyPane extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.outline, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                color: AppColors.outline,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),

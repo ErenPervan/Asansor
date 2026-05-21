@@ -4,5 +4,6 @@ class ConflictException implements Exception {
   final Map<String, dynamic> remoteState;
 
   @override
-  String toString() => 'ConflictException: Remote state differs from base version.';
+  String toString() =>
+      'ConflictException: Remote state differs from base version.';
 }

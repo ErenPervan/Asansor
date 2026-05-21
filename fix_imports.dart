@@ -1,11 +1,10 @@
 // ignore_for_file: avoid_print
 import 'dart:io';
 
-
 void main() async {
   final widgetsDir = 'd:/Asansor/lib/features/elevator/widgets/home';
   final dir = Directory(widgetsDir);
-  
+
   final commonImports = '''import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,7 +24,7 @@ import '../../../maintenance/providers/maintenance_providers.dart';
   await for (final file in dir.list()) {
     if (file is File && file.path.endsWith('.dart')) {
       final lines = await file.readAsLines();
-      
+
       // Remove the old common imports block
       // The old block had 14 lines.
       // But maybe it's safer to just remove all imports at the top
@@ -39,7 +38,7 @@ import '../../../maintenance/providers/maintenance_providers.dart';
           break; // found code
         }
       }
-      
+
       final content = lines.sublist(importEndIdx + 1).join('\n');
       await file.writeAsString('$commonImports\n$content');
       print('Fixed imports in ${file.path}');

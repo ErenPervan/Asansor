@@ -14,7 +14,8 @@ void main() async {
     'NunitoSans-BoldItalic.ttf': 'NunitoSans_7pt-BoldItalic.ttf',
   };
 
-  final baseUrl = 'https://raw.githubusercontent.com/google/fonts/main/ofl/nunitosans/static/';
+  final baseUrl =
+      'https://raw.githubusercontent.com/google/fonts/main/ofl/nunitosans/static/';
 
   for (final entry in files.entries) {
     final localName = entry.key;

@@ -3,9 +3,13 @@
 class SupabaseConstants {
   SupabaseConstants._();
 
-  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL',
-      defaultValue: 'MISSING_SUPABASE_URL');
+  static const String supabaseUrl = String.fromEnvironment(
+    'SUPABASE_URL',
+    defaultValue: 'MISSING_SUPABASE_URL',
+  );
 
-  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY',
-      defaultValue: 'MISSING_SUPABASE_ANON_KEY');
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+    defaultValue: 'MISSING_SUPABASE_ANON_KEY',
+  );
 }

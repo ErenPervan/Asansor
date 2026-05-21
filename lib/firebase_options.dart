@@ -72,5 +72,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'asansor-efaed.firebasestorage.app',
     measurementId: 'G-1DTJ7P49W7',
   );
-
 }

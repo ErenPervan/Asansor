@@ -41,7 +41,8 @@ class AdminStatisticsDashboard extends ConsumerStatefulWidget {
       _AdminStatisticsDashboardState();
 }
 
-class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashboard> {
+class _AdminStatisticsDashboardState
+    extends ConsumerState<AdminStatisticsDashboard> {
   int _touchedPieIndex = -1;
 
   @override
@@ -59,7 +60,9 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
         },
         child: analyticsAsync.when(
           data: (data) => _buildContent(data),
-          loading: () => const Center(child: CircularProgressIndicator(color: AppColors.blue)),
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.blue),
+          ),
           error: (err, stack) => _buildError(err),
         ),
       ),
@@ -179,8 +182,11 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white, size: 20),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   onPressed: () => context.pop(),
                 ),
                 const SizedBox(width: 4),
@@ -210,13 +216,16 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.15)),
+                      color: Colors.white.withValues(alpha: 0.15),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -316,9 +325,14 @@ class _LegendDot extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 5),
-        Text(label,
-            style: const TextStyle(
-                fontSize: 11, color: AppColors.onSurfaceVariant, fontWeight: FontWeight.w600)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            color: AppColors.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
@@ -384,8 +398,7 @@ class _KpiCard extends StatelessWidget {
               ),
               const Spacer(),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: data.trendUp
                       ? AppColors.successContainer
@@ -454,7 +467,9 @@ class _BarChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxY = monthlyFaults.isEmpty ? 10.0 : monthlyFaults.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+    final maxY = monthlyFaults.isEmpty
+        ? 10.0
+        : monthlyFaults.map((e) => e.value).reduce((a, b) => a > b ? a : b);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
@@ -479,9 +494,13 @@ class _BarChartCard extends StatelessWidget {
               enabled: true,
               touchTooltipData: BarTouchTooltipData(
                 getTooltipColor: (_) => AppColors.navy,
-                tooltipBorderRadius: const BorderRadius.all(Radius.circular(10)),
-                tooltipPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                tooltipBorderRadius: const BorderRadius.all(
+                  Radius.circular(10),
+                ),
+                tooltipPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
                   return BarTooltipItem(
                     '${monthlyFaults[groupIndex].month}\n',
@@ -547,9 +566,11 @@ class _BarChartCard extends StatelessWidget {
                 ),
               ),
               topTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false)),
+                sideTitles: SideTitles(showTitles: false),
+              ),
               rightTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false)),
+                sideTitles: SideTitles(showTitles: false),
+              ),
             ),
             gridData: FlGridData(
               show: true,
@@ -573,7 +594,8 @@ class _BarChartCard extends StatelessWidget {
                     toY: data.value,
                     width: 28,
                     borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(8)),
+                      top: Radius.circular(8),
+                    ),
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
@@ -640,8 +662,7 @@ class _PieChartCard extends StatelessWidget {
                     if (response != null &&
                         response.touchedSection != null &&
                         event.isInterestedForInteractions) {
-                      onTouch(
-                          response.touchedSection!.touchedSectionIndex);
+                      onTouch(response.touchedSection!.touchedSectionIndex);
                     } else if (!event.isInterestedForInteractions) {
                       onTouch(-1);
                     }
@@ -659,7 +680,8 @@ class _PieChartCard extends StatelessWidget {
                     borderSide: isTouched
                         ? BorderSide(
                             color: slice.color.withValues(alpha: 0.4),
-                            width: 4)
+                            width: 4,
+                          )
                         : const BorderSide(color: Colors.transparent),
                   );
                 }).toList(),
@@ -687,9 +709,13 @@ class _PieChartCard extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: isTouched
                           ? const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 8)
+                              horizontal: 10,
+                              vertical: 8,
+                            )
                           : const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 8),
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
                       constraints: const BoxConstraints(minHeight: 48),
                       decoration: BoxDecoration(
                         color: isTouched
@@ -713,8 +739,9 @@ class _PieChartCard extends StatelessWidget {
                               slice.label,
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight:
-                                    isTouched ? FontWeight.w700 : FontWeight.w500,
+                                fontWeight: isTouched
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
                                 color: isTouched
                                     ? AppColors.onSurface
                                     : AppColors.onSurfaceVariant,
@@ -726,7 +753,9 @@ class _PieChartCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
-                              color: isTouched ? slice.color : AppColors.onSurface,
+                              color: isTouched
+                                  ? slice.color
+                                  : AppColors.onSurface,
                             ),
                           ),
                         ],

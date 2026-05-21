@@ -42,8 +42,12 @@ class PdfService {
     final pdf = pw.Document();
 
     // Load fonts from local assets for offline support
-    final regularFont = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Regular.ttf'));
-    final boldFont = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Bold.ttf'));
+    final regularFont = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/NunitoSans-Regular.ttf'),
+    );
+    final boldFont = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/NunitoSans-Bold.ttf'),
+    );
     final iconFont = await PdfGoogleFonts.materialIcons();
 
     final theme = pw.ThemeData.withFont(
@@ -445,10 +449,18 @@ class PdfService {
     List<MaintenanceLogModel> logs,
   ) async {
     // Load Turkish-compatible fonts from local assets to support offline generation
-    final regular = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Regular.ttf'));
-    final bold = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Bold.ttf'));
-    final italic = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Italic.ttf'));
-    final boldItalic = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-BoldItalic.ttf'));
+    final regular = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/NunitoSans-Regular.ttf'),
+    );
+    final bold = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/NunitoSans-Bold.ttf'),
+    );
+    final italic = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/NunitoSans-Italic.ttf'),
+    );
+    final boldItalic = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/NunitoSans-BoldItalic.ttf'),
+    );
 
     final baseTheme = pw.ThemeData.withFont(
       base: regular,

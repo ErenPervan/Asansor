@@ -21,11 +21,11 @@ class ChecklistItemModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'label': label,
-        'description': description,
-        'is_active': isActive,
-      };
+    'id': id,
+    'label': label,
+    'description': description,
+    'is_active': isActive,
+  };
 
   ChecklistItemModel copyWith({
     String? id,

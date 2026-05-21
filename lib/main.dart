@@ -40,9 +40,7 @@ Future<void> main() async {
   // Environment variables are provided via --dart-define or --dart-define-from-file.
 
   // Firebase must be initialised before any Firebase service is used.
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Register the background handler as early as possible — before any other
   // Firebase call.  NotificationService.initialize() also registers it as a
@@ -75,7 +73,9 @@ Future<void> main() async {
   await Hive.initFlutter();
 
   const secureStorage = FlutterSecureStorage();
-  final encryptionKeyString = await secureStorage.read(key: 'hive_encryption_key');
+  final encryptionKeyString = await secureStorage.read(
+    key: 'hive_encryption_key',
+  );
   late List<int> encryptionKeyUint8List;
   if (encryptionKeyString == null) {
     final key = Hive.generateSecureKey();
@@ -101,11 +101,7 @@ Future<void> main() async {
 
   await initializeDateFormatting('tr_TR', null);
 
-  runApp(
-    const ProviderScope(
-      child: AsansorApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: AsansorApp()));
 }
 
 class AsansorApp extends ConsumerStatefulWidget {
@@ -124,10 +120,12 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
     // `navigatorKey.currentState` is guaranteed to be non-null.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       NotificationService.instance.handleInitialMessage();
-      
+
       // Keep token synced if the user is already signed in on startup
       if (Supabase.instance.client.auth.currentUser != null) {
-        NotificationService.instance.saveTokenToSupabase(Supabase.instance.client);
+        NotificationService.instance.saveTokenToSupabase(
+          Supabase.instance.client,
+        );
       }
     });
   }
@@ -152,11 +150,7 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('tr'),
-        Locale('en'),
-        Locale('de'),
-      ],
+      supportedLocales: const [Locale('tr'), Locale('en'), Locale('de')],
       // `navigatorKey` is owned by `appRouter` (passed via GoRouter constructor).
       // MaterialApp.router does not accept a separate navigatorKey; the key
       // is accessed through `navigatorKey` exported from app_router.dart.
@@ -171,30 +165,31 @@ ThemeData _buildTheme(Brightness brightness) {
       ? AppThemeColors.dark
       : AppThemeColors.light;
 
-  final base = ColorScheme.fromSeed(
-    seedColor: primaryColor,
-    brightness: brightness,
-  ).copyWith(
-    primary: primaryColor,
-    onPrimary: Colors.white,
-    primaryContainer: AppColors.primaryFixed,
-    onPrimaryContainer: AppColors.primaryDark,
-    secondary: AppColors.secondary,
-    onSecondary: Colors.white,
-    surface: colors.surface,
-    onSurface: colors.onSurface,
-    onSurfaceVariant: colors.onSurfaceVariant,
-    outline: colors.outline,
-    outlineVariant: colors.outlineVariant,
-    error: AppColors.error,
-    onError: AppColors.onError,
-    errorContainer: AppColors.errorContainer,
-    onErrorContainer: AppColors.primaryDark,
-    surfaceContainerLowest: colors.surfaceContainerLowest,
-    surfaceContainerLow: colors.surfaceContainerLow,
-    surfaceContainer: colors.surfaceContainer,
-    surfaceContainerHigh: colors.surfaceContainerHigh,
-  );
+  final base =
+      ColorScheme.fromSeed(
+        seedColor: primaryColor,
+        brightness: brightness,
+      ).copyWith(
+        primary: primaryColor,
+        onPrimary: Colors.white,
+        primaryContainer: AppColors.primaryFixed,
+        onPrimaryContainer: AppColors.primaryDark,
+        secondary: AppColors.secondary,
+        onSecondary: Colors.white,
+        surface: colors.surface,
+        onSurface: colors.onSurface,
+        onSurfaceVariant: colors.onSurfaceVariant,
+        outline: colors.outline,
+        outlineVariant: colors.outlineVariant,
+        error: AppColors.error,
+        onError: AppColors.onError,
+        errorContainer: AppColors.errorContainer,
+        onErrorContainer: AppColors.primaryDark,
+        surfaceContainerLowest: colors.surfaceContainerLowest,
+        surfaceContainerLow: colors.surfaceContainerLow,
+        surfaceContainer: colors.surfaceContainer,
+        surfaceContainerHigh: colors.surfaceContainerHigh,
+      );
 
   return ThemeData(
     useMaterial3: true,
@@ -267,8 +262,7 @@ ThemeData _buildTheme(Brightness brightness) {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: colors.surfaceContainerLow,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: colors.outlineVariant),
@@ -290,8 +284,10 @@ ThemeData _buildTheme(Brightness brightness) {
         borderSide: const BorderSide(color: AppColors.error, width: 1.5),
       ),
       labelStyle: TextStyle(color: colors.onSurfaceVariant),
-      hintStyle:
-          TextStyle(color: colors.outline.withValues(alpha: 0.8), fontSize: 14),
+      hintStyle: TextStyle(
+        color: colors.outline.withValues(alpha: 0.8),
+        fontSize: 14,
+      ),
       prefixIconColor: colors.outline,
       suffixIconColor: colors.outline,
     ),
@@ -302,9 +298,7 @@ ThemeData _buildTheme(Brightness brightness) {
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,
@@ -318,13 +312,8 @@ ThemeData _buildTheme(Brightness brightness) {
       style: OutlinedButton.styleFrom(
         foregroundColor: primaryColor,
         side: const BorderSide(color: primaryColor, width: 1.5),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        textStyle: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
       ),
     ),
 
@@ -353,9 +342,7 @@ ThemeData _buildTheme(Brightness brightness) {
         fontWeight: FontWeight.w600,
         color: colors.onSurface,
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
 
     // ── Divider ─────────────────────────────────────────────────────────────

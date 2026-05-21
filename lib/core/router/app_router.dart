@@ -67,13 +67,15 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 // ── Router ────────────────────────────────────────────────────────────────────
 
 final GoRouter appRouter = GoRouter(
-  navigatorKey: navigatorKey,   // ← GoRouter now owns the key's Navigator
+  navigatorKey: navigatorKey, // ← GoRouter now owns the key's Navigator
   initialLocation: '/',
 
   // Refresh whenever auth state OR the resolved role changes so that the
   // admin-route guard is re-evaluated as soon as the profile is loaded.
-  refreshListenable:
-      Listenable.merge([_authChangeNotifier, routerRoleNotifier]),
+  refreshListenable: Listenable.merge([
+    _authChangeNotifier,
+    routerRoleNotifier,
+  ]),
 
   /// Guards every navigation attempt.
   ///
@@ -90,8 +92,7 @@ final GoRouter appRouter = GoRouter(
   /// The router is refreshed the moment [routerRoleNotifier] emits a confirmed
   /// role, so the correct guard fires on the next evaluation.
   redirect: (BuildContext context, GoRouterState state) {
-    final isAuthenticated =
-        Supabase.instance.client.auth.currentUser != null;
+    final isAuthenticated = Supabase.instance.client.auth.currentUser != null;
     final loc = state.matchedLocation;
     final isOnLoginPage = loc == '/login';
 
@@ -134,11 +135,11 @@ final GoRouter appRouter = GoRouter(
     GoRoute(path: '/', builder: (context, state) => const HomeView()),
     // `/home` is a stable alias used in FCM notification data payloads so that
     // the edge function does not need to know the root path convention.
+    GoRoute(path: '/home', redirect: (_, _) => '/'),
     GoRoute(
-      path: '/home',
-      redirect: (_, _) => '/',
+      path: '/elevators',
+      builder: (context, _) => const ElevatorListView(),
     ),
-    GoRoute(path: '/elevators', builder: (context, _) => const ElevatorListView()),
     GoRoute(path: '/scan', builder: (context, state) => const ScannerView()),
     GoRoute(
       path: '/elevator/:id',
@@ -174,14 +175,8 @@ final GoRouter appRouter = GoRouter(
       path: '/admin/conflicts',
       builder: (context, _) => const AdminConflictManagementView(),
     ),
-    GoRoute(
-      path: '/admin/assign',
-      builder: (context, _) => const AssignView(),
-    ),
-    GoRoute(
-      path: '/admin/map',
-      builder: (context, _) => const AdminMapView(),
-    ),
+    GoRoute(path: '/admin/assign', builder: (context, _) => const AssignView()),
+    GoRoute(path: '/admin/map', builder: (context, _) => const AdminMapView()),
     GoRoute(
       path: '/admin/users',
       builder: (context, _) => const UserManagementView(),

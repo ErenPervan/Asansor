@@ -18,9 +18,13 @@ class AdminConflictDetailDialog extends ConsumerWidget {
     final notifier = ref.read(adminConflictProvider.notifier);
 
     // Get unique keys from both payloads
-    final allKeys = <String>{...report.localPayload.keys, ...report.remotePayload.keys};
+    final allKeys = <String>{
+      ...report.localPayload.keys,
+      ...report.remotePayload.keys,
+    };
     final excludedKeys = {'id', 'base_version', 'updated_at', 'version'};
-    final displayKeys = allKeys.where((k) => !excludedKeys.contains(k)).toList()..sort();
+    final displayKeys = allKeys.where((k) => !excludedKeys.contains(k)).toList()
+      ..sort();
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -35,7 +39,11 @@ class AdminConflictDetailDialog extends ConsumerWidget {
               children: [
                 Text(
                   'Çakışma Detayı: ${report.buildingName ?? report.elevatorId}',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF191C1D)),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF191C1D),
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -46,7 +54,11 @@ class AdminConflictDetailDialog extends ConsumerWidget {
             const SizedBox(height: 8),
             Text(
               'Teknisyen: ${report.technicianName ?? "Bilinmeyen Teknisyen"}',
-              style: const TextStyle(color: Color(0xFF424752), fontSize: 14, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                color: Color(0xFF424752),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const SizedBox(height: 24),
             Expanded(
@@ -86,10 +98,12 @@ class AdminConflictDetailDialog extends ConsumerWidget {
                     foregroundColor: _remoteLabel,
                     side: const BorderSide(color: _remoteLabel),
                   ),
-                  onPressed: isLoading ? null : () async {
-                    await notifier.resolveDiscardLocal(report);
-                    if (context.mounted) Navigator.of(context).pop();
-                  },
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          await notifier.resolveDiscardLocal(report);
+                          if (context.mounted) Navigator.of(context).pop();
+                        },
                 ),
                 const SizedBox(width: 16),
                 FilledButton.icon(
@@ -97,15 +111,20 @@ class AdminConflictDetailDialog extends ConsumerWidget {
                       ? const SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Icon(Icons.warning_amber_rounded),
                   label: const Text('Yereli Kabul Et (Zorla Güncelle)'),
                   style: FilledButton.styleFrom(backgroundColor: _error),
-                  onPressed: isLoading ? null : () async {
-                    await notifier.resolveForceLocal(report);
-                    if (context.mounted) Navigator.of(context).pop();
-                  },
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          await notifier.resolveForceLocal(report);
+                          if (context.mounted) Navigator.of(context).pop();
+                        },
                 ),
               ],
             ),
@@ -149,7 +168,11 @@ class _PayloadColumn extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: TextStyle(fontWeight: FontWeight.w800, color: labelColor, fontSize: 14),
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: labelColor,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),

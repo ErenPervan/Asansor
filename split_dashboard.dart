@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 import 'dart:io';
 
-
 void main() async {
   final baseDir = 'd:/Asansor/lib/features/admin/views';
   final widgetsDir = 'd:/Asansor/lib/features/admin/widgets/dashboard';
@@ -29,10 +28,13 @@ void main() async {
       startIdx = findLine('class $className<'); // handle generic classes
     }
     if (startIdx == -1) return '';
-    
+
     // go back to grab comments/annotations right above the class
     int realStart = startIdx;
-    while (realStart > 0 && (lines[realStart - 1].trim().isEmpty || lines[realStart - 1].trim().startsWith('//') || lines[realStart - 1].trim().startsWith('@'))) {
+    while (realStart > 0 &&
+        (lines[realStart - 1].trim().isEmpty ||
+            lines[realStart - 1].trim().startsWith('//') ||
+            lines[realStart - 1].trim().startsWith('@'))) {
       realStart--;
     }
 
@@ -43,7 +45,7 @@ void main() async {
         break;
       }
     }
-    
+
     // adjust endIdx back past empty lines
     while (endIdx > realStart && lines[endIdx - 1].trim().isEmpty) {
       endIdx--;
@@ -76,32 +78,32 @@ import '../../models/profile_model.dart';
   final files = {
     'dashboard_banners.dart': {
       'classes': ['_ConflictBanner', '_AddElevatorBanner', '_ErrorBanner'],
-      'publics': ['ConflictBanner', 'AddElevatorBanner', 'ErrorBanner']
+      'publics': ['ConflictBanner', 'AddElevatorBanner', 'ErrorBanner'],
     },
     'dashboard_stats.dart': {
       'classes': ['_StatsGrid', '_StatCard'],
-      'publics': ['DashboardStatsGrid', 'DashboardStatCard']
+      'publics': ['DashboardStatsGrid', 'DashboardStatCard'],
     },
     'dashboard_map_card.dart': {
       'classes': ['_MapPreviewCard'],
-      'publics': ['DashboardMapCard']
+      'publics': ['DashboardMapCard'],
     },
     'dashboard_user_cards.dart': {
       'classes': ['_UserManagementCard', '_TechnicianDirCard'],
-      'publics': ['UserManagementCard', 'TechnicianDirCard']
+      'publics': ['UserManagementCard', 'TechnicianDirCard'],
     },
     'dashboard_calendar_cards.dart': {
       'classes': ['_CalendarCard', '_MasterCalendarCard'],
-      'publics': ['DashboardCalendarCard', 'MasterCalendarCard']
+      'publics': ['DashboardCalendarCard', 'MasterCalendarCard'],
     },
     'dashboard_schedule.dart': {
       'classes': ['_ScheduleList', '_ScheduleCard'],
-      'publics': ['DashboardScheduleList', 'DashboardScheduleCard']
+      'publics': ['DashboardScheduleList', 'DashboardScheduleCard'],
     },
     'dashboard_misc_cards.dart': {
       'classes': ['_ChecklistCard', '_StatisticsCard'],
-      'publics': ['ChecklistCard', 'StatisticsCard']
-    }
+      'publics': ['ChecklistCard', 'StatisticsCard'],
+    },
   };
 
   for (final entry in files.entries) {
@@ -109,27 +111,27 @@ import '../../models/profile_model.dart';
     final config = entry.value;
     final classes = config['classes'] as List<String>;
     final publics = config['publics'] as List<String>;
-    
+
     List<String> contents = [];
     for (int i = 0; i < classes.length; i++) {
       String clsContent = extractClass(classes[i]);
       // Also extract the state class if it exists
       String stateClass = '_${classes[i].replaceFirst('_', '')}State';
       String stateContent = extractClass(stateClass);
-      
+
       contents.add(clsContent);
       if (stateContent.isNotEmpty) contents.add(stateContent);
     }
-    
+
     String content = contents.join('\n\n');
-    
+
     for (int i = 0; i < classes.length; i++) {
       final cls = classes[i];
       final publicCls = publics[i];
       content = content.replaceAll(cls, publicCls);
       content = content.replaceAll('State<$cls>', 'State<$publicCls>');
     }
-    
+
     final outFile = File('$widgetsDir/$filename');
     await outFile.writeAsString('$commonImports\n$content');
     print('Created $filename');
@@ -138,17 +140,19 @@ import '../../models/profile_model.dart';
   // Rewrite admin_dashboard_view.dart
   // Keep everything before the first extracted class (_ConflictBanner)
   int conflictBannerIdx = findLine('class _ConflictBanner');
-  
+
   if (conflictBannerIdx != -1) {
     // We need to keep only the AdminDashboardView class
     // Find where AdminDashboardView ends. It's before _ConflictBanner
     int endOfMainView = conflictBannerIdx;
-    while (endOfMainView > 0 && (lines[endOfMainView - 1].trim().isEmpty || lines[endOfMainView - 1].trim().startsWith('//'))) {
+    while (endOfMainView > 0 &&
+        (lines[endOfMainView - 1].trim().isEmpty ||
+            lines[endOfMainView - 1].trim().startsWith('//'))) {
       endOfMainView--;
     }
 
     var newDashboardView = lines.sublist(0, endOfMainView).join('\n');
-    
+
     for (final config in files.values) {
       final classes = config['classes'] as List<String>;
       final publics = config['publics'] as List<String>;
@@ -156,13 +160,18 @@ import '../../models/profile_model.dart';
         final cls = classes[i];
         final publicCls = publics[i];
         newDashboardView = newDashboardView.replaceAll('$cls(', '$publicCls(');
-        newDashboardView = newDashboardView.replaceAll('$cls.', '$publicCls.'); 
-        newDashboardView = newDashboardView.replaceAll('<$cls>', '<$publicCls>'); 
+        newDashboardView = newDashboardView.replaceAll('$cls.', '$publicCls.');
+        newDashboardView = newDashboardView.replaceAll(
+          '<$cls>',
+          '<$publicCls>',
+        );
       }
     }
-    
-    final imports = files.keys.map((f) => "import '../widgets/dashboard/$f';").join('\n');
-    
+
+    final imports = files.keys
+        .map((f) => "import '../widgets/dashboard/$f';")
+        .join('\n');
+
     final newDashboardLines = newDashboardView.split('\n');
     int lastImportIdx = 0;
     for (int i = 0; i < newDashboardLines.length; i++) {
@@ -170,9 +179,9 @@ import '../../models/profile_model.dart';
         lastImportIdx = i;
       }
     }
-    
+
     newDashboardLines.insert(lastImportIdx + 1, imports);
-    
+
     await dashboardFile.writeAsString(newDashboardLines.join('\n'));
     print('Updated admin_dashboard_view.dart');
   }

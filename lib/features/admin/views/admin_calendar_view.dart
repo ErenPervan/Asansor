@@ -19,6 +19,7 @@ import '../providers/profile_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../widgets/calendar/calendar_task_card.dart';
 import '../widgets/calendar/calendar_assign_sheet.dart';
+
 ElevatorModel? _findElevator(String id, List<ElevatorModel>? list) {
   if (list == null) return null;
   try {
@@ -56,13 +57,8 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
-  List<ScheduleModel> _eventsForDay(
-    DateTime day,
-    List<ScheduleModel> all,
-  ) {
-    return all
-        .where((s) => _isSameLocalDay(s.scheduledDate, day))
-        .toList()
+  List<ScheduleModel> _eventsForDay(DateTime day, List<ScheduleModel> all) {
+    return all.where((s) => _isSameLocalDay(s.scheduledDate, day)).toList()
       ..sort((a, b) => a.scheduledDate.compareTo(b.scheduledDate));
   }
 
@@ -222,8 +218,10 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: selectedEvents.isEmpty
                         ? AppColors.surfaceContainer
@@ -235,7 +233,9 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: selectedEvents.isEmpty ? AppColors.outline : Colors.white,
+                      color: selectedEvents.isEmpty
+                          ? AppColors.outline
+                          : Colors.white,
                     ),
                   ),
                 ),
@@ -258,7 +258,10 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                         const SizedBox(height: 12),
                         const Text(
                           'Bu gün için görev yok.',
-                          style: TextStyle(color: AppColors.outline, fontSize: 14),
+                          style: TextStyle(
+                            color: AppColors.outline,
+                            fontSize: 14,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -284,7 +287,8 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                         selectedEvents[i].technicianId,
                         techs,
                       ),
-                      onCancel: selectedEvents[i].status == 'pending' ||
+                      onCancel:
+                          selectedEvents[i].status == 'pending' ||
                               selectedEvents[i].status == 'in_progress'
                           ? () => _confirmCancel(context, selectedEvents[i].id)
                           : null,

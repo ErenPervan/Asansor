@@ -42,18 +42,32 @@ class FaultCategoryData {
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 
-final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((ref) async {
+final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
+  ref,
+) async {
   final supabase = Supabase.instance.client;
-  
+
   final now = DateTime.now();
   final startOfMonth = DateTime(now.year, now.month, 1);
   final sixMonthsAgo = DateTime(now.year, now.month - 5, 1);
 
   final results = await Future.wait([
-    supabase.from('fault_reports').select('id').eq('is_resolved', false).count(CountOption.exact),
-    supabase.from('maintenance_logs').select('id').gte('maintenance_date', startOfMonth.toIso8601String()).count(CountOption.exact),
+    supabase
+        .from('fault_reports')
+        .select('id')
+        .eq('is_resolved', false)
+        .count(CountOption.exact),
+    supabase
+        .from('maintenance_logs')
+        .select('id')
+        .gte('maintenance_date', startOfMonth.toIso8601String())
+        .count(CountOption.exact),
     supabase.from('elevators').select('id').count(CountOption.exact),
-    supabase.from('maintenance_schedules').select('id').eq('status', 'pending').count(CountOption.exact),
+    supabase
+        .from('maintenance_schedules')
+        .select('id')
+        .eq('status', 'pending')
+        .count(CountOption.exact),
   ]);
 
   final activeFaultsRes = results[0];
@@ -69,9 +83,11 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
 
   // Group by month
   final Map<String, int> monthlyCounts = {};
-  
+
   // Initialize the last 6 months to ensure they all appear in the chart, in order.
-  final monthFormat = DateFormat.MMM('tr_TR'); // Assuming Turkish locale as requested in mock
+  final monthFormat = DateFormat.MMM(
+    'tr_TR',
+  ); // Assuming Turkish locale as requested in mock
   final orderedMonths = <String>[];
   for (int i = 5; i >= 0; i--) {
     final d = DateTime(now.year, now.month - i, 1);
@@ -91,7 +107,9 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
   }
 
   final monthlyFaults = orderedMonths
-      .map((m) => MonthlyFaultData(month: m, value: monthlyCounts[m]!.toDouble()))
+      .map(
+        (m) => MonthlyFaultData(month: m, value: monthlyCounts[m]!.toDouble()),
+      )
       .toList();
 
   // 6. Fault Category Distribution
@@ -105,23 +123,27 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
 
   for (final fault in allFaultsForCategories) {
     String? cat = fault['fault_type'] as String?;
-    
+
     // Fallback logic if category column is null
     if (cat == null || cat.trim().isEmpty) {
       final desc = (fault['description'] as String?)?.toLowerCase() ?? '';
       if (desc.contains('kapı')) {
         cat = 'Kapı Motoru';
-      } else if (desc.contains('kart') || desc.contains('elektronik') || desc.contains('beyin')) {
+      } else if (desc.contains('kart') ||
+          desc.contains('elektronik') ||
+          desc.contains('beyin')) {
         cat = 'Anakart / Elektronik';
       } else if (desc.contains('halat') || desc.contains('kablo')) {
         cat = 'Halat / Kablo';
-      } else if (desc.contains('kabin') || desc.contains('ışık') || desc.contains('buton')) {
+      } else if (desc.contains('kabin') ||
+          desc.contains('ışık') ||
+          desc.contains('buton')) {
         cat = 'Kabin / Buton';
       } else {
         cat = 'Diğer';
       }
     }
-    
+
     categoryCounts[cat] = (categoryCounts[cat] ?? 0) + 1;
     totalCategories++;
   }
@@ -142,7 +164,9 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
   final faultCategories = <FaultCategoryData>[];
   for (int i = 0; i < sortedCategories.length; i++) {
     final entry = sortedCategories[i];
-    final percent = totalCategories > 0 ? (entry.value / totalCategories) * 100 : 0.0;
+    final percent = totalCategories > 0
+        ? (entry.value / totalCategories) * 100
+        : 0.0;
     faultCategories.add(
       FaultCategoryData(
         label: entry.key,
@@ -158,8 +182,14 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
     totalElevators: totalElevatorsRes.count,
     pendingMaintenances: pendingMaintenancesRes.count,
     monthlyFaults: monthlyFaults,
-    faultCategories: faultCategories.isEmpty 
-        ? [const FaultCategoryData(label: 'Veri Yok', percent: 100, color: Color(0xFF94A3B8))] 
+    faultCategories: faultCategories.isEmpty
+        ? [
+            const FaultCategoryData(
+              label: 'Veri Yok',
+              percent: 100,
+              color: Color(0xFF94A3B8),
+            ),
+          ]
         : faultCategories,
   );
 });

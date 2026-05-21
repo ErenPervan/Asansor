@@ -198,7 +198,11 @@ class _ConflictCard extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.person_outline, size: 14, color: AppColors.onSurfaceVariant),
+                      const Icon(
+                        Icons.person_outline,
+                        size: 14,
+                        color: AppColors.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         techName,
@@ -209,7 +213,11 @@ class _ConflictCard extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Icon(Icons.access_time, size: 14, color: AppColors.onSurfaceVariant),
+                      const Icon(
+                        Icons.access_time,
+                        size: 14,
+                        color: AppColors.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         _formatDate(report.createdAt.toIso8601String()),
@@ -331,15 +339,18 @@ class _ErrorState extends StatelessWidget {
             Text(
               'Bir hata oluştu',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.onSurface,
-                  ),
+                fontWeight: FontWeight.w700,
+                color: AppColors.onSurface,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 13),
+              style: const TextStyle(
+                color: AppColors.onSurfaceVariant,
+                fontSize: 13,
+              ),
             ),
           ],
         ),

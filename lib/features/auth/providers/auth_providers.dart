@@ -38,16 +38,12 @@ class AuthController extends AsyncNotifier<User?> {
   ///
   /// On success, state becomes `AsyncData<User>`.
   /// On failure, state becomes `AsyncError` with a user-friendly message.
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() {
-      return ref.read(authRepositoryProvider).signInWithEmail(
-            email: email,
-            password: password,
-          );
+      return ref
+          .read(authRepositoryProvider)
+          .signInWithEmail(email: email, password: password);
     });
   }
 
@@ -61,5 +57,6 @@ class AuthController extends AsyncNotifier<User?> {
   }
 }
 
-final authControllerProvider =
-    AsyncNotifierProvider<AuthController, User?>(AuthController.new);
+final authControllerProvider = AsyncNotifierProvider<AuthController, User?>(
+  AuthController.new,
+);

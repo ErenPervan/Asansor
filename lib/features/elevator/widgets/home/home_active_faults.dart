@@ -145,10 +145,8 @@ class FaultCardState extends State<FaultCard>
     final description = widget.fault.description.isNotEmpty
         ? widget.fault.description
         : 'Arıza bildirimi alındı.';
-    final isNew = DateTime.now()
-            .difference(widget.fault.reportedAt)
-            .inMinutes <
-        15;
+    final isNew =
+        DateTime.now().difference(widget.fault.reportedAt).inMinutes < 15;
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -218,7 +216,9 @@ class FaultCardState extends State<FaultCard>
                   // Time ago
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 7, vertical: 3),
+                      horizontal: 7,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(6),

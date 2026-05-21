@@ -34,49 +34,52 @@ void main() {
       expect(model.hasMaintenanceContract, isTrue);
     });
 
-    test('fromJson handles null/omitted model, capacity and other nullable fields', () {
-      final json = {
-        'id': 'e2',
-        'status': 'inactive',
-      };
+    test(
+      'fromJson handles null/omitted model, capacity and other nullable fields',
+      () {
+        final json = {'id': 'e2', 'status': 'inactive'};
 
-      final model = ElevatorModel.fromJson(json);
+        final model = ElevatorModel.fromJson(json);
 
-      expect(model.id, 'e2');
-      expect(model.buildingName, ''); // Empty string fallback
-      expect(model.address, isNull);
-      expect(model.status, 'inactive');
-      expect(model.latitude, isNull);
-      expect(model.longitude, isNull);
-      expect(model.maintenanceDay, isNull);
-      expect(model.model, isNull);
-      expect(model.capacity, isNull);
-      expect(model.version, 1); // Default value
-      expect(model.hasMappableLocation, isFalse);
-      expect(model.hasMaintenanceContract, isFalse);
-    });
+        expect(model.id, 'e2');
+        expect(model.buildingName, ''); // Empty string fallback
+        expect(model.address, isNull);
+        expect(model.status, 'inactive');
+        expect(model.latitude, isNull);
+        expect(model.longitude, isNull);
+        expect(model.maintenanceDay, isNull);
+        expect(model.model, isNull);
+        expect(model.capacity, isNull);
+        expect(model.version, 1); // Default value
+        expect(model.hasMappableLocation, isFalse);
+        expect(model.hasMaintenanceContract, isFalse);
+      },
+    );
 
-    test('toJson serializes model correctly (omits nulls except version/status)', () {
-      const model = ElevatorModel(
-        id: 'e3',
-        buildingName: 'Apt B',
-        status: 'under_maintenance',
-        version: 3,
-      );
+    test(
+      'toJson serializes model correctly (omits nulls except version/status)',
+      () {
+        const model = ElevatorModel(
+          id: 'e3',
+          buildingName: 'Apt B',
+          status: 'under_maintenance',
+          version: 3,
+        );
 
-      final json = model.toJson();
+        final json = model.toJson();
 
-      expect(json['id'], 'e3');
-      expect(json['building_name'], 'Apt B');
-      expect(json['status'], 'under_maintenance');
-      expect(json['version'], 3);
-      expect(json['address'], isNull);
-      expect(json.containsKey('latitude'), isFalse);
-      expect(json.containsKey('longitude'), isFalse);
-      expect(json.containsKey('maintenance_day'), isFalse);
-      expect(json.containsKey('model'), isFalse);
-      expect(json.containsKey('capacity'), isFalse);
-    });
+        expect(json['id'], 'e3');
+        expect(json['building_name'], 'Apt B');
+        expect(json['status'], 'under_maintenance');
+        expect(json['version'], 3);
+        expect(json['address'], isNull);
+        expect(json.containsKey('latitude'), isFalse);
+        expect(json.containsKey('longitude'), isFalse);
+        expect(json.containsKey('maintenance_day'), isFalse);
+        expect(json.containsKey('model'), isFalse);
+        expect(json.containsKey('capacity'), isFalse);
+      },
+    );
 
     test('toJson includes model and capacity when they are not null', () {
       const model = ElevatorModel(
@@ -128,10 +131,7 @@ void main() {
         version: 4,
       );
 
-      expect(
-        model.toString(),
-        contains('model: Otis, capacity: 1000'),
-      );
+      expect(model.toString(), contains('model: Otis, capacity: 1000'));
     });
   });
 
@@ -145,9 +145,7 @@ void main() {
         'is_approved': true,
         'maintenance_date': '2026-05-17T12:00:00.000Z',
         'pdf_url': 'https://supabase.com/reports/log1.pdf',
-        'profiles': {
-          'full_name': 'John Doe',
-        },
+        'profiles': {'full_name': 'John Doe'},
       };
 
       final model = MaintenanceLogModel.fromJson(json);
@@ -164,9 +162,7 @@ void main() {
     });
 
     test('fromJson handles null values and missing profiles nested map', () {
-      final json = {
-        'id': 'log2',
-      };
+      final json = {'id': 'log2'};
 
       final model = MaintenanceLogModel.fromJson(json);
 
@@ -175,7 +171,10 @@ void main() {
       expect(model.technicianId, ''); // Default fallback
       expect(model.notes, isNull);
       expect(model.isApproved, isFalse); // Default fallback
-      expect(model.maintenanceDate, DateTime.fromMillisecondsSinceEpoch(0)); // Sentinel value fallback
+      expect(
+        model.maintenanceDate,
+        DateTime.fromMillisecondsSinceEpoch(0),
+      ); // Sentinel value fallback
       expect(model.pdfUrl, isNull);
       expect(model.technicianName, isNull);
       expect(model.isOfflineQueued, isFalse);

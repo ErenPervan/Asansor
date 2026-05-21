@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
-
 class QrFab extends StatelessWidget {
   const QrFab({super.key, required this.onPressed});
 

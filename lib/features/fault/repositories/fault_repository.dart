@@ -141,8 +141,9 @@ class FaultRepository {
           .order('reported_at', ascending: false);
 
       return (response as List<dynamic>)
-          .map((json) =>
-              FaultReportModel.fromJson(json as Map<String, dynamic>))
+          .map(
+            (json) => FaultReportModel.fromJson(json as Map<String, dynamic>),
+          )
           .toList();
     } on PostgrestException catch (e) {
       throw Exception('Failed to load active faults: ${e.message}');
@@ -164,8 +165,7 @@ class FaultRepository {
 
       return (response as List<dynamic>)
           .map(
-            (json) =>
-                FaultReportModel.fromJson(json as Map<String, dynamic>),
+            (json) => FaultReportModel.fromJson(json as Map<String, dynamic>),
           )
           .toList();
     } on PostgrestException catch (e) {

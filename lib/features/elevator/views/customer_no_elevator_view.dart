@@ -103,8 +103,9 @@ class CustomerNoElevatorView extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: AppColors.surfaceContainer,
                   borderRadius: BorderRadius.circular(14),
-                  border:
-                      Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: AppColors.outlineVariant.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: const Row(
                   children: [

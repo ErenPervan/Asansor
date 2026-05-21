@@ -4,11 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 // ── Conflict Banner ───────────────────────────────────────────────────────────
 
 class ConflictBanner extends StatelessWidget {
-  const ConflictBanner({
-    super.key,
-    required this.count,
-    required this.onTap,
-  });
+  const ConflictBanner({super.key, required this.count, required this.onTap});
 
   final int count;
   final VoidCallback onTap;
@@ -93,10 +89,7 @@ class ConflictBanner extends StatelessWidget {
 // ── Add Elevator Banner ───────────────────────────────────────────────────────
 
 class AddElevatorBanner extends StatelessWidget {
-  const AddElevatorBanner({
-    super.key,
-    required this.onTap,
-  });
+  const AddElevatorBanner({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -168,7 +161,9 @@ class AddElevatorBanner extends StatelessWidget {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 6),
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
@@ -176,8 +171,7 @@ class AddElevatorBanner extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.qr_code_rounded,
-                        size: 14, color: Colors.white),
+                    Icon(Icons.qr_code_rounded, size: 14, color: Colors.white),
                     SizedBox(width: 5),
                     Text(
                       'QR',
@@ -201,10 +195,7 @@ class AddElevatorBanner extends StatelessWidget {
 // ── Shared ────────────────────────────────────────────────────────────────────
 
 class ErrorBanner extends StatelessWidget {
-  const ErrorBanner({
-    super.key,
-    required this.message,
-  });
+  const ErrorBanner({super.key, required this.message});
 
   final String message;
 

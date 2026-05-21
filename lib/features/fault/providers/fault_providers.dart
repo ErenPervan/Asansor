@@ -16,30 +16,31 @@ final faultRepositoryProvider = Provider<FaultRepository>((ref) {
 // ── Data Providers ───────────────────────────────────────────────────────────
 
 /// Fetches all unresolved fault reports across every elevator.
-final activeFaultsProvider =
-    FutureProvider<List<FaultReportModel>>((ref) async {
+final activeFaultsProvider = FutureProvider<List<FaultReportModel>>((
+  ref,
+) async {
   final repo = ref.watch(faultRepositoryProvider);
   return repo.getAllActiveFaults();
 });
 
 /// Fetches all fault reports for a given elevator [id].
 final faultsByElevatorProvider =
-    FutureProvider.family<List<FaultReportModel>, String>(
-        (ref, elevatorId) async {
-  final repo = ref.watch(faultRepositoryProvider);
-  return repo.getFaultsByElevatorId(elevatorId);
-});
+    FutureProvider.family<List<FaultReportModel>, String>((
+      ref,
+      elevatorId,
+    ) async {
+      final repo = ref.watch(faultRepositoryProvider);
+      return repo.getFaultsByElevatorId(elevatorId);
+    });
 
 /// Fetches a single fault report by its [id].
 ///
 /// Usage: `ref.watch(faultByIdProvider('some-uuid'))`
-final faultByIdProvider =
-    FutureProvider.autoDispose.family<FaultReportModel, String>(
-  (ref, faultId) async {
-    final repo = ref.watch(faultRepositoryProvider);
-    return repo.getFaultById(faultId);
-  },
-);
+final faultByIdProvider = FutureProvider.autoDispose
+    .family<FaultReportModel, String>((ref, faultId) async {
+      final repo = ref.watch(faultRepositoryProvider);
+      return repo.getFaultById(faultId);
+    });
 
 // ── Report Notifier ──────────────────────────────────────────────────────────
 
@@ -60,16 +61,18 @@ class FaultController extends AsyncNotifier<FaultReportModel?> {
     if (!isOnline) {
       // ── Offline path ──────────────────────────────────────────────────────
       // Note: photo uploads require connectivity and cannot be queued.
-      await ref.read(syncQueueServiceProvider).enqueue(
-        type: SyncItemType.faultReport,
-        payload: {
-          'elevator_id': elevatorId,
-          'description': description,
-          'is_resolved': false,
-          'reported_at': DateTime.now().toUtc().toIso8601String(),
-          // photo_url intentionally omitted – upload requires network
-        },
-      );
+      await ref
+          .read(syncQueueServiceProvider)
+          .enqueue(
+            type: SyncItemType.faultReport,
+            payload: {
+              'elevator_id': elevatorId,
+              'description': description,
+              'is_resolved': false,
+              'reported_at': DateTime.now().toUtc().toIso8601String(),
+              // photo_url intentionally omitted – upload requires network
+            },
+          );
 
       state = AsyncData(
         FaultReportModel(
@@ -86,7 +89,9 @@ class FaultController extends AsyncNotifier<FaultReportModel?> {
 
     // ── Online path ───────────────────────────────────────────────────────
     state = await AsyncValue.guard(() {
-      return ref.read(faultRepositoryProvider).reportFault(
+      return ref
+          .read(faultRepositoryProvider)
+          .reportFault(
             elevatorId: elevatorId,
             description: description,
             photoUrl: photoUrl,
@@ -101,8 +106,8 @@ class FaultController extends AsyncNotifier<FaultReportModel?> {
 
 final faultControllerProvider =
     AsyncNotifierProvider<FaultController, FaultReportModel?>(
-  FaultController.new,
-);
+      FaultController.new,
+    );
 
 // ── Update Notifier (resolve / reopen) ──────────────────────────────────────
 
@@ -114,16 +119,12 @@ class FaultUpdateController extends AutoDisposeAsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
-  Future<bool> resolve(
-    String faultId, {
-    String? resolutionNotes,
-  }) async {
+  Future<bool> resolve(String faultId, {String? resolutionNotes}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(faultRepositoryProvider).resolveFault(
-            faultId,
-            resolutionNotes: resolutionNotes,
-          );
+      await ref
+          .read(faultRepositoryProvider)
+          .resolveFault(faultId, resolutionNotes: resolutionNotes);
     });
 
     if (!state.hasError) {
@@ -151,5 +152,5 @@ class FaultUpdateController extends AutoDisposeAsyncNotifier<void> {
 
 final faultUpdateControllerProvider =
     AsyncNotifierProvider.autoDispose<FaultUpdateController, void>(
-  FaultUpdateController.new,
-);
+      FaultUpdateController.new,
+    );

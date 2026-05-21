@@ -33,8 +33,8 @@ class MaintenanceLogEntryView extends ConsumerStatefulWidget {
 }
 
 class _MaintenanceLogEntryViewState
-  extends ConsumerState<MaintenanceLogEntryView>
-  with TickerProviderStateMixin {
+    extends ConsumerState<MaintenanceLogEntryView>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _notesController = TextEditingController();
   final _imagePicker = ImagePicker();
@@ -83,9 +83,12 @@ class _MaintenanceLogEntryViewState
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Fotoğraf eklenemedi: $e'), duration: AppDurations.snackBarError));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Fotoğraf eklenemedi: $e'),
+          duration: AppDurations.snackBarError,
+        ),
+      );
     }
   }
 
@@ -109,9 +112,12 @@ class _MaintenanceLogEntryViewState
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Fotoğraflar eklenemedi: $e'), duration: AppDurations.snackBarError));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Fotoğraflar eklenemedi: $e'),
+          duration: AppDurations.snackBarError,
+        ),
+      );
     }
   }
 
@@ -157,7 +163,10 @@ class _MaintenanceLogEntryViewState
     super.dispose();
   }
 
-  void _triggerSignatureError({required bool techMissing, required bool custMissing}) {
+  void _triggerSignatureError({
+    required bool techMissing,
+    required bool custMissing,
+  }) {
     setState(() {
       _techSignatureError = techMissing;
       _custSignatureError = custMissing;
@@ -193,7 +202,10 @@ class _MaintenanceLogEntryViewState
       await HapticFeedback.heavyImpact();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Oturum bilgisi alınamadı.'), duration: AppDurations.snackBarError),
+        const SnackBar(
+          content: Text('Oturum bilgisi alınamadı.'),
+          duration: AppDurations.snackBarError,
+        ),
       );
       return;
     }
@@ -248,7 +260,7 @@ class _MaintenanceLogEntryViewState
 
       await HapticFeedback.lightImpact();
       if (!mounted) return;
-      
+
       // Premium Success Dialog
       await showDialog<void>(
         context: context,
@@ -301,7 +313,7 @@ class _MaintenanceLogEntryViewState
       // Wait a brief moment to show the dialog
       await Future.delayed(const Duration(milliseconds: 1500));
       if (!mounted) return;
-      
+
       // Close dialog
       Navigator.of(context).pop();
 
@@ -325,10 +337,9 @@ class _MaintenanceLogEntryViewState
     final elevatorAsync = ref.watch(elevatorByIdProvider(widget.elevatorId));
     final checklistAsync = ref.watch(checklistProvider);
     final maintenanceState = ref.watch(maintenanceControllerProvider);
-    final sectionLabelStyle = Theme.of(context)
-        .textTheme
-        .titleMedium
-        ?.copyWith(fontWeight: FontWeight.bold);
+    final sectionLabelStyle = Theme.of(
+      context,
+    ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
 
     return PopScope(
       canPop: !maintenanceState.isLoading,
@@ -336,7 +347,9 @@ class _MaintenanceLogEntryViewState
         if (!didPop && maintenanceState.isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Lütfen kaydetme işlemi tamamlanana kadar bekleyin.'),
+              content: Text(
+                'Lütfen kaydetme işlemi tamamlanana kadar bekleyin.',
+              ),
               backgroundColor: AppColors.error,
               duration: AppDurations.snackBarInfo,
             ),
@@ -346,284 +359,285 @@ class _MaintenanceLogEntryViewState
       child: Scaffold(
         appBar: AppBar(title: const Text('Yeni Bakım Formu')),
         body: elevatorAsync.when(
-        data: (elevator) => Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // Elevator Info Card
-              Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        elevator.buildingName,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (elevator.address != null &&
-                          elevator.address!.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(
-                              Icons.location_on_outlined,
-                              size: 18,
-                              color: AppColors.outline,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                elevator.address!,
-                                style: const TextStyle(color: AppColors.outline),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
+          data: (elevator) => Form(
+            key: _formKey,
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // Elevator Info Card
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Checklist Section
-              SectionLabel(
-                label: 'Kontrol Listesi',
-                textStyle: sectionLabelStyle,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-
-              checklistAsync.when(
-                data: (items) {
-                  final activeItems = items.where((i) => i.isActive).toList();
-                  if (activeItems.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                      child: EmptyState(
-                        icon: Icons.checklist_rtl_rounded,
-                        message: 'Aktif kontrol öğesi bulunamadı.',
-                      ),
-                    );
-                  }
-
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
                     child: Column(
-                      children: activeItems.map((item) {
-                        final isChecked = _checkedItems[item.id] ?? false;
-                        return CheckboxListTile(
-                          title: Text(item.label),
-                          subtitle: item.description.isNotEmpty
-                              ? Text(item.description)
-                              : null,
-                          value: isChecked,
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _checkedItems[item.id] = value;
-                              });
-                            }
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  );
-                },
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(AppSpacing.md),
-                  child: LoadingState(),
-                ),
-                error: (err, stack) => Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: ErrorState(
-                    message: 'Kontrol listesi yüklenemedi: $err',
-                    onRetry: () => ref.invalidate(checklistProvider),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.lg),
-
-              // Photo Section
-              SectionLabel(
-                label: 'Fotoğraflar',
-                textStyle: sectionLabelStyle,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _addPhotoFromCamera,
-                      icon: const Icon(Icons.photo_camera_outlined),
-                      label: const Text('Kamera'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _addPhotosFromGallery,
-                      icon: const Icon(Icons.photo_library_outlined),
-                      label: const Text('Galeri'),
-                    ),
-                  ),
-                ],
-              ),
-              if (_photoPaths.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: List.generate(_photoPaths.length, (index) {
-                    final path = _photoPaths[index];
-                    return Stack(
-                      clipBehavior: Clip.none,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            File(path),
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                width: 80,
-                                height: 80,
-                                color: Colors.black12,
-                                alignment: Alignment.center,
-                                child: const Icon(Icons.broken_image_outlined),
-                              );
-                            },
-                          ),
+                        Text(
+                          elevator.buildingName,
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        Positioned(
-                          top: -6,
-                          right: -6,
-                          child: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _photoPaths.removeAt(index);
-                              });
-                            },
-                            icon: const Icon(Icons.close, size: 16),
-                            style: IconButton.styleFrom(
-                              backgroundColor: Colors.white70,
-                              padding: const EdgeInsets.all(2),
-                              minimumSize: const Size(24, 24),
-                            ),
-                            tooltip: 'Fotoğrafı kaldır',
+                        if (elevator.address != null &&
+                            elevator.address!.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.location_on_outlined,
+                                size: 18,
+                                color: AppColors.outline,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  elevator.address!,
+                                  style: const TextStyle(
+                                    color: AppColors.outline,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
+                        ],
                       ],
-                    );
-                  }),
-                ),
-              ] else ...[
-                const SizedBox(height: 8),
-                const Text('Henüz fotoğraf eklenmedi.'),
-              ],
-
-              const SizedBox(height: AppSpacing.lg),
-
-              // Notes Section
-              SectionLabel(
-                label: 'Bakım Notları',
-                textStyle: sectionLabelStyle,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _notesController,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  hintText:
-                      'Yapılan işlemleri, değiştirilen parçaları vb. buraya yazın...',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-
-              // Signature Section
-              SectionLabel(
-                label: 'İmzalar',
-                textStyle: sectionLabelStyle,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-
-              _buildSignaturePad(
-                label: 'Teknisyen İmzası',
-                controller: _techSignatureController,
-                showError: _techSignatureError,
-                onClear: () => _techSignatureController.clear(),
-                onInteract: () {
-                  if (_techSignatureError) {
-                    setState(() => _techSignatureError = false);
-                  }
-                },
-              ),
-              const SizedBox(height: AppSpacing.md),
-
-              _buildSignaturePad(
-                label: 'Müşteri İmzası',
-                controller: _custSignatureController,
-                showError: _custSignatureError,
-                onClear: () => _custSignatureController.clear(),
-                onInteract: () {
-                  if (_custSignatureError) {
-                    setState(() => _custSignatureError = false);
-                  }
-                },
-              ),
-
-              const SizedBox(height: 32),
-
-              // Submit Button
-              AnimatedPressButton(
-                onPressed: maintenanceState.isLoading ? null : _submit,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: FilledButton.icon(
-                    // We pass null to onPressed here because AnimatedPressButton handles the tap
-                    onPressed: maintenanceState.isLoading ? null : () {},
-                    icon: maintenanceState.isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Icon(Icons.check_circle_outline),
-                    label: Text(
-                      maintenanceState.isLoading
-                          ? 'Kaydediliyor...'
-                          : 'Bakımı Kaydet',
-                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: AppSpacing.lg),
+
+                // Checklist Section
+                SectionLabel(
+                  label: 'Kontrol Listesi',
+                  textStyle: sectionLabelStyle,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+
+                checklistAsync.when(
+                  data: (items) {
+                    final activeItems = items.where((i) => i.isActive).toList();
+                    if (activeItems.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                        child: EmptyState(
+                          icon: Icons.checklist_rtl_rounded,
+                          message: 'Aktif kontrol öğesi bulunamadı.',
+                        ),
+                      );
+                    }
+
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        children: activeItems.map((item) {
+                          final isChecked = _checkedItems[item.id] ?? false;
+                          return CheckboxListTile(
+                            title: Text(item.label),
+                            subtitle: item.description.isNotEmpty
+                                ? Text(item.description)
+                                : null,
+                            value: isChecked,
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  _checkedItems[item.id] = value;
+                                });
+                              }
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  },
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(AppSpacing.md),
+                    child: LoadingState(),
+                  ),
+                  error: (err, stack) => Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: ErrorState(
+                      message: 'Kontrol listesi yüklenemedi: $err',
+                      onRetry: () => ref.invalidate(checklistProvider),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: AppSpacing.lg),
+
+                // Photo Section
+                SectionLabel(
+                  label: 'Fotoğraflar',
+                  textStyle: sectionLabelStyle,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _addPhotoFromCamera,
+                        icon: const Icon(Icons.photo_camera_outlined),
+                        label: const Text('Kamera'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _addPhotosFromGallery,
+                        icon: const Icon(Icons.photo_library_outlined),
+                        label: const Text('Galeri'),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_photoPaths.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: List.generate(_photoPaths.length, (index) {
+                      final path = _photoPaths[index];
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              File(path),
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 80,
+                                  height: 80,
+                                  color: Colors.black12,
+                                  alignment: Alignment.center,
+                                  child: const Icon(
+                                    Icons.broken_image_outlined,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          Positioned(
+                            top: -6,
+                            right: -6,
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _photoPaths.removeAt(index);
+                                });
+                              },
+                              icon: const Icon(Icons.close, size: 16),
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.white70,
+                                padding: const EdgeInsets.all(2),
+                                minimumSize: const Size(24, 24),
+                              ),
+                              tooltip: 'Fotoğrafı kaldır',
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ),
+                ] else ...[
+                  const SizedBox(height: 8),
+                  const Text('Henüz fotoğraf eklenmedi.'),
+                ],
+
+                const SizedBox(height: AppSpacing.lg),
+
+                // Notes Section
+                SectionLabel(
+                  label: 'Bakım Notları',
+                  textStyle: sectionLabelStyle,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                TextFormField(
+                  controller: _notesController,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText:
+                        'Yapılan işlemleri, değiştirilen parçaları vb. buraya yazın...',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Signature Section
+                SectionLabel(label: 'İmzalar', textStyle: sectionLabelStyle),
+                const SizedBox(height: AppSpacing.sm),
+
+                _buildSignaturePad(
+                  label: 'Teknisyen İmzası',
+                  controller: _techSignatureController,
+                  showError: _techSignatureError,
+                  onClear: () => _techSignatureController.clear(),
+                  onInteract: () {
+                    if (_techSignatureError) {
+                      setState(() => _techSignatureError = false);
+                    }
+                  },
+                ),
+                const SizedBox(height: AppSpacing.md),
+
+                _buildSignaturePad(
+                  label: 'Müşteri İmzası',
+                  controller: _custSignatureController,
+                  showError: _custSignatureError,
+                  onClear: () => _custSignatureController.clear(),
+                  onInteract: () {
+                    if (_custSignatureError) {
+                      setState(() => _custSignatureError = false);
+                    }
+                  },
+                ),
+
+                const SizedBox(height: 32),
+
+                // Submit Button
+                AnimatedPressButton(
+                  onPressed: maintenanceState.isLoading ? null : _submit,
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: FilledButton.icon(
+                      // We pass null to onPressed here because AnimatedPressButton handles the tap
+                      onPressed: maintenanceState.isLoading ? null : () {},
+                      icon: maintenanceState.isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.check_circle_outline),
+                      label: Text(
+                        maintenanceState.isLoading
+                            ? 'Kaydediliyor...'
+                            : 'Bakımı Kaydet',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        loading: () => const LoadingState(),
-        error: (err, stack) => ErrorState(
-          message: 'Hata: $err',
-          onRetry: () => ref.invalidate(elevatorByIdProvider(widget.elevatorId)),
-        ),
+          loading: () => const LoadingState(),
+          error: (err, stack) => ErrorState(
+            message: 'Hata: $err',
+            onRetry: () =>
+                ref.invalidate(elevatorByIdProvider(widget.elevatorId)),
+          ),
         ),
       ),
     );
@@ -649,10 +663,7 @@ class _MaintenanceLogEntryViewState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           Container(
             decoration: BoxDecoration(
@@ -691,4 +702,3 @@ class _MaintenanceLogEntryViewState
     );
   }
 }
-

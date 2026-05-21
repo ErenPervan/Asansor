@@ -25,7 +25,10 @@ class CustomerDashboardView extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Asansör Durumu', style: TextStyle(fontWeight: FontWeight.w700)),
+        title: const Text(
+          'Asansör Durumu',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.onSurface,
@@ -99,7 +102,7 @@ class _ElevatorHealthCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isFaulty = elevator.status == 'faulty';
     final bool isUnderMaintenance = elevator.status == 'under_maintenance';
-    
+
     Color bgColor = AppColors.successContainer;
     Color iconColor = AppColors.success;
     IconData iconData = Icons.check_circle_outline;
@@ -147,7 +150,9 @@ class _ElevatorHealthCard extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            elevator.buildingName.isNotEmpty ? elevator.buildingName : 'Asansör',
+            elevator.buildingName.isNotEmpty
+                ? elevator.buildingName
+                : 'Asansör',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -182,9 +187,7 @@ class _ReportFaultButton extends StatelessWidget {
         backgroundColor: AppColors.error,
         foregroundColor: AppColors.onError,
         padding: const EdgeInsets.symmetric(vertical: 20),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 4,
       ),
       onPressed: () {
@@ -201,17 +204,18 @@ class _ReportFaultButton extends StatelessWidget {
       icon: const Icon(Icons.report_problem_outlined, size: 28),
       label: const Text(
         'Arıza Bildir',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }
 }
 
 class _MaintenanceLogList extends StatelessWidget {
-  const _MaintenanceLogList({
-    required this.logsAsync,
-    required this.onRetry,
-  });
+  const _MaintenanceLogList({required this.logsAsync, required this.onRetry});
 
   final AsyncValue<List<MaintenanceLogModel>> logsAsync;
   final VoidCallback onRetry;
@@ -234,7 +238,9 @@ class _MaintenanceLogList extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
             final log = logs[index];
-            final dateStr = DateFormat('dd MMMM yyyy').format(log.maintenanceDate.toLocal());
+            final dateStr = DateFormat(
+              'dd MMMM yyyy',
+            ).format(log.maintenanceDate.toLocal());
             final hasPdf = log.pdfUrl != null && log.pdfUrl!.isNotEmpty;
 
             return Container(
@@ -251,42 +257,65 @@ class _MaintenanceLogList extends StatelessWidget {
                 ],
               ),
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF3F4F6),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.build_circle_outlined, color: Color(0xFF4B5563)),
+                  child: const Icon(
+                    Icons.build_circle_outlined,
+                    color: Color(0xFF4B5563),
+                  ),
                 ),
                 title: Text(
                   dateStr,
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
                 ),
                 subtitle: Text(
-                  log.notes != null && log.notes!.isNotEmpty ? log.notes! : 'Periyodik Bakım',
+                  log.notes != null && log.notes!.isNotEmpty
+                      ? log.notes!
+                      : 'Periyodik Bakım',
                   style: const TextStyle(color: Colors.black54),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 trailing: hasPdf
                     ? IconButton(
-                        icon: const Icon(Icons.picture_as_pdf, color: AppColors.error),
+                        icon: const Icon(
+                          Icons.picture_as_pdf,
+                          color: AppColors.error,
+                        ),
                         tooltip: 'Raporu İndir',
                         onPressed: () async {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Rapor açılıyor...'), duration: AppDurations.snackBarInfo),
+                              const SnackBar(
+                                content: Text('Rapor açılıyor...'),
+                                duration: AppDurations.snackBarInfo,
+                              ),
                             );
                           }
                           final uri = Uri.parse(log.pdfUrl!);
                           if (await canLaunchUrl(uri)) {
-                            await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            await launchUrl(
+                              uri,
+                              mode: LaunchMode.externalApplication,
+                            );
                           } else {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('PDF açılamadı.'), duration: AppDurations.snackBarError),
+                                const SnackBar(
+                                  content: Text('PDF açılamadı.'),
+                                  duration: AppDurations.snackBarError,
+                                ),
                               );
                             }
                           }

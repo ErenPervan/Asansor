@@ -15,10 +15,10 @@ void main() {
       final file = File(fp);
       if (!file.existsSync()) continue;
       String content = file.readAsStringSync();
-      
+
       // Let's replace `\1` based on context
       content = content.replaceAll(r'\1', 'backgroundColor: AppColors.error,');
-      
+
       file.writeAsStringSync(content);
       print("Fixed \\1 in $fp");
     } catch (e) {

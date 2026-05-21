@@ -153,7 +153,9 @@ class _LoginViewState extends ConsumerState<LoginView>
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    await ref.read(authControllerProvider.notifier).signIn(
+    await ref
+        .read(authControllerProvider.notifier)
+        .signIn(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -172,9 +174,7 @@ class _LoginViewState extends ConsumerState<LoginView>
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
-                content: Text(
-                  error.toString().replaceFirst('Exception: ', ''),
-                ),
+                content: Text(error.toString().replaceFirst('Exception: ', '')),
                 backgroundColor: AppColors.error,
                 behavior: SnackBarBehavior.floating,
                 duration: AppDurations.snackBarError,
@@ -261,7 +261,9 @@ class _LoginViewState extends ConsumerState<LoginView>
                       const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 5),
+                          horizontal: 14,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
@@ -357,23 +359,28 @@ class _LoginViewState extends ConsumerState<LoginView>
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    BorderSide(color: colors.outlineVariant),
+                                borderSide: BorderSide(
+                                  color: colors.outlineVariant,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    BorderSide(color: colors.outlineVariant),
+                                borderSide: BorderSide(
+                                  color: colors.outlineVariant,
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: AppColors.primary, width: 1.5),
+                                  color: AppColors.primary,
+                                  width: 1.5,
+                                ),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: AppColors.error),
+                                  color: AppColors.error,
+                                ),
                               ),
                             ),
                             validator: (v) {
@@ -411,23 +418,28 @@ class _LoginViewState extends ConsumerState<LoginView>
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    BorderSide(color: colors.outlineVariant),
+                                borderSide: BorderSide(
+                                  color: colors.outlineVariant,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    BorderSide(color: colors.outlineVariant),
+                                borderSide: BorderSide(
+                                  color: colors.outlineVariant,
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: AppColors.primary, width: 1.5),
+                                  color: AppColors.primary,
+                                  width: 1.5,
+                                ),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: AppColors.error),
+                                  color: AppColors.error,
+                                ),
                               ),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -460,8 +472,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                               onPressed: isLoading ? null : _submit,
                               style: FilledButton.styleFrom(
                                 backgroundColor: AppColors.primary,
-                                disabledBackgroundColor:
-                                    AppColors.primary.withValues(alpha: 0.5),
+                                disabledBackgroundColor: AppColors.primary
+                                    .withValues(alpha: 0.5),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),

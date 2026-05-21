@@ -22,8 +22,10 @@ final elevatorRepositoryProvider = Provider<ElevatorRepository>((ref) {
 /// creation time) ordered descending and takes only the first row.
 ///
 /// Usage: `ref.watch(latestFaultDateProvider('some-uuid'))`
-final latestFaultDateProvider =
-    FutureProvider.family<DateTime?, String>((ref, elevatorId) async {
+final latestFaultDateProvider = FutureProvider.family<DateTime?, String>((
+  ref,
+  elevatorId,
+) async {
   final client = Supabase.instance.client;
   final response = await client
       .from('fault_reports')
@@ -53,25 +55,25 @@ final latestFaultDateProvider =
 /// Usage: `ref.watch(nextScheduledMaintenanceProvider('some-uuid'))`
 final nextScheduledMaintenanceProvider =
     FutureProvider.family<DateTime?, String>((ref, elevatorId) async {
-  final client = Supabase.instance.client;
-  final now = DateTime.now().toUtc().toIso8601String();
+      final client = Supabase.instance.client;
+      final now = DateTime.now().toUtc().toIso8601String();
 
-  final response = await client
-      .from('maintenance_schedules')
-      .select('scheduled_date')
-      .eq('elevator_id', elevatorId)
-      .eq('status', 'pending')
-      .gte('scheduled_date', now)
-      .order('scheduled_date', ascending: true)
-      .limit(1);
+      final response = await client
+          .from('maintenance_schedules')
+          .select('scheduled_date')
+          .eq('elevator_id', elevatorId)
+          .eq('status', 'pending')
+          .gte('scheduled_date', now)
+          .order('scheduled_date', ascending: true)
+          .limit(1);
 
-  final rows = response as List<dynamic>;
-  if (rows.isEmpty) return null;
+      final rows = response as List<dynamic>;
+      if (rows.isEmpty) return null;
 
-  final raw = rows.first['scheduled_date'] as String?;
-  if (raw == null) return null;
-  return DateTime.parse(raw);
-});
+      final raw = rows.first['scheduled_date'] as String?;
+      if (raw == null) return null;
+      return DateTime.parse(raw);
+    });
 
 // ── Data Providers ───────────────────────────────────────────────────────────
 
@@ -111,8 +113,10 @@ final elevatorsProvider = FutureProvider<List<ElevatorModel>>((ref) async {
 /// Fetches a single elevator by [id].
 ///
 /// Usage: `ref.watch(elevatorByIdProvider('some-uuid'))`
-final elevatorByIdProvider =
-    FutureProvider.family<ElevatorModel, String>((ref, id) async {
+final elevatorByIdProvider = FutureProvider.family<ElevatorModel, String>((
+  ref,
+  id,
+) async {
   final isOnline = ref.read(isOnlineProvider);
   final cache = ref.read(readCacheServiceProvider);
 
@@ -157,15 +161,16 @@ class ElevatorCreateController
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final elevator =
-          await ref.read(elevatorRepositoryProvider).createElevator(
-                buildingName: buildingName,
-                address: address,
-                status: status,
-                latitude: latitude,
-                longitude: longitude,
-                maintenanceDay: maintenanceDay,
-              );
+      final elevator = await ref
+          .read(elevatorRepositoryProvider)
+          .createElevator(
+            buildingName: buildingName,
+            address: address,
+            status: status,
+            latitude: latitude,
+            longitude: longitude,
+            maintenanceDay: maintenanceDay,
+          );
       // Refresh the global elevator list so dashboards stay in sync.
       ref.invalidate(elevatorsProvider);
       return elevator;
@@ -173,7 +178,7 @@ class ElevatorCreateController
   }
 }
 
-final elevatorCreateControllerProvider = AutoDisposeAsyncNotifierProvider<
-    ElevatorCreateController, ElevatorModel?>(
-  ElevatorCreateController.new,
-);
+final elevatorCreateControllerProvider =
+    AutoDisposeAsyncNotifierProvider<ElevatorCreateController, ElevatorModel?>(
+      ElevatorCreateController.new,
+    );

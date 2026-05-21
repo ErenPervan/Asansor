@@ -95,8 +95,8 @@ final allProfilesProvider = FutureProvider<List<ProfileModel>>((ref) {
 /// Usage: `ref.watch(profilesByRoleProvider('technician'))`
 final profilesByRoleProvider =
     FutureProvider.family<List<ProfileModel>, String>((ref, role) {
-  return ref.watch(profileRepositoryProvider).getProfilesByRole(role);
-});
+      return ref.watch(profileRepositoryProvider).getProfilesByRole(role);
+    });
 
 // ── Mutation notifier ─────────────────────────────────────────────────────────
 
@@ -120,10 +120,7 @@ class ProfileUpdateController extends AutoDisposeAsyncNotifier<void> {
     });
   }
 
-  Future<void> updateCustomerElevator(
-    String userId,
-    String? elevatorId,
-  ) async {
+  Future<void> updateCustomerElevator(String userId, String? elevatorId) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await ref
@@ -140,8 +137,8 @@ class ProfileUpdateController extends AutoDisposeAsyncNotifier<void> {
 
 final profileUpdateControllerProvider =
     AsyncNotifierProvider.autoDispose<ProfileUpdateController, void>(
-  ProfileUpdateController.new,
-);
+      ProfileUpdateController.new,
+    );
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

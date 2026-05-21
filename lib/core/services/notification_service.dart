@@ -314,9 +314,9 @@ class NotificationService {
   void handleNotificationClick(Map<String, dynamic>? data) {
     if (data == null) return;
 
-    final type       = data['type']        as String?;
+    final type = data['type'] as String?;
     final elevatorId = data['elevator_id'] as String?;
-    final route      = data['route']       as String?;
+    final route = data['route'] as String?;
 
     final String destination;
     if (type == 'task_assigned') {
@@ -364,10 +364,8 @@ class NotificationService {
 
     // If we are already between frames (idle), navigate immediately.
     // Otherwise wait for the next frame boundary.
-    if (
-      scheduler.SchedulerBinding.instance.schedulerPhase ==
-      scheduler.SchedulerPhase.idle
-    ) {
+    if (scheduler.SchedulerBinding.instance.schedulerPhase ==
+        scheduler.SchedulerPhase.idle) {
       attempt();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) => attempt());

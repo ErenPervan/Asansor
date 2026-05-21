@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/widgets/loading_state.dart';
+import '../../../../core/widgets/animations/fade_in_slide.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/offline_banner.dart';
@@ -202,8 +204,9 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           const OfflineBanner(),
           Expanded(
             child: elevatorsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: LoadingState(count: 6),
         ),
         error: (e, _) => _ErrorBody(
           message: e.toString().replaceFirst('Exception: ', ''),
@@ -232,13 +235,20 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           return RefreshIndicator(
             color: AppColors.primary,
             onRefresh: () async => ref.invalidate(elevatorsProvider),
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               itemCount: items.length,
-              itemBuilder: (context, i) => _ElevatorCard(
-                elevator: items[i],
-                onTap: () => context.push('/elevator/${items[i].id}'),
-              ),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final elevator = items[index];
+                return FadeInSlide(
+                  index: index,
+                  child: _ElevatorCard(
+                    elevator: elevator,
+                    onTap: () => context.push('/elevator/${elevator.id}'),
+                  ),
+                );
+              },
             ),
           );
         },
@@ -287,14 +297,17 @@ class _ElevatorCard extends StatelessWidget {
             child: Row(
               children: [
                 // ── Status icon ──────────────────────────────────────────
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: style.iconBg,
-                    borderRadius: BorderRadius.circular(14),
+                Hero(
+                  tag: 'elevator_icon_${elevator.id}',
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: style.iconBg,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(style.icon, color: style.iconFg, size: 26),
                   ),
-                  child: Icon(style.icon, color: style.iconFg, size: 26),
                 ),
                 const SizedBox(width: 14),
 
@@ -303,16 +316,22 @@ class _ElevatorCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        elevator.buildingName,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.onSurface,
-                          letterSpacing: -0.2,
+                      Hero(
+                        tag: 'elevator_title_${elevator.id}',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Text(
+                            elevator.buildingName,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onSurface,
+                              letterSpacing: -0.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       if (elevator.address != null &&
                           elevator.address!.isNotEmpty) ...[

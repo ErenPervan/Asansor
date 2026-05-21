@@ -49,32 +49,17 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
   final startOfMonth = DateTime(now.year, now.month, 1);
   final sixMonthsAgo = DateTime(now.year, now.month - 5, 1);
 
-  // 1. KPI 1: Active Faults (is_resolved = false)
-  final activeFaultsRes = await supabase
-      .from('fault_reports')
-      .select('id')
-      .eq('is_resolved', false)
-      .count(CountOption.exact);
-  
-  // 2. KPI 2: Completed this month
-  final completedThisMonthRes = await supabase
-      .from('maintenance_logs')
-      .select('id')
-      .gte('maintenance_date', startOfMonth.toIso8601String())
-      .count(CountOption.exact);
+  final results = await Future.wait([
+    supabase.from('fault_reports').select('id').eq('is_resolved', false).count(CountOption.exact),
+    supabase.from('maintenance_logs').select('id').gte('maintenance_date', startOfMonth.toIso8601String()).count(CountOption.exact),
+    supabase.from('elevators').select('id').count(CountOption.exact),
+    supabase.from('maintenance_schedules').select('id').eq('status', 'pending').count(CountOption.exact),
+  ]);
 
-  // 3. KPI 3: Total Elevators
-  final totalElevatorsRes = await supabase
-      .from('elevators')
-      .select('id')
-      .count(CountOption.exact);
-
-  // 4. KPI 4: Pending Maintenances
-  final pendingMaintenancesRes = await supabase
-      .from('maintenance_schedules')
-      .select('id')
-      .eq('status', 'pending')
-      .count(CountOption.exact);
+  final activeFaultsRes = results[0];
+  final completedThisMonthRes = results[1];
+  final totalElevatorsRes = results[2];
+  final pendingMaintenancesRes = results[3];
 
   // 5. 6-Month Fault Trend
   final recentFaults = await supabase
@@ -113,13 +98,13 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
   // Try fetching category. If it fails or is null, fallback to description keywords.
   final allFaultsForCategories = await supabase
       .from('fault_reports')
-      .select('category, description'); // Assuming category column might exist
+      .select('fault_type, description');
 
   final Map<String, int> categoryCounts = {};
   int totalCategories = 0;
 
   for (final fault in allFaultsForCategories) {
-    String? cat = fault['category'] as String?;
+    String? cat = fault['fault_type'] as String?;
     
     // Fallback logic if category column is null
     if (cat == null || cat.trim().isEmpty) {

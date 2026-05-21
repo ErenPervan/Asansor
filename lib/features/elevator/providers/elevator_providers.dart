@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -97,7 +98,7 @@ final elevatorsProvider = FutureProvider<List<ElevatorModel>>((ref) async {
     final repo = ref.watch(elevatorRepositoryProvider);
     final data = await repo.getAllElevators();
     // Update the cache in the background — don't await so the UI isn't blocked.
-    cache.saveElevators(data);
+    unawaited(cache.saveElevators(data));
     return data;
   } catch (e) {
     // Network or Supabase error: serve stale cache so the screen doesn't crash.
@@ -112,8 +113,26 @@ final elevatorsProvider = FutureProvider<List<ElevatorModel>>((ref) async {
 /// Usage: `ref.watch(elevatorByIdProvider('some-uuid'))`
 final elevatorByIdProvider =
     FutureProvider.family<ElevatorModel, String>((ref, id) async {
-  final repo = ref.watch(elevatorRepositoryProvider);
-  return repo.getElevatorById(id);
+  final isOnline = ref.read(isOnlineProvider);
+  final cache = ref.read(readCacheServiceProvider);
+
+  if (!isOnline) {
+    final cachedElevators = cache.loadElevators();
+    return cachedElevators.firstWhere(
+      (e) => e.id == id,
+      orElse: () => throw Exception('Elevator not found in offline cache.'),
+    );
+  }
+
+  try {
+    final repo = ref.watch(elevatorRepositoryProvider);
+    return await repo.getElevatorById(id);
+  } catch (e) {
+    final cachedElevators = cache.loadElevators();
+    final cached = cachedElevators.where((e) => e.id == id).firstOrNull;
+    if (cached != null) return cached;
+    rethrow;
+  }
 });
 
 // ── Create notifier ──────────────────────────────────────────────────────────

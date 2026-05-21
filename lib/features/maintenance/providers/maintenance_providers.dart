@@ -55,7 +55,7 @@ final logsByElevatorProvider =
       try {
         final repo = ref.watch(maintenanceRepositoryProvider);
         final data = await repo.getLogsByElevatorId(elevatorId);
-        cache.savePastLogs(elevatorId, data);
+        await cache.savePastLogs(elevatorId, data);
         return data;
       } catch (e) {
         final cached = cache
@@ -253,7 +253,7 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
       );
 
       // Notify all admins that a maintenance job has been completed.
-      NotificationService.instance.notifyAllAdmins(
+      await NotificationService.instance.notifyAllAdmins(
         client: Supabase.instance.client,
         title: 'Bakım Tamamlandı',
         body: 'Bir teknisyen bakım görevini tamamladı.',

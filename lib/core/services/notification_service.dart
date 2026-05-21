@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -64,6 +65,7 @@ class NotificationService {
   final _localNotifications = FlutterLocalNotificationsPlugin();
 
   bool _initialised = false;
+  StreamSubscription<String>? _tokenRefreshSub;
 
   // ── Setup ─────────────────────────────────────────────────────────────────
 
@@ -163,9 +165,10 @@ class NotificationService {
       }
 
       // Keep the token fresh.
-      _messaging.onTokenRefresh.listen((newToken) {
+      await _tokenRefreshSub?.cancel();
+      _tokenRefreshSub = _messaging.onTokenRefresh.listen((newToken) {
         debugPrint('[FCM] Token refreshed: $newToken');
-        _updateToken(client, newToken);
+        unawaited(_updateToken(client, newToken));
       });
     } catch (e) {
       debugPrint('[FCM] saveTokenToSupabase error: $e');

@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:flutter/services.dart';
 
 import '../../features/maintenance/models/maintenance_log_model.dart';
 import '../../features/elevator/models/elevator_model.dart';
@@ -40,9 +41,9 @@ class PdfService {
   }) async {
     final pdf = pw.Document();
 
-    // Load fonts (NunitoSans supports Turkish chars, materialIcons for icons)
-    final regularFont = await PdfGoogleFonts.nunitoSansRegular();
-    final boldFont = await PdfGoogleFonts.nunitoSansBold();
+    // Load fonts from local assets for offline support
+    final regularFont = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Regular.ttf'));
+    final boldFont = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Bold.ttf'));
     final iconFont = await PdfGoogleFonts.materialIcons();
 
     final theme = pw.ThemeData.withFont(
@@ -443,12 +444,11 @@ class PdfService {
     ElevatorModel elevator,
     List<MaintenanceLogModel> logs,
   ) async {
-    // Load Turkish-compatible fonts from the Google Fonts CDN (cached after first
-    // download by the `printing` package).
-    final regular = await PdfGoogleFonts.nunitoSansRegular();
-    final bold = await PdfGoogleFonts.nunitoSansBold();
-    final italic = await PdfGoogleFonts.nunitoSansItalic();
-    final boldItalic = await PdfGoogleFonts.nunitoSansBoldItalic();
+    // Load Turkish-compatible fonts from local assets to support offline generation
+    final regular = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Regular.ttf'));
+    final bold = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Bold.ttf'));
+    final italic = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-Italic.ttf'));
+    final boldItalic = pw.Font.ttf(await rootBundle.load('assets/fonts/NunitoSans-BoldItalic.ttf'));
 
     final baseTheme = pw.ThemeData.withFont(
       base: regular,

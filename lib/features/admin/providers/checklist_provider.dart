@@ -24,7 +24,7 @@ class ChecklistNotifier extends AutoDisposeAsyncNotifier<List<ChecklistItemModel
           .order('label', ascending: true);
           
       final items = response.map((e) => ChecklistItemModel.fromJson(e)).toList();
-      cache.saveChecklistItems(items);
+      await cache.saveChecklistItems(items);
       return items;
     } catch (e) {
       final cached = cache.loadChecklistItems(ChecklistItemModel.fromJson).cast<ChecklistItemModel>();

@@ -1,0 +1,13 @@
+{
+  "@@locale": "de",
+  "appTitle": "Aufzugswartungssystem",
+  "@appTitle": {
+    "description": "Haupttitel der Anwendung"
+  },
+  "loginTitle": "Anmelden",
+  "loginEmailLabel": "E-Mail",
+  "loginPasswordLabel": "Passwort",
+  "loginButton": "Einloggen",
+  "homeActiveFaults": "Aktive Störungen",
+  "homeDailyAgenda": "Tagesordnung"
+}

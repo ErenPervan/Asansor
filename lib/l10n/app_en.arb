@@ -1,0 +1,13 @@
+{
+  "@@locale": "en",
+  "appTitle": "Elevator Maintenance System",
+  "@appTitle": {
+    "description": "Main application title"
+  },
+  "loginTitle": "Login",
+  "loginEmailLabel": "Email",
+  "loginPasswordLabel": "Password",
+  "loginButton": "Sign In",
+  "homeActiveFaults": "Active Faults",
+  "homeDailyAgenda": "Daily Agenda"
+}

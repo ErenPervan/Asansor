@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +18,7 @@ import '../providers/profile_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/input_decorations.dart';
 import '../../../core/widgets/section_label.dart';
+import '../../../core/constants/app_durations.dart';
 // â”€â”€ AssignView â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Screen that allows a manager/admin to create a new maintenance schedule:
@@ -140,7 +142,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
       );
     } else {
       _showSnack('GÃ¶rev baÅŸarÄ±yla atandÄ±!');
-      HapticFeedback.lightImpact();
+      await HapticFeedback.lightImpact();
       if (mounted) context.pop();
     }
   }
@@ -148,13 +150,14 @@ class _AssignViewState extends ConsumerState<AssignView> {
   void _showSnack(String message, {bool isError = false}) {
     if (!mounted) return;
     if (isError) {
-      HapticFeedback.heavyImpact();
+      unawaited(HapticFeedback.heavyImpact());
     }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: isError ? AppColors.error : AppColors.primary,
         behavior: SnackBarBehavior.floating,
+        duration: isError ? AppDurations.snackBarError : AppDurations.snackBarSuccess,
       ),
     );
   }

@@ -6,10 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
+import '../../../l10n/app_localizations.dart';
 
 import '../providers/auth_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/constants/app_durations.dart';
 // ── Brand palette ──────────────────────────────────────────────────────────────
 
 // ── Industrial grid background painter ────────────────────────────────────────
@@ -175,6 +177,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                 ),
                 backgroundColor: AppColors.error,
                 behavior: SnackBarBehavior.floating,
+                duration: AppDurations.snackBarError,
               ),
             );
         },
@@ -184,6 +187,7 @@ class _LoginViewState extends ConsumerState<LoginView>
     final isLoading = ref.watch(authControllerProvider).isLoading;
     final screenH = MediaQuery.of(context).size.height;
     final colors = AppThemeColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: colors.primary,
@@ -311,7 +315,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                         children: [
                           // Card title
                           Text(
-                            'Giriş Yap',
+                            l10n.loginTitle,
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w800,
@@ -331,7 +335,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                           const SizedBox(height: 32),
 
                           // ── E-posta ──────────────────────────────────────
-                          _FormLabel(label: 'E-posta Adresi'),
+                          _FormLabel(label: l10n.loginEmailLabel),
                           const SizedBox(height: 6),
                           TextFormField(
                             controller: _emailController,
@@ -385,7 +389,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                           const SizedBox(height: 20),
 
                           // ── Şifre ────────────────────────────────────────
-                          _FormLabel(label: 'Şifre'),
+                          _FormLabel(label: l10n.loginPasswordLabel),
                           const SizedBox(height: 6),
                           TextFormField(
                             controller: _passwordController,
@@ -471,9 +475,9 @@ class _LoginViewState extends ConsumerState<LoginView>
                                         color: Colors.white,
                                       ),
                                     )
-                                  : const Text(
-                                      'Giriş Yap',
-                                      style: TextStyle(
+                                  : Text(
+                                      l10n.loginButton,
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 0.3,

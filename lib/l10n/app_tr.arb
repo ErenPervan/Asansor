@@ -1,0 +1,13 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Asansör Bakım Sistemi",
+  "@appTitle": {
+    "description": "Uygulama genel başlığı"
+  },
+  "loginTitle": "Giriş Yap",
+  "loginEmailLabel": "E-posta",
+  "loginPasswordLabel": "Şifre",
+  "loginButton": "Giriş",
+  "homeActiveFaults": "Aktif Arızalar",
+  "homeDailyAgenda": "Günlük Ajandam"
+}

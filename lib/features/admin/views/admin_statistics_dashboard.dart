@@ -181,7 +181,7 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new_rounded,
                       color: Colors.white, size: 20),
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => context.pop(),
                 ),
                 const SizedBox(width: 4),
                 const Expanded(
@@ -779,15 +779,15 @@ final _quickActions = [
   const _QuickAction(
     label: 'Harita',
     icon: Icons.map_outlined,
-    color: Color(0xFF0D9488),
-    bg: Color(0xFFECFDF5),
+    color: AppColors.teal,
+    bg: AppColors.tealSurface,
     route: '/admin/map',
   ),
   const _QuickAction(
     label: 'Teknisyenler',
     icon: Icons.engineering_outlined,
-    color: Color(0xFF7C3AED),
-    bg: Color(0xFFF5F3FF),
+    color: AppColors.violet,
+    bg: AppColors.violetSurface,
     route: '/admin/technicians',
   ),
 ];

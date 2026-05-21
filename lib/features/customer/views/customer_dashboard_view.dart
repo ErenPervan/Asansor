@@ -10,7 +10,8 @@ import '../../../core/widgets/loading_state.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/models/elevator_model.dart';
 import '../../maintenance/models/maintenance_log_model.dart';
-import '../../elevator/views/elevator_detail_view.dart';
+import '../../elevator/widgets/detail/report_fault_sheet.dart';
+import '../../../core/constants/app_durations.dart';
 import '../providers/customer_portal_provider.dart';
 
 class CustomerDashboardView extends ConsumerWidget {
@@ -190,7 +191,7 @@ class _ReportFaultButton extends StatelessWidget {
         showModalBottomSheet<void>(
           context: context,
           isScrollControlled: true,
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
@@ -276,7 +277,7 @@ class _MaintenanceLogList extends StatelessWidget {
                         onPressed: () async {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Rapor açılıyor...')),
+                              const SnackBar(content: Text('Rapor açılıyor...'), duration: AppDurations.snackBarInfo),
                             );
                           }
                           final uri = Uri.parse(log.pdfUrl!);
@@ -285,7 +286,7 @@ class _MaintenanceLogList extends StatelessWidget {
                           } else {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('PDF açılamadı.')),
+                                const SnackBar(content: Text('PDF açılamadı.'), duration: AppDurations.snackBarError),
                               );
                             }
                           }

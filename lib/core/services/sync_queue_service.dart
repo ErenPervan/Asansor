@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/maintenance/models/maintenance_log_model.dart';
 import '../exceptions/conflict_exception.dart';
 import 'pdf_service.dart';
+import 'package:uuid/uuid.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -68,6 +69,8 @@ class SyncResult {
 class SyncQueueService extends ChangeNotifier {
   SyncQueueService();
 
+  static const _uuid = Uuid();
+
   Box<String> get _box => Hive.box<String>(syncQueueBoxName);
 
   /// Number of items currently waiting to be synced.
@@ -113,8 +116,6 @@ class SyncQueueService extends ChangeNotifier {
 
   // ── Write ─────────────────────────────────────────────────────────────────
 
-  static int _idCounter = 0;
-
   /// Saves [payload] as a pending operation of the given [type].
   ///
   /// [type] must be one of the [SyncItemType] constants.
@@ -124,9 +125,7 @@ class SyncQueueService extends ChangeNotifier {
     required String type,
     required Map<String, dynamic> payload,
   }) async {
-    _idCounter++;
-    final id =
-        '${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}_$_idCounter';
+    final id = _uuid.v4();
     final item = jsonEncode({
       'id': id,
       'type': type,
@@ -140,13 +139,18 @@ class SyncQueueService extends ChangeNotifier {
 
   // ── Flush ─────────────────────────────────────────────────────────────────
 
+  bool _isFlushing = false;
+
   /// Processes every queued item in chronological order.
   ///
   /// Items that succeed are removed from the box.
   /// Items that fail are kept for the next attempt.
   Future<SyncResult> flush(SupabaseClient client) async {
-    // Sort keys so we replay in the order they were queued.
-    final keys = _box.keys.cast<String>().toList()..sort();
+    if (_isFlushing) return const SyncResult(synced: 0, failed: 0);
+    _isFlushing = true;
+    try {
+      // Sort keys so we replay in the order they were queued.
+      final keys = _box.keys.cast<String>().toList()..sort();
 
     int synced = 0;
     int failed = 0;
@@ -179,11 +183,14 @@ class SyncQueueService extends ChangeNotifier {
       }
     }
 
-    if (synced > 0 || failed == 0) {
-      notifyListeners();
-    }
+      if (synced > 0 || failed == 0) {
+        notifyListeners();
+      }
 
-    return SyncResult(synced: synced, failed: failed);
+      return SyncResult(synced: synced, failed: failed);
+    } finally {
+      _isFlushing = false;
+    }
   }
 
   // ── Internal ──────────────────────────────────────────────────────────────
@@ -230,6 +237,7 @@ class SyncQueueService extends ChangeNotifier {
         client,
         elevatorId: elevatorId,
         technicianId: technicianId,
+        maintenanceDate: payload['maintenance_date'] as String?,
       );
       return;
     }
@@ -296,81 +304,14 @@ class SyncQueueService extends ChangeNotifier {
 
     // ignore: unnecessary_null_comparison
     if (response != null) {
-      try {
-        // ── Step 1: Generate the PDF ──────────────────────────────────────────
-        final logModel = MaintenanceLogModel.fromJson(response);
-        final pdfFile = await PdfService().generateMaintenanceReport(
-          log: logModel,
-          checklistDetails:
-              [], // Checklist mapping verified: currently not in schema, placeholder used
-          mediaUrls: logModel.photos,
-          signatureUrl: logModel.signatureUrl,
-          customerSignatureUrl: logModel.customerSignatureUrl,
-        );
-
-        // ── Step 2: Upload to Supabase Storage ───────────────────────────────
-        final fileName =
-            'report_${logModel.elevatorId}_${DateTime.now().millisecondsSinceEpoch}.pdf';
-        await client.storage
-            .from(_maintenanceReportsBucket)
-            .upload(fileName, pdfFile);
-
-        // ── Step 3: Write the public URL back to maintenance_logs.pdf_url ────
-        final publicUrl = client.storage
-            .from(_maintenanceReportsBucket)
-            .getPublicUrl(fileName);
-        await client
-            .from('maintenance_logs')
-            .update({'pdf_url': publicUrl})
-            .eq('id', logModel.id);
-        debugPrint('[SyncQueue] PDF uploaded & linked: $publicUrl');
-
-        // ── Step 4: Notify the customer who owns this elevator ───────────────
-        try {
-          final customerData = await client
-              .from('profiles')
-              .select('id')
-              .eq('elevator_id', logModel.elevatorId)
-              .eq('role', 'customer')
-              .maybeSingle();
-
-          if (customerData != null) {
-            final customerId = customerData['id'] as String;
-            await client.functions.invoke(
-              'send-notification',
-              body: {
-                'to_user_id': customerId,
-                'title': 'Bakım Tamamlandı ✓',
-                'body':
-                    'Asansörünüzün periyodik bakımı tamamlandı. Rapora göz atabilirsiniz.',
-                'data': {'route': '/customer', 'pdf_url': publicUrl},
-              },
-            );
-            debugPrint(
-              '[SyncQueue] Customer notification sent to: $customerId',
-            );
-          } else {
-            debugPrint(
-              '[SyncQueue] No customer profile found for elevator ${logModel.elevatorId}. Skipping notification.',
-            );
-          }
-        } catch (notifErr) {
-          // Notification failure must never crash the sync — log and continue.
-          debugPrint(
-            '[SyncQueue] Customer notification failed (non-fatal): $notifErr',
-          );
-        }
-      } catch (e) {
-        debugPrint('[SyncQueue] Failed to generate or upload PDF report: $e');
-        // Throw so that the flush loop knows this item is not fully synced
-        throw Exception('PDF generation/upload failed');
-      }
+      await _generateUploadAndAttachPdf(client, response);
     }
 
     await _completeMatchingSchedule(
       client,
       elevatorId: elevatorId,
       technicianId: technicianId,
+      maintenanceDate: payload['maintenance_date'] as String?,
     );
   }
 
@@ -485,20 +426,21 @@ class SyncQueueService extends ChangeNotifier {
     SupabaseClient client, {
     required String? elevatorId,
     required String? technicianId,
+    String? maintenanceDate,
   }) async {
     if (elevatorId == null || technicianId == null) return;
 
     try {
-      final today = DateTime.now();
+      final targetDate = maintenanceDate != null ? DateTime.parse(maintenanceDate) : DateTime.now();
       final start = DateTime(
-        today.year,
-        today.month,
-        today.day,
+        targetDate.year,
+        targetDate.month,
+        targetDate.day,
       ).toIso8601String();
       final end = DateTime(
-        today.year,
-        today.month,
-        today.day,
+        targetDate.year,
+        targetDate.month,
+        targetDate.day,
         23,
         59,
         59,
@@ -648,9 +590,14 @@ class SyncQueueService extends ChangeNotifier {
     final id = payload['id'] as String;
     final remoteState = item['remote_state'] as Map<String, dynamic>;
 
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) {
+      throw StateError('User not authenticated during conflict resolution.');
+    }
+
     await client.from('conflict_reports').insert({
       'elevator_id': id,
-      'technician_id': client.auth.currentUser!.id,
+      'technician_id': userId,
       'local_payload': payload,
       'remote_payload': remoteState,
       'status': _statusPending,

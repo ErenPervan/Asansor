@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/elevator/repositories/elevator_repository.dart';
@@ -43,9 +44,11 @@ class AutoScheduleResult {
 /// print('${result.inserted} tasks created, ${result.skipped} already existed');
 /// ```
 class AutoScheduleService {
-  AutoScheduleService(SupabaseClient client)
-      : _elevatorRepo = ElevatorRepository(client),
-        _scheduleRepo = ScheduleRepository(client);
+  AutoScheduleService(SupabaseClient client, {
+    @visibleForTesting ElevatorRepository? elevatorRepo,
+    @visibleForTesting ScheduleRepository? scheduleRepo,
+  })  : _elevatorRepo = elevatorRepo ?? ElevatorRepository(client),
+        _scheduleRepo = scheduleRepo ?? ScheduleRepository(client);
 
   final ElevatorRepository _elevatorRepo;
   final ScheduleRepository _scheduleRepo;

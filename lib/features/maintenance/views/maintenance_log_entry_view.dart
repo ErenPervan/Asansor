@@ -19,6 +19,8 @@ import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/section_label.dart';
+import '../../../core/widgets/animations/animated_press_button.dart';
+import '../../../core/constants/app_durations.dart';
 
 class MaintenanceLogEntryView extends ConsumerStatefulWidget {
   const MaintenanceLogEntryView({super.key, required this.elevatorId});
@@ -83,7 +85,7 @@ class _MaintenanceLogEntryViewState
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Fotoğraf eklenemedi: $e')));
+      ).showSnackBar(SnackBar(content: Text('Fotoğraf eklenemedi: $e'), duration: AppDurations.snackBarError));
     }
   }
 
@@ -109,7 +111,7 @@ class _MaintenanceLogEntryViewState
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Fotoğraflar eklenemedi: $e')));
+      ).showSnackBar(SnackBar(content: Text('Fotoğraflar eklenemedi: $e'), duration: AppDurations.snackBarError));
     }
   }
 
@@ -188,9 +190,10 @@ class _MaintenanceLogEntryViewState
 
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) {
-      HapticFeedback.heavyImpact();
+      await HapticFeedback.heavyImpact();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Oturum bilgisi alınamadı.')),
+        const SnackBar(content: Text('Oturum bilgisi alınamadı.'), duration: AppDurations.snackBarError),
       );
       return;
     }
@@ -199,8 +202,8 @@ class _MaintenanceLogEntryViewState
       final techMissing = _techSignatureController.isEmpty;
       final custMissing = _custSignatureController.isEmpty;
       if (techMissing || custMissing) {
+        await HapticFeedback.heavyImpact();
         if (!mounted) return;
-        HapticFeedback.heavyImpact();
         _triggerSignatureError(
           techMissing: techMissing,
           custMissing: custMissing,
@@ -211,6 +214,7 @@ class _MaintenanceLogEntryViewState
               'Lütfen hem teknisyen hem de müşteri imzasını tamamlayın.',
             ),
             backgroundColor: AppColors.error,
+            duration: AppDurations.snackBarError,
           ),
         );
         return;
@@ -242,25 +246,75 @@ class _MaintenanceLogEntryViewState
             customerSignaturePath: custSigPath,
           );
 
+      await HapticFeedback.lightImpact();
       if (!mounted) return;
-
-      HapticFeedback.lightImpact();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Bakım başarıyla kaydedildi.'),
-          backgroundColor: AppColors.success,
-        ),
+      
+      // Premium Success Dialog
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeOutBack,
+            tween: Tween(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return Transform.scale(
+                scale: value,
+                child: AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  contentPadding: const EdgeInsets.all(32),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.success.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.check_circle_rounded,
+                          color: AppColors.success,
+                          size: 64,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Bakım Kaydedildi',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
       );
+
+      // Wait a brief moment to show the dialog
+      await Future.delayed(const Duration(milliseconds: 1500));
+      if (!mounted) return;
+      
+      // Close dialog
+      Navigator.of(context).pop();
 
       // Navigate back to the home/dashboard
       context.go('/');
     } catch (e) {
+      await HapticFeedback.heavyImpact();
       if (!mounted) return;
-      HapticFeedback.heavyImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Kayıt sırasında hata oluştu: $e'),
           backgroundColor: AppColors.error,
+          duration: AppDurations.snackBarError,
         ),
       );
     }
@@ -284,6 +338,7 @@ class _MaintenanceLogEntryViewState
             const SnackBar(
               content: Text('Lütfen kaydetme işlemi tamamlanana kadar bekleyin.'),
               backgroundColor: AppColors.error,
+              duration: AppDurations.snackBarInfo,
             ),
           );
         }
@@ -534,26 +589,30 @@ class _MaintenanceLogEntryViewState
               const SizedBox(height: 32),
 
               // Submit Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: FilledButton.icon(
-                  onPressed: maintenanceState.isLoading ? null : _submit,
-                  icon: maintenanceState.isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.check_circle_outline),
-                  label: Text(
-                    maintenanceState.isLoading
-                        ? 'Kaydediliyor...'
-                        : 'Bakımı Kaydet',
-                    style: const TextStyle(fontSize: 16),
+              AnimatedPressButton(
+                onPressed: maintenanceState.isLoading ? null : _submit,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: FilledButton.icon(
+                    // We pass null to onPressed here because AnimatedPressButton handles the tap
+                    onPressed: maintenanceState.isLoading ? null : () {},
+                    icon: maintenanceState.isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.check_circle_outline),
+                    label: Text(
+                      maintenanceState.isLoading
+                          ? 'Kaydediliyor...'
+                          : 'Bakımı Kaydet',
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ),
                 ),
               ),

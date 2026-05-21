@@ -508,7 +508,7 @@ class _ProfileCard extends StatelessWidget {
 void _showEditRoleSheet(BuildContext context, ProfileModel profile) {
   showModalBottomSheet<void>(
     context: context,
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.of(context).colorScheme.surface,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
@@ -764,8 +764,8 @@ void _showAssignElevatorSheet(
 ) {
   showModalBottomSheet<void>(
     context: context,
-    backgroundColor: Colors.white,
     isScrollControlled: true,
+    backgroundColor: Theme.of(context).colorScheme.surface,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),

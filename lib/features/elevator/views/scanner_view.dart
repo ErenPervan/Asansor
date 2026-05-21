@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/constants/app_durations.dart';
 
 class ScannerView extends ConsumerStatefulWidget {
   const ScannerView({super.key});
@@ -65,7 +66,8 @@ class _ScannerViewState extends ConsumerState<ScannerView>
     ).hasMatch(rawValue);
 
     if (isValidUuid) {
-      HapticFeedback.mediumImpact();
+      await HapticFeedback.mediumImpact();
+      if (!mounted) return;
       // Route based on role:
       // Since customers are guarded from reaching this view, only
       // technicians and admins will scan QR codes to start maintenance.
@@ -75,7 +77,8 @@ class _ScannerViewState extends ConsumerState<ScannerView>
         await _controller.start();
       }
     } else {
-      HapticFeedback.heavyImpact();
+      await HapticFeedback.heavyImpact();
+      if (!mounted) return;
       // Invalid payload — show feedback and resume scanning.
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -86,6 +89,7 @@ class _ScannerViewState extends ConsumerState<ScannerView>
             ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
+            duration: AppDurations.snackBarError,
           ),
         );
       setState(() => _isProcessing = false);

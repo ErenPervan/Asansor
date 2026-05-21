@@ -16,6 +16,8 @@ import '../providers/fault_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/section_label.dart';
+import '../../../core/constants/app_durations.dart';
+import 'package:confetti/confetti.dart';
 // ── Local colour tokens (matches global theme) ──────────────────────────────
 
 class FaultDetailView extends ConsumerWidget {
@@ -85,10 +87,18 @@ class _FaultDetailScaffold extends ConsumerStatefulWidget {
 class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
   final _notesController = TextEditingController();
   bool _notesExpanded = false;
+  late final ConfettiController _confettiController;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+  }
 
   @override
   void dispose() {
     _notesController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -103,9 +113,11 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          // ── App bar with status gradient ─────────────────────────────
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              // ── App bar with status gradient ─────────────────────────────
           SliverAppBar(
             expandedHeight: 180,
             pinned: true,
@@ -401,14 +413,33 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                   ],
 
                   const SizedBox(height: 40),
-                ],
+                ]),
               ),
             ),
+          ],
+        ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            emissionFrequency: 0.05,
+            numberOfParticles: 20,
+            maxBlastForce: 20,
+            minBlastForce: 8,
+            colors: const [
+              Colors.green,
+              Colors.blue,
+              Colors.pink,
+              Colors.orange,
+              Colors.purple
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   Future<void> _handleResolve(
     BuildContext context,
@@ -419,26 +450,30 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     final ctrl = ref.read(faultUpdateControllerProvider.notifier);
     final ok = await ctrl.resolve(faultId, resolutionNotes: notes.isEmpty ? null : notes);
 
-    if (!context.mounted) return;
     if (ok) {
-      HapticFeedback.lightImpact();
+      _confettiController.play();
+      await HapticFeedback.lightImpact();
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Arıza başarıyla onarıldı olarak işaretlendi.'),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
+          duration: AppDurations.snackBarSuccess,
         ),
       );
       // Refresh the fault data so the page re-renders to resolved state.
       ref.invalidate(faultByIdProvider(faultId));
     } else {
-      HapticFeedback.heavyImpact();
+      await HapticFeedback.heavyImpact();
+      if (!context.mounted) return;
       final err = ref.read(faultUpdateControllerProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Hata: $err'),
           backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
+          duration: AppDurations.snackBarError,
         ),
       );
     }
@@ -452,24 +487,27 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     final ctrl = ref.read(faultUpdateControllerProvider.notifier);
     final ok = await ctrl.reopen(faultId);
 
-    if (!context.mounted) return;
     if (ok) {
-      HapticFeedback.lightImpact();
+      await HapticFeedback.lightImpact();
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Arıza yeniden açıldı.'),
           behavior: SnackBarBehavior.floating,
+          duration: AppDurations.snackBarSuccess,
         ),
       );
       ref.invalidate(faultByIdProvider(faultId));
     } else {
-      HapticFeedback.heavyImpact();
+      await HapticFeedback.heavyImpact();
+      if (!context.mounted) return;
       final err = ref.read(faultUpdateControllerProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Hata: $err'),
           backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
+          duration: AppDurations.snackBarError,
         ),
       );
     }

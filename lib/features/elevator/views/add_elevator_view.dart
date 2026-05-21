@@ -12,6 +12,7 @@ import '../providers/elevator_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/input_decorations.dart';
 import '../../../core/widgets/section_label.dart';
+import '../../../core/constants/app_durations.dart';
 // ── Status options ────────────────────────────────────────────────────────────
 
 const _statusOptions = [
@@ -75,6 +76,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
               content: Text('Hata: $e'),
               backgroundColor: AppColors.primary,
               behavior: SnackBarBehavior.floating,
+              duration: AppDurations.snackBarError,
             ),
           );
         },
@@ -89,6 +91,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
             const SnackBar(
               content: Text('Lütfen kayıt tamamlanana kadar bekleyin.'),
               backgroundColor: AppColors.error,
+              duration: AppDurations.snackBarInfo,
             ),
           );
         }

@@ -63,6 +63,12 @@ abstract final class AppColors {
   static const blue = Color(0xFF2563EB);
   static const blueSoft = Color(0xFFEFF6FF);
   static const blueAccent = Color(0xFF3B82F6);
+
+  // ── Quick Actions ───────────────────────────────────────────────────────────
+  static const teal = Color(0xFF0D9488);
+  static const tealSurface = Color(0xFFECFDF5);
+  static const violet = Color(0xFF7C3AED);
+  static const violetSurface = Color(0xFFF5F3FF);
 }
 
 class AppThemeColors {
@@ -96,6 +102,10 @@ class AppThemeColors {
     required this.blue,
     required this.blueSoft,
     required this.blueAccent,
+    required this.teal,
+    required this.tealSurface,
+    required this.violet,
+    required this.violetSurface,
   });
 
   final Color primary;
@@ -127,6 +137,10 @@ class AppThemeColors {
   final Color blue;
   final Color blueSoft;
   final Color blueAccent;
+  final Color teal;
+  final Color tealSurface;
+  final Color violet;
+  final Color violetSurface;
 
   static const light = AppThemeColors(
     primary: AppColors.primary,
@@ -158,6 +172,10 @@ class AppThemeColors {
     blue: AppColors.blue,
     blueSoft: AppColors.blueSoft,
     blueAccent: AppColors.blueAccent,
+    teal: AppColors.teal,
+    tealSurface: AppColors.tealSurface,
+    violet: AppColors.violet,
+    violetSurface: AppColors.violetSurface,
   );
 
   static const dark = AppThemeColors(
@@ -190,6 +208,10 @@ class AppThemeColors {
     blue: AppColors.blue,
     blueSoft: AppColors.blueSoft,
     blueAccent: AppColors.blueAccent,
+    teal: AppColors.teal,
+    tealSurface: AppColors.tealSurface,
+    violet: AppColors.violet,
+    violetSurface: AppColors.violetSurface,
   );
 
   static AppThemeColors of(BuildContext context) {

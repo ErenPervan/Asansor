@@ -1,13 +1,17 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 import 'core/constants/supabase_constants.dart';
 import 'core/providers/connectivity_providers.dart';
@@ -33,7 +37,7 @@ Future<void> main() async {
     ),
   );
 
-  await dotenv.load(fileName: '.env');
+  // Environment variables are provided via --dart-define or --dart-define-from-file.
 
   // Firebase must be initialised before any Firebase service is used.
   await Firebase.initializeApp(
@@ -51,9 +55,11 @@ Future<void> main() async {
   // Print startup FCM token for quick verification in debug console.
   try {
     final fcmToken = await FirebaseMessaging.instance.getToken();
-    debugPrint('====================================================');
-    debugPrint("EREN'IN FCM TOKEN'I: $fcmToken");
-    debugPrint('====================================================');
+    if (kDebugMode) {
+      debugPrint('====================================================');
+      debugPrint("EREN'IN FCM TOKEN'I: $fcmToken");
+      debugPrint('====================================================');
+    }
   } catch (e) {
     debugPrint('Token alinirken hata olustu: $e');
   }
@@ -67,11 +73,28 @@ Future<void> main() async {
   //   • sync queue  – write operations queued while offline
   //   • read caches – last-known-good snapshots for offline reads
   await Hive.initFlutter();
-  await Hive.openBox<String>(syncQueueBoxName);
-  await Hive.openBox<String>(elevatorsCacheBoxName);
-  await Hive.openBox<String>(tasksCacheBoxName);
-  await Hive.openBox<String>(checklistCacheBoxName);
-  await Hive.openBox<String>(pastLogsCacheBoxName);
+
+  const secureStorage = FlutterSecureStorage();
+  final encryptionKeyString = await secureStorage.read(key: 'hive_encryption_key');
+  late List<int> encryptionKeyUint8List;
+  if (encryptionKeyString == null) {
+    final key = Hive.generateSecureKey();
+    await secureStorage.write(
+      key: 'hive_encryption_key',
+      value: base64UrlEncode(key),
+    );
+    encryptionKeyUint8List = key;
+  } else {
+    encryptionKeyUint8List = base64Url.decode(encryptionKeyString);
+  }
+
+  final cipher = HiveAesCipher(encryptionKeyUint8List);
+
+  await Hive.openBox<String>(syncQueueBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(elevatorsCacheBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(tasksCacheBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(checklistCacheBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(pastLogsCacheBoxName, encryptionCipher: cipher);
 
   // Set up FCM permissions, notification channels, and message listeners.
   await NotificationService.instance.initialize();
@@ -123,6 +146,17 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
       theme: _buildTheme(Brightness.light),
       darkTheme: _buildTheme(Brightness.dark),
       themeMode: ThemeMode.system,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('tr'),
+        Locale('en'),
+        Locale('de'),
+      ],
       // `navigatorKey` is owned by `appRouter` (passed via GoRouter constructor).
       // MaterialApp.router does not accept a separate navigatorKey; the key
       // is accessed through `navigatorKey` exported from app_router.dart.

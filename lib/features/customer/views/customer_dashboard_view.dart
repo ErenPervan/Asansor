@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/error_state.dart';
+import '../../../core/widgets/loading_state.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/models/elevator_model.dart';
 import '../../maintenance/models/maintenance_log_model.dart';
@@ -18,12 +22,12 @@ class CustomerDashboardView extends ConsumerWidget {
     final logsAsync = ref.watch(customerMaintenanceLogsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Asansör Durumu', style: TextStyle(fontWeight: FontWeight.w700)),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.onSurface,
         elevation: 0,
         actions: [
           IconButton(
@@ -37,11 +41,9 @@ class CustomerDashboardView extends ConsumerWidget {
       body: elevatorAsync.when(
         data: (elevator) {
           if (elevator == null) {
-            return const Center(
-              child: Text(
-                'Size atanmış bir asansör bulunamadı.',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
+            return const EmptyState(
+              icon: Icons.elevator_outlined,
+              message: 'Size atanmış bir asansör bulunamadı.',
             );
           }
           return RefreshIndicator(
@@ -66,13 +68,22 @@ class CustomerDashboardView extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _MaintenanceLogList(logsAsync: logsAsync),
+                _MaintenanceLogList(
+                  logsAsync: logsAsync,
+                  onRetry: () {
+                    ref.invalidate(customerElevatorProvider);
+                    ref.invalidate(customerMaintenanceLogsProvider);
+                  },
+                ),
               ],
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Hata: $err')),
+        loading: () => const LoadingState(),
+        error: (err, _) => ErrorState(
+          message: 'Asansör bilgisi alınamadı.\n$err',
+          onRetry: () => ref.invalidate(customerElevatorProvider),
+        ),
       ),
     );
   }
@@ -88,24 +99,24 @@ class _ElevatorHealthCard extends StatelessWidget {
     final bool isFaulty = elevator.status == 'faulty';
     final bool isUnderMaintenance = elevator.status == 'under_maintenance';
     
-    Color bgColor = const Color(0xFFDCFCE7); // Green bg
-    Color iconColor = const Color(0xFF166534); // Green text
+    Color bgColor = AppColors.successContainer;
+    Color iconColor = AppColors.success;
     IconData iconData = Icons.check_circle_outline;
     String statusText = 'Aktif ve Sorunsuz';
 
     if (isFaulty) {
-      bgColor = const Color(0xFFFEE2E2);
-      iconColor = const Color(0xFFDC2626);
+      bgColor = AppColors.errorContainer;
+      iconColor = AppColors.error;
       iconData = Icons.warning_amber_rounded;
       statusText = 'Arızalı';
     } else if (isUnderMaintenance) {
-      bgColor = const Color(0xFFFEF3C7);
-      iconColor = const Color(0xFFD97706);
+      bgColor = AppColors.warningContainer;
+      iconColor = AppColors.warningLight;
       iconData = Icons.handyman_outlined;
       statusText = 'Bakımda';
     } else if (elevator.status == 'inactive') {
-      bgColor = const Color(0xFFF3F4F6);
-      iconColor = const Color(0xFF4B5563);
+      bgColor = AppColors.surfaceContainerHigh;
+      iconColor = AppColors.onSurfaceVariant;
       iconData = Icons.not_interested_rounded;
       statusText = 'Devre Dışı';
     }
@@ -167,8 +178,8 @@ class _ReportFaultButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton.icon(
       style: FilledButton.styleFrom(
-        backgroundColor: const Color(0xFFDC2626), // Red
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.error,
+        foregroundColor: AppColors.onError,
         padding: const EdgeInsets.symmetric(vertical: 20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -196,27 +207,22 @@ class _ReportFaultButton extends StatelessWidget {
 }
 
 class _MaintenanceLogList extends StatelessWidget {
-  const _MaintenanceLogList({required this.logsAsync});
+  const _MaintenanceLogList({
+    required this.logsAsync,
+    required this.onRetry,
+  });
 
   final AsyncValue<List<MaintenanceLogModel>> logsAsync;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
     return logsAsync.when(
       data: (logs) {
         if (logs.isEmpty) {
-          return Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            alignment: Alignment.center,
-            child: const Text(
-              'Henüz bakım kaydı bulunmuyor.',
-              style: TextStyle(color: Colors.black54),
-            ),
+          return const EmptyState(
+            icon: Icons.history_rounded,
+            message: 'Henüz bakım kaydı bulunmuyor.',
           );
         }
 
@@ -257,15 +263,22 @@ class _MaintenanceLogList extends StatelessWidget {
                   dateStr,
                   style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
-                subtitle: const Text(
-                  'Periyodik Bakım',
-                  style: TextStyle(color: Colors.black54),
+                subtitle: Text(
+                  log.notes != null && log.notes!.isNotEmpty ? log.notes! : 'Periyodik Bakım',
+                  style: const TextStyle(color: Colors.black54),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 trailing: hasPdf
                     ? IconButton(
-                        icon: const Icon(Icons.picture_as_pdf, color: Color(0xFFDC2626)),
+                        icon: const Icon(Icons.picture_as_pdf, color: AppColors.error),
                         tooltip: 'Raporu İndir',
                         onPressed: () async {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Rapor açılıyor...')),
+                            );
+                          }
                           final uri = Uri.parse(log.pdfUrl!);
                           if (await canLaunchUrl(uri)) {
                             await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -284,13 +297,11 @@ class _MaintenanceLogList extends StatelessWidget {
           },
         );
       },
-      loading: () => const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24.0),
-          child: CircularProgressIndicator(),
-        ),
+      loading: () => const LoadingState(),
+      error: (err, _) => ErrorState(
+        message: 'Bakım geçmişi alınamadı.\n$err',
+        onRetry: onRetry,
       ),
-      error: (err, _) => Center(child: Text('Hata: $err')),
     );
   }
 }

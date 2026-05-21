@@ -9,6 +9,10 @@ class MaintenanceLogModel {
     required this.maintenanceDate,
     this.pdfUrl,
     this.technicianName,
+    this.checklist,
+    this.photos,
+    this.signatureUrl,
+    this.customerSignatureUrl,
     this.isOfflineQueued = false,
   });
 
@@ -36,6 +40,18 @@ class MaintenanceLogModel {
   /// profile row does not yet exist for the technician UUID.
   final String? technicianName;
 
+  /// The checklist state saved as a JSON object.
+  final Map<String, dynamic>? checklist;
+
+  /// Photo URLs (or local paths while queued offline).
+  final List<String>? photos;
+
+  /// Technician's signature URL (or local path while queued offline).
+  final String? signatureUrl;
+
+  /// Customer's signature URL (or local path while queued offline).
+  final String? customerSignatureUrl;
+
   /// `true` when this record was created offline and is waiting in the
   /// local sync queue. It has no corresponding row in Supabase yet.
   final bool isOfflineQueued;
@@ -60,6 +76,10 @@ class MaintenanceLogModel {
           : DateTime.fromMillisecondsSinceEpoch(0),
       pdfUrl: json['pdf_url'] as String?,
       technicianName: profilesData?['full_name'] as String?,
+      checklist: json['checklist'] as Map<String, dynamic>?,
+      photos: (json['photos'] as List?)?.whereType<String>().toList(),
+      signatureUrl: json['signature_url'] as String?,
+      customerSignatureUrl: json['customer_signature_url'] as String?,
     );
   }
 
@@ -72,6 +92,11 @@ class MaintenanceLogModel {
       'is_approved': isApproved,
       'maintenance_date': maintenanceDate.toIso8601String(),
       'pdf_url': pdfUrl,
+      'checklist': checklist,
+      if (photos != null) 'photos': photos,
+      if (signatureUrl != null) 'signature_url': signatureUrl,
+      if (customerSignatureUrl != null)
+        'customer_signature_url': customerSignatureUrl,
       // technicianName is a read-only joined field; never written back to DB.
     };
   }
@@ -85,6 +110,10 @@ class MaintenanceLogModel {
     DateTime? maintenanceDate,
     String? pdfUrl,
     String? technicianName,
+    Map<String, dynamic>? checklist,
+    List<String>? photos,
+    String? signatureUrl,
+    String? customerSignatureUrl,
     bool? isOfflineQueued,
   }) {
     return MaintenanceLogModel(
@@ -96,6 +125,10 @@ class MaintenanceLogModel {
       maintenanceDate: maintenanceDate ?? this.maintenanceDate,
       pdfUrl: pdfUrl ?? this.pdfUrl,
       technicianName: technicianName ?? this.technicianName,
+      checklist: checklist ?? this.checklist,
+      photos: photos ?? this.photos,
+      signatureUrl: signatureUrl ?? this.signatureUrl,
+      customerSignatureUrl: customerSignatureUrl ?? this.customerSignatureUrl,
       isOfflineQueued: isOfflineQueued ?? this.isOfflineQueued,
     );
   }
@@ -104,5 +137,5 @@ class MaintenanceLogModel {
   String toString() =>
       'MaintenanceLogModel(id: $id, elevatorId: $elevatorId, '
       'technicianId: $technicianId, technicianName: $technicianName, '
-      'isApproved: $isApproved)';
+      'isApproved: $isApproved, checklist: $checklist, photos: $photos)';
 }

@@ -3,27 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/admin_analytics_provider.dart';
 
-// ── Design tokens (deep-blue B2B SaaS palette) ────────────────────────────────
-
-const _navy = Color(0xFF0F2040);
-const _navyMid = Color(0xFF1B3A6B);
-const _blue = Color(0xFF2563EB);
-const _blueSoft = Color(0xFFEFF6FF);
-const _blueAccent = Color(0xFF3B82F6);
-
-const _success = Color(0xFF059669);
-const _successBg = Color(0xFFECFDF5);
-const _warning = Color(0xFFD97706);
-const _warningBg = Color(0xFFFFFBEB);
-const _danger = Color(0xFFDC2626);
-const _dangerBg = Color(0xFFFFF1F2);
-
-const _surface = Colors.white;
-const _background = Color(0xFFF0F4F8);
-const _outline = Color(0xFFE2E8F0);
-const _textPrimary = Color(0xFF0F172A);
-const _textSecondary = Color(0xFF64748B);
-const _textMuted = Color(0xFF94A3B8);
+import 'package:go_router/go_router.dart';
+import '../../../core/widgets/error_state.dart';
+import '../../../core/theme/app_colors.dart';
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
@@ -49,8 +31,6 @@ class _KpiData {
   final bool trendUp;
 }
 
-
-
 // ── Main view ─────────────────────────────────────────────────────────────────
 
 class AdminStatisticsDashboard extends ConsumerStatefulWidget {
@@ -69,17 +49,17 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
     final analyticsAsync = ref.watch(adminAnalyticsProvider);
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       appBar: _buildAppBar(context),
       body: RefreshIndicator(
-        color: _blue,
+        color: AppColors.blue,
         onRefresh: () async {
           ref.invalidate(adminAnalyticsProvider);
           await ref.read(adminAnalyticsProvider.future);
         },
         child: analyticsAsync.when(
           data: (data) => _buildContent(data),
-          loading: () => const Center(child: CircularProgressIndicator(color: _blue)),
+          loading: () => const Center(child: CircularProgressIndicator(color: AppColors.blue)),
           error: (err, stack) => _buildError(err),
         ),
       ),
@@ -93,8 +73,8 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
         label: 'Aktif Arızalar',
         subtitle: 'Çözüm bekliyor',
         icon: Icons.warning_amber_rounded,
-        color: _danger,
-        bg: _dangerBg,
+        color: AppColors.error,
+        bg: AppColors.errorContainer,
         trend: 'Güncel',
         trendUp: false,
       ),
@@ -103,8 +83,8 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
         label: 'Bu Ay Çözülen',
         subtitle: 'Tamamlanan görevler',
         icon: Icons.check_circle_outline_rounded,
-        color: _success,
-        bg: _successBg,
+        color: AppColors.success,
+        bg: AppColors.successContainer,
         trend: 'Bu ay',
         trendUp: true,
       ),
@@ -113,8 +93,8 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
         label: 'Toplam Asansör',
         subtitle: 'Sistemde kayıtlı',
         icon: Icons.elevator_rounded,
-        color: _blue,
-        bg: _blueSoft,
+        color: AppColors.blue,
+        bg: AppColors.blueSoft,
         trend: 'Sistem geneli',
         trendUp: true,
       ),
@@ -123,8 +103,8 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
         label: 'Bekleyen Bakım',
         subtitle: 'Bu ay planlanmış',
         icon: Icons.pending_actions_rounded,
-        color: _warning,
-        bg: _warningBg,
+        color: AppColors.warning,
+        bg: AppColors.warningContainer,
         trend: 'Planlanmış',
         trendUp: false,
       ),
@@ -146,7 +126,7 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
           const _SectionHeader(
             title: 'Aylık Arıza Trendi',
             subtitle: 'Son 6 aylık arıza kayıtları',
-            trailing: _LegendDot(color: _blueAccent, label: 'Arıza'),
+            trailing: _LegendDot(color: AppColors.blueAccent, label: 'Arıza'),
           ),
           const SizedBox(height: 16),
           _BarChartCard(monthlyFaults: data.monthlyFaults),
@@ -174,25 +154,11 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
   }
 
   Widget _buildError(Object err) {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline_rounded, size: 48, color: _danger),
-              const SizedBox(height: 16),
-              Text(
-                'Veriler yüklenemedi:\n$err',
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: _textPrimary),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return ErrorState(
+      message: 'Veriler yüklenemedi:\n$err',
+      onRetry: () {
+        ref.invalidate(adminAnalyticsProvider);
+      },
     );
   }
 
@@ -204,7 +170,7 @@ class _AdminStatisticsDashboardState extends ConsumerState<AdminStatisticsDashbo
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [_navy, _navyMid],
+            colors: [AppColors.navy, AppColors.navyMid],
           ),
         ),
         child: SafeArea(
@@ -311,7 +277,7 @@ class _SectionHeader extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
-                  color: _textPrimary,
+                  color: AppColors.onSurface,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -320,7 +286,7 @@ class _SectionHeader extends StatelessWidget {
                 subtitle,
                 style: const TextStyle(
                   fontSize: 12,
-                  color: _textMuted,
+                  color: AppColors.outline,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -352,7 +318,7 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 5),
         Text(label,
             style: const TextStyle(
-                fontSize: 11, color: _textSecondary, fontWeight: FontWeight.w600)),
+                fontSize: 11, color: AppColors.onSurfaceVariant, fontWeight: FontWeight.w600)),
       ],
     );
   }
@@ -391,9 +357,9 @@ class _KpiCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
       decoration: BoxDecoration(
-        color: _surface,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _outline),
+        border: Border.all(color: AppColors.outline),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -422,8 +388,8 @@ class _KpiCard extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: data.trendUp
-                      ? _successBg
-                      : _dangerBg.withValues(alpha: 0.6),
+                      ? AppColors.successContainer
+                      : AppColors.errorContainer.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -434,7 +400,7 @@ class _KpiCard extends StatelessWidget {
                           ? Icons.trending_up_rounded
                           : Icons.trending_down_rounded,
                       size: 11,
-                      color: data.trendUp ? _success : _danger,
+                      color: data.trendUp ? AppColors.success : AppColors.error,
                     ),
                   ],
                 ),
@@ -458,7 +424,7 @@ class _KpiCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: _textPrimary,
+              color: AppColors.onSurface,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -468,7 +434,7 @@ class _KpiCard extends StatelessWidget {
             data.trend,
             style: TextStyle(
               fontSize: 10,
-              color: data.trendUp ? _success : _textMuted,
+              color: data.trendUp ? AppColors.success : AppColors.outline,
               fontWeight: FontWeight.w500,
             ),
             maxLines: 1,
@@ -493,9 +459,9 @@ class _BarChartCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
       decoration: BoxDecoration(
-        color: _surface,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _outline),
+        border: Border.all(color: AppColors.outline),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -512,7 +478,7 @@ class _BarChartCard extends StatelessWidget {
             barTouchData: BarTouchData(
               enabled: true,
               touchTooltipData: BarTouchTooltipData(
-                getTooltipColor: (_) => _navy,
+                getTooltipColor: (_) => AppColors.navy,
                 tooltipBorderRadius: const BorderRadius.all(Radius.circular(10)),
                 tooltipPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -555,7 +521,7 @@ class _BarChartCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: _textSecondary,
+                          color: AppColors.onSurfaceVariant,
                         ),
                       ),
                     );
@@ -573,7 +539,7 @@ class _BarChartCard extends StatelessWidget {
                       value.toInt().toString(),
                       style: const TextStyle(
                         fontSize: 10,
-                        color: _textMuted,
+                        color: AppColors.outline,
                         fontWeight: FontWeight.w500,
                       ),
                     );
@@ -590,7 +556,7 @@ class _BarChartCard extends StatelessWidget {
               drawVerticalLine: false,
               horizontalInterval: 5,
               getDrawingHorizontalLine: (value) => FlLine(
-                color: _outline,
+                color: AppColors.outline,
                 strokeWidth: 1,
                 dashArray: [4, 4],
               ),
@@ -612,10 +578,10 @@ class _BarChartCard extends StatelessWidget {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: isLast
-                          ? [_blueAccent, _blue]
+                          ? [AppColors.blueAccent, AppColors.blue]
                           : [
-                              _blueAccent.withValues(alpha: 0.35),
-                              _blueAccent.withValues(alpha: 0.65),
+                              AppColors.blueAccent.withValues(alpha: 0.35),
+                              AppColors.blueAccent.withValues(alpha: 0.65),
                             ],
                     ),
                   ),
@@ -648,9 +614,9 @@ class _PieChartCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: _surface,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _outline),
+        border: Border.all(color: AppColors.outline),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -710,52 +676,62 @@ class _PieChartCard extends StatelessWidget {
                 final i = entry.key;
                 final slice = entry.value;
                 final isTouched = i == touchedIndex;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: isTouched
-                      ? const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 8)
-                      : EdgeInsets.zero,
-                  decoration: BoxDecoration(
-                    color: isTouched
-                        ? slice.color.withValues(alpha: 0.08)
-                        : Colors.transparent,
+                return Semantics(
+                  button: true,
+                  label: '${slice.label}, ${slice.percent.toInt()}%',
+                  child: InkWell(
                     borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: slice.color,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
+                    onTap: () => onTouch(i),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: isTouched
+                          ? const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8)
+                          : const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
+                      constraints: const BoxConstraints(minHeight: 48),
+                      decoration: BoxDecoration(
+                        color: isTouched
+                            ? slice.color.withValues(alpha: 0.08)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          slice.label,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: isTouched
-                                ? FontWeight.w700
-                                : FontWeight.w500,
-                            color:
-                                isTouched ? _textPrimary : _textSecondary,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: slice.color,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              slice.label,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight:
+                                    isTouched ? FontWeight.w700 : FontWeight.w500,
+                                color: isTouched
+                                    ? AppColors.onSurface
+                                    : AppColors.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '${slice.percent.toInt()}%',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: isTouched ? slice.color : AppColors.onSurface,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '${slice.percent.toInt()}%',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: isTouched ? slice.color : _textPrimary,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 );
               }).toList(),
@@ -789,15 +765,15 @@ final _quickActions = [
   const _QuickAction(
     label: 'Rapor İndir',
     icon: Icons.download_rounded,
-    color: _blue,
-    bg: _blueSoft,
+    color: AppColors.blue,
+    bg: AppColors.blueSoft,
     route: '',
   ),
   const _QuickAction(
     label: 'Arızalar',
     icon: Icons.build_circle_outlined,
-    color: _danger,
-    bg: _dangerBg,
+    color: AppColors.error,
+    bg: AppColors.errorContainer,
     route: '/',
   ),
   const _QuickAction(
@@ -836,14 +812,14 @@ class _QuickActionsGrid extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             if (action.route.isNotEmpty) {
-              Navigator.of(context).pushNamed(action.route);
+              context.push(action.route);
             }
           },
           child: Container(
             decoration: BoxDecoration(
-              color: _surface,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: _outline),
+              border: Border.all(color: AppColors.outline),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.03),
@@ -870,7 +846,7 @@ class _QuickActionsGrid extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: _textPrimary,
+                    color: AppColors.onSurface,
                   ),
                   textAlign: TextAlign.center,
                 ),

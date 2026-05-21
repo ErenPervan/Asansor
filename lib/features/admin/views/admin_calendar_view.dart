@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../elevator/models/elevator_model.dart';
+
 import '../../elevator/providers/elevator_providers.dart';
+
 import '../models/profile_model.dart';
+
 import '../models/schedule_model.dart';
+
 import '../providers/admin_providers.dart';
+
 import '../providers/profile_providers.dart';
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _primaryContainer = Color(0xFF991B1B);
-const _error = Color(0xFFDC2626);
-const _surfaceContainerLowest = Colors.white;
-const _surfaceContainer = Color(0xFFF1F5F9);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _background = Color(0xFFF9FAFB);
-const _warning = Color(0xFFEA580C);
-
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/section_label.dart';
 // ── Priority helpers ──────────────────────────────────────────────────────────
 
 Color _priorityColor(String p) {
@@ -30,11 +25,11 @@ Color _priorityColor(String p) {
     case 'low':
       return const Color(0xFF78909C);
     case 'high':
-      return _warning;
+      return AppColors.warning;
     case 'emergency':
-      return _error;
+      return AppColors.error;
     default:
-      return _primary;
+      return AppColors.primary;
   }
 }
 
@@ -67,13 +62,13 @@ String _statusLabel(String s) {
 Color _statusColor(String s) {
   switch (s) {
     case 'in_progress':
-      return _primary;
+      return AppColors.primary;
     case 'completed':
       return const Color(0xFF2E7D32);
     case 'cancelled':
-      return _outline;
+      return AppColors.outline;
     default:
-      return _warning;
+      return AppColors.warning;
   }
 }
 
@@ -169,9 +164,9 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
     });
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: _primary,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         title: const Text(
           'Bakım Takvimi',
@@ -201,7 +196,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
         children: [
           // ── Calendar ─────────────────────────────────────────────────────
           Container(
-            color: _surfaceContainerLowest,
+            color: AppColors.surfaceContainerLowest,
             child: TableCalendar<ScheduleModel>(
               firstDay: DateTime.utc(2020, 1, 1),
               lastDay: DateTime.utc(2030, 12, 31),
@@ -216,15 +211,15 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
               calendarStyle: CalendarStyle(
                 outsideDaysVisible: false,
                 todayDecoration: BoxDecoration(
-                  color: _primaryContainer.withValues(alpha: 0.3),
+                  color: AppColors.primaryDark.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
                 selectedDecoration: const BoxDecoration(
-                  color: _primary,
+                  color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
                 todayTextStyle: const TextStyle(
-                  color: _primary,
+                  color: AppColors.primary,
                   fontWeight: FontWeight.w700,
                 ),
                 selectedTextStyle: const TextStyle(
@@ -233,7 +228,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                 ),
                 markersMaxCount: 4,
                 markerDecoration: const BoxDecoration(
-                  color: _warning,
+                  color: AppColors.warning,
                   shape: BoxShape.circle,
                 ),
                 markerSize: 5,
@@ -244,33 +239,33 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                 titleTextStyle: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: _onSurface,
+                  color: AppColors.onSurface,
                 ),
                 leftChevronIcon: Icon(
                   Icons.chevron_left,
-                  color: _primary,
+                  color: AppColors.primary,
                 ),
                 rightChevronIcon: Icon(
                   Icons.chevron_right,
-                  color: _primary,
+                  color: AppColors.primary,
                 ),
               ),
               daysOfWeekStyle: const DaysOfWeekStyle(
                 weekdayStyle: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: _outline,
+                  color: AppColors.outline,
                 ),
                 weekendStyle: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: _error,
+                  color: AppColors.error,
                 ),
               ),
             ),
           ),
 
-          const Divider(height: 1, color: _outlineVariant),
+          const Divider(height: 1, color: AppColors.outlineVariant),
 
           // ── Selected day header ───────────────────────────────────────────
           Padding(
@@ -282,7 +277,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: _onSurface,
+                    color: AppColors.onSurface,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -291,8 +286,8 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: selectedEvents.isEmpty
-                        ? _surfaceContainer
-                        : _primaryContainer,
+                        ? AppColors.surfaceContainer
+                        : AppColors.primaryDark,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -300,7 +295,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: selectedEvents.isEmpty ? _outline : Colors.white,
+                      color: selectedEvents.isEmpty ? AppColors.outline : Colors.white,
                     ),
                   ),
                 ),
@@ -318,18 +313,18 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                         Icon(
                           Icons.event_available_outlined,
                           size: 48,
-                          color: _outline.withValues(alpha: 0.5),
+                          color: AppColors.outline.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 12),
                         const Text(
                           'Bu gün için görev yok.',
-                          style: TextStyle(color: _outline, fontSize: 14),
+                          style: TextStyle(color: AppColors.outline, fontSize: 14),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Yeni görev atamak için + butonuna bas.',
                           style: TextStyle(
-                            color: _outline.withValues(alpha: 0.6),
+                            color: AppColors.outline.withValues(alpha: 0.6),
                             fontSize: 12,
                           ),
                         ),
@@ -360,7 +355,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openAssignSheet,
-        backgroundColor: _primary,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
         label: const Text(
@@ -383,7 +378,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
             child: const Text('Vazgeç'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: _error),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () {
               Navigator.pop(ctx);
               ref
@@ -422,9 +417,9 @@ class _CalendarTaskCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
         decoration: BoxDecoration(
-          color: _surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: _outlineVariant.withValues(alpha: 0.5)),
+          border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -481,7 +476,7 @@ class _CalendarTaskCard extends StatelessWidget {
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
-                          color: _onSurface,
+                          color: AppColors.onSurface,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -495,7 +490,7 @@ class _CalendarTaskCard extends StatelessWidget {
                               const Icon(
                                 Icons.location_on_outlined,
                                 size: 13,
-                                color: _outline,
+                                color: AppColors.outline,
                               ),
                               const SizedBox(width: 3),
                               Expanded(
@@ -503,7 +498,7 @@ class _CalendarTaskCard extends StatelessWidget {
                                   elevator!.address!,
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: _outline,
+                                    color: AppColors.outline,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -519,7 +514,7 @@ class _CalendarTaskCard extends StatelessWidget {
                           const Icon(
                             Icons.engineering_outlined,
                             size: 13,
-                            color: _onSurfaceVariant,
+                            color: AppColors.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -527,7 +522,7 @@ class _CalendarTaskCard extends StatelessWidget {
                                 'Teknisyen ${schedule.technicianId.substring(0, 6)}',
                             style: const TextStyle(
                               fontSize: 12,
-                              color: _onSurfaceVariant,
+                              color: AppColors.onSurfaceVariant,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -537,7 +532,7 @@ class _CalendarTaskCard extends StatelessWidget {
                             const Icon(
                               Icons.notes_outlined,
                               size: 13,
-                              color: _outline,
+                              color: AppColors.outline,
                             ),
                             const SizedBox(width: 3),
                             Expanded(
@@ -545,7 +540,7 @@ class _CalendarTaskCard extends StatelessWidget {
                                 schedule.notes!,
                                 style: const TextStyle(
                                   fontSize: 12,
-                                  color: _outline,
+                                  color: AppColors.outline,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -561,7 +556,7 @@ class _CalendarTaskCard extends StatelessWidget {
                           child: TextButton.icon(
                             onPressed: onCancel,
                             style: TextButton.styleFrom(
-                              foregroundColor: _error,
+                              foregroundColor: AppColors.error,
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 8),
                               minimumSize: Size.zero,
@@ -695,7 +690,7 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
-          colorScheme: const ColorScheme.light(primary: _primary),
+          colorScheme: const ColorScheme.light(primary: AppColors.primary),
         ),
         child: child!,
       ),
@@ -709,7 +704,7 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
       initialTime: _time,
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
-          colorScheme: const ColorScheme.light(primary: _primary),
+          colorScheme: const ColorScheme.light(primary: AppColors.primary),
         ),
         child: child!,
       ),
@@ -745,7 +740,7 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Lütfen asansör ve teknisyen seçin.'),
-          backgroundColor: _error,
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -767,7 +762,7 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
           content: Text(
             ctrl.error.toString().replaceFirst('Exception: ', ''),
           ),
-          backgroundColor: _error,
+          backgroundColor: AppColors.error,
         ),
       );
     } else {
@@ -794,7 +789,7 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
       expand: false,
       builder: (_, scrollCtrl) => Container(
         decoration: const BoxDecoration(
-          color: _surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -805,7 +800,7 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: _outlineVariant,
+                color: AppColors.outlineVariant,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -818,19 +813,19 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: _onSurface,
+                      color: AppColors.onSurface,
                     ),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.close),
-                    color: _outline,
+                    color: AppColors.outline,
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: _outlineVariant),
+            const Divider(height: 1, color: AppColors.outlineVariant),
             Expanded(
               child: SingleChildScrollView(
                 controller: scrollCtrl,
@@ -841,7 +836,18 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // ── Elevator picker ─────────────────────────────────
-                      _SectionLabel(icon: Icons.elevator_outlined, text: 'Asansör'),
+                      const SectionLabel(
+                        icon: Icons.elevator_outlined,
+                        label: 'Asansör',
+                        color: AppColors.primary,
+                        iconSize: 15,
+                        gap: 6,
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       _PickerField(
                         hint: 'Asansör seçin...',
@@ -857,9 +863,18 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Technician picker ────────────────────────────────
-                      _SectionLabel(
-                          icon: Icons.engineering_outlined,
-                          text: 'Teknisyen'),
+                      const SectionLabel(
+                        icon: Icons.engineering_outlined,
+                        label: 'Teknisyen',
+                        color: AppColors.primary,
+                        iconSize: 15,
+                        gap: 6,
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       _PickerField(
                         hint: 'Teknisyen seçin...',
@@ -875,9 +890,18 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Date & Time pickers ──────────────────────────────
-                      _SectionLabel(
-                          icon: Icons.calendar_today_outlined,
-                          text: 'Tarih ve Saat'),
+                      const SectionLabel(
+                        icon: Icons.calendar_today_outlined,
+                        label: 'Tarih ve Saat',
+                        color: AppColors.primary,
+                        iconSize: 15,
+                        gap: 6,
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
@@ -904,8 +928,18 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Priority selector ────────────────────────────────
-                      _SectionLabel(
-                          icon: Icons.flag_outlined, text: 'Öncelik'),
+                      const SectionLabel(
+                        icon: Icons.flag_outlined,
+                        label: 'Öncelik',
+                        color: AppColors.primary,
+                        iconSize: 15,
+                        gap: 6,
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       _PrioritySelector(
                         selected: _priority,
@@ -915,9 +949,18 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Notes ────────────────────────────────────────────
-                      _SectionLabel(
-                          icon: Icons.notes_outlined,
-                          text: 'Notlar (İsteğe Bağlı)'),
+                      const SectionLabel(
+                        icon: Icons.notes_outlined,
+                        label: 'Notlar (İsteğe Bağlı)',
+                        color: AppColors.primary,
+                        iconSize: 15,
+                        gap: 6,
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _notesCtrl,
@@ -926,11 +969,11 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
                           hintText:
                               'Görev hakkında ek bilgi veya talimatlar...',
                           hintStyle: const TextStyle(
-                            color: _outline,
+                            color: AppColors.outline,
                             fontSize: 14,
                           ),
                           filled: true,
-                          fillColor: _surfaceContainer,
+                          fillColor: AppColors.surfaceContainer,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -938,12 +981,12 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                                color: _outlineVariant, width: 1),
+                                color: AppColors.outlineVariant, width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                const BorderSide(color: _primary, width: 1.5),
+                                const BorderSide(color: AppColors.primary, width: 1.5),
                           ),
                         ),
                       ),
@@ -957,7 +1000,7 @@ class _AssignTaskSheetState extends ConsumerState<_AssignTaskSheet> {
                         child: FilledButton.icon(
                           onPressed: isSubmitting ? null : _submit,
                           style: FilledButton.styleFrom(
-                            backgroundColor: _primary,
+                            backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
@@ -1030,10 +1073,10 @@ class _PrioritySelector extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? color.withValues(alpha: 0.12)
-                      : _surfaceContainer,
+                      : AppColors.surfaceContainer,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isSelected ? color : _outlineVariant,
+                    color: isSelected ? color : AppColors.outlineVariant,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -1043,7 +1086,7 @@ class _PrioritySelector extends StatelessWidget {
                     Icon(
                       icon,
                       size: 18,
-                      color: isSelected ? color : _outline,
+                      color: isSelected ? color : AppColors.outline,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -1053,7 +1096,7 @@ class _PrioritySelector extends StatelessWidget {
                         fontWeight: isSelected
                             ? FontWeight.w700
                             : FontWeight.w500,
-                        color: isSelected ? color : _outline,
+                        color: isSelected ? color : AppColors.outline,
                       ),
                     ),
                   ],
@@ -1094,10 +1137,10 @@ class _PickerField extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: _surfaceContainer,
+          color: AppColors.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: hasValue ? _primary.withValues(alpha: 0.5) : _outlineVariant,
+            color: hasValue ? AppColors.primary.withValues(alpha: 0.5) : AppColors.outlineVariant,
             width: hasValue ? 1.5 : 1,
           ),
         ),
@@ -1106,7 +1149,7 @@ class _PickerField extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: hasValue ? _primary : _outline,
+              color: hasValue ? AppColors.primary : AppColors.outline,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -1121,7 +1164,7 @@ class _PickerField extends StatelessWidget {
                         fontSize: 14,
                         fontWeight:
                             hasValue ? FontWeight.w600 : FontWeight.w400,
-                        color: hasValue ? _onSurface : _outline,
+                        color: hasValue ? AppColors.onSurface : AppColors.outline,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -1129,38 +1172,11 @@ class _PickerField extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_drop_down_rounded,
-              color: hasValue ? _primary : _outline,
+              color: hasValue ? AppColors.primary : AppColors.outline,
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-// ── _SectionLabel ─────────────────────────────────────────────────────────────
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({required this.icon, required this.text});
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 15, color: _primary),
-        const SizedBox(width: 6),
-        Text(
-          text,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: _primary,
-            letterSpacing: 0.2,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -1202,7 +1218,7 @@ class _ElevatorPickerDialogState extends State<_ElevatorPickerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: _surfaceContainerLowest,
+      backgroundColor: AppColors.surfaceContainerLowest,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: const Text(
         'Asansör Seç',
@@ -1221,9 +1237,9 @@ class _ElevatorPickerDialogState extends State<_ElevatorPickerDialog> {
                 autofocus: true,
                 decoration: InputDecoration(
                   hintText: 'Bina adı veya adres ara...',
-                  prefixIcon: const Icon(Icons.search, color: _outline),
+                  prefixIcon: const Icon(Icons.search, color: AppColors.outline),
                   filled: true,
-                  fillColor: _surfaceContainer,
+                  fillColor: AppColors.surfaceContainer,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -1247,21 +1263,21 @@ class _ElevatorPickerDialogState extends State<_ElevatorPickerDialog> {
                       height: 36,
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? _primary.withValues(alpha: 0.1)
-                            : _surfaceContainer,
+                            ? AppColors.primary.withValues(alpha: 0.1)
+                            : AppColors.surfaceContainer,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         Icons.elevator_outlined,
                         size: 18,
-                        color: isSelected ? _primary : _outline,
+                        color: isSelected ? AppColors.primary : AppColors.outline,
                       ),
                     ),
                     title: Text(
                       e.buildingName,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? _primary : _onSurface,
+                        color: isSelected ? AppColors.primary : AppColors.onSurface,
                       ),
                     ),
                     subtitle: e.address != null
@@ -1270,11 +1286,11 @@ class _ElevatorPickerDialogState extends State<_ElevatorPickerDialog> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style:
-                                const TextStyle(fontSize: 12, color: _outline),
+                                const TextStyle(fontSize: 12, color: AppColors.outline),
                           )
                         : null,
                     trailing: isSelected
-                        ? const Icon(Icons.check_circle, color: _primary)
+                        ? const Icon(Icons.check_circle, color: AppColors.primary)
                         : null,
                     onTap: () => Navigator.pop(context, e),
                   );
@@ -1332,7 +1348,7 @@ class _TechnicianPickerDialogState extends State<_TechnicianPickerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: _surfaceContainerLowest,
+      backgroundColor: AppColors.surfaceContainerLowest,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: const Text(
         'Teknisyen Seç',
@@ -1351,9 +1367,9 @@ class _TechnicianPickerDialogState extends State<_TechnicianPickerDialog> {
                 autofocus: true,
                 decoration: InputDecoration(
                   hintText: 'Ad veya e-posta ara...',
-                  prefixIcon: const Icon(Icons.search, color: _outline),
+                  prefixIcon: const Icon(Icons.search, color: AppColors.outline),
                   filled: true,
-                  fillColor: _surfaceContainer,
+                  fillColor: AppColors.surfaceContainer,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -1369,7 +1385,7 @@ class _TechnicianPickerDialogState extends State<_TechnicianPickerDialog> {
                 padding: EdgeInsets.all(24),
                 child: Text(
                   'Henüz kayıtlı teknisyen yok.',
-                  style: TextStyle(color: _outline),
+                  style: TextStyle(color: AppColors.outline),
                 ),
               )
             else
@@ -1383,15 +1399,15 @@ class _TechnicianPickerDialogState extends State<_TechnicianPickerDialog> {
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundColor: isSelected
-                            ? _primary
-                            : _surfaceContainer,
+                            ? AppColors.primary
+                            : AppColors.surfaceContainer,
                         radius: 18,
                         child: Text(
                           p.initials,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: isSelected ? Colors.white : _onSurface,
+                            color: isSelected ? Colors.white : AppColors.onSurface,
                           ),
                         ),
                       ),
@@ -1399,18 +1415,18 @@ class _TechnicianPickerDialogState extends State<_TechnicianPickerDialog> {
                         p.displayName,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: isSelected ? _primary : _onSurface,
+                          color: isSelected ? AppColors.primary : AppColors.onSurface,
                         ),
                       ),
                       subtitle: p.phone != null
                           ? Text(
                               p.phone!,
                               style:
-                                  const TextStyle(fontSize: 12, color: _outline),
+                                  const TextStyle(fontSize: 12, color: AppColors.outline),
                             )
                           : null,
                       trailing: isSelected
-                          ? const Icon(Icons.check_circle, color: _primary)
+                          ? const Icon(Icons.check_circle, color: AppColors.primary)
                           : null,
                       onTap: () => Navigator.pop(context, p),
                     );

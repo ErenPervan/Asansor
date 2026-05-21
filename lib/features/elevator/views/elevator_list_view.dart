@@ -2,26 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/offline_banner.dart';
 import '../models/elevator_model.dart';
 import '../providers/elevator_providers.dart';
-
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _error = Color(0xFFDC2626);
-const _errorContainer = Color(0xFFFEE2E2);
-const _success = Color(0xFF166534);
-const _successContainer = Color(0xFFDCFCE7);
-const _warning = Color(0xFF92400E);
-const _warningContainer = Color(0xFFFEF3C7);
-const _surfaceContainerLowest = Colors.white;
-const _surfaceContainer = Color(0xFFF1F5F9);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _background = Color(0xFFF9FAFB);
 
 // ── Status helpers ────────────────────────────────────────────────────────────
 
@@ -38,46 +22,46 @@ _StatusStyle _statusStyle(String status) {
   switch (status.toLowerCase()) {
     case 'active':
       return (
-        bg: _successContainer,
-        fg: _success,
-        iconBg: const Color(0xFFDCFCE7),
-        iconFg: _success,
+        bg: AppColors.successContainer,
+        fg: AppColors.success,
+        iconBg: AppColors.successContainer,
+        iconFg: AppColors.success,
         label: 'Aktif',
         icon: Icons.check_circle_outline,
       );
     case 'faulty':
       return (
-        bg: _errorContainer,
-        fg: _error,
-        iconBg: _errorContainer,
-        iconFg: _error,
+        bg: AppColors.errorContainer,
+        fg: AppColors.error,
+        iconBg: AppColors.errorContainer,
+        iconFg: AppColors.error,
         label: 'Arızalı',
         icon: Icons.error_outline,
       );
     case 'under_maintenance':
       return (
-        bg: _warningContainer,
-        fg: _warning,
-        iconBg: _warningContainer,
-        iconFg: _warning,
+        bg: AppColors.warningContainer,
+        fg: AppColors.warning,
+        iconBg: AppColors.warningContainer,
+        iconFg: AppColors.warning,
         label: 'Bakımda',
         icon: Icons.build_outlined,
       );
     case 'inactive':
       return (
-        bg: _surfaceContainer,
-        fg: _outline,
-        iconBg: _surfaceContainer,
-        iconFg: _outline,
+        bg: AppColors.surfaceContainer,
+        fg: AppColors.outline,
+        iconBg: AppColors.surfaceContainer,
+        iconFg: AppColors.outline,
         label: 'Pasif',
         icon: Icons.pause_circle_outline,
       );
     default:
       return (
-        bg: _surfaceContainer,
-        fg: _outline,
-        iconBg: _surfaceContainer,
-        iconFg: _outline,
+        bg: AppColors.surfaceContainer,
+        fg: AppColors.outline,
+        iconBg: AppColors.surfaceContainer,
+        iconFg: AppColors.outline,
         label: 'Bilinmiyor',
         icon: Icons.help_outline,
       );
@@ -117,10 +101,10 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
     final elevatorsAsync = ref.watch(elevatorsProvider);
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       // ── App Bar ──────────────────────────────────────────────────────────
       appBar: AppBar(
-        backgroundColor: _primary,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -170,17 +154,17 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
               controller: _searchController,
               onChanged: (v) => setState(() => _query = v),
               style: const TextStyle(
-                color: _onSurface,
+                color: AppColors.onSurface,
                 fontSize: 14,
               ),
               decoration: InputDecoration(
                 hintText: 'Bina adı veya adres ile ara…',
-                hintStyle: TextStyle(color: _outline.withValues(alpha: 0.8)),
+                hintStyle: TextStyle(color: AppColors.outline.withValues(alpha: 0.8)),
                 prefixIcon:
-                    const Icon(Icons.search, color: _outline, size: 20),
+                    const Icon(Icons.search, color: AppColors.outline, size: 20),
                 suffixIcon: _query.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.close, size: 18, color: _outline),
+                        icon: const Icon(Icons.close, size: 18, color: AppColors.outline),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _query = '');
@@ -188,7 +172,7 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                       )
                     : null,
                 filled: true,
-                fillColor: _surfaceContainerLowest,
+                fillColor: AppColors.surfaceContainerLowest,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 border: OutlineInputBorder(
@@ -202,7 +186,7 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide:
-                      BorderSide(color: _primary.withValues(alpha: 0.4)),
+                      BorderSide(color: AppColors.primary.withValues(alpha: 0.4)),
                 ),
               ),
             ),
@@ -219,7 +203,7 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           Expanded(
             child: elevatorsAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: _primary),
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
         error: (e, _) => _ErrorBody(
           message: e.toString().replaceFirst('Exception: ', ''),
@@ -246,7 +230,7 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           }
 
           return RefreshIndicator(
-            color: _primary,
+            color: AppColors.primary,
             onRefresh: () async => ref.invalidate(elevatorsProvider),
             child: ListView.builder(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -281,7 +265,7 @@ class _ElevatorCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: _surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: onTap,
@@ -291,7 +275,7 @@ class _ElevatorCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               border:
-                  Border.all(color: _outlineVariant.withValues(alpha: 0.45)),
+                  Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.45)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.04),
@@ -324,7 +308,7 @@ class _ElevatorCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: _onSurface,
+                          color: AppColors.onSurface,
                           letterSpacing: -0.2,
                         ),
                         maxLines: 1,
@@ -338,7 +322,7 @@ class _ElevatorCard extends StatelessWidget {
                             const Icon(
                               Icons.location_on_outlined,
                               size: 13,
-                              color: _onSurfaceVariant,
+                              color: AppColors.onSurfaceVariant,
                             ),
                             const SizedBox(width: 3),
                             Expanded(
@@ -346,7 +330,7 @@ class _ElevatorCard extends StatelessWidget {
                                 elevator.address!,
                                 style: const TextStyle(
                                   fontSize: 12,
-                                  color: _onSurfaceVariant,
+                                  color: AppColors.onSurfaceVariant,
                                   height: 1.3,
                                 ),
                                 maxLines: 1,
@@ -385,7 +369,7 @@ class _ElevatorCard extends StatelessWidget {
                     const Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 13,
-                      color: _outline,
+                      color: AppColors.outline,
                     ),
                   ],
                 ),
@@ -414,19 +398,19 @@ class _ErrorBody extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 56, color: _error),
+            const Icon(Icons.error_outline, size: 56, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _onSurfaceVariant),
+              style: const TextStyle(color: AppColors.onSurfaceVariant),
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(backgroundColor: _primary),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
             ),
           ],
         ),
@@ -460,10 +444,10 @@ class _EmptyBody extends StatelessWidget {
               width: 88,
               height: 88,
               decoration: BoxDecoration(
-                color: _surfaceContainer,
+                color: AppColors.surfaceContainer,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 44, color: _outline),
+              child: Icon(icon, size: 44, color: AppColors.outline),
             ),
             const SizedBox(height: 20),
             Text(
@@ -471,7 +455,7 @@ class _EmptyBody extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: _onSurface,
+                color: AppColors.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -480,7 +464,7 @@ class _EmptyBody extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 13,
-                color: _onSurfaceVariant,
+                color: AppColors.onSurfaceVariant,
                 height: 1.5,
               ),
             ),

@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:go_router/go_router.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../providers/elevator_providers.dart';
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _surface = Colors.white;
-const _surfaceContainer = Color(0xFFF1F5F9);
-const _background = Color(0xFFF9FAFB);
-
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/input_decorations.dart';
+import '../../../core/widgets/section_label.dart';
 // ── Status options ────────────────────────────────────────────────────────────
 
 const _statusOptions = [
@@ -40,10 +37,12 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
   final _cityCtrl = TextEditingController();
   final _latCtrl = TextEditingController();
   final _lngCtrl = TextEditingController();
+  final MapController _mapController = MapController();
 
   String _status = 'active';
   bool _showLocation = false;
   int? _maintenanceDay; // null = no contract configured
+  LatLng? _selectedLatLng;
 
   @override
   void dispose() {
@@ -65,14 +64,16 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
       next.whenOrNull(
         data: (elevator) {
           if (elevator != null) {
+            HapticFeedback.lightImpact();
             context.pushReplacement('/admin/elevator-qr/${elevator.id}');
           }
         },
         error: (e, st) {
+          HapticFeedback.heavyImpact();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Hata: $e'),
-              backgroundColor: _primary,
+              backgroundColor: AppColors.primary,
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -80,23 +81,37 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
       );
     });
 
-    return Scaffold(
-      backgroundColor: _background,
-      appBar: AppBar(
-        title: const Text(
-          'Asansör Ekle',
-          style: TextStyle(fontWeight: FontWeight.w800),
+    return PopScope(
+      canPop: !isLoading,
+        onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && isLoading) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Lütfen kayıt tamamlanana kadar bekleyin.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          title: const Text(
+            'Asansör Ekle',
+            style: TextStyle(fontWeight: FontWeight.w800),
+          ),
         ),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 48),
-          children: [
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 48),
+            children: [
             // ── Building info ─────────────────────────────────────────
-            _SectionHeader(
+            SectionLabel(
               icon: Icons.domain_outlined,
-              title: 'Bina Bilgileri',
+              label: 'Bina Bilgileri',
+              color: AppColors.onSurfaceVariant,
+              uppercase: true,
             ),
             const SizedBox(height: 12),
 
@@ -137,9 +152,11 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
             const SizedBox(height: 20),
 
             // ── Status ────────────────────────────────────────────────
-            _SectionHeader(
+            SectionLabel(
               icon: Icons.info_outline_rounded,
-              title: 'Durum',
+              label: 'Durum',
+              color: AppColors.onSurfaceVariant,
+              uppercase: true,
             ),
             const SizedBox(height: 12),
             _StatusPicker(
@@ -150,9 +167,11 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
             const SizedBox(height: 20),
 
             // ── Periodic maintenance contract ─────────────────────────
-            _SectionHeader(
+            SectionLabel(
               icon: Icons.event_repeat_outlined,
-              title: 'Periyodik Bakım Sözleşmesi',
+              label: 'Periyodik Bakım Sözleşmesi',
+              color: AppColors.onSurfaceVariant,
+              uppercase: true,
             ),
             const SizedBox(height: 12),
             _MaintenanceDayPicker(
@@ -170,27 +189,30 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: _surface,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _outlineVariant),
+                  border: Border.all(color: AppColors.outlineVariant),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.my_location_rounded,
                       size: 18,
-                      color: _showLocation ? _primary : _outline,
+                      color: _showLocation ? AppColors.primary : AppColors.outline,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'GPS Konumu (İsteğe Bağlı)',
+                        _selectedLatLng == null
+                            ? 'GPS Konumu (İsteğe Bağlı)'
+                            : 'GPS Konumu • ${_selectedLatLng!.latitude.toStringAsFixed(5)}, '
+                                '${_selectedLatLng!.longitude.toStringAsFixed(5)}',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: _showLocation
-                              ? _primary
-                              : _onSurfaceVariant,
+                              ? AppColors.primary
+                              : AppColors.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -198,7 +220,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                       _showLocation
                           ? Icons.expand_less_rounded
                           : Icons.expand_more_rounded,
-                      color: _outline,
+                      color: AppColors.outline,
                     ),
                   ],
                 ),
@@ -213,6 +235,63 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                       padding: const EdgeInsets.only(top: 12),
                       child: Column(
                         children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: SizedBox(
+                              height: 200,
+                              child: FlutterMap(
+                                mapController: _mapController,
+                                options: MapOptions(
+                                  initialCenter: _selectedLatLng ??
+                                      const LatLng(39.9334, 32.8597),
+                                  initialZoom: 13,
+                                  onTap: (_, point) {
+                                    setState(() {
+                                      _selectedLatLng = point;
+                                      _latCtrl.text =
+                                          point.latitude.toStringAsFixed(6);
+                                      _lngCtrl.text =
+                                          point.longitude.toStringAsFixed(6);
+                                    });
+                                  },
+                                ),
+                                children: [
+                                  TileLayer(
+                                    urlTemplate:
+                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                    userAgentPackageName: 'com.asansor.app',
+                                  ),
+                                  if (_selectedLatLng != null)
+                                    MarkerLayer(
+                                      markers: [
+                                        Marker(
+                                          point: _selectedLatLng!,
+                                          width: 44,
+                                          height: 44,
+                                          child: const Icon(
+                                            Icons.location_pin,
+                                            color: AppColors.primary,
+                                            size: 36,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Haritaya dokunarak konum pinini belirleyin.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                           _Field(
                             controller: _latCtrl,
                             label: 'Enlem',
@@ -240,9 +319,6 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                   : const SizedBox.shrink(),
             ),
 
-            const SizedBox(height: 32),
-
-            // ── Submit ────────────────────────────────────────────────
             FilledButton.icon(
               icon: isLoading
                   ? const SizedBox(
@@ -259,14 +335,14 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
               ),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 54),
-                backgroundColor: _primary,
+                backgroundColor: AppColors.primary,
               ),
               onPressed: isLoading ? null : _submit,
             ),
           ],
         ),
       ),
-    );
+    ));
   }
 
   void _submit() {
@@ -317,32 +393,6 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
 
 // ── Section header ────────────────────────────────────────────────────────────
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.icon, required this.title});
-
-  final IconData icon;
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: _primary),
-        const SizedBox(width: 7),
-        Text(
-          title.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            color: _onSurfaceVariant,
-            letterSpacing: 1.2,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 // ── Text field ────────────────────────────────────────────────────────────────
 
 class _Field extends StatelessWidget {
@@ -372,35 +422,13 @@ class _Field extends StatelessWidget {
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 15, color: _onSurface),
-      decoration: InputDecoration(
-        labelText: required ? '$label *' : label,
-        hintText: hint,
-        prefixIcon: Icon(icon, size: 18, color: _outline),
-        filled: true,
-        fillColor: _surface,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _outlineVariant),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _outlineVariant),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _primary, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _primary),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _primary, width: 1.5),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 14),
+      style: const TextStyle(fontSize: 15, color: AppColors.onSurface),
+      decoration: appInputDecoration(
+        label: required ? '$label *' : label,
+        hint: hint,
+        prefixIcon: Icon(icon, size: 18, color: AppColors.outline),
+        fillColor: AppColors.surface,
+        radius: 12,
       ),
       validator: validator,
     );
@@ -427,39 +455,25 @@ class _MaintenanceDayPicker extends StatelessWidget {
     return DropdownButtonFormField<int?>(
       initialValue: selected,
       isExpanded: true,
-      decoration: InputDecoration(
-        labelText: 'Sözleşme Bakım Günü',
-        hintText: 'Ayın kaçında bakım yapılacak?',
+      decoration: appInputDecoration(
+        label: 'Sözleşme Bakım Günü',
+        hint: 'Ayın kaçında bakım yapılacak?',
         prefixIcon: const Icon(
           Icons.calendar_month_outlined,
           size: 18,
-          color: _outline,
+          color: AppColors.outline,
         ),
-        filled: true,
-        fillColor: _surface,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _outlineVariant),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _outlineVariant),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _primary, width: 1.5),
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        fillColor: AppColors.surface,
+        radius: 12,
       ),
-      style: const TextStyle(fontSize: 15, color: _onSurface),
+      style: const TextStyle(fontSize: 15, color: AppColors.onSurface),
       items: [
         // Unset option
         const DropdownMenuItem<int?>(
           value: null,
           child: Text(
             'Seçilmedi (sözleşme yok)',
-            style: TextStyle(color: _onSurfaceVariant),
+            style: TextStyle(color: AppColors.onSurfaceVariant),
           ),
         ),
         // Days 1–28
@@ -533,7 +547,7 @@ class _StatusChip extends StatelessWidget {
           border: Border.all(
             color: isSelected
                 ? fg.withValues(alpha: 0.5)
-                : _outlineVariant,
+                : AppColors.outlineVariant,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -558,7 +572,7 @@ class _StatusChip extends StatelessWidget {
   }
 
   static (Color, Color) _colors(String val, bool selected) {
-    if (!selected) return (_surface, _outline);
+    if (!selected) return (AppColors.surface, AppColors.outline);
     switch (val) {
       case 'active':
         return (const Color(0xFFDCFCE7), const Color(0xFF166534));
@@ -567,7 +581,7 @@ class _StatusChip extends StatelessWidget {
       case 'under_maintenance':
         return (const Color(0xFFFFF7ED), const Color(0xFF92400E));
       default: // inactive
-        return (_surfaceContainer, _onSurfaceVariant);
+        return (AppColors.surfaceContainer, AppColors.onSurfaceVariant);
     }
   }
 }

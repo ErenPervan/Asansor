@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -224,6 +225,9 @@ void main() {
           () => mockPdfService.generateMaintenanceReport(
             log: any(named: 'log'),
             checklistDetails: any(named: 'checklistDetails'),
+            mediaUrls: any(named: 'mediaUrls'),
+            signatureUrl: any(named: 'signatureUrl'),
+            customerSignatureUrl: any(named: 'customerSignatureUrl'),
           ),
         ).thenAnswer((_) async => mockPdfFile);
 
@@ -289,6 +293,90 @@ void main() {
             ),
           ),
         ).called(1);
+      },
+    );
+
+    test(
+      'maintenance_log remains pdf_pending and retries only PDF when PDF generation fails',
+      () async {
+        final logPayload = {
+          'elevator_id': 'e1',
+          'technician_id': 'tech1',
+          'notes': 'Monthly checkup',
+          'is_approved': true,
+          'maintenance_date': '2026-05-17T12:00:00.000Z',
+          'signature_url': 'https://supabase.com/signatures/tech.png',
+          'customer_signature_url':
+              'https://supabase.com/signatures/customer.png',
+        };
+
+        await service.enqueue(
+          type: SyncItemType.maintenanceLog,
+          payload: logPayload,
+        );
+
+        final dbRecord = {'id': 'log123', ...logPayload};
+        when(() => mockQueryBuilder.insert(any())).thenAnswer(
+          (_) =>
+              FakePostgrestBuilder<Map<String, dynamic>>(dbRecord) as dynamic,
+        );
+
+        when(
+          () => mockPdfService.generateMaintenanceReport(
+            log: any(named: 'log'),
+            checklistDetails: any(named: 'checklistDetails'),
+            mediaUrls: any(named: 'mediaUrls'),
+            signatureUrl: any(named: 'signatureUrl'),
+            customerSignatureUrl: any(named: 'customerSignatureUrl'),
+          ),
+        ).thenThrow(TimeoutException('pdf timeout'));
+
+        final firstResult = await service.flush(mockClient);
+
+        expect(firstResult.synced, 0);
+        expect(firstResult.failed, 1);
+        expect(service.pendingCount, 1);
+
+        final queuedRaw = Hive.box<String>(syncQueueBoxName).values.single;
+        final queued = jsonDecode(queuedRaw) as Map<String, dynamic>;
+        expect(queued['status'], 'pdf_pending');
+        expect(queued['remote_state']['id'], 'log123');
+
+        clearInteractions(mockQueryBuilder);
+        clearInteractions(mockPdfService);
+        clearInteractions(mockStorageFileApi);
+
+        final mockPdfFile = File('${tempDir.path}/fake_report_retry.pdf');
+        await mockPdfFile.writeAsBytes([1, 2, 3]);
+        when(
+          () => mockPdfService.generateMaintenanceReport(
+            log: any(named: 'log'),
+            checklistDetails: any(named: 'checklistDetails'),
+            mediaUrls: any(named: 'mediaUrls'),
+            signatureUrl: any(named: 'signatureUrl'),
+            customerSignatureUrl: any(named: 'customerSignatureUrl'),
+          ),
+        ).thenAnswer((_) async => mockPdfFile);
+        when(
+          () => mockStorageFileApi.upload(any(), any()),
+        ).thenAnswer((_) async => 'reports/log123.pdf');
+        when(
+          () => mockStorageFileApi.getPublicUrl(any()),
+        ).thenReturn('https://supabase.com/reports/log123.pdf');
+        when(
+          () => mockQueryBuilder.update(any()),
+        ).thenAnswer((_) => FakePostgrestBuilder<dynamic>(null) as dynamic);
+        when(() => mockQueryBuilder.select('id')).thenAnswer(
+          (_) =>
+              FakePostgrestBuilder<List<Map<String, dynamic>>>([]) as dynamic,
+        );
+
+        final retryResult = await service.flush(mockClient);
+
+        expect(retryResult.synced, 1);
+        expect(retryResult.failed, 0);
+        expect(service.hasPending, isFalse);
+        verifyNever(() => mockQueryBuilder.insert(any()));
       },
     );
 

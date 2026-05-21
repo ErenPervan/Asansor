@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:go_router/go_router.dart';
+
 import 'package:intl/intl.dart';
+
 import 'package:table_calendar/table_calendar.dart';
 
 import '../models/schedule_with_details.dart';
+
 import '../providers/admin_providers.dart';
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _outlineVariant = Color(0xFFE2E8F0);
-const _surface = Colors.white;
-const _surfaceContainer = Color(0xFFF1F5F9);
-const _background = Color(0xFFF9FAFB);
-
+import '../../../core/theme/app_colors.dart';
 // Dot colours for calendar markers.
 const _dotRed = Color(0xFFDC2626);
 const _dotGreen = Color(0xFF16A34A);
@@ -66,7 +61,7 @@ class _AdminMasterCalendarViewState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Hata: $e'),
-              backgroundColor: _primary,
+              backgroundColor: AppColors.primary,
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -78,7 +73,7 @@ class _AdminMasterCalendarViewState
     final isGenerating = autoScheduleState.isLoading;
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Ana Takvim',
@@ -142,7 +137,7 @@ class _AdminMasterCalendarViewState
           isGenerating ? 'Oluşturuluyor…' : 'Bu Ayı Planla',
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
-        backgroundColor: isGenerating ? _outline : _primary,
+        backgroundColor: isGenerating ? AppColors.outline : AppColors.primary,
       ),
       body: allAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -172,7 +167,7 @@ class _AdminMasterCalendarViewState
                     setState(() => _focusedDay = foc),
               ),
 
-              const Divider(height: 1, color: _outlineVariant),
+              const Divider(height: 1, color: AppColors.outlineVariant),
 
               // ── Day header ──────────────────────────────────────────
               _DayHeader(day: _selectedDay, taskCount: dayTasks.length),
@@ -227,11 +222,11 @@ class _AdminMasterCalendarViewState
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: _primary.withValues(alpha: 0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.auto_fix_high_rounded,
-                  color: _primary, size: 20),
+                  color: AppColors.primary, size: 20),
             ),
             const SizedBox(width: 12),
             const Expanded(
@@ -252,7 +247,7 @@ class _AdminMasterCalendarViewState
           style: const TextStyle(
             fontSize: 14,
             height: 1.5,
-            color: _onSurfaceVariant,
+            color: AppColors.onSurfaceVariant,
           ),
         ),
         actions: [
@@ -260,12 +255,12 @@ class _AdminMasterCalendarViewState
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text(
               'İptal',
-              style: TextStyle(color: _onSurfaceVariant),
+              style: TextStyle(color: AppColors.onSurfaceVariant),
             ),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: _primary,
+              backgroundColor: AppColors.primary,
               minimumSize: const Size(90, 40),
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -335,7 +330,7 @@ class _CalendarSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: _surface,
+      color: AppColors.surface,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: TableCalendar<ScheduleWithDetails>(
         locale: 'tr_TR',
@@ -357,7 +352,7 @@ class _CalendarSection extends StatelessWidget {
         calendarStyle: CalendarStyle(
           // Selected day: solid crimson circle with white text.
           selectedDecoration: const BoxDecoration(
-            color: _primary,
+            color: AppColors.primary,
             shape: BoxShape.circle,
           ),
           selectedTextStyle: const TextStyle(
@@ -367,15 +362,15 @@ class _CalendarSection extends StatelessWidget {
           // Today: crimson border, no fill.
           todayDecoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: _primary, width: 1.5),
+            border: Border.all(color: AppColors.primary, width: 1.5),
           ),
           todayTextStyle: const TextStyle(
-            color: _primary,
+            color: AppColors.primary,
             fontWeight: FontWeight.w700,
           ),
           defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
           weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
-          weekendTextStyle: const TextStyle(color: _onSurfaceVariant),
+          weekendTextStyle: const TextStyle(color: AppColors.onSurfaceVariant),
           outsideDaysVisible: false,
           cellMargin: const EdgeInsets.all(5),
           // Marker decoration is overridden by calendarBuilders below.
@@ -389,15 +384,15 @@ class _CalendarSection extends StatelessWidget {
           titleTextStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: _onSurface,
+            color: AppColors.onSurface,
           ),
           leftChevronIcon: Icon(
             Icons.chevron_left_rounded,
-            color: _primary,
+            color: AppColors.primary,
           ),
           rightChevronIcon: Icon(
             Icons.chevron_right_rounded,
-            color: _primary,
+            color: AppColors.primary,
           ),
           headerPadding: EdgeInsets.symmetric(vertical: 8),
         ),
@@ -405,12 +400,12 @@ class _CalendarSection extends StatelessWidget {
           weekdayStyle: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: _onSurfaceVariant,
+            color: AppColors.onSurfaceVariant,
           ),
           weekendStyle: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: _outline,
+            color: AppColors.outline,
           ),
         ),
         // ── Marker builder ─────────────────────────────────────────────
@@ -471,11 +466,11 @@ class _DayHeader extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      color: _surfaceContainer,
+      color: AppColors.surfaceContainer,
       child: Row(
         children: [
           const Icon(Icons.calendar_today_outlined,
-              size: 15, color: _primary),
+              size: 15, color: AppColors.primary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -483,7 +478,7 @@ class _DayHeader extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: _onSurface,
+                color: AppColors.onSurface,
               ),
             ),
           ),
@@ -492,8 +487,8 @@ class _DayHeader extends StatelessWidget {
                 const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
             decoration: BoxDecoration(
               color: taskCount > 0
-                  ? _primary.withValues(alpha: 0.1)
-                  : _outlineVariant,
+                  ? AppColors.primary.withValues(alpha: 0.1)
+                  : AppColors.outlineVariant,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -502,7 +497,7 @@ class _DayHeader extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color:
-                    taskCount > 0 ? _primary : _onSurfaceVariant,
+                    taskCount > 0 ? AppColors.primary : AppColors.onSurfaceVariant,
               ),
             ),
           ),
@@ -525,7 +520,7 @@ class _MasterTaskCard extends StatelessWidget {
         .format(task.scheduledDate.toLocal());
 
     return Material(
-      color: _surface,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -533,7 +528,7 @@ class _MasterTaskCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: _outlineVariant),
+            border: Border.all(color: AppColors.outlineVariant),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
@@ -572,7 +567,7 @@ class _MasterTaskCard extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w800,
-                                  color: _onSurface,
+                                  color: AppColors.onSurface,
                                   letterSpacing: -0.2,
                                 ),
                                 maxLines: 1,
@@ -591,13 +586,13 @@ class _MasterTaskCard extends StatelessWidget {
                           Row(
                             children: [
                               const Icon(Icons.location_on_outlined,
-                                  size: 12, color: _outline),
+                                  size: 12, color: AppColors.outline),
                               const SizedBox(width: 3),
                               Expanded(
                                 child: Text(
                                   task.address!,
                                   style: const TextStyle(
-                                      fontSize: 12, color: _outline),
+                                      fontSize: 12, color: AppColors.outline),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -614,7 +609,7 @@ class _MasterTaskCard extends StatelessWidget {
                             CircleAvatar(
                               radius: 11,
                               backgroundColor:
-                                  _primary.withValues(alpha: 0.12),
+                                  AppColors.primary.withValues(alpha: 0.12),
                               child: Text(
                                 task.technicianName.isNotEmpty
                                     ? task.technicianName[0]
@@ -623,7 +618,7 @@ class _MasterTaskCard extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w800,
-                                  color: _primary,
+                                  color: AppColors.primary,
                                 ),
                               ),
                             ),
@@ -633,7 +628,7 @@ class _MasterTaskCard extends StatelessWidget {
                                 task.technicianName,
                                 style: const TextStyle(
                                   fontSize: 13,
-                                  color: _onSurfaceVariant,
+                                  color: AppColors.onSurfaceVariant,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -654,13 +649,13 @@ class _MasterTaskCard extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(Icons.schedule_rounded,
-                                    size: 13, color: _outline),
+                                    size: 13, color: AppColors.outline),
                                 const SizedBox(width: 4),
                                 Text(
                                   time,
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: _onSurfaceVariant,
+                                    color: AppColors.onSurfaceVariant,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -685,14 +680,14 @@ class _MasterTaskCard extends StatelessWidget {
                             width: double.infinity,
                             padding: const EdgeInsets.all(9),
                             decoration: BoxDecoration(
-                              color: _surfaceContainer,
+                              color: AppColors.surfaceContainer,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               task.notes!,
                               style: const TextStyle(
                                 fontSize: 12,
-                                color: _onSurfaceVariant,
+                                color: AppColors.onSurfaceVariant,
                                 height: 1.4,
                               ),
                               maxLines: 2,
@@ -856,11 +851,11 @@ class _EmptyDayPlaceholder extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(22),
               decoration: const BoxDecoration(
-                color: _surfaceContainer,
+                color: AppColors.surfaceContainer,
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.event_available_outlined,
-                  size: 36, color: _outline),
+                  size: 36, color: AppColors.outline),
             ),
             const SizedBox(height: 16),
             Text(
@@ -868,7 +863,7 @@ class _EmptyDayPlaceholder extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 15,
-                color: _onSurfaceVariant,
+                color: AppColors.onSurfaceVariant,
                 height: 1.5,
               ),
             ),
@@ -896,19 +891,19 @@ class _ErrorView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.cloud_off_outlined,
-                size: 48, color: _outline),
+                size: 48, color: AppColors.outline),
             const SizedBox(height: 12),
             const Text(
               'Veriler yüklenemedi',
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: _onSurface),
+                  color: AppColors.onSurface),
             ),
             const SizedBox(height: 6),
             Text(
               error.toString(),
-              style: const TextStyle(fontSize: 12, color: _onSurfaceVariant),
+              style: const TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -960,7 +955,7 @@ class _FilterSheet extends ConsumerWidget {
 
     return Container(
       decoration: const BoxDecoration(
-        color: _surface,
+        color: AppColors.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
@@ -976,7 +971,7 @@ class _FilterSheet extends ConsumerWidget {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: _outlineVariant,
+                    color: AppColors.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -991,7 +986,7 @@ class _FilterSheet extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: _onSurface,
+                      color: AppColors.onSurface,
                     ),
                   ),
                   const Spacer(),
@@ -1000,11 +995,11 @@ class _FilterSheet extends ConsumerWidget {
                       onPressed: notifier.clear,
                       child: const Text(
                         'Temizle',
-                        style: TextStyle(color: _primary),
+                        style: TextStyle(color: AppColors.primary),
                       ),
                     ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: _outline),
+                    icon: const Icon(Icons.close, color: AppColors.outline),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
@@ -1038,7 +1033,7 @@ class _FilterSheet extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Divider(color: _outlineVariant, height: 1),
+                const Divider(color: AppColors.outlineVariant, height: 1),
                 const SizedBox(height: 16),
               ],
 
@@ -1079,7 +1074,7 @@ class _SheetSectionLabel extends StatelessWidget {
       style: const TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w700,
-        color: _onSurfaceVariant,
+        color: AppColors.onSurfaceVariant,
         letterSpacing: 1.2,
       ),
     );
@@ -1105,17 +1100,17 @@ class _FilterChipItem extends StatelessWidget {
         style: TextStyle(
           fontSize: 13,
           fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-          color: selected ? _primary : _onSurfaceVariant,
+          color: selected ? AppColors.primary : AppColors.onSurfaceVariant,
         ),
       ),
       selected: selected,
       onSelected: (_) => onSelected(),
-      selectedColor: _primary.withValues(alpha: 0.1),
-      checkmarkColor: _primary,
+      selectedColor: AppColors.primary.withValues(alpha: 0.1),
+      checkmarkColor: AppColors.primary,
       side: BorderSide(
-        color: selected ? _primary.withValues(alpha: 0.4) : _outlineVariant,
+        color: selected ? AppColors.primary.withValues(alpha: 0.4) : AppColors.outlineVariant,
       ),
-      backgroundColor: _surface,
+      backgroundColor: AppColors.surface,
       padding: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
@@ -1162,7 +1157,7 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 5),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: _onSurfaceVariant),
+          style: const TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant),
         ),
       ],
     );

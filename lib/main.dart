@@ -15,19 +15,7 @@ import 'core/router/app_router.dart'; // also exports: appRouter, navigatorKey
 import 'core/services/notification_service.dart';
 import 'core/services/read_cache_service.dart';
 import 'core/services/sync_queue_service.dart';
-
-// ── Brand palette (shared with all view-layer files) ──────────────────────────
-
-const kPrimary = Color(0xFFB91C1C);       // Red-700  – brand/headers
-const kPrimaryDark = Color(0xFF991B1B);   // Red-800  – gradient endpoint
-const kSecondary = Color(0xFFEF4444);     // Red-500  – bright accents/badges
-const kBackground = Color(0xFFF9FAFB);   // Slate-50  – scaffold bg
-const kSurface = Colors.white;            // card / sheet bg
-const kOnSurface = Color(0xFF0F172A);     // Slate-900 – primary text
-const kOnSurfaceVariant = Color(0xFF475569); // Slate-600 – secondary text
-const kOutline = Color(0xFF94A3B8);       // Slate-400 – disabled text
-const kOutlineVariant = Color(0xFFE2E8F0);// Slate-200 – borders/dividers
-const kSurfaceContainer = Color(0xFFF1F5F9); // Slate-100 – input/chip bg
+import 'core/theme/app_colors.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,6 +70,8 @@ Future<void> main() async {
   await Hive.openBox<String>(syncQueueBoxName);
   await Hive.openBox<String>(elevatorsCacheBoxName);
   await Hive.openBox<String>(tasksCacheBoxName);
+  await Hive.openBox<String>(checklistCacheBoxName);
+  await Hive.openBox<String>(pastLogsCacheBoxName);
 
   // Set up FCM permissions, notification channels, and message listeners.
   await NotificationService.instance.initialize();
@@ -130,7 +120,9 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
     return MaterialApp.router(
       title: 'Asansor',
       debugShowCheckedModeBanner: false,
-      theme: _buildTheme(),
+      theme: _buildTheme(Brightness.light),
+      darkTheme: _buildTheme(Brightness.dark),
+      themeMode: ThemeMode.system,
       // `navigatorKey` is owned by `appRouter` (passed via GoRouter constructor).
       // MaterialApp.router does not accept a separate navigatorKey; the key
       // is accessed through `navigatorKey` exported from app_router.dart.
@@ -139,67 +131,69 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
   }
 }
 
-ThemeData _buildTheme() {
-  const primaryColor = kPrimary;
-  const seedColor = kPrimary;
+ThemeData _buildTheme(Brightness brightness) {
+  const primaryColor = AppColors.primary;
+  final colors = brightness == Brightness.dark
+      ? AppThemeColors.dark
+      : AppThemeColors.light;
 
   final base = ColorScheme.fromSeed(
-    seedColor: seedColor,
-    brightness: Brightness.light,
+    seedColor: primaryColor,
+    brightness: brightness,
   ).copyWith(
     primary: primaryColor,
     onPrimary: Colors.white,
-    primaryContainer: const Color(0xFFFFE4E4), // very light red tint
-    onPrimaryContainer: kPrimaryDark,
-    secondary: kSecondary,
+    primaryContainer: AppColors.primaryFixed,
+    onPrimaryContainer: AppColors.primaryDark,
+    secondary: AppColors.secondary,
     onSecondary: Colors.white,
-    surface: kSurface,
-    onSurface: kOnSurface,
-    onSurfaceVariant: kOnSurfaceVariant,
-    outline: kOutline,
-    outlineVariant: kOutlineVariant,
-    error: const Color(0xFFDC2626),
-    onError: Colors.white,
-    errorContainer: const Color(0xFFFEE2E2),
-    onErrorContainer: kPrimaryDark,
-    surfaceContainerLowest: Colors.white,
-    surfaceContainerLow: const Color(0xFFF8FAFC),
-    surfaceContainer: kSurfaceContainer,
-    surfaceContainerHigh: const Color(0xFFE2E8F0),
+    surface: colors.surface,
+    onSurface: colors.onSurface,
+    onSurfaceVariant: colors.onSurfaceVariant,
+    outline: colors.outline,
+    outlineVariant: colors.outlineVariant,
+    error: AppColors.error,
+    onError: AppColors.onError,
+    errorContainer: AppColors.errorContainer,
+    onErrorContainer: AppColors.primaryDark,
+    surfaceContainerLowest: colors.surfaceContainerLowest,
+    surfaceContainerLow: colors.surfaceContainerLow,
+    surfaceContainer: colors.surfaceContainer,
+    surfaceContainerHigh: colors.surfaceContainerHigh,
   );
 
   return ThemeData(
     useMaterial3: true,
     colorScheme: base,
-    scaffoldBackgroundColor: kBackground,
+    scaffoldBackgroundColor: colors.background,
 
     // ── Typography ──────────────────────────────────────────────────────────
-    textTheme: const TextTheme(
+    textTheme: TextTheme(
       displayLarge: TextStyle(
-        color: kOnSurface,
+        color: colors.onSurface,
         fontWeight: FontWeight.w800,
         letterSpacing: -1.5,
       ),
       headlineLarge: TextStyle(
-        color: kOnSurface,
+        color: colors.onSurface,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.5,
       ),
       headlineMedium: TextStyle(
-        color: kOnSurface,
+        color: colors.onSurface,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.3,
       ),
       titleLarge: TextStyle(
-        color: kOnSurface,
+        color: colors.onSurface,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.2,
       ),
-      bodyLarge: TextStyle(color: kOnSurface, height: 1.5),
-      bodyMedium: TextStyle(color: kOnSurfaceVariant, height: 1.5),
-      bodySmall: TextStyle(color: kOutline, height: 1.4),
+      bodyLarge: TextStyle(color: colors.onSurface, height: 1.5),
+      bodyMedium: TextStyle(color: colors.onSurfaceVariant, height: 1.5),
+      bodySmall: TextStyle(color: colors.outline, height: 1.4),
       labelLarge: TextStyle(
-        color: kOnSurface,
+        color: colors.onSurface,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.1,
       ),
@@ -227,10 +221,10 @@ ThemeData _buildTheme() {
     // ── Cards ───────────────────────────────────────────────────────────────
     cardTheme: CardThemeData(
       elevation: 0,
-      color: kSurface,
+      color: colors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: kOutlineVariant, width: 0.8),
+        side: BorderSide(color: colors.outlineVariant, width: 0.8),
       ),
       margin: EdgeInsets.zero,
     ),
@@ -238,16 +232,16 @@ ThemeData _buildTheme() {
     // ── Input fields ────────────────────────────────────────────────────────
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFFF8FAFC),
+      fillColor: colors.surfaceContainerLow,
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: kOutlineVariant),
+        borderSide: BorderSide(color: colors.outlineVariant),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: kOutlineVariant, width: 1),
+        borderSide: BorderSide(color: colors.outlineVariant, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -255,17 +249,17 @@ ThemeData _buildTheme() {
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1),
+        borderSide: const BorderSide(color: AppColors.error, width: 1),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
+        borderSide: const BorderSide(color: AppColors.error, width: 1.5),
       ),
-      labelStyle: const TextStyle(color: kOnSurfaceVariant),
+      labelStyle: TextStyle(color: colors.onSurfaceVariant),
       hintStyle:
-          TextStyle(color: kOutline.withValues(alpha: 0.8), fontSize: 14),
-      prefixIconColor: kOutline,
-      suffixIconColor: kOutline,
+          TextStyle(color: colors.outline.withValues(alpha: 0.8), fontSize: 14),
+      prefixIconColor: colors.outline,
+      suffixIconColor: colors.outline,
     ),
 
     // ── Filled buttons ──────────────────────────────────────────────────────
@@ -309,21 +303,21 @@ ThemeData _buildTheme() {
     ),
 
     // ── Bottom nav bar ──────────────────────────────────────────────────────
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: kSurface,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: colors.surface,
       selectedItemColor: primaryColor,
-      unselectedItemColor: kOutline,
+      unselectedItemColor: colors.outline,
       type: BottomNavigationBarType.fixed,
       elevation: 8,
     ),
 
     // ── Chips ───────────────────────────────────────────────────────────────
     chipTheme: ChipThemeData(
-      backgroundColor: kSurfaceContainer,
-      labelStyle: const TextStyle(
+      backgroundColor: colors.surfaceContainer,
+      labelStyle: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w600,
-        color: kOnSurface,
+        color: colors.onSurface,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -331,28 +325,29 @@ ThemeData _buildTheme() {
     ),
 
     // ── Divider ─────────────────────────────────────────────────────────────
-    dividerTheme: const DividerThemeData(
-      color: kOutlineVariant,
+    dividerTheme: DividerThemeData(
+      color: colors.outlineVariant,
       thickness: 1,
       space: 1,
     ),
 
     // ── Dialog ──────────────────────────────────────────────────────────────
     dialogTheme: DialogThemeData(
-      backgroundColor: kSurface,
+      backgroundColor: colors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
-        color: kOnSurface,
+        color: colors.onSurface,
       ),
     ),
 
     // ── SnackBar ─────────────────────────────────────────────────────────────
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
+      showCloseIcon: true,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      backgroundColor: kOnSurface,
+      backgroundColor: colors.onSurface,
       contentTextStyle: const TextStyle(color: Colors.white, fontSize: 14),
     ),
   );

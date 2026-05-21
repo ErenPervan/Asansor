@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -20,8 +22,9 @@ final maintenanceRepositoryProvider = Provider<MaintenanceRepository>((ref) {
 /// Fetches all pending (unapproved) maintenance logs across every elevator.
 ///
 /// Used by the dashboard to populate the "Günlük Bakımlar" section.
-final pendingMaintenanceProvider =
-    FutureProvider<List<MaintenanceLogModel>>((ref) async {
+final pendingMaintenanceProvider = FutureProvider<List<MaintenanceLogModel>>((
+  ref,
+) async {
   final repo = ref.watch(maintenanceRepositoryProvider);
   return repo.getAllPendingLogs();
 });
@@ -36,11 +39,32 @@ final completedTodayCountProvider = FutureProvider<int>((ref) async {
 ///
 /// Usage: `ref.watch(logsByElevatorProvider('some-uuid'))`
 final logsByElevatorProvider =
-    FutureProvider.family<List<MaintenanceLogModel>, String>(
-        (ref, elevatorId) async {
-  final repo = ref.watch(maintenanceRepositoryProvider);
-  return repo.getLogsByElevatorId(elevatorId);
-});
+    FutureProvider.family<List<MaintenanceLogModel>, String>((
+      ref,
+      elevatorId,
+    ) async {
+      final isOnline = ref.read(isOnlineProvider);
+      final cache = ref.read(readCacheServiceProvider);
+
+      if (!isOnline) {
+        return cache
+            .loadPastLogs(elevatorId, MaintenanceLogModel.fromJson)
+            .cast<MaintenanceLogModel>();
+      }
+
+      try {
+        final repo = ref.watch(maintenanceRepositoryProvider);
+        final data = await repo.getLogsByElevatorId(elevatorId);
+        cache.savePastLogs(elevatorId, data);
+        return data;
+      } catch (e) {
+        final cached = cache
+            .loadPastLogs(elevatorId, MaintenanceLogModel.fromJson)
+            .cast<MaintenanceLogModel>();
+        if (cached.isNotEmpty) return cached;
+        rethrow;
+      }
+    });
 
 // ── Action Notifier ──────────────────────────────────────────────────────────
 
@@ -51,11 +75,48 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
   @override
   Future<MaintenanceLogModel?> build() async => null;
 
+  Future<List<String>> _uploadPhotos({
+    required SupabaseClient client,
+    required List<String> photoPaths,
+    required String elevatorId,
+    required String technicianId,
+  }) async {
+    final storage = client.storage.from(_maintenancePhotosBucket);
+    final uploadedUrls = <String>[];
+    var index = 0;
+
+    for (final path in photoPaths) {
+      if (_isRemoteUrl(path)) {
+        uploadedUrls.add(path);
+        continue;
+      }
+
+      final file = File(path);
+      if (!await file.exists()) {
+        continue;
+      }
+
+      final extension = _safeExtension(path);
+      final fileName =
+          'maintenance_logs/$elevatorId/${technicianId}_${DateTime.now().millisecondsSinceEpoch}_$index.$extension';
+      index++;
+
+      await storage.upload(fileName, file);
+      uploadedUrls.add(storage.getPublicUrl(fileName));
+    }
+
+    return uploadedUrls;
+  }
+
   Future<void> addLog({
     required String elevatorId,
     required String technicianId,
     required String notes,
     required DateTime maintenanceDate,
+    Map<String, dynamic>? checklist,
+    List<String>? photos,
+    String? signaturePath,
+    String? customerSignaturePath,
   }) async {
     state = const AsyncLoading();
 
@@ -63,16 +124,21 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
 
     if (!isOnline) {
       // ── Offline path: enqueue for later sync ──────────────────────────────
-      await ref.read(syncQueueServiceProvider).enqueue(
-        type: SyncItemType.maintenanceLog,
-        payload: {
-          'elevator_id': elevatorId,
-          'technician_id': technicianId,
-          'notes': notes,
-          'is_approved': false,
-          'maintenance_date': maintenanceDate.toIso8601String(),
-        },
-      );
+      final payload = <String, dynamic>{
+        'elevator_id': elevatorId,
+        'technician_id': technicianId,
+        'notes': notes,
+        'is_approved': false,
+        'maintenance_date': maintenanceDate.toIso8601String(),
+        'checklist': ?checklist,
+        if (photos != null && photos.isNotEmpty) 'photos': photos,
+        'signature_url': ?signaturePath,
+        'customer_signature_url': ?customerSignaturePath,
+      };
+
+      await ref
+          .read(syncQueueServiceProvider)
+          .enqueue(type: SyncItemType.maintenanceLog, payload: payload);
 
       // Represent success with a synthetic in-memory model so the UI can
       // show a "saved offline" confirmation without a null-state guard.
@@ -84,6 +150,76 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
           notes: notes,
           isApproved: false,
           maintenanceDate: maintenanceDate,
+          checklist: checklist,
+          photos: photos,
+          signatureUrl: signaturePath,
+          customerSignatureUrl: customerSignaturePath,
+          isOfflineQueued: true,
+        ),
+      );
+      return;
+    }
+
+    List<String>? photoUrls;
+    String? sigUrlStr;
+    String? custSigUrlStr;
+
+    try {
+      if (photos != null && photos.isNotEmpty) {
+        photoUrls = await _uploadPhotos(
+          client: Supabase.instance.client,
+          photoPaths: photos,
+          elevatorId: elevatorId,
+          technicianId: technicianId,
+        );
+      }
+      if (signaturePath != null) {
+        final res = await _uploadPhotos(
+          client: Supabase.instance.client,
+          photoPaths: [signaturePath],
+          elevatorId: elevatorId,
+          technicianId: technicianId,
+        );
+        if (res.isNotEmpty) sigUrlStr = res.first;
+      }
+      if (customerSignaturePath != null) {
+        final res = await _uploadPhotos(
+          client: Supabase.instance.client,
+          photoPaths: [customerSignaturePath],
+          elevatorId: elevatorId,
+          technicianId: technicianId,
+        );
+        if (res.isNotEmpty) custSigUrlStr = res.first;
+      }
+    } catch (e) {
+      final payload = <String, dynamic>{
+        'elevator_id': elevatorId,
+        'technician_id': technicianId,
+        'notes': notes,
+        'is_approved': false,
+        'maintenance_date': maintenanceDate.toIso8601String(),
+        'checklist': ?checklist,
+        if (photos != null && photos.isNotEmpty) 'photos': photos,
+        'signature_url': ?signaturePath,
+        'customer_signature_url': ?customerSignaturePath,
+      };
+
+      await ref
+          .read(syncQueueServiceProvider)
+          .enqueue(type: SyncItemType.maintenanceLog, payload: payload);
+
+      state = AsyncData(
+        MaintenanceLogModel(
+          id: 'offline_${DateTime.now().millisecondsSinceEpoch}',
+          elevatorId: elevatorId,
+          technicianId: technicianId,
+          notes: notes,
+          isApproved: false,
+          maintenanceDate: maintenanceDate,
+          checklist: checklist,
+          photos: photos,
+          signatureUrl: signaturePath,
+          customerSignatureUrl: customerSignaturePath,
           isOfflineQueued: true,
         ),
       );
@@ -92,19 +228,26 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
 
     // ── Online path: write directly to Supabase ───────────────────────────
     state = await AsyncValue.guard(() {
-      return ref.read(maintenanceRepositoryProvider).addLog(
+      return ref
+          .read(maintenanceRepositoryProvider)
+          .addLog(
             elevatorId: elevatorId,
             technicianId: technicianId,
             notes: notes,
             maintenanceDate: maintenanceDate,
+            checklist: checklist,
+            photos: photoUrls,
+            signatureUrl: sigUrlStr,
+            customerSignatureUrl: custSigUrlStr,
           );
     });
 
     // After a successful log, auto-complete any matching scheduled task
     // for the same elevator+technician on today's date.
     if (!state.hasError && state.value != null) {
-      await ScheduleRepository(Supabase.instance.client)
-          .completeMatchingSchedule(
+      await ScheduleRepository(
+        Supabase.instance.client,
+      ).completeMatchingSchedule(
         elevatorId: elevatorId,
         technicianId: technicianId,
       );
@@ -126,5 +269,25 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
 
 final maintenanceControllerProvider =
     AsyncNotifierProvider<MaintenanceController, MaintenanceLogModel?>(
-  MaintenanceController.new,
-);
+      MaintenanceController.new,
+    );
+
+const _maintenancePhotosBucket = 'maintenance-photos';
+
+bool _isRemoteUrl(String path) {
+  return path.startsWith('http://') || path.startsWith('https://');
+}
+
+String _safeExtension(String path) {
+  final dotIndex = path.lastIndexOf('.');
+  if (dotIndex == -1 || dotIndex == path.length - 1) {
+    return 'jpg';
+  }
+
+  final extension = path.substring(dotIndex + 1).toLowerCase();
+  if (extension.length > 5) {
+    return 'jpg';
+  }
+
+  return extension;
+}

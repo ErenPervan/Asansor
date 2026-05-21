@@ -14,6 +14,12 @@ const elevatorsCacheBoxName = 'elevators_cache';
 /// Name of the Hive box used to cache per-user task lists.
 const tasksCacheBoxName = 'tasks_cache';
 
+/// Name of the Hive box used to cache checklist items.
+const checklistCacheBoxName = 'checklist_cache';
+
+/// Name of the Hive box used to cache past maintenance logs.
+const pastLogsCacheBoxName = 'past_logs_cache';
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 /// Provides a thin read/write cache layer backed by Hive.
@@ -25,12 +31,17 @@ const tasksCacheBoxName = 'tasks_cache';
 /// ```dart
 /// await Hive.openBox<String>(elevatorsCacheBoxName);
 /// await Hive.openBox<String>(tasksCacheBoxName);
+/// await Hive.openBox<String>(checklistCacheBoxName);
+/// await Hive.openBox<String>(pastLogsCacheBoxName);
 /// ```
 class ReadCacheService {
   static const _elevatorsKey = 'all';
+  static const _checklistsKey = 'all_checklists';
 
   Box<String> get _elevBox => Hive.box<String>(elevatorsCacheBoxName);
   Box<String> get _tasksBox => Hive.box<String>(tasksCacheBoxName);
+  Box<String> get _checklistBox => Hive.box<String>(checklistCacheBoxName);
+  Box<String> get _pastLogsBox => Hive.box<String>(pastLogsCacheBoxName);
 
   // ── Elevators ─────────────────────────────────────────────────────────────
 
@@ -92,4 +103,50 @@ class ReadCacheService {
   /// `true` when a task list has been cached for [userId].
   bool hasMyTasks(String userId) =>
       userId.isNotEmpty && _tasksBox.containsKey(userId);
+      
+  // ── Checklists ────────────────────────────────────────────────────────────
+
+  /// Persists the checklist items. Overwrites any previous value.
+  Future<void> saveChecklistItems(List<dynamic> items) async {
+    final encoded = jsonEncode(
+      items.map((i) => i.toJson()).toList(),
+    );
+    await _checklistBox.put(_checklistsKey, encoded);
+  }
+
+  /// Returns the cached checklist items.
+  List<dynamic> loadChecklistItems(dynamic fromJson) {
+    final raw = _checklistBox.get(_checklistsKey);
+    if (raw == null) return [];
+    try {
+      final list = jsonDecode(raw) as List<dynamic>;
+      return list.map((j) => fromJson(j as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  // ── Past Logs ─────────────────────────────────────────────────────────────
+
+  /// Persists the past logs for [elevatorId]. Overwrites any previous value.
+  Future<void> savePastLogs(String elevatorId, List<dynamic> logs) async {
+    if (elevatorId.isEmpty) return;
+    final encoded = jsonEncode(
+      logs.map((l) => l.toJson()).toList(),
+    );
+    await _pastLogsBox.put(elevatorId, encoded);
+  }
+
+  /// Returns the cached past logs for [elevatorId].
+  List<dynamic> loadPastLogs(String elevatorId, dynamic fromJson) {
+    if (elevatorId.isEmpty) return [];
+    final raw = _pastLogsBox.get(elevatorId);
+    if (raw == null) return [];
+    try {
+      final list = jsonDecode(raw) as List<dynamic>;
+      return list.map((j) => fromJson(j as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
 }

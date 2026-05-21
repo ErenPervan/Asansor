@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_map/flutter_map.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:go_router/go_router.dart';
+
 import 'package:latlong2/latlong.dart';
 
 import '../../elevator/models/elevator_model.dart';
+
 import '../../elevator/providers/elevator_providers.dart';
+
 import '../../fault/models/fault_report_model.dart';
+
 import '../../fault/providers/fault_providers.dart';
+
 import '../models/schedule_model.dart';
+
 import '../providers/admin_providers.dart';
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-
-const _primary = Color(0xFFB91C1C);
-const _errorContainer = Color(0xFFFEE2E2);
-const _onErrorContainer = Color(0xFF991B1B);
-const _surfaceContainerLowest = Colors.white;
-const _outlineVariant = Color(0xFFE2E8F0);
-const _onSurface = Color(0xFF0F172A);
-const _onSurfaceVariant = Color(0xFF475569);
-const _outline = Color(0xFF94A3B8);
-const _background = Color(0xFFF9FAFB);
-
+import '../../../core/theme/app_colors.dart';
 // Marker colours (match Google Maps palette for familiarity)
 const _colorFault = Color(0xFFDB4437);
 const _colorMaintenance = Color(0xFFF4B400);
@@ -188,9 +186,9 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
     final allSchedules = ref.watch(allSchedulesProvider);
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: _primary,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         title: const Text(
@@ -212,7 +210,7 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
       ),
       body: elevatorsAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: _primary),
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
         error: (e, _) => _ErrorBody(
           message: e.toString().replaceFirst('Exception: ', ''),
@@ -350,7 +348,7 @@ class _ElevatorSheet extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       decoration: BoxDecoration(
-        color: _surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -372,7 +370,7 @@ class _ElevatorSheet extends StatelessWidget {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: _outlineVariant,
+                  color: AppColors.outlineVariant,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -389,7 +387,7 @@ class _ElevatorSheet extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: _onSurface,
+                      color: AppColors.onSurface,
                       letterSpacing: -0.4,
                     ),
                   ),
@@ -427,7 +425,7 @@ class _ElevatorSheet extends StatelessWidget {
                   const Icon(
                     Icons.location_on_outlined,
                     size: 15,
-                    color: _outline,
+                    color: AppColors.outline,
                   ),
                   const SizedBox(width: 4),
                   Expanded(
@@ -435,7 +433,7 @@ class _ElevatorSheet extends StatelessWidget {
                       elevator.address!,
                       style: const TextStyle(
                         fontSize: 13,
-                        color: _outline,
+                        color: AppColors.outline,
                         height: 1.4,
                       ),
                     ),
@@ -461,7 +459,7 @@ class _ElevatorSheet extends StatelessWidget {
                   ),
                 ),
                 style: FilledButton.styleFrom(
-                  backgroundColor: _primary,
+                  backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -512,7 +510,7 @@ class _StatsOverlay extends StatelessWidget {
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: _onSurface,
+              color: AppColors.onSurface,
             ),
           ),
           if (faultCount > 0) ...[
@@ -558,7 +556,7 @@ class _LegendSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
       decoration: BoxDecoration(
-        color: _surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
@@ -577,7 +575,7 @@ class _LegendSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 14),
             decoration: BoxDecoration(
-              color: _outlineVariant,
+              color: AppColors.outlineVariant,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -613,17 +611,17 @@ class _LegendSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: _background,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(8),
                 border:
-                    Border.all(color: _outlineVariant.withValues(alpha: 0.5)),
+                    Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
               ),
               child: Row(
                 children: [
                   const Icon(
                     Icons.location_off_outlined,
                     size: 14,
-                    color: _onSurfaceVariant,
+                    color: AppColors.onSurfaceVariant,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -631,7 +629,7 @@ class _LegendSheet extends StatelessWidget {
                       '$unmappedCount asansörün koordinatı eksik — haritada gösterilmiyor.',
                       style: const TextStyle(
                         fontSize: 11,
-                        color: _onSurfaceVariant,
+                        color: AppColors.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -689,12 +687,12 @@ class _LegendItem extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: _onSurface,
+                color: AppColors.onSurface,
               ),
             ),
             Text(
               sublabel,
-              style: const TextStyle(fontSize: 10, color: _outline),
+              style: const TextStyle(fontSize: 10, color: AppColors.outline),
             ),
           ],
         ),
@@ -722,12 +720,12 @@ class _ErrorBody extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
-                color: _errorContainer,
+                color: AppColors.errorContainer,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.location_off_outlined,
-                color: _onErrorContainer,
+                color: AppColors.onErrorContainer,
                 size: 32,
               ),
             ),
@@ -735,14 +733,14 @@ class _ErrorBody extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _onSurfaceVariant),
+              style: const TextStyle(color: AppColors.onSurfaceVariant),
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(backgroundColor: _primary),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
             ),
           ],
         ),

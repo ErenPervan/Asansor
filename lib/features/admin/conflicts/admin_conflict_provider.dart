@@ -14,6 +14,8 @@ class ConflictReport {
     required this.remotePayload,
     required this.status,
     required this.createdAt,
+    this.buildingName,
+    this.technicianName,
   });
 
   final String id;
@@ -23,6 +25,8 @@ class ConflictReport {
   final Map<String, dynamic> remotePayload;
   final String status;
   final DateTime createdAt;
+  final String? buildingName;
+  final String? technicianName;
 
   factory ConflictReport.fromJson(Map<String, dynamic> json) {
     return ConflictReport(
@@ -33,6 +37,8 @@ class ConflictReport {
       remotePayload: (json['remote_payload'] as Map<String, dynamic>?) ?? {},
       status: json['status'] as String? ?? 'pending',
       createdAt: DateTime.parse(json['created_at'] as String),
+      buildingName: json['building_name'] as String?,
+      technicianName: json['technician_name'] as String?,
     );
   }
 }
@@ -50,65 +56,88 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
   Future<List<ConflictReport>> _fetchPending() async {
     final rows = await _client
         .from('conflict_reports')
-        .select()
+        .select('*, elevators(building_name)')
         .eq('status', 'pending')
         .order('created_at', ascending: false);
 
-    return (rows as List)
-        .map((r) => ConflictReport.fromJson(r as Map<String, dynamic>))
+    if (rows.isEmpty) return [];
+
+    final List<String> technicianIds = (rows as List)
+        .map((r) => r['technician_id'] as String)
+        .toSet()
         .toList();
+
+    final profilesResponse = await _client
+        .from('profiles')
+        .select('id, full_name')
+        .inFilter('id', technicianIds);
+
+    final profileMap = {
+      for (final p in profilesResponse) p['id'] as String: p['full_name'] as String?,
+    };
+
+    return (rows as List).map((r) {
+      final map = Map<String, dynamic>.from(r as Map<String, dynamic>);
+      final elevatorData = map['elevators'] as Map<String, dynamic>?;
+      map['building_name'] = elevatorData?['building_name'];
+      map['technician_name'] = profileMap[map['technician_id']];
+      return ConflictReport.fromJson(map);
+    }).toList();
   }
 
   // ── Public actions ─────────────────────────────────────────────────────────
 
-  /// Accepts the [chosenPayload] as the canonical version and marks the
-  /// conflict report as resolved.
-  ///
-  /// If [chosenPayload] is the local payload, pass [ConflictReport.localPayload].
-  /// If the remote state is preferred, pass [ConflictReport.remotePayload].
-  Future<void> resolveConflict({
-    required ConflictReport report,
-    required Map<String, dynamic> chosenPayload,
-  }) async {
+  /// Apply the technician's offline changes (Force Update).
+  /// This updates the target record with the local payload and increments its version.
+  Future<void> resolveForceLocal(ConflictReport report) async {
     state = const AsyncLoading();
 
     try {
-      // 1. Apply the chosen payload to the elevators table.
-      //    Strip any OCC fields that belong to the sync queue, not the table.
-      final sanitized = Map<String, dynamic>.from(chosenPayload)
+      final sanitized = Map<String, dynamic>.from(report.localPayload)
         ..remove('id')
-        ..remove('base_version');
+        ..remove('base_version')
+        ..remove('updated_at'); // will be set by DB or updated here
+
+      // Increment version based on remote payload to enforce OCC
+      final currentVersion = (report.remotePayload['version'] as int?) ?? 1;
+      sanitized['version'] = currentVersion + 1;
+      sanitized['updated_at'] = DateTime.now().toUtc().toIso8601String();
 
       await _client
           .from('elevators')
           .update(sanitized)
           .eq('id', report.elevatorId);
 
-      // 2. Mark the conflict report as resolved.
       await _client
           .from('conflict_reports')
           .update({
-            'status': 'resolved',
-            'resolved_at': DateTime.now().toIso8601String(),
+            'status': 'resolved_forced',
           })
           .eq('id', report.id);
 
-      // 3. Refresh the list.
       state = AsyncData(await _fetchPending());
     } catch (e, st) {
       state = AsyncError(e, st);
     }
   }
 
-  /// Dismisses a conflict report without applying any changes (marks as
-  /// 'dismissed' so it doesn't clutter the queue).
-  Future<void> dismissConflict(String reportId) async {
-    await _client
-        .from('conflict_reports')
-        .update({'status': 'dismissed'})
-        .eq('id', reportId);
+  /// Discard the technician's offline changes (Keep Remote Data).
+  /// Leaves the target record untouched, marks conflict as discarded.
+  Future<void> resolveDiscardLocal(ConflictReport report) async {
+    state = const AsyncLoading();
 
-    state = AsyncData(await _fetchPending());
+    try {
+      await _client
+          .from('conflict_reports')
+          .update({
+            'status': 'resolved_discarded',
+          })
+          .eq('id', report.id);
+
+      state = AsyncData(await _fetchPending());
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
   }
 }
 

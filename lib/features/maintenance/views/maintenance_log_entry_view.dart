@@ -303,6 +303,16 @@ class _MaintenanceLogEntryViewState
                       ),
                     ],
                   ),
+                  actions: [
+                    FilledButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      child: const Text('Tamam'),
+                    ),
+                  ],
+                  actionsAlignment: MainAxisAlignment.center,
                 ),
               );
             },
@@ -310,12 +320,7 @@ class _MaintenanceLogEntryViewState
         },
       );
 
-      // Wait a brief moment to show the dialog
-      await Future.delayed(const Duration(milliseconds: 1500));
       if (!mounted) return;
-
-      // Close dialog
-      Navigator.of(context).pop();
 
       // Navigate back to the home/dashboard
       context.go('/');
@@ -362,7 +367,7 @@ class _MaintenanceLogEntryViewState
           data: (elevator) => Form(
             key: _formKey,
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.md),
               children: [
                 // Elevator Info Card
                 Card(
@@ -371,7 +376,7 @@ class _MaintenanceLogEntryViewState
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -515,7 +520,7 @@ class _MaintenanceLogEntryViewState
                                 return Container(
                                   width: 80,
                                   height: 80,
-                                  color: Colors.black12,
+                                  color: AppColors.outlineVariant,
                                   alignment: Alignment.center,
                                   child: const Icon(
                                     Icons.broken_image_outlined,
@@ -535,7 +540,7 @@ class _MaintenanceLogEntryViewState
                               },
                               icon: const Icon(Icons.close, size: 16),
                               style: IconButton.styleFrom(
-                                backgroundColor: Colors.white70,
+                                backgroundColor: AppColors.surface.withValues(alpha: 0.7),
                                 padding: const EdgeInsets.all(2),
                                 minimumSize: const Size(24, 24),
                               ),
@@ -612,11 +617,11 @@ class _MaintenanceLogEntryViewState
                       onPressed: maintenanceState.isLoading ? null : () {},
                       icon: maintenanceState.isLoading
                           ? const SizedBox(
-                              width: 20,
-                              height: 20,
+                              width: 24,
+                              height: 24,
                               child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
+                                strokeWidth: 2.5,
+                                color: AppColors.onError,
                               ),
                             )
                           : const Icon(Icons.check_circle_outline),

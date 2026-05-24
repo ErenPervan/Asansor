@@ -20,6 +20,9 @@ const checklistCacheBoxName = 'checklist_cache';
 /// Name of the Hive box used to cache past maintenance logs.
 const pastLogsCacheBoxName = 'past_logs_cache';
 
+/// Name of the Hive box used to cache active faults.
+const faultsCacheBoxName = 'faults_cache';
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 /// Provides a thin read/write cache layer backed by Hive.
@@ -42,6 +45,7 @@ class ReadCacheService {
   Box<String> get _tasksBox => Hive.box<String>(tasksCacheBoxName);
   Box<String> get _checklistBox => Hive.box<String>(checklistCacheBoxName);
   Box<String> get _pastLogsBox => Hive.box<String>(pastLogsCacheBoxName);
+  Box<String> get _faultsBox => Hive.box<String>(faultsCacheBoxName);
 
   // ── Elevators ─────────────────────────────────────────────────────────────
 
@@ -133,6 +137,26 @@ class ReadCacheService {
   List<dynamic> loadPastLogs(String elevatorId, dynamic fromJson) {
     if (elevatorId.isEmpty) return [];
     final raw = _pastLogsBox.get(elevatorId);
+    if (raw == null) return [];
+    try {
+      final list = jsonDecode(raw) as List<dynamic>;
+      return list.map((j) => fromJson(j as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  // ── Faults ─────────────────────────────────────────────────────────────
+
+  /// Persists active faults. Overwrites any previous value.
+  Future<void> saveFaults(List<dynamic> faults) async {
+    final encoded = jsonEncode(faults.map((f) => f.toJson()).toList());
+    await _faultsBox.put('active_faults', encoded);
+  }
+
+  /// Returns the cached active faults.
+  List<dynamic> loadFaults(dynamic fromJson) {
+    final raw = _faultsBox.get('active_faults');
     if (raw == null) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;

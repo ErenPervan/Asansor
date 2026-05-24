@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
+import '../../../core/widgets/offline_banner.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/models/elevator_model.dart';
 import '../../maintenance/models/maintenance_log_model.dart';
@@ -42,52 +43,59 @@ class CustomerDashboardView extends ConsumerWidget {
           ),
         ],
       ),
-      body: elevatorAsync.when(
-        data: (elevator) {
-          if (elevator == null) {
-            return const EmptyState(
-              icon: Icons.elevator_outlined,
-              message: 'Size atanmış bir asansör bulunamadı.',
-            );
-          }
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(customerElevatorProvider);
-              ref.invalidate(customerMaintenanceLogsProvider);
-            },
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                _ElevatorHealthCard(elevator: elevator),
-                const SizedBox(height: 24),
-                _ReportFaultButton(elevatorId: elevator.id),
-                const SizedBox(height: 32),
-                const Text(
-                  'Son Bakım Geçmişi',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _MaintenanceLogList(
-                  logsAsync: logsAsync,
-                  onRetry: () {
+      body: Column(
+        children: [
+          const OfflineBanner(),
+          Expanded(
+            child: elevatorAsync.when(
+              data: (elevator) {
+                if (elevator == null) {
+                  return const EmptyState(
+                    icon: Icons.elevator_outlined,
+                    message: 'Size atanmış bir asansör bulunamadı.',
+                  );
+                }
+                return RefreshIndicator(
+                  onRefresh: () async {
                     ref.invalidate(customerElevatorProvider);
                     ref.invalidate(customerMaintenanceLogsProvider);
                   },
-                ),
-              ],
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      _ElevatorHealthCard(elevator: elevator),
+                      const SizedBox(height: 24),
+                      _ReportFaultButton(elevatorId: elevator.id),
+                      const SizedBox(height: 32),
+                      const Text(
+                        'Son Bakım Geçmişi',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _MaintenanceLogList(
+                        logsAsync: logsAsync,
+                        onRetry: () {
+                          ref.invalidate(customerElevatorProvider);
+                          ref.invalidate(customerMaintenanceLogsProvider);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+              loading: () => const LoadingState(),
+              error: (err, _) => ErrorState(
+                message: 'Asansör bilgisi alınamadı.\n$err',
+                onRetry: () => ref.invalidate(customerElevatorProvider),
+              ),
             ),
-          );
-        },
-        loading: () => const LoadingState(),
-        error: (err, _) => ErrorState(
-          message: 'Asansör bilgisi alınamadı.\n$err',
-          onRetry: () => ref.invalidate(customerElevatorProvider),
-        ),
+          ),
+        ],
       ),
     );
   }

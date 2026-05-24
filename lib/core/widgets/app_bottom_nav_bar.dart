@@ -34,7 +34,14 @@ class AppBottomNavBar extends ConsumerWidget {
               icon: Icons.error_outline,
               label: 'Arızalar',
               isActive: currentIndex == 1,
-              onPressed: () {}, // Route implementation pending
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Arızalar listesi yapım aşamasındadır.'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
             ),
             const SizedBox(width: 56), // spacer for the centre FAB
             _NavItem(
@@ -73,7 +80,9 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDisabled = onPressed == null;
     final color = isActive ? AppColors.primary : const Color(0xFF94A3B8);
+    
     final child = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -91,7 +100,18 @@ class _NavItem extends StatelessWidget {
       ],
     );
 
-    if (onPressed == null) return child;
+    if (isDisabled) {
+      return Tooltip(
+        message: 'Yalnızca yöneticiler erişebilir',
+        child: Opacity(
+          opacity: 0.4,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: child,
+          ),
+        ),
+      );
+    }
 
     return InkWell(
       onTap: onPressed,

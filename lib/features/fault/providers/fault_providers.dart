@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'dart:async';
 import '../../../core/providers/connectivity_providers.dart';
 import '../../../core/services/sync_queue_service.dart';
 import '../models/fault_report_model.dart';
@@ -19,8 +20,29 @@ final faultRepositoryProvider = Provider<FaultRepository>((ref) {
 final activeFaultsProvider = FutureProvider<List<FaultReportModel>>((
   ref,
 ) async {
-  final repo = ref.watch(faultRepositoryProvider);
-  return repo.getAllActiveFaults();
+  final isOnline = ref.read(isOnlineProvider);
+  // Assume readCacheServiceProvider is imported or accessible. If not, we will need to adjust.
+  // wait, I don't know the name of the provider. Let's just create an instance if needed.
+  // Wait, I should find readCacheServiceProvider import. I will use ReadCacheService() directly if not provided, or search for it.
+  // Actually, I can use ref.read(readCacheServiceProvider) if I know it exists. Let's look at it.
+  
+  // To be safe, I'll use the same cache provider we saw in elevator_providers.dart.
+  final cache = ref.read(readCacheServiceProvider);
+
+  if (!isOnline) {
+    return cache.loadFaults(FaultReportModel.fromJson).cast<FaultReportModel>();
+  }
+
+  try {
+    final repo = ref.watch(faultRepositoryProvider);
+    final data = await repo.getAllActiveFaults();
+    unawaited(cache.saveFaults(data));
+    return data;
+  } catch (e) {
+    final cached = cache.loadFaults(FaultReportModel.fromJson).cast<FaultReportModel>();
+    if (cached.isNotEmpty) return cached;
+    rethrow;
+  }
 });
 
 /// Fetches all fault reports for a given elevator [id].

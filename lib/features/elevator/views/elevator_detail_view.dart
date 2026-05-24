@@ -47,12 +47,6 @@ class ElevatorDetailView extends ConsumerWidget {
           ),
         ),
         centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: AppColors.primary),
-            onPressed: () {},
-          ),
-        ],
       ),
 
       // ── Body ─────────────────────────────────────────────────────────────

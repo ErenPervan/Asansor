@@ -15,6 +15,7 @@ import '../providers/fault_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/info_card.dart';
+import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/section_label.dart';
 import '../../../core/constants/app_durations.dart';
 import 'package:confetti/confetti.dart';
@@ -30,10 +31,53 @@ class FaultDetailView extends ConsumerWidget {
     final faultAsync = ref.watch(faultByIdProvider(faultId));
 
     return faultAsync.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.background,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+            onPressed: () => context.pop(),
+          ),
+          title: const Text(
+            'Arıza Detayı',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 17,
+              color: AppColors.onSurface,
+              letterSpacing: -0.2,
+            ),
+          ),
+          centerTitle: false,
+        ),
+        body: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: LoadingState(isList: false),
+        ),
+      ),
       error: (e, _) => Scaffold(
-        appBar: AppBar(title: const Text('Arıza Detayı')),
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.background,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+            onPressed: () => context.pop(),
+          ),
+          title: const Text(
+            'Arıza Detayı',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 17,
+              color: AppColors.onSurface,
+              letterSpacing: -0.2,
+            ),
+          ),
+          centerTitle: false,
+        ),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

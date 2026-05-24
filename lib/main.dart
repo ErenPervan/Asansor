@@ -95,6 +95,7 @@ Future<void> main() async {
   await Hive.openBox<String>(tasksCacheBoxName, encryptionCipher: cipher);
   await Hive.openBox<String>(checklistCacheBoxName, encryptionCipher: cipher);
   await Hive.openBox<String>(pastLogsCacheBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(faultsCacheBoxName, encryptionCipher: cipher);
 
   // Set up FCM permissions, notification channels, and message listeners.
   await NotificationService.instance.initialize();

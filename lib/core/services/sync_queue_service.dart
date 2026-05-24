@@ -333,9 +333,13 @@ class SyncQueueService extends ChangeNotifier {
   ) async {
     try {
       final logModel = MaintenanceLogModel.fromJson(response);
+      final checklistDetails = logModel.checklist?.entries.map(
+        (e) => ChecklistItem(label: e.key, isPassed: e.value == true)
+      ).toList() ?? <ChecklistItem>[];
+
       final pdfFile = await PdfService().generateMaintenanceReport(
         log: logModel,
-        checklistDetails: [],
+        checklistDetails: checklistDetails,
         mediaUrls: logModel.photos,
         signatureUrl: logModel.signatureUrl,
         customerSignatureUrl: logModel.customerSignatureUrl,

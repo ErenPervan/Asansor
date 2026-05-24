@@ -26,6 +26,8 @@ final latestFaultDateProvider = FutureProvider.family<DateTime?, String>((
   ref,
   elevatorId,
 ) async {
+  if (!ref.read(isOnlineProvider)) return null;
+
   final client = Supabase.instance.client;
   final response = await client
       .from('fault_reports')
@@ -55,6 +57,8 @@ final latestFaultDateProvider = FutureProvider.family<DateTime?, String>((
 /// Usage: `ref.watch(nextScheduledMaintenanceProvider('some-uuid'))`
 final nextScheduledMaintenanceProvider =
     FutureProvider.family<DateTime?, String>((ref, elevatorId) async {
+      if (!ref.read(isOnlineProvider)) return null;
+
       final client = Supabase.instance.client;
       final now = DateTime.now().toUtc().toIso8601String();
 

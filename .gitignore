@@ -54,3 +54,6 @@ asansor-efaed-firebase-adminsdk-*.json
 # Supabase local envs
 supabase/.env.local
 supabase/.env.local.*
+
+# Whitelist scripts folder to ensure it is always pushed to GitHub
+!scripts/

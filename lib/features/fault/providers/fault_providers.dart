@@ -33,7 +33,9 @@ final allFaultsProvider = FutureProvider<List<FaultReportModel>>((ref) async {
     unawaited(cache.saveFaults(data));
     return data;
   } catch (e) {
-    final cached = cache.loadFaults(FaultReportModel.fromJson).cast<FaultReportModel>();
+    final cached = cache
+        .loadFaults(FaultReportModel.fromJson)
+        .cast<FaultReportModel>();
     if (cached.isNotEmpty) return cached;
     rethrow;
   }
@@ -48,7 +50,7 @@ final activeFaultsProvider = FutureProvider<List<FaultReportModel>>((
   // wait, I don't know the name of the provider. Let's just create an instance if needed.
   // Wait, I should find readCacheServiceProvider import. I will use ReadCacheService() directly if not provided, or search for it.
   // Actually, I can use ref.read(readCacheServiceProvider) if I know it exists. Let's look at it.
-  
+
   // To be safe, I'll use the same cache provider we saw in elevator_providers.dart.
   final cache = ref.read(readCacheServiceProvider);
 
@@ -62,7 +64,9 @@ final activeFaultsProvider = FutureProvider<List<FaultReportModel>>((
     unawaited(cache.saveFaults(data));
     return data;
   } catch (e) {
-    final cached = cache.loadFaults(FaultReportModel.fromJson).cast<FaultReportModel>();
+    final cached = cache
+        .loadFaults(FaultReportModel.fromJson)
+        .cast<FaultReportModel>();
     if (cached.isNotEmpty) return cached;
     rethrow;
   }

@@ -23,7 +23,8 @@ Future<String?> copyToDocumentsDirectory(String? path) async {
   final offlineDir = Directory('${docsDir.path}/offline_media');
   if (!await offlineDir.exists()) await offlineDir.create(recursive: true);
 
-  final fileName = '${DateTime.now().millisecondsSinceEpoch}_${p.basename(path)}';
+  final fileName =
+      '${DateTime.now().millisecondsSinceEpoch}_${p.basename(path)}';
   final dest = File('${offlineDir.path}/$fileName');
   await file.copy(dest.path);
   return dest.path;
@@ -143,10 +144,12 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
 
     if (!isOnline) {
       final stablePhotos = await Future.wait(
-        (photos ?? []).map((path) => copyToDocumentsDirectory(path))
+        (photos ?? []).map((path) => copyToDocumentsDirectory(path)),
       );
       final stableSignature = await copyToDocumentsDirectory(signaturePath);
-      final stableCustomerSignature = await copyToDocumentsDirectory(customerSignaturePath);
+      final stableCustomerSignature = await copyToDocumentsDirectory(
+        customerSignaturePath,
+      );
 
       final payload = <String, dynamic>{
         'elevator_id': elevatorId,
@@ -155,7 +158,8 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
         'is_approved': false,
         'maintenance_date': maintenanceDate.toIso8601String(),
         'checklist': ?checklist,
-        if (stablePhotos.isNotEmpty) 'photos': stablePhotos.whereType<String>().toList(),
+        if (stablePhotos.isNotEmpty)
+          'photos': stablePhotos.whereType<String>().toList(),
         'signature_url': ?stableSignature,
         'customer_signature_url': ?stableCustomerSignature,
       };
@@ -217,10 +221,12 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
       }
     } catch (e) {
       final stablePhotos = await Future.wait(
-        (photos ?? []).map((path) => copyToDocumentsDirectory(path))
+        (photos ?? []).map((path) => copyToDocumentsDirectory(path)),
       );
       final stableSignature = await copyToDocumentsDirectory(signaturePath);
-      final stableCustomerSignature = await copyToDocumentsDirectory(customerSignaturePath);
+      final stableCustomerSignature = await copyToDocumentsDirectory(
+        customerSignaturePath,
+      );
 
       final payload = <String, dynamic>{
         'elevator_id': elevatorId,
@@ -229,7 +235,8 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
         'is_approved': false,
         'maintenance_date': maintenanceDate.toIso8601String(),
         'checklist': ?checklist,
-        if (stablePhotos.isNotEmpty) 'photos': stablePhotos.whereType<String>().toList(),
+        if (stablePhotos.isNotEmpty)
+          'photos': stablePhotos.whereType<String>().toList(),
         'signature_url': ?stableSignature,
         'customer_signature_url': ?stableCustomerSignature,
       };

@@ -43,14 +43,18 @@ class CustomerDashboardView extends ConsumerWidget {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('Çıkış Yap'),
-                  content: const Text('Oturumu kapatmak istediğinize emin misiniz?'),
+                  content: const Text(
+                    'Oturumu kapatmak istediğinize emin misiniz?',
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(false),
                       child: const Text('İptal'),
                     ),
                     FilledButton(
-                      style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                      ),
                       onPressed: () => Navigator.of(context).pop(true),
                       child: const Text('Çıkış Yap'),
                     ),
@@ -276,10 +280,14 @@ class _MaintenanceLogList extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppThemeColors.of(context).surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppThemeColors.of(context).outlineVariant),
+                border: Border.all(
+                  color: AppThemeColors.of(context).outlineVariant,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppThemeColors.of(context).onSurface.withValues(alpha: 0.05),
+                    color: AppThemeColors.of(
+                      context,
+                    ).onSurface.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -312,7 +320,9 @@ class _MaintenanceLogList extends StatelessWidget {
                   log.notes != null && log.notes!.isNotEmpty
                       ? log.notes!
                       : 'Periyodik Bakım',
-                  style: TextStyle(color: AppThemeColors.of(context).onSurfaceVariant),
+                  style: TextStyle(
+                    color: AppThemeColors.of(context).onSurfaceVariant,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),

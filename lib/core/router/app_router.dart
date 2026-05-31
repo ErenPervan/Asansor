@@ -158,10 +158,7 @@ final GoRouter appRouter = GoRouter(
     ),
 
     // ── Fault routes ──────────────────────────────────────────────────────
-    GoRoute(
-      path: '/faults',
-      builder: (context, _) => const FaultListView(),
-    ),
+    GoRoute(path: '/faults', builder: (context, _) => const FaultListView()),
     GoRoute(
       path: '/fault/:id',
       builder: (_, state) {

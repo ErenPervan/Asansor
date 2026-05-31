@@ -51,10 +51,10 @@ void main() {
       ];
 
       await service.saveElevators(elevators);
-      
+
       expect(service.hasElevators, isTrue);
       final loaded = service.loadElevators();
-      
+
       expect(loaded.length, 2);
       expect(loaded[0].id, 'e1');
       expect(loaded[1].buildingName, 'B2');
@@ -85,12 +85,12 @@ void main() {
       ];
 
       await service.saveMyTasks('user_x', tasks);
-      
+
       expect(service.hasMyTasks('user_x'), isTrue);
       expect(service.hasMyTasks('other_user'), isFalse);
-      
+
       final loaded = service.loadMyTasks('user_x');
-      
+
       expect(loaded.length, 2);
       expect(loaded[0].id, 't1');
       expect(loaded[1].elevatorId, 'e2');
@@ -100,18 +100,28 @@ void main() {
   group('ReadCacheService - Past Logs', () {
     test('savePastLogs empty elevatorId does nothing', () async {
       await service.savePastLogs('', [TestFactories.createMaintenanceLog()]);
-      expect(service.loadPastLogs('', (j) => MaintenanceLogModel.fromJson(j)), isEmpty);
+      expect(
+        service.loadPastLogs('', (j) => MaintenanceLogModel.fromJson(j)),
+        isEmpty,
+      );
     });
 
     test('save and load past logs works correctly', () async {
       final logs = [
-        TestFactories.createMaintenanceLog(id: 'l1', elevatorId: 'e1', notes: 'Log 1'),
+        TestFactories.createMaintenanceLog(
+          id: 'l1',
+          elevatorId: 'e1',
+          notes: 'Log 1',
+        ),
       ];
 
       await service.savePastLogs('e1', logs);
-      
-      final loaded = service.loadPastLogs('e1', (json) => MaintenanceLogModel.fromJson(json));
-      
+
+      final loaded = service.loadPastLogs(
+        'e1',
+        (json) => MaintenanceLogModel.fromJson(json),
+      );
+
       expect(loaded.length, 1);
       expect((loaded[0] as MaintenanceLogModel).notes, 'Log 1');
     });
@@ -124,9 +134,11 @@ void main() {
       ];
 
       await service.saveFaults(faults);
-      
-      final loaded = service.loadFaults((json) => FaultReportModel.fromJson(json));
-      
+
+      final loaded = service.loadFaults(
+        (json) => FaultReportModel.fromJson(json),
+      );
+
       expect(loaded.length, 1);
       expect((loaded[0] as FaultReportModel).description, 'Fault 1');
     });

@@ -47,8 +47,14 @@ void main() {
       expect(model.maintenanceDay, 15);
       expect(model.model, 'Otis Gen2');
       expect(model.capacity, 630);
-      expect(model.lastInspectionDate, DateTime.parse('2026-01-01T10:00:00.000Z'));
-      expect(model.nextInspectionDate, DateTime.parse('2027-01-01T10:00:00.000Z'));
+      expect(
+        model.lastInspectionDate,
+        DateTime.parse('2026-01-01T10:00:00.000Z'),
+      );
+      expect(
+        model.nextInspectionDate,
+        DateTime.parse('2027-01-01T10:00:00.000Z'),
+      );
       expect(model.inspectionStatus, InspectionStatus.green);
       expect(model.version, 2);
       expect(model.hasMappableLocation, isTrue);
@@ -108,29 +114,32 @@ void main() {
       },
     );
 
-    test('toJson includes model, capacity, and inspection dates when not null', () {
-      final lastIns = DateTime(2026, 1, 1);
-      final nextIns = DateTime(2027, 1, 1);
-      final model = ElevatorModel(
-        id: 'e4',
-        buildingName: 'Apt C',
-        status: 'faulty',
-        model: 'Schindler 3300',
-        capacity: 800,
-        lastInspectionDate: lastIns,
-        nextInspectionDate: nextIns,
-        inspectionStatus: InspectionStatus.red,
-        version: 1,
-      );
+    test(
+      'toJson includes model, capacity, and inspection dates when not null',
+      () {
+        final lastIns = DateTime(2026, 1, 1);
+        final nextIns = DateTime(2027, 1, 1);
+        final model = ElevatorModel(
+          id: 'e4',
+          buildingName: 'Apt C',
+          status: 'faulty',
+          model: 'Schindler 3300',
+          capacity: 800,
+          lastInspectionDate: lastIns,
+          nextInspectionDate: nextIns,
+          inspectionStatus: InspectionStatus.red,
+          version: 1,
+        );
 
-      final json = model.toJson();
+        final json = model.toJson();
 
-      expect(json['model'], 'Schindler 3300');
-      expect(json['capacity'], 800);
-      expect(json['last_inspection_date'], lastIns.toIso8601String());
-      expect(json['next_inspection_date'], nextIns.toIso8601String());
-      expect(json['inspection_status'], 'red');
-    });
+        expect(json['model'], 'Schindler 3300');
+        expect(json['capacity'], 800);
+        expect(json['last_inspection_date'], lastIns.toIso8601String());
+        expect(json['next_inspection_date'], nextIns.toIso8601String());
+        expect(json['inspection_status'], 'red');
+      },
+    );
 
     test('copyWith duplicates values and overrides specified fields', () {
       const original = ElevatorModel(

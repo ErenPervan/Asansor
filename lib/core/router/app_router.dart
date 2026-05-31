@@ -19,6 +19,7 @@ import '../../features/auth/views/login_view.dart';
 import '../../features/customer/views/customer_dashboard_view.dart';
 import '../../features/elevator/views/customer_no_elevator_view.dart';
 import '../../features/fault/views/fault_detail_view.dart';
+import '../../features/fault/views/fault_list_view.dart';
 import '../../features/elevator/views/elevator_detail_view.dart';
 import '../../features/elevator/views/elevator_list_view.dart';
 import '../../features/elevator/views/home_view.dart';
@@ -157,6 +158,10 @@ final GoRouter appRouter = GoRouter(
     ),
 
     // ── Fault routes ──────────────────────────────────────────────────────
+    GoRoute(
+      path: '/faults',
+      builder: (context, _) => const FaultListView(),
+    ),
     GoRoute(
       path: '/fault/:id',
       builder: (_, state) {

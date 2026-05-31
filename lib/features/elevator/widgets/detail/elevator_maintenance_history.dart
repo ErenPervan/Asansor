@@ -405,5 +405,8 @@ final List<String> _monthsTr = [
 ];
 
 String _fmtDate(DateTime dt) {
-  return '${dt.day} ${_monthsTr[dt.month - 1]} ${dt.year}';
+  final localDt = dt.toLocal();
+  final hour = localDt.hour.toString().padLeft(2, '0');
+  final minute = localDt.minute.toString().padLeft(2, '0');
+  return '${localDt.day} ${_monthsTr[localDt.month - 1]} ${localDt.year}, $hour:$minute';
 }

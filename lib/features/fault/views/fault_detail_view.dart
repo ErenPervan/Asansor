@@ -32,9 +32,9 @@ class FaultDetailView extends ConsumerWidget {
 
     return faultAsync.when(
       loading: () => Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppThemeColors.of(context).background,
         appBar: AppBar(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppThemeColors.of(context).background,
           elevation: 0,
           surfaceTintColor: Colors.transparent,
           leading: IconButton(
@@ -58,9 +58,9 @@ class FaultDetailView extends ConsumerWidget {
         ),
       ),
       error: (e, _) => Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppThemeColors.of(context).background,
         appBar: AppBar(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppThemeColors.of(context).background,
           elevation: 0,
           surfaceTintColor: Colors.transparent,
           leading: IconButton(
@@ -158,7 +158,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     final elevatorAddress = elevatorAsync.valueOrNull?.address ?? '';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       body: Stack(
         children: [
           CustomScrollView(
@@ -191,6 +191,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                     isResolved: fault.isResolved,
                     reportedAt: fault.reportedAt,
                     resolvedAt: fault.resolvedAt,
+                    onLongPress: fault.isResolved
+                        ? null
+                        : () => _showResolveDialog(context, fault.id),
                   ),
                 ),
                 title: const Text(
@@ -512,6 +515,31 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     );
   }
 
+  void _showResolveDialog(BuildContext context, String faultId) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Arızayı Onar'),
+        content: const Text(
+          'Bu arızayı onarıldı olarak işaretlemek istediğinize emin misiniz?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('İptal'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _handleResolve(context, ref, faultId);
+            },
+            child: const Text('Evet, Onar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _handleResolve(
     BuildContext context,
     WidgetRef ref,
@@ -545,7 +573,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Hata: $err'),
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           duration: AppDurations.snackBarError,
         ),
@@ -579,7 +607,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Hata: $err'),
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           duration: AppDurations.snackBarError,
         ),
@@ -595,11 +623,13 @@ class _StatusHeader extends StatelessWidget {
     required this.isResolved,
     required this.reportedAt,
     this.resolvedAt,
+    this.onLongPress,
   });
 
   final bool isResolved;
   final DateTime reportedAt;
   final DateTime? resolvedAt;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -623,55 +653,79 @@ class _StatusHeader extends StatelessWidget {
         ? 'Onarıldı: ${_fmt(resolvedAt ?? reportedAt)}'
         : 'Bildirildi: ${_fmt(reportedAt)}';
 
-    return Container(
-      decoration: BoxDecoration(gradient: gradient),
-      child: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                transitionBuilder: (child, animation) {
-                  final curved = CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.elasticOut,
-                  );
-                  return FadeTransition(
-                    opacity: animation,
-                    child: ScaleTransition(scale: curved, child: child),
-                  );
-                },
-                child: Container(
-                  key: ValueKey<bool>(isResolved),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    shape: BoxShape.circle,
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: Container(
+        decoration: BoxDecoration(gradient: gradient),
+        child: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  transitionBuilder: (child, animation) {
+                    final curved = CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.elasticOut,
+                    );
+                    return FadeTransition(
+                      opacity: animation,
+                      child: ScaleTransition(scale: curved, child: child),
+                    );
+                  },
+                  child: Container(
+                    key: ValueKey<bool>(isResolved),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.18),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: Colors.white, size: 36),
                   ),
-                  child: Icon(icon, color: Colors.white, size: 36),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: 2,
+                const SizedBox(height: 10),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: 2,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                sub,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white.withValues(alpha: 0.85),
+                const SizedBox(height: 4),
+                Text(
+                  sub,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.85),
+                  ),
                 ),
-              ),
-            ],
+                if (!isResolved) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'Onarmak için basılı tutun',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),

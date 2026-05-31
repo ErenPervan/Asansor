@@ -74,7 +74,7 @@ class _AdminMasterCalendarViewState
     final isGenerating = autoScheduleState.isLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       appBar: AppBar(
         title: const Text(
           'Ana Takvim',

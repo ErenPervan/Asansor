@@ -24,7 +24,7 @@ class CustomerDashboardView extends ConsumerWidget {
     final logsAsync = ref.watch(customerMaintenanceLogsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       appBar: AppBar(
         title: const Text(
           'Asansör Durumu',
@@ -36,9 +36,30 @@ class CustomerDashboardView extends ConsumerWidget {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.redAccent),
-            onPressed: () {
-              ref.read(authControllerProvider.notifier).signOut();
+            tooltip: 'Çıkış Yap',
+            icon: const Icon(Icons.logout, color: AppColors.error),
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Çıkış Yap'),
+                  content: const Text('Oturumu kapatmak istediğinize emin misiniz?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('İptal'),
+                    ),
+                    FilledButton(
+                      style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Çıkış Yap'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                await ref.read(authControllerProvider.notifier).signOut();
+              }
             },
           ),
         ],
@@ -68,12 +89,12 @@ class CustomerDashboardView extends ConsumerWidget {
                       const SizedBox(height: 24),
                       _ReportFaultButton(elevatorId: elevator.id),
                       const SizedBox(height: 32),
-                      const Text(
+                      Text(
                         'Son Bakım Geçmişi',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: AppThemeColors.of(context).onSurface,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -253,12 +274,12 @@ class _MaintenanceLogList extends StatelessWidget {
 
             return Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppThemeColors.of(context).surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: AppThemeColors.of(context).outlineVariant),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
+                    color: AppThemeColors.of(context).onSurface.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -272,12 +293,12 @@ class _MaintenanceLogList extends StatelessWidget {
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF3F4F6),
+                    color: AppThemeColors.of(context).surfaceContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.build_circle_outlined,
-                    color: Color(0xFF4B5563),
+                    color: AppThemeColors.of(context).onSurfaceVariant,
                   ),
                 ),
                 title: Text(
@@ -291,7 +312,7 @@ class _MaintenanceLogList extends StatelessWidget {
                   log.notes != null && log.notes!.isNotEmpty
                       ? log.notes!
                       : 'Periyodik Bakım',
-                  style: const TextStyle(color: Colors.black54),
+                  style: TextStyle(color: AppThemeColors.of(context).onSurfaceVariant),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),

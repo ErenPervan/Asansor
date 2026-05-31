@@ -137,11 +137,20 @@ class DailyAgendaSection extends StatelessWidget {
                   if (upcomingTasks.length > 3)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        '+${upcomingTasks.length - 3} daha görev var.',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.outline,
+                      child: TextButton(
+                        onPressed: () => context.push('/admin/calendar'),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          '+${upcomingTasks.length - 3} daha görev var. Tümünü gör',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),

@@ -27,10 +27,10 @@ class ElevatorDetailView extends ConsumerWidget {
     final elevatorAsync = ref.watch(elevatorByIdProvider(elevatorId));
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       // ── Top App Bar ──────────────────────────────────────────────────────
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppThemeColors.of(context).background,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(

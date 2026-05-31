@@ -35,20 +35,16 @@ class ElevatorDetailHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Elevator icon
-                    Hero(
-                      tag: 'elevator_icon_${elevator.id}',
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color:
-                              AppColors.primaryFixed, // primary-fixed: #D6E3FF
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.elevator_outlined,
-                          color: AppColors.primary,
-                          size: 28,
-                        ),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryFixed, // primary-fixed: #D6E3FF
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.elevator_outlined,
+                        color: AppColors.primary,
+                        size: 28,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -57,18 +53,15 @@ class ElevatorDetailHeader extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 2),
-                          Hero(
-                            tag: 'elevator_title_${elevator.id}',
-                            child: Material(
-                              color: Colors.transparent,
-                              child: Text(
-                                elevator.buildingName,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.onSurface,
-                                  letterSpacing: -0.3,
-                                ),
+                          Material(
+                            color: Colors.transparent,
+                            child: Text(
+                              elevator.buildingName,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.onSurface,
+                                letterSpacing: -0.3,
                               ),
                             ),
                           ),

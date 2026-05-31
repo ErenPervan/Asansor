@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../core/widgets/error_state.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_durations.dart';
@@ -97,6 +99,64 @@ class _ScannerViewState extends ConsumerState<ScannerView>
     }
   }
 
+  Future<void> _pickImage() async {
+    if (_isProcessing) return;
+
+    final picker = ImagePicker();
+    final xFile = await picker.pickImage(source: ImageSource.gallery);
+    if (xFile == null) return;
+
+    setState(() => _isProcessing = true);
+
+    final capture = await _controller.analyzeImage(xFile.path);
+    final rawValue = capture?.barcodes.firstOrNull?.rawValue?.trim();
+
+    if (rawValue == null || rawValue.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: const Text('Bu görselde QR kod bulunamadı.'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.error,
+            duration: AppDurations.snackBarError,
+          ),
+        );
+      setState(() => _isProcessing = false);
+      return;
+    }
+
+    if (!mounted) return;
+    final isValidUuid = RegExp(
+      _uuidRegex,
+      caseSensitive: false,
+    ).hasMatch(rawValue);
+
+    if (isValidUuid) {
+      await HapticFeedback.mediumImpact();
+      if (!mounted) return;
+      await context.push('/elevator/$rawValue/maintenance/new');
+      if (mounted) setState(() => _isProcessing = false);
+    } else {
+      await HapticFeedback.heavyImpact();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Geçersiz QR kod. Lütfen bir asansör QR kodu seçin.',
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.error,
+            duration: AppDurations.snackBarError,
+          ),
+        );
+      setState(() => _isProcessing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,7 +165,21 @@ class _ScannerViewState extends ConsumerState<ScannerView>
         fit: StackFit.expand,
         children: [
           // ── Full-screen camera feed ──────────────────────────────────────
-          MobileScanner(controller: _controller, onDetect: _onDetect),
+          MobileScanner(
+            controller: _controller,
+            onDetect: _onDetect,
+            errorBuilder: (context, error) {
+              return Scaffold(
+                backgroundColor: Colors.black,
+                body: ErrorState(
+                  message:
+                      error.errorCode == MobileScannerErrorCode.permissionDenied
+                      ? "Kamera izni gerekli — Ayarlar'dan izin verin."
+                      : 'Kamera başlatılamadı: ${error.errorCode.name}',
+                ),
+              );
+            },
+          ),
 
           // ── Animated overlay with transparent cutout ────────────────────
           AnimatedBuilder(
@@ -132,10 +206,20 @@ class _ScannerViewState extends ConsumerState<ScannerView>
                     tooltip: 'Geri',
                     onTap: () => context.pop(),
                   ),
-                  _CircleIconButton(
-                    icon: Icons.flashlight_on_outlined,
-                    tooltip: 'Fener',
-                    onTap: () => _controller.toggleTorch(),
+                  Row(
+                    children: [
+                      _CircleIconButton(
+                        icon: Icons.photo_library_outlined,
+                        tooltip: 'Galeriden Seç',
+                        onTap: _pickImage,
+                      ),
+                      const SizedBox(width: 12),
+                      _CircleIconButton(
+                        icon: Icons.flashlight_on_outlined,
+                        tooltip: 'Fener',
+                        onTap: () => _controller.toggleTorch(),
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -82,6 +82,7 @@ class ElevatorListView extends ConsumerStatefulWidget {
 class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
   final _searchController = TextEditingController();
   String _query = '';
+  String _selectedStatus = 'all';
 
   @override
   void dispose() {
@@ -90,9 +91,16 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
   }
 
   List<ElevatorModel> _applyFilter(List<ElevatorModel> all) {
-    if (_query.trim().isEmpty) return all;
+    var filtered = all;
+    if (_selectedStatus != 'all') {
+      filtered = filtered
+          .where((e) => e.status.toLowerCase() == _selectedStatus)
+          .toList();
+    }
+    if (_query.trim().isEmpty) return filtered;
+
     final q = _query.trim().toLowerCase();
-    return all.where((e) {
+    return filtered.where((e) {
       return e.buildingName.toLowerCase().contains(q) ||
           (e.address?.toLowerCase().contains(q) ?? false);
     }).toList();
@@ -103,7 +111,7 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
     final elevatorsAsync = ref.watch(elevatorsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       // ── App Bar ──────────────────────────────────────────────────────────
       appBar: AppBar(
         backgroundColor: AppColors.primary,
@@ -213,6 +221,48 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           // Shows an amber "offline / cached data" strip when there is no
           // internet connection; renders nothing when online.
           const OfflineBanner(),
+
+          // Status Filters
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                _StatusFilterChip(
+                  label: 'Tümü',
+                  isSelected: _selectedStatus == 'all',
+                  onSelected: () => setState(() => _selectedStatus = 'all'),
+                ),
+                const SizedBox(width: 8),
+                _StatusFilterChip(
+                  label: 'Aktif',
+                  isSelected: _selectedStatus == 'active',
+                  onSelected: () => setState(() => _selectedStatus = 'active'),
+                ),
+                const SizedBox(width: 8),
+                _StatusFilterChip(
+                  label: 'Arızalı',
+                  isSelected: _selectedStatus == 'faulty',
+                  onSelected: () => setState(() => _selectedStatus = 'faulty'),
+                ),
+                const SizedBox(width: 8),
+                _StatusFilterChip(
+                  label: 'Bakımda',
+                  isSelected: _selectedStatus == 'under_maintenance',
+                  onSelected: () =>
+                      setState(() => _selectedStatus = 'under_maintenance'),
+                ),
+                const SizedBox(width: 8),
+                _StatusFilterChip(
+                  label: 'Pasif',
+                  isSelected: _selectedStatus == 'inactive',
+                  onSelected: () =>
+                      setState(() => _selectedStatus = 'inactive'),
+                ),
+              ],
+            ),
+          ),
+
           Expanded(
             child: elevatorsAsync.when(
               loading: () => const Padding(
@@ -313,17 +363,14 @@ class _ElevatorCard extends StatelessWidget {
             child: Row(
               children: [
                 // ── Status icon ──────────────────────────────────────────
-                Hero(
-                  tag: 'elevator_icon_${elevator.id}',
-                  child: Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: style.iconBg,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(style.icon, color: style.iconFg, size: 26),
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: style.iconBg,
+                    borderRadius: BorderRadius.circular(14),
                   ),
+                  child: Icon(style.icon, color: style.iconFg, size: 26),
                 ),
                 const SizedBox(width: 14),
 
@@ -332,21 +379,18 @@ class _ElevatorCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Hero(
-                        tag: 'elevator_title_${elevator.id}',
-                        child: Material(
-                          color: Colors.transparent,
-                          child: Text(
-                            elevator.buildingName,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.onSurface,
-                              letterSpacing: -0.2,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                      Material(
+                        color: Colors.transparent,
+                        child: Text(
+                          elevator.buildingName,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.onSurface,
+                            letterSpacing: -0.2,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (elevator.address != null &&
@@ -508,6 +552,38 @@ class _EmptyBody extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _StatusFilterChip extends StatelessWidget {
+  const _StatusFilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onSelected,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => onSelected(),
+      selectedColor: AppColors.primary.withValues(alpha: 0.15),
+      labelStyle: TextStyle(
+        color: isSelected ? AppColors.primary : AppColors.outline,
+        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+        fontSize: 13,
+      ),
+      side: BorderSide(
+        color: isSelected ? AppColors.primary : AppColors.outlineVariant,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      showCheckmark: false,
     );
   }
 }

@@ -6,10 +6,12 @@ class StatsSection extends StatelessWidget {
     super.key,
     required this.activeFaultCount,
     required this.completedCount,
+    this.completedLabel = 'TAMAMLANAN',
   });
 
   final int activeFaultCount;
   final int completedCount;
+  final String completedLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +72,9 @@ class StatsSection extends StatelessWidget {
                             color: Colors.white,
                           ),
                         ),
-                        const Text(
-                          'TAMAMLANAN',
-                          style: TextStyle(
+                        Text(
+                          completedLabel,
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
                             color: Colors.white70,

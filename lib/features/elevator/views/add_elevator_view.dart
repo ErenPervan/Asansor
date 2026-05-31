@@ -97,7 +97,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppThemeColors.of(context).background,
         appBar: AppBar(
           title: const Text(
             'Asansör Ekle',

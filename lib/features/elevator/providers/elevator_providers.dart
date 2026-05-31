@@ -26,7 +26,7 @@ final latestFaultDateProvider = FutureProvider.family<DateTime?, String>((
   ref,
   elevatorId,
 ) async {
-  if (!ref.read(isOnlineProvider)) return null;
+  if (!ref.watch(isOnlineProvider)) return null;
 
   final client = Supabase.instance.client;
   final response = await client
@@ -57,7 +57,7 @@ final latestFaultDateProvider = FutureProvider.family<DateTime?, String>((
 /// Usage: `ref.watch(nextScheduledMaintenanceProvider('some-uuid'))`
 final nextScheduledMaintenanceProvider =
     FutureProvider.family<DateTime?, String>((ref, elevatorId) async {
-      if (!ref.read(isOnlineProvider)) return null;
+      if (!ref.watch(isOnlineProvider)) return null;
 
       final client = Supabase.instance.client;
       final now = DateTime.now().toUtc().toIso8601String();
@@ -91,7 +91,7 @@ final nextScheduledMaintenanceProvider =
 ///
 /// Re-fetch by calling `ref.invalidate(elevatorsProvider)`.
 final elevatorsProvider = FutureProvider<List<ElevatorModel>>((ref) async {
-  final isOnline = ref.read(isOnlineProvider);
+  final isOnline = ref.watch(isOnlineProvider);
   final cache = ref.read(readCacheServiceProvider);
 
   // ── Offline path ───────────────────────────────────────────────────────────
@@ -121,7 +121,7 @@ final elevatorByIdProvider = FutureProvider.family<ElevatorModel, String>((
   ref,
   id,
 ) async {
-  final isOnline = ref.read(isOnlineProvider);
+  final isOnline = ref.watch(isOnlineProvider);
   final cache = ref.read(readCacheServiceProvider);
 
   if (!isOnline) {

@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:asansor/features/elevator/repositories/elevator_repository.dart';
 import 'package:asansor/features/admin/repositories/schedule_repository.dart';
+import 'package:asansor/features/maintenance/repositories/maintenance_repository.dart';
+import 'package:asansor/features/fault/repositories/fault_repository.dart';
 import 'package:asansor/core/services/pdf_service.dart';
 
 // Supabase Mocks
@@ -29,6 +31,10 @@ class MockHiveBox<T> extends Mock implements Box<T> {}
 class MockElevatorRepository extends Mock implements ElevatorRepository {}
 
 class MockScheduleRepository extends Mock implements ScheduleRepository {}
+
+class MockMaintenanceRepository extends Mock implements MaintenanceRepository {}
+
+class MockFaultRepository extends Mock implements FaultRepository {}
 
 // Service Mocks
 class MockPdfService extends Mock implements PdfService {}

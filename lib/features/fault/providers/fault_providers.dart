@@ -16,11 +16,34 @@ final faultRepositoryProvider = Provider<FaultRepository>((ref) {
 
 // ── Data Providers ───────────────────────────────────────────────────────────
 
+/// Fetches all fault reports (resolved and unresolved) across every elevator.
+final allFaultsProvider = FutureProvider<List<FaultReportModel>>((ref) async {
+  // Try network first if online
+  final isOnline = ref.watch(isOnlineProvider);
+  final cache = ref.read(readCacheServiceProvider);
+
+  if (!isOnline) {
+    return cache.loadFaults(FaultReportModel.fromJson).cast<FaultReportModel>();
+  }
+
+  try {
+    final repo = ref.watch(faultRepositoryProvider);
+    final data = await repo.getAllFaults();
+    // Cache the faults for offline use
+    unawaited(cache.saveFaults(data));
+    return data;
+  } catch (e) {
+    final cached = cache.loadFaults(FaultReportModel.fromJson).cast<FaultReportModel>();
+    if (cached.isNotEmpty) return cached;
+    rethrow;
+  }
+});
+
 /// Fetches all unresolved fault reports across every elevator.
 final activeFaultsProvider = FutureProvider<List<FaultReportModel>>((
   ref,
 ) async {
-  final isOnline = ref.read(isOnlineProvider);
+  final isOnline = ref.watch(isOnlineProvider);
   // Assume readCacheServiceProvider is imported or accessible. If not, we will need to adjust.
   // wait, I don't know the name of the provider. Let's just create an instance if needed.
   // Wait, I should find readCacheServiceProvider import. I will use ReadCacheService() directly if not provided, or search for it.

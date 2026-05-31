@@ -154,6 +154,7 @@ class SyncQueueService extends ChangeNotifier {
 
       int synced = 0;
       int failed = 0;
+      final Map<String, int> versionMap = {};
 
       for (final key in keys) {
         final raw = _box.get(key);
@@ -167,7 +168,7 @@ class SyncQueueService extends ChangeNotifier {
             continue; // Skip conflicted items, they require manual resolution
           }
 
-          await _process(client, item, key);
+          await _processWithVersionTracking(client, item, key, versionMap);
           await _box.delete(key);
           synced++;
         } on ConflictException catch (e) {
@@ -194,6 +195,28 @@ class SyncQueueService extends ChangeNotifier {
   }
 
   // ── Internal ──────────────────────────────────────────────────────────────
+
+  Future<void> _processWithVersionTracking(
+    SupabaseClient client,
+    Map<String, dynamic> item,
+    String key,
+    Map<String, int> versionMap,
+  ) async {
+    final type = item['type'] as String;
+    final payload = Map<String, dynamic>.from(item['payload'] as Map);
+
+    if (type == SyncItemType.elevatorUpdate) {
+      final elevatorId = payload['id'] as String;
+      if (versionMap.containsKey(elevatorId)) {
+        payload['base_version'] = versionMap[elevatorId]!;
+      }
+      await _syncElevatorUpdate(client, payload);
+      versionMap[elevatorId] = (payload['base_version'] as int) + 1;
+      return;
+    }
+    
+    await _process(client, item, key);
+  }
 
   Future<void> _process(
     SupabaseClient client,
@@ -374,9 +397,9 @@ class SyncQueueService extends ChangeNotifier {
             'send-notification',
             body: {
               'to_user_id': customerId,
-              'title': 'BakÄ±m TamamlandÄ± âœ“',
+              'title': 'Bakım Tamamlandı ✓',
               'body':
-                  'AsansÃ¶rÃ¼nÃ¼zÃ¼n periyodik bakÄ±mÄ± tamamlandÄ±. Rapora gÃ¶z atabilirsiniz.',
+                  'Asansörünüzün periyodik bakımı tamamlandı. Rapora göz atabilirsiniz.',
               'data': {'route': '/customer', 'pdf_url': publicUrl},
             },
           );

@@ -80,6 +80,25 @@ serve(async (req: Request) => {
       console.log(`[Webhook] Broadcasting to ${targets.length} admins.`);
     }
     else if (reqBody.to_user_id && reqBody.title && reqBody.body) {
+      // Direct App Call — MUST verify the caller is an authenticated Supabase user
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized: Missing or invalid Authorization header." }),
+          { status: 401, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Verify the JWT using Supabase auth
+      const callerToken = authHeader.replace("Bearer ", "");
+      const { data: { user }, error: authError } = await supabase.auth.getUser(callerToken);
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized: Invalid token." }),
+          { status: 401, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
+
       // It's a direct API call from the app
       title = reqBody.title;
       bodyText = reqBody.body;

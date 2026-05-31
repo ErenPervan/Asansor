@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -9,6 +11,23 @@ import '../../../core/services/sync_queue_service.dart';
 import '../models/maintenance_log_model.dart';
 import '../repositories/maintenance_repository.dart';
 import '../../admin/repositories/schedule_repository.dart';
+
+Future<String?> copyToDocumentsDirectory(String? path) async {
+  if (path == null) return null;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+
+  final file = File(path);
+  if (!await file.exists()) return null;
+
+  final docsDir = await getApplicationDocumentsDirectory();
+  final offlineDir = Directory('${docsDir.path}/offline_media');
+  if (!await offlineDir.exists()) await offlineDir.create(recursive: true);
+
+  final fileName = '${DateTime.now().millisecondsSinceEpoch}_${p.basename(path)}';
+  final dest = File('${offlineDir.path}/$fileName');
+  await file.copy(dest.path);
+  return dest.path;
+}
 
 // ── Repository ──────────────────────────────────────────────────────────────
 
@@ -43,7 +62,7 @@ final logsByElevatorProvider =
       ref,
       elevatorId,
     ) async {
-      final isOnline = ref.read(isOnlineProvider);
+      final isOnline = ref.watch(isOnlineProvider);
       final cache = ref.read(readCacheServiceProvider);
 
       if (!isOnline) {
@@ -123,7 +142,12 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
     final isOnline = ref.read(isOnlineProvider);
 
     if (!isOnline) {
-      // ── Offline path: enqueue for later sync ──────────────────────────────
+      final stablePhotos = await Future.wait(
+        (photos ?? []).map((path) => copyToDocumentsDirectory(path))
+      );
+      final stableSignature = await copyToDocumentsDirectory(signaturePath);
+      final stableCustomerSignature = await copyToDocumentsDirectory(customerSignaturePath);
+
       final payload = <String, dynamic>{
         'elevator_id': elevatorId,
         'technician_id': technicianId,
@@ -131,9 +155,9 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
         'is_approved': false,
         'maintenance_date': maintenanceDate.toIso8601String(),
         'checklist': ?checklist,
-        if (photos != null && photos.isNotEmpty) 'photos': photos,
-        'signature_url': ?signaturePath,
-        'customer_signature_url': ?customerSignaturePath,
+        if (stablePhotos.isNotEmpty) 'photos': stablePhotos.whereType<String>().toList(),
+        'signature_url': ?stableSignature,
+        'customer_signature_url': ?stableCustomerSignature,
       };
 
       await ref
@@ -192,6 +216,12 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
         if (res.isNotEmpty) custSigUrlStr = res.first;
       }
     } catch (e) {
+      final stablePhotos = await Future.wait(
+        (photos ?? []).map((path) => copyToDocumentsDirectory(path))
+      );
+      final stableSignature = await copyToDocumentsDirectory(signaturePath);
+      final stableCustomerSignature = await copyToDocumentsDirectory(customerSignaturePath);
+
       final payload = <String, dynamic>{
         'elevator_id': elevatorId,
         'technician_id': technicianId,
@@ -199,9 +229,9 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
         'is_approved': false,
         'maintenance_date': maintenanceDate.toIso8601String(),
         'checklist': ?checklist,
-        if (photos != null && photos.isNotEmpty) 'photos': photos,
-        'signature_url': ?signaturePath,
-        'customer_signature_url': ?customerSignaturePath,
+        if (stablePhotos.isNotEmpty) 'photos': stablePhotos.whereType<String>().toList(),
+        'signature_url': ?stableSignature,
+        'customer_signature_url': ?stableCustomerSignature,
       };
 
       await ref

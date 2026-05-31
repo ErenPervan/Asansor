@@ -15,6 +15,7 @@ import '../../admin/providers/checklist_provider.dart';
 import '../providers/maintenance_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/input_decorations.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -434,29 +435,132 @@ class _MaintenanceLogEntryViewState
                       );
                     }
 
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: activeItems.map((item) {
-                          final isChecked = _checkedItems[item.id] ?? false;
-                          return CheckboxListTile(
-                            title: Text(item.label),
-                            subtitle: item.description.isNotEmpty
-                                ? Text(item.description)
-                                : null,
-                            value: isChecked,
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  _checkedItems[item.id] = value;
-                                });
-                              }
-                            },
-                          );
-                        }).toList(),
-                      ),
+                    final checkedCount = activeItems
+                        .where((i) => _checkedItems[i.id] == true)
+                        .length;
+                    final totalCount = activeItems.length;
+                    final progress = totalCount > 0
+                        ? checkedCount / totalCount
+                        : 0.0;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 8,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '$checkedCount / $totalCount tamamlandı',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.outline,
+                                ),
+                              ),
+                              Text(
+                                '${(progress * 100).toInt()}%',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: progress == 1.0
+                                      ? AppColors.success
+                                      : AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 6,
+                            backgroundColor: AppColors.surfaceContainerHigh,
+                            color: progress == 1.0
+                                ? AppColors.success
+                                : AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: activeItems.map((item) {
+                              final isChecked = _checkedItems[item.id] ?? false;
+                              return InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _checkedItems[item.id] = !isChecked;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Transform.scale(
+                                        scale: 1.2,
+                                        child: Checkbox(
+                                          value: isChecked,
+                                          onChanged: (value) {
+                                            if (value != null) {
+                                              setState(() {
+                                                _checkedItems[item.id] = value;
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(
+                                              height: 6,
+                                            ), // align with scaled checkbox center
+                                            Text(
+                                              item.label,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            if (item
+                                                .description
+                                                .isNotEmpty) ...[
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                item.description,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: AppColors.outline,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
                     );
                   },
                   loading: () => const Padding(
@@ -540,7 +644,9 @@ class _MaintenanceLogEntryViewState
                               },
                               icon: const Icon(Icons.close, size: 16),
                               style: IconButton.styleFrom(
-                                backgroundColor: AppColors.surface.withValues(alpha: 0.7),
+                                backgroundColor: AppColors.surface.withValues(
+                                  alpha: 0.7,
+                                ),
                                 padding: const EdgeInsets.all(2),
                                 minimumSize: const Size(24, 24),
                               ),
@@ -567,10 +673,9 @@ class _MaintenanceLogEntryViewState
                 TextFormField(
                   controller: _notesController,
                   maxLines: 4,
-                  decoration: const InputDecoration(
-                    hintText:
+                  decoration: appInputDecoration(
+                    hint:
                         'Yapılan işlemleri, değiştirilen parçaları vb. buraya yazın...',
-                    border: OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/widgets/animated_counter.dart';
+import 'package:asansor/core/widgets/shimmer_card.dart';
 import 'package:asansor/features/admin/repositories/admin_repository.dart';
 import 'package:asansor/features/admin/widgets/dashboard/dashboard_banners.dart';
 
@@ -15,12 +16,7 @@ class DashboardStatsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return stats.when(
-      loading: () => const Center(
-        child: Padding(
-          padding: EdgeInsets.all(32),
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
-      ),
+      loading: () => const _StatsGridShimmer(),
       error: (e, _) =>
           ErrorBanner(message: e.toString().replaceFirst('Exception: ', '')),
       data: (s) => Column(
@@ -108,6 +104,36 @@ class DashboardStatsGrid extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StatsGridShimmer extends StatelessWidget {
+  const _StatsGridShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const ShimmerCard(width: 140, height: 24, borderRadius: 6),
+        const SizedBox(height: 16),
+        Row(
+          children: const [
+            Expanded(child: ShimmerCard(height: 140, borderRadius: 20)),
+            SizedBox(width: 12),
+            Expanded(child: ShimmerCard(height: 140, borderRadius: 20)),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: const [
+            Expanded(child: ShimmerCard(height: 140, borderRadius: 20)),
+            SizedBox(width: 12),
+            Expanded(child: ShimmerCard(height: 140, borderRadius: 20)),
+          ],
+        ),
+      ],
     );
   }
 }

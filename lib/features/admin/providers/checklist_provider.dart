@@ -11,7 +11,7 @@ class ChecklistNotifier
   }
 
   Future<List<ChecklistItemModel>> _fetchItems() async {
-    final isOnline = ref.read(isOnlineProvider);
+    final isOnline = ref.watch(isOnlineProvider);
     final cache = ref.read(readCacheServiceProvider);
 
     if (!isOnline) {

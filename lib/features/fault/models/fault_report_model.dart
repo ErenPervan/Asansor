@@ -12,6 +12,8 @@ class FaultReportModel {
     required this.elevatorId,
     required this.description,
     this.photoUrl,
+    this.faultType,
+    this.priority,
     required this.isResolved,
     required this.reportedAt,
     this.resolvedAt,
@@ -28,6 +30,12 @@ class FaultReportModel {
 
   /// Optional URL pointing to a photo stored in Supabase Storage.
   final String? photoUrl;
+
+  /// Arıza kategorisi (örn. 'Kapı Motoru', 'Anakart', vs.)
+  final String? faultType;
+
+  /// Öncelik seviyesi: 'low' | 'normal' | 'high' | 'emergency'
+  final String? priority;
 
   final bool isResolved;
   final DateTime reportedAt;
@@ -48,6 +56,8 @@ class FaultReportModel {
       elevatorId: (json['elevator_id'] as String?) ?? '',
       description: (json['description'] as String?) ?? '',
       photoUrl: json['photo_url'] as String?,
+      faultType: json['fault_type'] as String?,
+      priority: json['priority'] as String?,
       isResolved: (json['is_resolved'] as bool?) ?? false,
       reportedAt: json['reported_at'] != null
           ? DateTime.parse(json['reported_at'] as String)
@@ -65,6 +75,8 @@ class FaultReportModel {
       'elevator_id': elevatorId,
       'description': description,
       'photo_url': photoUrl,
+      if (faultType != null) 'fault_type': faultType,
+      if (priority != null) 'priority': priority,
       'is_resolved': isResolved,
       'reported_at': reportedAt.toIso8601String(),
       'resolved_at': resolvedAt?.toIso8601String(),
@@ -77,6 +89,8 @@ class FaultReportModel {
     String? elevatorId,
     String? description,
     String? photoUrl,
+    String? faultType,
+    String? priority,
     bool? isResolved,
     DateTime? reportedAt,
     DateTime? resolvedAt,
@@ -88,6 +102,8 @@ class FaultReportModel {
       elevatorId: elevatorId ?? this.elevatorId,
       description: description ?? this.description,
       photoUrl: photoUrl ?? this.photoUrl,
+      faultType: faultType ?? this.faultType,
+      priority: priority ?? this.priority,
       isResolved: isResolved ?? this.isResolved,
       reportedAt: reportedAt ?? this.reportedAt,
       resolvedAt: resolvedAt ?? this.resolvedAt,

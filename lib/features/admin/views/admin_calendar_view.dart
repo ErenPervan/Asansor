@@ -100,7 +100,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,

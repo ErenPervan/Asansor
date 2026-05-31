@@ -188,7 +188,7 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
     final allSchedules = ref.watch(allSchedulesProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,

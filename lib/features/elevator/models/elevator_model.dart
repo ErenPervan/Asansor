@@ -5,6 +5,21 @@
 /// alter table elevators add column latitude  double precision;
 /// alter table elevators add column longitude double precision;
 /// ```
+/// Inspection status enum
+/// Maps to the DB ENUM: 'red' | 'yellow' | 'blue' | 'green' | 'none'
+enum InspectionStatus { red, yellow, blue, green, none }
+
+extension InspectionStatusX on InspectionStatus {
+  String get dbValue => name;
+  
+  static InspectionStatus fromDb(String? value) {
+    return InspectionStatus.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => InspectionStatus.none,
+    );
+  }
+}
+
 class ElevatorModel {
   const ElevatorModel({
     required this.id,
@@ -16,6 +31,9 @@ class ElevatorModel {
     this.maintenanceDay,
     this.model,
     this.capacity,
+    this.lastInspectionDate,
+    this.nextInspectionDate,
+    this.inspectionStatus = InspectionStatus.none,
     this.version = 1,
   });
 
@@ -46,6 +64,10 @@ class ElevatorModel {
   /// Null when not yet recorded in the database.
   final int? capacity;
 
+  final DateTime? lastInspectionDate;
+  final DateTime? nextInspectionDate;
+  final InspectionStatus inspectionStatus;
+
   /// OCC Version number
   final int version;
 
@@ -60,6 +82,13 @@ class ElevatorModel {
       maintenanceDay: json['maintenance_day'] as int?,
       model: json['model'] as String?,
       capacity: json['capacity'] as int?,
+      lastInspectionDate: json['last_inspection_date'] != null
+          ? DateTime.parse(json['last_inspection_date'] as String)
+          : null,
+      nextInspectionDate: json['next_inspection_date'] != null
+          ? DateTime.parse(json['next_inspection_date'] as String)
+          : null,
+      inspectionStatus: InspectionStatusX.fromDb(json['inspection_status'] as String?),
       version: json['version'] as int? ?? 1,
     );
   }
@@ -75,6 +104,9 @@ class ElevatorModel {
       if (maintenanceDay != null) 'maintenance_day': maintenanceDay,
       if (model != null) 'model': model,
       if (capacity != null) 'capacity': capacity,
+      'last_inspection_date': lastInspectionDate?.toIso8601String(),
+      'next_inspection_date': nextInspectionDate?.toIso8601String(),
+      'inspection_status': inspectionStatus.dbValue,
       'version': version,
     };
   }
@@ -89,6 +121,9 @@ class ElevatorModel {
     int? maintenanceDay,
     String? model,
     int? capacity,
+    DateTime? lastInspectionDate,
+    DateTime? nextInspectionDate,
+    InspectionStatus? inspectionStatus,
     int? version,
   }) {
     return ElevatorModel(
@@ -101,6 +136,9 @@ class ElevatorModel {
       maintenanceDay: maintenanceDay ?? this.maintenanceDay,
       model: model ?? this.model,
       capacity: capacity ?? this.capacity,
+      lastInspectionDate: lastInspectionDate ?? this.lastInspectionDate,
+      nextInspectionDate: nextInspectionDate ?? this.nextInspectionDate,
+      inspectionStatus: inspectionStatus ?? this.inspectionStatus,
       version: version ?? this.version,
     );
   }
@@ -116,5 +154,5 @@ class ElevatorModel {
       'ElevatorModel(id: $id, buildingName: $buildingName, '
       'address: $address, status: $status, '
       'model: $model, capacity: $capacity, '
-      'lat: $latitude, lng: $longitude, version: $version)';
+      'lat: $latitude, lng: $longitude, inspection: ${inspectionStatus.name}, version: $version)';
 }

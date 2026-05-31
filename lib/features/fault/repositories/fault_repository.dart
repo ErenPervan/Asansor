@@ -9,6 +9,23 @@ class FaultRepository {
 
   static const _table = 'fault_reports';
 
+  // ── Read ───────────────────────────────────────────────────────────────────
+
+  Future<List<FaultReportModel>> getAllFaults() async {
+    try {
+      final response = await _client
+          .from(_table)
+          .select()
+          .order('reported_at', ascending: false);
+
+      return (response as List<dynamic>)
+          .map((json) => FaultReportModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Tüm arızalar yüklenemedi: $e');
+    }
+  }
+
   // ── Write ──────────────────────────────────────────────────────────────────
 
   /// Inserts a new fault report and returns the saved record.

@@ -55,15 +55,13 @@ DECLARE
 BEGIN
   -- ── Build the Edge Function URL ──────────────────────────────────────────
   -- Replace <YOUR_PROJECT_REF> with your actual Supabase project reference ID.
-  _edge_function_url := 'https://fuwmrhahwvsouhcxycyr.supabase.co
-/functions/v1/notify-technician';
+  _edge_function_url := 'https://fuwmrhahwvsouhcxycyr.supabase.co/functions/v1/send-notification';
 
   -- ── Authorisation header value ────────────────────────────────────────────
   -- The function is deployed with --no-verify-jwt, but passing the anon key
   -- keeps the call consistent with Supabase conventions and allows you to
   -- re-enable JWT verification later without changing the trigger.
-  -- Replace <YOUR_ANON_KEY> with your project's anon/public key.
-  _anon_key := '<eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1d21yaGFod3Zzb3VoY3h5Y3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTEzMjQsImV4cCI6MjA5MTMyNzMyNH0.ylkeV283PxJhF8C_683njSN7SyONrB-WJrC9xs1c-dA>';
+  _anon_key := COALESCE(current_setting('app.settings.anon_key', true), '<eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1d21yaGFod3Zzb3VoY3h5Y3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTEzMjQsImV4cCI6MjA5MTMyNzMyNH0.ylkeV283PxJhF8C_683njSN7SyONrB-WJrC9xs1c-dA>');
 
   -- ── Wrap the new row in the standard Supabase webhook envelope ────────────
   -- This matches what Supabase native Database Webhooks send, so the Edge

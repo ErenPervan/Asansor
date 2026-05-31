@@ -3,6 +3,21 @@ import 'package:asansor/features/elevator/models/elevator_model.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 
 void main() {
+  group('InspectionStatus Tests', () {
+    test('fromDb handles valid and invalid values', () {
+      expect(InspectionStatusX.fromDb('green'), InspectionStatus.green);
+      expect(InspectionStatusX.fromDb('red'), InspectionStatus.red);
+      expect(InspectionStatusX.fromDb('unknown_value'), InspectionStatus.none);
+      expect(InspectionStatusX.fromDb(null), InspectionStatus.none);
+    });
+
+    test('dbValue returns correct string', () {
+      expect(InspectionStatus.red.dbValue, 'red');
+      expect(InspectionStatus.blue.dbValue, 'blue');
+      expect(InspectionStatus.none.dbValue, 'none');
+    });
+  });
+
   group('ElevatorModel Tests', () {
     test('fromJson handles complete data correctly', () {
       final json = {
@@ -15,6 +30,9 @@ void main() {
         'maintenance_day': 15,
         'model': 'Otis Gen2',
         'capacity': 630,
+        'last_inspection_date': '2026-01-01T10:00:00.000Z',
+        'next_inspection_date': '2027-01-01T10:00:00.000Z',
+        'inspection_status': 'green',
         'version': 2,
       };
 
@@ -29,6 +47,9 @@ void main() {
       expect(model.maintenanceDay, 15);
       expect(model.model, 'Otis Gen2');
       expect(model.capacity, 630);
+      expect(model.lastInspectionDate, DateTime.parse('2026-01-01T10:00:00.000Z'));
+      expect(model.nextInspectionDate, DateTime.parse('2027-01-01T10:00:00.000Z'));
+      expect(model.inspectionStatus, InspectionStatus.green);
       expect(model.version, 2);
       expect(model.hasMappableLocation, isTrue);
       expect(model.hasMaintenanceContract, isTrue);
@@ -50,6 +71,9 @@ void main() {
         expect(model.maintenanceDay, isNull);
         expect(model.model, isNull);
         expect(model.capacity, isNull);
+        expect(model.lastInspectionDate, isNull);
+        expect(model.nextInspectionDate, isNull);
+        expect(model.inspectionStatus, InspectionStatus.none);
         expect(model.version, 1); // Default value
         expect(model.hasMappableLocation, isFalse);
         expect(model.hasMaintenanceContract, isFalse);
@@ -78,16 +102,24 @@ void main() {
         expect(json.containsKey('maintenance_day'), isFalse);
         expect(json.containsKey('model'), isFalse);
         expect(json.containsKey('capacity'), isFalse);
+        expect(json['last_inspection_date'], isNull);
+        expect(json['next_inspection_date'], isNull);
+        expect(json['inspection_status'], 'none');
       },
     );
 
-    test('toJson includes model and capacity when they are not null', () {
-      const model = ElevatorModel(
+    test('toJson includes model, capacity, and inspection dates when not null', () {
+      final lastIns = DateTime(2026, 1, 1);
+      final nextIns = DateTime(2027, 1, 1);
+      final model = ElevatorModel(
         id: 'e4',
         buildingName: 'Apt C',
         status: 'faulty',
         model: 'Schindler 3300',
         capacity: 800,
+        lastInspectionDate: lastIns,
+        nextInspectionDate: nextIns,
+        inspectionStatus: InspectionStatus.red,
         version: 1,
       );
 
@@ -95,6 +127,9 @@ void main() {
 
       expect(json['model'], 'Schindler 3300');
       expect(json['capacity'], 800);
+      expect(json['last_inspection_date'], lastIns.toIso8601String());
+      expect(json['next_inspection_date'], nextIns.toIso8601String());
+      expect(json['inspection_status'], 'red');
     });
 
     test('copyWith duplicates values and overrides specified fields', () {
@@ -104,6 +139,7 @@ void main() {
         status: 'active',
         model: 'Kone MonoSpace',
         capacity: 450,
+        inspectionStatus: InspectionStatus.blue,
         version: 1,
       );
 
@@ -111,6 +147,7 @@ void main() {
         status: 'faulty',
         capacity: 630,
         model: 'Kone MonoSpace DX',
+        inspectionStatus: InspectionStatus.red,
       );
 
       expect(updated.id, 'e5');
@@ -118,6 +155,7 @@ void main() {
       expect(updated.status, 'faulty');
       expect(updated.model, 'Kone MonoSpace DX');
       expect(updated.capacity, 630);
+      expect(updated.inspectionStatus, InspectionStatus.red);
       expect(updated.version, 1);
     });
 
@@ -128,10 +166,12 @@ void main() {
         status: 'active',
         model: 'Otis',
         capacity: 1000,
+        inspectionStatus: InspectionStatus.green,
         version: 4,
       );
 
       expect(model.toString(), contains('model: Otis, capacity: 1000'));
+      expect(model.toString(), contains('inspection: green, version: 4'));
     });
   });
 

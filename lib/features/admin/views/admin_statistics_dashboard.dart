@@ -50,7 +50,7 @@ class _AdminStatisticsDashboardState
     final analyticsAsync = ref.watch(adminAnalyticsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       appBar: _buildAppBar(context),
       body: RefreshIndicator(
         color: AppColors.blue,

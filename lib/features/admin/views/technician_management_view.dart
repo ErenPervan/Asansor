@@ -23,7 +23,7 @@ class TechnicianManagementView extends ConsumerWidget {
     final dataAsync = ref.watch(technicianManagementProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       appBar: AppBar(
         title: const Text(
           'Teknisyen Ekibi',

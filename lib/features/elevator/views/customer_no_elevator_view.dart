@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/providers/auth_providers.dart';
+import '../../admin/providers/profile_providers.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 // ── CustomerNoElevatorView ────────────────────────────────────────────────────
@@ -12,13 +14,38 @@ import '../../../core/theme/app_colors.dart';
 ///
 /// Instructs the user to contact their building manager.
 /// The only action available is signing out.
-class CustomerNoElevatorView extends ConsumerWidget {
+class CustomerNoElevatorView extends ConsumerStatefulWidget {
   const CustomerNoElevatorView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CustomerNoElevatorView> createState() =>
+      _CustomerNoElevatorViewState();
+}
+
+class _CustomerNoElevatorViewState
+    extends ConsumerState<CustomerNoElevatorView> {
+  @override
+  void initState() {
+    super.initState();
+    routerRoleNotifier.addListener(_checkElevatorId);
+  }
+
+  @override
+  void dispose() {
+    routerRoleNotifier.removeListener(_checkElevatorId);
+    super.dispose();
+  }
+
+  void _checkElevatorId() {
+    if (routerRoleNotifier.elevatorId != null) {
+      context.go('/customer/dashboard');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.of(context).background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -40,8 +67,35 @@ class CustomerNoElevatorView extends ConsumerWidget {
                       ),
                     ),
                     TextButton.icon(
-                      onPressed: () =>
-                          ref.read(authControllerProvider.notifier).signOut(),
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Çıkış Yap'),
+                            content: const Text(
+                              'Oturumu kapatmak istediğinize emin misiniz?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text('İptal'),
+                              ),
+                              FilledButton(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.error,
+                                ),
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: const Text('Çıkış Yap'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true) {
+                          await ref.read(authControllerProvider.notifier).signOut();
+                        }
+                      },
                       icon: const Icon(Icons.logout_outlined, size: 16),
                       label: const Text('Çıkış Yap'),
                       style: TextButton.styleFrom(
@@ -134,8 +188,8 @@ class CustomerNoElevatorView extends ConsumerWidget {
 
               // ── Sign-out button ───────────────────────────────────────
               FilledButton.icon(
-                onPressed: () =>
-                    ref.read(authControllerProvider.notifier).signOut(),
+                onPressed: () async =>
+                    await ref.read(authControllerProvider.notifier).signOut(),
                 icon: const Icon(Icons.logout_outlined),
                 label: const Text(
                   'Oturumu Kapat',

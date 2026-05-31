@@ -34,14 +34,7 @@ class AppBottomNavBar extends ConsumerWidget {
               icon: Icons.error_outline,
               label: 'Arızalar',
               isActive: currentIndex == 1,
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Arızalar listesi yapım aşamasındadır.'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
+              onPressed: () => context.go('/faults'),
             ),
             const SizedBox(width: 56), // spacer for the centre FAB
             _NavItem(

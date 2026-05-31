@@ -31,6 +31,7 @@ class HomeView extends ConsumerWidget {
     final mySchedules = ref.watch(technicianScheduleStreamProvider);
     final elevators = ref.watch(elevatorsProvider);
     final completedCount = ref.watch(completedTodayCountProvider);
+    final adminStatsAsync = ref.watch(adminStatsProvider);
 
     final pendingCount = ref.watch(pendingSyncCountProvider);
     final isOnline = ref.watch(isOnlineProvider);
@@ -48,6 +49,9 @@ class HomeView extends ConsumerWidget {
               pendingSyncCount: pendingCount,
               isOnline: isOnline,
               isAdmin: isAdmin,
+              activeFaultCount: isAdmin
+                  ? (adminStatsAsync.valueOrNull?.activeFaults ?? 0)
+                  : (activeFaults.valueOrNull?.length ?? 0),
               onSignOut: () =>
                   ref.read(authControllerProvider.notifier).signOut(),
             ),
@@ -71,8 +75,16 @@ class HomeView extends ConsumerWidget {
                     ),
                     const SizedBox(height: 32),
                     StatsSection(
-                      activeFaultCount: activeFaults.valueOrNull?.length ?? 0,
-                      completedCount: completedCount.valueOrNull ?? 0,
+                      activeFaultCount: isAdmin
+                          ? (adminStatsAsync.valueOrNull?.activeFaults ?? 0)
+                          : (activeFaults.valueOrNull?.length ?? 0),
+                      completedCount: isAdmin
+                          ? (adminStatsAsync.valueOrNull?.completedThisMonth ??
+                                0)
+                          : (completedCount.valueOrNull ?? 0),
+                      completedLabel: isAdmin
+                          ? 'BU AY TAMAMLANAN'
+                          : 'TAMAMLANAN',
                     ),
                     const SizedBox(height: 24),
                     ElevatorsShortcutCard(

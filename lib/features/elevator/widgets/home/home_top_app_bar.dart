@@ -12,6 +12,7 @@ class TopAppBar extends StatelessWidget {
     required this.pendingSyncCount,
     required this.isOnline,
     required this.isAdmin,
+    required this.activeFaultCount,
     required this.onSignOut,
   });
 
@@ -19,6 +20,7 @@ class TopAppBar extends StatelessWidget {
   final int pendingSyncCount;
   final bool isOnline;
   final bool isAdmin;
+  final int activeFaultCount;
   final VoidCallback onSignOut;
 
   @override
@@ -27,6 +29,15 @@ class TopAppBar extends StatelessWidget {
     final displayName = userEmail.isNotEmpty
         ? userEmail.split('@').first
         : 'Teknisyen';
+
+    final String statusText;
+    if (!isOnline) {
+      statusText = 'DURUM: ÇEVRİMDIŞI';
+    } else if (pendingSyncCount > 0) {
+      statusText = 'DURUM: SENKRONİZE EDİLİYOR';
+    } else {
+      statusText = 'DURUM: AKTİF';
+    }
 
     return Container(
       color: colors.background,
@@ -55,7 +66,7 @@ class TopAppBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'DURUM: AKTÄ°F',
+                  statusText,
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -64,9 +75,11 @@ class TopAppBar extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Merhaba, $displayName',
+                  isAdmin
+                      ? 'Merhaba Admin — $activeFaultCount açık arıza'
+                      : 'Merhaba, $displayName',
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: colors.primary,
                     letterSpacing: -0.3,
@@ -107,7 +120,33 @@ class TopAppBar extends StatelessWidget {
             shadowColor: Colors.black12,
             child: InkWell(
               customBorder: const CircleBorder(),
-              onTap: onSignOut,
+              onTap: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Çıkış Yap'),
+                    content: const Text(
+                      'Oturumu kapatmak istediğinize emin misiniz?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('İptal'),
+                      ),
+                      FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.error,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Çıkış Yap'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirm == true) {
+                  onSignOut();
+                }
+              },
               child: const Padding(
                 padding: EdgeInsets.all(10),
                 child: Icon(
@@ -151,7 +190,7 @@ class SyncStatusButton extends ConsumerWidget {
 
     if (!isOnline) {
       icon = Icons.cloud_off_outlined;
-      color = AppColors.primary;
+      color = const Color(0xFFD97706); // amber-600
       tooltip = 'Ã‡evrimdÄ±ÅŸÄ±';
     } else if (hasPending) {
       icon = Icons.cloud_upload_outlined;
@@ -374,14 +413,14 @@ class SyncSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEE2E2),
+                color: const Color(0xFFFEF3C7), // amber-100
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: const [
                   Icon(
                     Icons.wifi_off_rounded,
-                    color: AppColors.primary,
+                    color: Color(0xFFD97706),
                     size: 18,
                   ),
                   SizedBox(width: 10),
@@ -390,7 +429,7 @@ class SyncSheet extends StatelessWidget {
                       'Ä°nternet baÄŸlantÄ±sÄ± yok. BaÄŸlantÄ± kurulduÄŸunda otomatik senkronize edilecek.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.primary,
+                        color: Color(0xFFD97706),
                         height: 1.4,
                       ),
                     ),

@@ -67,7 +67,7 @@ final technicianScheduleStreamProvider = StreamProvider.autoDispose<List<Schedul
   final user = ref.watch(authControllerProvider).valueOrNull;
   if (user == null) return const Stream.empty();
 
-  final isOnline = ref.read(isOnlineProvider);
+  final isOnline = ref.watch(isOnlineProvider);
   final cache = ref.read(readCacheServiceProvider);
 
   // ── Offline path ───────────────────────────────────────────────────────────

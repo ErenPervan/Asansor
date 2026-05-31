@@ -7,7 +7,7 @@ void main() {
     test('fromJson parses complete data correctly', () {
       final reportedAt = DateTime.utc(2026, 1, 15);
       final resolvedAt = DateTime.utc(2026, 1, 16);
-      
+
       final json = {
         'id': 'f1',
         'elevator_id': 'e1',
@@ -37,11 +37,7 @@ void main() {
     });
 
     test('fromJson handles nulls with defaults', () {
-      final json = {
-        'id': 'f2',
-        'elevator_id': 'e2',
-        'description': 'Stuck',
-      };
+      final json = {'id': 'f2', 'elevator_id': 'e2', 'description': 'Stuck'};
 
       final model = FaultReportModel.fromJson(json);
 
@@ -52,7 +48,10 @@ void main() {
       expect(model.faultType, isNull);
       expect(model.priority, isNull);
       expect(model.isResolved, isFalse); // Default when null
-      expect(model.reportedAt, DateTime.fromMillisecondsSinceEpoch(0)); // Default when null
+      expect(
+        model.reportedAt,
+        DateTime.fromMillisecondsSinceEpoch(0),
+      ); // Default when null
       expect(model.resolvedAt, isNull);
       expect(model.resolutionNotes, isNull);
     });
@@ -82,9 +81,7 @@ void main() {
     });
 
     test('toJson includes null resolvedAt correctly', () {
-      final model = TestFactories.createFaultReport(
-        resolvedAt: null,
-      );
+      final model = TestFactories.createFaultReport(resolvedAt: null);
 
       final json = model.toJson();
 
@@ -112,8 +109,11 @@ void main() {
     });
 
     test('toString includes key info', () {
-      final model = TestFactories.createFaultReport(id: 'f123', elevatorId: 'e456');
-      
+      final model = TestFactories.createFaultReport(
+        id: 'f123',
+        elevatorId: 'e456',
+      );
+
       expect(model.toString(), contains('f123'));
       expect(model.toString(), contains('e456'));
     });

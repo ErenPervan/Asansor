@@ -19,7 +19,9 @@ class FaultRepository {
           .order('reported_at', ascending: false);
 
       return (response as List<dynamic>)
-          .map((json) => FaultReportModel.fromJson(json as Map<String, dynamic>))
+          .map(
+            (json) => FaultReportModel.fromJson(json as Map<String, dynamic>),
+          )
           .toList();
     } catch (e) {
       throw Exception('Tüm arızalar yüklenemedi: $e');

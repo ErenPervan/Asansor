@@ -7,7 +7,7 @@ void main() {
     test('fromJson parses complete data correctly', () {
       final scheduledDate = DateTime.utc(2026, 2, 1);
       final createdAt = DateTime.utc(2026, 1, 20);
-      
+
       final json = {
         'id': 's1',
         'elevator_id': 'e1',
@@ -36,17 +36,17 @@ void main() {
     });
 
     test('fromJson handles nulls with defaults', () {
-      final json = {
-        'id': 's2',
-        'elevator_id': 'e2',
-      };
+      final json = {'id': 's2', 'elevator_id': 'e2'};
 
       final model = ScheduleModel.fromJson(json);
 
       expect(model.id, 's2');
       expect(model.elevatorId, 'e2');
       expect(model.technicianId, '');
-      expect(model.scheduledDate, DateTime.fromMillisecondsSinceEpoch(0)); // Default when null
+      expect(
+        model.scheduledDate,
+        DateTime.fromMillisecondsSinceEpoch(0),
+      ); // Default when null
       expect(model.status, 'pending'); // Default
       expect(model.priority, 'normal'); // Default
       expect(model.taskType, 'manual'); // Default
@@ -65,14 +65,16 @@ void main() {
 
     test('toJson handles null notes', () {
       final model = TestFactories.createSchedule(notes: null);
-      
+
       final json = model.toJson();
       expect(json.containsKey('notes'), isTrue);
       expect(json['notes'], isNull);
     });
 
     test('isPeriodicMaintenance getter works correctly', () {
-      final periodic = TestFactories.createSchedule(taskType: 'periodic_maintenance');
+      final periodic = TestFactories.createSchedule(
+        taskType: 'periodic_maintenance',
+      );
       expect(periodic.isPeriodicMaintenance, isTrue);
 
       final manual = TestFactories.createSchedule(taskType: 'manual');
@@ -93,10 +95,7 @@ void main() {
         status: 'pending',
       );
 
-      final updated = original.copyWith(
-        status: 'completed',
-        priority: 'high',
-      );
+      final updated = original.copyWith(status: 'completed', priority: 'high');
 
       expect(updated.id, 'orig');
       expect(updated.status, 'completed');
@@ -104,8 +103,13 @@ void main() {
     });
 
     test('toString includes key info', () {
-      final model = TestFactories.createSchedule(id: 's123', elevatorId: 'e456', status: 'pending', priority: 'normal');
-      
+      final model = TestFactories.createSchedule(
+        id: 's123',
+        elevatorId: 'e456',
+        status: 'pending',
+        priority: 'normal',
+      );
+
       expect(model.toString(), contains('s123'));
       expect(model.toString(), contains('e456'));
       expect(model.toString(), contains('pending'));

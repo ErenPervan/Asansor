@@ -75,7 +75,7 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDisabled = onPressed == null;
     final color = isActive ? AppColors.primary : const Color(0xFF94A3B8);
-    
+
     final child = Column(
       mainAxisSize: MainAxisSize.min,
       children: [

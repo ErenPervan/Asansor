@@ -93,7 +93,9 @@ class _CustomerNoElevatorViewState
                           ),
                         );
                         if (confirm == true) {
-                          await ref.read(authControllerProvider.notifier).signOut();
+                          await ref
+                              .read(authControllerProvider.notifier)
+                              .signOut();
                         }
                       },
                       icon: const Icon(Icons.logout_outlined, size: 16),

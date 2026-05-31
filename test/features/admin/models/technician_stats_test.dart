@@ -16,7 +16,9 @@ void main() {
       final pending = TestFactories.createTechnicianTask(status: 'pending');
       expect(pending.isActive, isTrue);
 
-      final inProgress = TestFactories.createTechnicianTask(status: 'in_progress');
+      final inProgress = TestFactories.createTechnicianTask(
+        status: 'in_progress',
+      );
       expect(inProgress.isActive, isTrue);
 
       final completed = TestFactories.createTechnicianTask(status: 'completed');
@@ -33,7 +35,7 @@ void main() {
     test('computed fields are calculated correctly when tasks exist', () {
       final tasks = [
         TestFactories.createTechnicianTask(status: 'completed'), // 1
-        TestFactories.createTechnicianTask(status: 'pending'),   // 2
+        TestFactories.createTechnicianTask(status: 'pending'), // 2
         TestFactories.createTechnicianTask(status: 'in_progress'), // 3
         TestFactories.createTechnicianTask(status: 'cancelled'), // 4
       ];
@@ -41,7 +43,8 @@ void main() {
       final stats = TechnicianStats(
         profile: profile,
         todayTasks: tasks,
-        todayCompleted: 1, // Usually computed/queried externally, but we pass it
+        todayCompleted:
+            1, // Usually computed/queried externally, but we pass it
         monthlyCompleted: 10,
       );
 
@@ -51,29 +54,30 @@ void main() {
       expect(stats.progressValue, 0.25); // 1 / 4
     });
 
-    test('progressValue is 0 when todayTotal is 0 (division by zero protection)', () {
-      final stats = TechnicianStats(
-        profile: profile,
-        todayTasks: [],
-        todayCompleted: 0,
-        monthlyCompleted: 5,
-      );
+    test(
+      'progressValue is 0 when todayTotal is 0 (division by zero protection)',
+      () {
+        final stats = TechnicianStats(
+          profile: profile,
+          todayTasks: [],
+          todayCompleted: 0,
+          monthlyCompleted: 5,
+        );
 
-      expect(stats.todayTotal, 0);
-      expect(stats.progressValue, 0.0);
-      expect(stats.hasActiveTasks, isFalse);
-    });
+        expect(stats.todayTotal, 0);
+        expect(stats.progressValue, 0.0);
+        expect(stats.hasActiveTasks, isFalse);
+      },
+    );
 
     test('progressValue is clamped to 1.0 if todayCompleted > todayTotal', () {
-      final tasks = [
-        TestFactories.createTechnicianTask(status: 'completed'),
-      ];
+      final tasks = [TestFactories.createTechnicianTask(status: 'completed')];
 
       // Technically anomalous data, but test clamp protection
       final stats = TechnicianStats(
         profile: profile,
         todayTasks: tasks,
-        todayCompleted: 2, 
+        todayCompleted: 2,
         monthlyCompleted: 5,
       );
 

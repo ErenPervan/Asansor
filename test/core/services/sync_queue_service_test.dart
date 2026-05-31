@@ -48,12 +48,12 @@ void main() {
 
     test('hasPending getter works correctly', () async {
       expect(service.hasPending, isFalse);
-      
+
       await service.enqueue(
         type: SyncItemType.elevatorUpdate,
         payload: {'id': 'e1'},
       );
-      
+
       expect(service.hasPending, isTrue);
     });
   });
@@ -93,7 +93,7 @@ void main() {
         payload: {'id': 'f1'},
       );
       final key = box.keys.first as String;
-      
+
       // Reset notification flag
       notified = false;
 
@@ -105,32 +105,39 @@ void main() {
     });
   });
 
-  group('SyncQueueService - OCC Version Tracking (Private method testing via enqueue/process logic)', () {
-    test('consecutive enqueues for same elevator track versionMap', () async {
-      // Since flush and _processWithVersionTracking are private/complex to test directly without a Mock SupabaseClient,
-      // we test that enqueuing multiple updates maintains them in the box, and if we inspect the payloads, 
-      // they don't automatically increment version BEFORE flush, but rather the enqueue allows multiple pending items.
-      
-      await service.enqueue(
-        type: SyncItemType.elevatorUpdate,
-        payload: {'id': 'elev_occ', 'status': 'faulty', 'base_version': 1},
-      );
-      
-      await service.enqueue(
-        type: SyncItemType.elevatorUpdate,
-        payload: {'id': 'elev_occ', 'status': 'active', 'base_version': 1}, // UI might pass 1 again if not refreshed
-      );
+  group(
+    'SyncQueueService - OCC Version Tracking (Private method testing via enqueue/process logic)',
+    () {
+      test('consecutive enqueues for same elevator track versionMap', () async {
+        // Since flush and _processWithVersionTracking are private/complex to test directly without a Mock SupabaseClient,
+        // we test that enqueuing multiple updates maintains them in the box, and if we inspect the payloads,
+        // they don't automatically increment version BEFORE flush, but rather the enqueue allows multiple pending items.
 
-      expect(service.pendingCount, 2);
-      
-      final keys = box.keys.toList();
-      final raw1 = box.get(keys[0]);
-      final raw2 = box.get(keys[1]);
-      
-      expect(jsonDecode(raw1!)['payload']['base_version'], 1);
-      // Wait, enqueue itself doesn't update the version Map, flush does.
-      // So this test just confirms they both get enqueued.
-      expect(jsonDecode(raw2!)['payload']['base_version'], 1);
-    });
-  });
+        await service.enqueue(
+          type: SyncItemType.elevatorUpdate,
+          payload: {'id': 'elev_occ', 'status': 'faulty', 'base_version': 1},
+        );
+
+        await service.enqueue(
+          type: SyncItemType.elevatorUpdate,
+          payload: {
+            'id': 'elev_occ',
+            'status': 'active',
+            'base_version': 1,
+          }, // UI might pass 1 again if not refreshed
+        );
+
+        expect(service.pendingCount, 2);
+
+        final keys = box.keys.toList();
+        final raw1 = box.get(keys[0]);
+        final raw2 = box.get(keys[1]);
+
+        expect(jsonDecode(raw1!)['payload']['base_version'], 1);
+        // Wait, enqueue itself doesn't update the version Map, flush does.
+        // So this test just confirms they both get enqueued.
+        expect(jsonDecode(raw2!)['payload']['base_version'], 1);
+      });
+    },
+  );
 }

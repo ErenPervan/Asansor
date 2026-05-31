@@ -11,7 +11,7 @@ enum InspectionStatus { red, yellow, blue, green, none }
 
 extension InspectionStatusX on InspectionStatus {
   String get dbValue => name;
-  
+
   static InspectionStatus fromDb(String? value) {
     return InspectionStatus.values.firstWhere(
       (e) => e.name == value,
@@ -88,7 +88,9 @@ class ElevatorModel {
       nextInspectionDate: json['next_inspection_date'] != null
           ? DateTime.parse(json['next_inspection_date'] as String)
           : null,
-      inspectionStatus: InspectionStatusX.fromDb(json['inspection_status'] as String?),
+      inspectionStatus: InspectionStatusX.fromDb(
+        json['inspection_status'] as String?,
+      ),
       version: json['version'] as int? ?? 1,
     );
   }

@@ -78,8 +78,10 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
     final today = DateTime.now();
     final hasTodayMaintenance =
         allSchedules.valueOrNull?.any((s) {
-          if (s.elevatorId != elevatorId || s.status != ScheduleStatus.pending)
+          if (s.elevatorId != elevatorId ||
+              s.status != ScheduleStatus.pending) {
             return false;
+          }
           final d = s.scheduledDate.toLocal();
           return d.year == today.year &&
               d.month == today.month &&

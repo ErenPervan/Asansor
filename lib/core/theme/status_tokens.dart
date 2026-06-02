@@ -70,7 +70,10 @@ abstract final class StatusTokens {
     }
   }
 
-  static Color elevatorBadgeBackgroundDynamic(BuildContext context, String status) {
+  static Color elevatorBadgeBackgroundDynamic(
+    BuildContext context,
+    String status,
+  ) {
     final colors = AppThemeColors.of(context);
     switch (status.toLowerCase()) {
       case 'active':
@@ -86,7 +89,10 @@ abstract final class StatusTokens {
     }
   }
 
-  static Color elevatorBadgeForegroundDynamic(BuildContext context, String status) {
+  static Color elevatorBadgeForegroundDynamic(
+    BuildContext context,
+    String status,
+  ) {
     final colors = AppThemeColors.of(context);
     switch (status.toLowerCase()) {
       case 'active':

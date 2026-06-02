@@ -13,7 +13,9 @@ class ConflictBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+    final iconSize = (MediaQuery.textScalerOf(
+      context,
+    ).scale(52)).clamp(40.0, 72.0);
 
     return Material(
       color: Colors.transparent,
@@ -99,7 +101,9 @@ class AddElevatorBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+    final iconSize = (MediaQuery.textScalerOf(
+      context,
+    ).scale(52)).clamp(40.0, 72.0);
 
     return Material(
       color: Colors.transparent,
@@ -113,7 +117,10 @@ class AddElevatorBanner extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [colors.error, colors.errorContainer], // Just matching a general red gradient from theme
+              colors: [
+                colors.error,
+                colors.errorContainer,
+              ], // Just matching a general red gradient from theme
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
@@ -175,7 +182,11 @@ class AddElevatorBanner extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.qr_code_rounded, size: 14, color: Colors.white),
+                    const Icon(
+                      Icons.qr_code_rounded,
+                      size: 14,
+                      color: Colors.white,
+                    ),
                     const SizedBox(width: 5),
                     Text(
                       'QR',
@@ -220,7 +231,9 @@ class ErrorBanner extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: textTheme.bodyMedium?.copyWith(color: colors.onErrorContainer),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colors.onErrorContainer,
+              ),
             ),
           ),
         ],

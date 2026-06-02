@@ -37,11 +37,7 @@ class OfflineBanner extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: [
-            Icon(
-              Icons.cloud_off_rounded,
-              size: 16,
-              color: colors.warning,
-            ),
+            Icon(Icons.cloud_off_rounded, size: 16, color: colors.warning),
             const SizedBox(width: 8),
             Expanded(
               child: Text(

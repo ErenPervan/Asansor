@@ -68,20 +68,20 @@ class TopAppBar extends StatelessWidget {
                 Text(
                   statusText,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: colors.outline,
-                        letterSpacing: 1.1,
-                      ),
+                    fontWeight: FontWeight.w600,
+                    color: colors.outline,
+                    letterSpacing: 1.1,
+                  ),
                 ),
                 Text(
                   isAdmin
                       ? 'Merhaba Admin — $activeFaultCount açık arıza'
                       : 'Merhaba, $displayName',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: colors.primary,
-                        letterSpacing: -0.3,
-                      ),
+                    fontWeight: FontWeight.w600,
+                    color: colors.primary,
+                    letterSpacing: -0.3,
+                  ),
                 ),
               ],
             ),
@@ -247,10 +247,10 @@ class SyncStatusButton extends ConsumerWidget {
                       child: Text(
                         '$pendingCount',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              fontSize: 8,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
+                          fontSize: 8,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -365,9 +365,7 @@ class SyncSheet extends StatelessWidget {
                     : Icons.cloud_done_outlined,
                 key: ValueKey(hasPending),
                 size: 28,
-                color: hasPending
-                    ? colors.warning
-                    : colors.success,
+                color: hasPending ? colors.warning : colors.success,
               ),
             ),
           ),
@@ -376,9 +374,9 @@ class SyncSheet extends StatelessWidget {
           Text(
             hasPending ? 'Bekleyen Senkronizasyon' : 'Tüm Veriler Senkronize',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: colors.onSurface,
-                ),
+              fontWeight: FontWeight.w800,
+              color: colors.onSurface,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
@@ -388,9 +386,9 @@ class SyncSheet extends StatelessWidget {
                 : 'Tüm bakım ve arıza kayıtları Supabase ile senkronize.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  height: 1.5,
-                ),
+              color: colors.onSurfaceVariant,
+              height: 1.5,
+            ),
           ),
 
           const SizedBox(height: 24),
@@ -415,19 +413,15 @@ class SyncSheet extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.wifi_off_rounded,
-                    color: colors.warning,
-                    size: 18,
-                  ),
+                  Icon(Icons.wifi_off_rounded, color: colors.warning, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'İnternet bağlantısı yok. Bağlantı kurulduğunda otomatik senkronize edilecek.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colors.warning,
-                            height: 1.4,
-                          ),
+                        color: colors.warning,
+                        height: 1.4,
+                      ),
                     ),
                   ),
                 ],

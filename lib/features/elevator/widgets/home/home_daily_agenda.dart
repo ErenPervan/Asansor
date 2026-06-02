@@ -52,10 +52,10 @@ class DailyAgendaSection extends StatelessWidget {
                 Text(
                   'Günlük Ajanda',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppThemeColors.of(context).onSurface,
-                        letterSpacing: -0.5,
-                      ),
+                    fontWeight: FontWeight.w800,
+                    color: AppThemeColors.of(context).onSurface,
+                    letterSpacing: -0.5,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 // Live dot — visible only when the stream is active
@@ -145,7 +145,8 @@ class DailyAgendaSection extends StatelessWidget {
                         ),
                         child: Text(
                           '+${upcomingTasks.length - 3} daha görev var. Tümünü gör',
-                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
                                 color: AppThemeColors.of(context).primary,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -182,10 +183,10 @@ class AgendaGroupHeader extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: highlight ? colors.primary : colors.onSurfaceVariant,
-                letterSpacing: 0.3,
-              ),
+            fontWeight: FontWeight.w700,
+            color: highlight ? colors.primary : colors.onSurfaceVariant,
+            letterSpacing: 0.3,
+          ),
         ),
         const SizedBox(width: 6),
         Container(
@@ -199,9 +200,9 @@ class AgendaGroupHeader extends StatelessWidget {
           child: Text(
             '$count',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: highlight ? colors.primary : colors.outline,
-                ),
+              fontWeight: FontWeight.w700,
+              color: highlight ? colors.primary : colors.outline,
+            ),
           ),
         ),
       ],
@@ -234,7 +235,11 @@ class AgendaTaskCard extends ConsumerWidget {
     }
   }
 
-  static Widget _buildPriorityLabel(String p, Color color, TextTheme textTheme) {
+  static Widget _buildPriorityLabel(
+    String p,
+    Color color,
+    TextTheme textTheme,
+  ) {
     final style = textTheme.labelSmall?.copyWith(
       fontWeight: FontWeight.w700,
       color: color,
@@ -323,9 +328,9 @@ class AgendaTaskCard extends ConsumerWidget {
                           Text(
                             dateLabel,
                             style: textTheme.labelMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: pColor,
-                                ),
+                              fontWeight: FontWeight.w700,
+                              color: pColor,
+                            ),
                           ),
                           const Spacer(),
                           Container(
@@ -337,7 +342,11 @@ class AgendaTaskCard extends ConsumerWidget {
                               color: pColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: _buildPriorityLabel(schedule.priority, pColor, textTheme),
+                            child: _buildPriorityLabel(
+                              schedule.priority,
+                              pColor,
+                              textTheme,
+                            ),
                           ),
                         ],
                       ),
@@ -346,9 +355,9 @@ class AgendaTaskCard extends ConsumerWidget {
                       Text(
                         elevator?.buildingName ?? 'Asansör $shortElevatorId',
                         style: textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: colors.onSurface,
-                            ),
+                          fontWeight: FontWeight.w700,
+                          color: colors.onSurface,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -368,8 +377,8 @@ class AgendaTaskCard extends ConsumerWidget {
                                 child: Text(
                                   elevator!.address!,
                                   style: textTheme.bodySmall?.copyWith(
-                                        color: colors.outline,
-                                      ),
+                                    color: colors.outline,
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -383,9 +392,9 @@ class AgendaTaskCard extends ConsumerWidget {
                           child: Text(
                             schedule.notes!,
                             style: textTheme.bodySmall?.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                  fontStyle: FontStyle.italic,
-                                ),
+                              color: colors.onSurfaceVariant,
+                              fontStyle: FontStyle.italic,
+                            ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -422,9 +431,9 @@ class AgendaTaskCard extends ConsumerWidget {
                             label: Text(
                               'İşe Başla',
                               style: textTheme.labelLarge?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                  ),
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         )
@@ -446,11 +455,11 @@ class AgendaTaskCard extends ConsumerWidget {
                                   ? 'Tamamlandı'
                                   : 'İptal Edildi',
                               style: textTheme.labelMedium?.copyWith(
-                                    color: schedule.status == 'completed'
-                                        ? colors.success
-                                        : colors.outline,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                color: schedule.status == 'completed'
+                                    ? colors.success
+                                    : colors.outline,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),

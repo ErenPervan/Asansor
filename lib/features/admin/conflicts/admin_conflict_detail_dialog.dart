@@ -197,8 +197,8 @@ class _PayloadColumn extends StatelessWidget {
                       value,
                       style: textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? AppThemeColors.dark.onSurface 
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppThemeColors.dark.onSurface
                             : AppThemeColors.light.onSurface,
                       ),
                     ),

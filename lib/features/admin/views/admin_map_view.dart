@@ -195,7 +195,11 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
         elevation: 0,
         title: Text(
           'Canlı Operasyon Haritası',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppThemeColors.of(context).onPrimary),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.3,
+            color: AppThemeColors.of(context).onPrimary,
+          ),
         ),
         actions: [
           IconButton(
@@ -212,7 +216,9 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
       ),
       body: elevatorsAsync.when(
         loading: () => Center(
-          child: CircularProgressIndicator(color: AppThemeColors.of(context).primary),
+          child: CircularProgressIndicator(
+            color: AppThemeColors.of(context).primary,
+          ),
         ),
         error: (e, _) => _ErrorBody(
           message: e.toString().replaceFirst('Exception: ', ''),
@@ -454,7 +460,9 @@ class _ElevatorSheet extends StatelessWidget {
                 icon: const Icon(Icons.open_in_new_rounded, size: 18),
                 label: Text(
                   'Detayları Gör',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppThemeColors.of(context).primary,
@@ -611,7 +619,9 @@ class _LegendSheet extends StatelessWidget {
                 color: AppThemeColors.of(context).background,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: AppThemeColors.of(context).outlineVariant.withValues(alpha: 0.5),
+                  color: AppThemeColors.of(
+                    context,
+                  ).outlineVariant.withValues(alpha: 0.5),
                 ),
               ),
               child: Row(
@@ -688,7 +698,9 @@ class _LegendItem extends StatelessWidget {
             ),
             Text(
               sublabel,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppThemeColors.of(context).outline),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: AppThemeColors.of(context).outline,
+              ),
             ),
           ],
         ),
@@ -729,7 +741,9 @@ class _ErrorBody extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppThemeColors.of(context).onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppThemeColors.of(context).onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 20),
             FilledButton.icon(

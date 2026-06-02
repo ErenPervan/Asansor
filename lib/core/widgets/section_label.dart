@@ -26,10 +26,9 @@ class SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final effectiveColor =
-        color ?? textStyle?.color ?? colors.onSurfaceVariant;
+    final effectiveColor = color ?? textStyle?.color ?? colors.onSurfaceVariant;
     final effectiveLabel = uppercase ? label.toUpperCase() : label;
-    
+
     final baseStyle = uppercase
         ? (textTheme.labelSmall ?? const TextStyle()).copyWith(
             fontWeight: FontWeight.w700,

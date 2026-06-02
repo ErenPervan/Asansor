@@ -12,7 +12,9 @@ class UserManagementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+    final iconSize = (MediaQuery.textScalerOf(
+      context,
+    ).scale(52)).clamp(40.0, 72.0);
 
     return Material(
       color: Colors.transparent,
@@ -100,7 +102,9 @@ class TechnicianDirCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+    final iconSize = (MediaQuery.textScalerOf(
+      context,
+    ).scale(52)).clamp(40.0, 72.0);
 
     return Material(
       color: Colors.transparent,

@@ -62,16 +62,19 @@ class _AdminStatisticsDashboardState
         },
         child: analyticsAsync.when(
           data: (data) => _buildContent(context, data, colors),
-          loading: () => Center(
-            child: CircularProgressIndicator(color: colors.primary),
-          ),
+          loading: () =>
+              Center(child: CircularProgressIndicator(color: colors.primary)),
           error: (err, stack) => _buildError(err),
         ),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, AdminAnalyticsState data, AppThemeColors colors) {
+  Widget _buildContent(
+    BuildContext context,
+    AdminAnalyticsState data,
+    AppThemeColors colors,
+  ) {
     final kpiCards = [
       _KpiData(
         value: data.activeFaults.toString(),
@@ -173,14 +176,15 @@ class _AdminStatisticsDashboardState
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context, AppThemeColors colors) {
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    AppThemeColors colors,
+  ) {
     final textTheme = Theme.of(context).textTheme;
     return PreferredSize(
       preferredSize: const Size.fromHeight(72),
       child: Container(
-        decoration: BoxDecoration(
-          color: colors.primary,
-        ),
+        decoration: BoxDecoration(color: colors.primary),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -405,7 +409,9 @@ class _KpiCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: data.trendUp
                       ? AppThemeColors.of(context).successContainer
-                      : AppThemeColors.of(context).errorContainer.withValues(alpha: 0.6),
+                      : AppThemeColors.of(
+                          context,
+                        ).errorContainer.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -416,7 +422,9 @@ class _KpiCard extends StatelessWidget {
                           ? Icons.trending_up_rounded
                           : Icons.trending_down_rounded,
                       size: 11,
-                      color: data.trendUp ? AppThemeColors.of(context).success : AppThemeColors.of(context).error,
+                      color: data.trendUp
+                          ? AppThemeColors.of(context).success
+                          : AppThemeColors.of(context).error,
                     ),
                   ],
                 ),
@@ -447,7 +455,9 @@ class _KpiCard extends StatelessWidget {
           Text(
             data.trend,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: data.trendUp ? AppThemeColors.of(context).success : AppThemeColors.of(context).outline,
+              color: data.trendUp
+                  ? AppThemeColors.of(context).success
+                  : AppThemeColors.of(context).outline,
               fontWeight: FontWeight.w500,
             ),
             maxLines: 1,
@@ -737,24 +747,26 @@ class _PieChartCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               slice.label,
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontWeight: isTouched
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                                color: isTouched
-                                    ? colors.onSurface
-                                    : colors.onSurfaceVariant,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    fontWeight: isTouched
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    color: isTouched
+                                        ? colors.onSurface
+                                        : colors.onSurfaceVariant,
+                                  ),
                             ),
                           ),
                           Text(
                             '${slice.percent.toInt()}%',
-                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: isTouched
-                                  ? slice.color
-                                  : colors.onSurface,
-                            ),
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: isTouched
+                                      ? slice.color
+                                      : colors.onSurface,
+                                ),
                           ),
                         ],
                       ),

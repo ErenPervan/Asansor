@@ -233,7 +233,9 @@ class _AdminMasterCalendarViewState
             Expanded(
               child: Text(
                 'Otomatik Planlama',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           ],
@@ -252,7 +254,9 @@ class _AdminMasterCalendarViewState
             onPressed: () => Navigator.of(ctx).pop(false),
             child: Text(
               'İptal',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colors.onSurfaceVariant),
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
           FilledButton(
@@ -354,22 +358,30 @@ class _CalendarSection extends StatelessWidget {
             color: colors.primary,
             shape: BoxShape.circle,
           ),
-          selectedTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w800,
-          ) ?? const TextStyle(),
+          selectedTextStyle:
+              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ) ??
+              const TextStyle(),
           // Today: crimson border, no fill.
           todayDecoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: colors.primary, width: 1.5),
           ),
-          todayTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: colors.primary,
-            fontWeight: FontWeight.w700,
-          ) ?? const TextStyle(),
+          todayTextStyle:
+              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colors.primary,
+                fontWeight: FontWeight.w700,
+              ) ??
+              const TextStyle(),
           defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
           weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
-          weekendTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant) ?? const TextStyle(),
+          weekendTextStyle:
+              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ) ??
+              const TextStyle(),
           outsideDaysVisible: false,
           cellMargin: const EdgeInsets.all(5),
           // Marker decoration is overridden by calendarBuilders below.
@@ -379,10 +391,12 @@ class _CalendarSection extends StatelessWidget {
         headerStyle: HeaderStyle(
           formatButtonVisible: false,
           titleCentered: true,
-          titleTextStyle: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colors.onSurface,
-          ) ?? const TextStyle(),
+          titleTextStyle:
+              textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colors.onSurface,
+              ) ??
+              const TextStyle(),
           leftChevronIcon: Icon(
             Icons.chevron_left_rounded,
             color: colors.primary,
@@ -394,14 +408,18 @@ class _CalendarSection extends StatelessWidget {
           headerPadding: const EdgeInsets.symmetric(vertical: 8),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
-          weekdayStyle: textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colors.onSurfaceVariant,
-          ) ?? const TextStyle(),
-          weekendStyle: textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colors.outline,
-          ) ?? const TextStyle(),
+          weekdayStyle:
+              textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colors.onSurfaceVariant,
+              ) ??
+              const TextStyle(),
+          weekendStyle:
+              textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colors.outline,
+              ) ??
+              const TextStyle(),
         ),
         // ── Marker builder ─────────────────────────────────────────────
         calendarBuilders: CalendarBuilders<ScheduleWithDetails>(
@@ -462,11 +480,7 @@ class _DayHeader extends StatelessWidget {
       color: colors.surfaceContainer,
       child: Row(
         children: [
-          Icon(
-            Icons.calendar_today_outlined,
-            size: 15,
-            color: colors.primary,
-          ),
+          Icon(Icons.calendar_today_outlined, size: 15, color: colors.primary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -489,9 +503,7 @@ class _DayHeader extends StatelessWidget {
               '$taskCount görev',
               style: textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: taskCount > 0
-                    ? colors.primary
-                    : colors.onSurfaceVariant,
+                color: taskCount > 0 ? colors.primary : colors.onSurfaceVariant,
               ),
             ),
           ),
@@ -1005,7 +1017,9 @@ class _FilterSheet extends ConsumerWidget {
                       onPressed: notifier.clear,
                       child: Text(
                         'Temizle',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colors.primary),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelLarge?.copyWith(color: colors.primary),
                       ),
                     ),
                   IconButton(

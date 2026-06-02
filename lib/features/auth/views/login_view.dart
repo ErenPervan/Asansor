@@ -251,7 +251,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                       const SizedBox(height: 20),
                       Text(
                         'ASANSOR',
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                        style: Theme.of(context).textTheme.headlineLarge
+                            ?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
                               letterSpacing: 4,
@@ -272,7 +273,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                         ),
                         child: Text(
                           'Bakım & Arıza Takip Sistemi',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                                 letterSpacing: 0.5,
@@ -316,7 +318,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                           // Card title
                           Text(
                             l10n.loginTitle,
-                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(
                                   fontWeight: FontWeight.w800,
                                   color: colors.onSurface,
                                   letterSpacing: -0.5,
@@ -325,7 +328,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                           const SizedBox(height: 4),
                           Text(
                             'Hesabınıza erişmek için bilgilerinizi girin.',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
                                   color: colors.onSurfaceVariant,
                                   height: 1.4,
                                 ),
@@ -341,9 +345,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                             textInputAction: TextInputAction.next,
                             autocorrect: false,
                             enabled: !isLoading,
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: colors.onSurface,
-                                ),
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: colors.onSurface),
                             decoration: InputDecoration(
                               hintText: 'ornek@sirket.com',
                               filled: true,
@@ -374,9 +377,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                             textInputAction: TextInputAction.done,
                             enabled: !isLoading,
                             onFieldSubmitted: (_) => _submit(),
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: colors.onSurface,
-                                ),
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: colors.onSurface),
                             decoration: InputDecoration(
                               hintText: '••••••••',
                               filled: true,
@@ -415,9 +417,12 @@ class _LoginViewState extends ConsumerState<LoginView>
                             child: FilledButton(
                               onPressed: isLoading ? null : _submit,
                               style: FilledButton.styleFrom(
-                                backgroundColor: Theme.of(context).colorScheme.primary,
-                                disabledBackgroundColor: Theme.of(context).colorScheme.primary
-                                    .withValues(alpha: 0.5),
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                                disabledBackgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.5),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),
@@ -433,10 +438,15 @@ class _LoginViewState extends ConsumerState<LoginView>
                                     )
                                   : Text(
                                       l10n.loginButton,
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
                                             fontWeight: FontWeight.w700,
                                             letterSpacing: 0.3,
-                                            color: Theme.of(context).colorScheme.onPrimary,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
                                           ),
                                     ),
                             ),
@@ -456,11 +466,12 @@ class _LoginViewState extends ConsumerState<LoginView>
                               const SizedBox(width: 10),
                               Text(
                                 'Güvenli Bağlantı',
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(
                                       color: colors.onSurfaceVariant,
                                       letterSpacing: 0.3,
                                     ),
-                                ),
+                              ),
                               const SizedBox(width: 5),
                               Icon(
                                 Icons.lock_outlined,
@@ -501,10 +512,10 @@ class _FormLabel extends StatelessWidget {
     return Text(
       label,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colors.onSurface,
-            letterSpacing: 0.1,
-          ),
+        fontWeight: FontWeight.w600,
+        color: colors.onSurface,
+        letterSpacing: 0.1,
+      ),
     );
   }
 }

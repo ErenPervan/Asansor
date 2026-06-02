@@ -189,10 +189,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
       canPop: !isLoading,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && isLoading) {
-          _showSnack(
-            'Lütfen işlem tamamlanana kadar bekleyin.',
-            isError: true,
-          );
+          _showSnack('Lütfen işlem tamamlanana kadar bekleyin.', isError: true);
         }
       },
       child: Scaffold(
@@ -256,9 +253,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                   loading: () => Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: CircularProgressIndicator(
-                        color: colors.primary,
-                      ),
+                      child: CircularProgressIndicator(color: colors.primary),
                     ),
                   ),
                   error: (e, _) => _InlineError(
@@ -275,8 +270,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                       initialValue: _selectedTechnician,
                       decoration: appInputDecoration(
                         hint: 'Teknisyen seçin...',
-                        helper:
-                            'Teknisyen seçildiğinde UUID otomatik yazılır.',
+                        helper: 'Teknisyen seçildiğinde UUID otomatik yazılır.',
                       ),
                       icon: const Icon(Icons.expand_more),
                       isExpanded: true,
@@ -432,9 +426,7 @@ class _ElevatorSelector extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colors.outlineVariant.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<ElevatorModel>(
@@ -532,9 +524,7 @@ class _PickerButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 18,
-                color: hasValue
-                    ? colors.primary
-                    : colors.onSurfaceVariant,
+                color: hasValue ? colors.primary : colors.onSurfaceVariant,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -542,9 +532,7 @@ class _PickerButton extends StatelessWidget {
                   label,
                   style: textTheme.labelLarge?.copyWith(
                     fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
-                    color: hasValue
-                        ? colors.primary
-                        : colors.onSurfaceVariant,
+                    color: hasValue ? colors.primary : colors.onSurfaceVariant,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -575,11 +563,7 @@ class _InlineError extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.error_outline,
-            color: colors.onErrorContainer,
-            size: 18,
-          ),
+          Icon(Icons.error_outline, color: colors.onErrorContainer, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

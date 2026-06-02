@@ -36,9 +36,9 @@ class _FaultListViewState extends ConsumerState<FaultListView> {
         elevation: 0,
         title: Text(
           'Arızalar',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
@@ -171,9 +171,7 @@ class _FaultCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: colors.outlineVariant.withValues(alpha: 0.5),
-        ),
+        side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.5)),
       ),
       elevation: 0,
       color: colors.surface,
@@ -251,9 +249,7 @@ class _FaultCard extends StatelessWidget {
                 fault.description,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurface,
-                ),
+                style: textTheme.bodyMedium?.copyWith(color: colors.onSurface),
               ),
             ],
           ),

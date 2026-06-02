@@ -35,7 +35,10 @@ class ElevatorDetailView extends ConsumerWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppThemeColors.of(context).primary),
+          icon: Icon(
+            Icons.arrow_back,
+            color: AppThemeColors.of(context).primary,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(

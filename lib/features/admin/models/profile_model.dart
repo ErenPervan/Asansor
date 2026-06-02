@@ -42,6 +42,10 @@
 ///   on public.profiles for update
 ///   using ((select role from public.profiles where id = auth.uid()) = 'admin');
 /// ```
+library;
+
+import '../../../core/enums/app_enums.dart';
+
 class ProfileModel {
   const ProfileModel({
     required this.id,
@@ -57,8 +61,7 @@ class ProfileModel {
   final String? fullName;
   final String? phone;
 
-  /// One of: `'admin'` | `'technician'` | `'customer'`
-  final String role;
+  final UserRole role;
 
   /// Only relevant for the `customer` role.
   /// References the elevator (and therefore building) this customer belongs to.
@@ -72,7 +75,7 @@ class ProfileModel {
       email: json['email'] as String?,
       fullName: json['full_name'] as String?,
       phone: json['phone'] as String?,
-      role: (json['role'] as String?) ?? 'technician',
+      role: UserRole.fromDb(json['role'] as String?),
       elevatorId: json['elevator_id'] as String?,
     );
   }
@@ -82,7 +85,7 @@ class ProfileModel {
     'email': email,
     'full_name': fullName,
     'phone': phone,
-    'role': role,
+    'role': role.dbValue,
     'elevator_id': elevatorId,
   };
 
@@ -91,7 +94,7 @@ class ProfileModel {
     String? email,
     String? fullName,
     String? phone,
-    String? role,
+    UserRole? role,
     String? elevatorId,
     bool clearElevatorId = false,
   }) {
@@ -129,23 +132,21 @@ class ProfileModel {
   /// Turkish localised role label.
   String get roleTr {
     switch (role) {
-      case 'admin':
+      case UserRole.admin:
         return 'Admin';
-      case 'technician':
+      case UserRole.technician:
         return 'Teknisyen';
-      case 'customer':
+      case UserRole.customer:
         return 'Müşteri';
-      default:
-        return role;
     }
   }
 
-  bool get isAdmin => role == 'admin';
-  bool get isTechnician => role == 'technician';
-  bool get isCustomer => role == 'customer';
+  bool get isAdmin => role == UserRole.admin;
+  bool get isTechnician => role == UserRole.technician;
+  bool get isCustomer => role == UserRole.customer;
 
   @override
   String toString() =>
-      'ProfileModel(id: $id, role: $role, email: $email, '
+      'ProfileModel(id: $id, role: ${role.name}, email: $email, '
       'fullName: $fullName)';
 }

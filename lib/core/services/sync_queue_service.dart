@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -22,6 +23,19 @@ const _maintenanceReportsBucket = 'maintenance-reports';
 const _statusPending = 'pending';
 const _statusPdfPending = 'pdf_pending';
 const _statusConflictDetected = 'conflict_detected';
+
+// ── Timeout constants ─────────────────────────────────────────────────────────
+// All network / storage / PDF operations inside flush() are guarded by these.
+// A flaky-but-alive TCP connection would otherwise block indefinitely.
+
+/// Maximum time allowed for a single file upload (photo or PDF).
+const _uploadTimeout = Duration(seconds: 45);
+
+/// Maximum time allowed for PDF generation (CPU-bound on-device work).
+const _pdfGenerationTimeout = Duration(seconds: 30);
+
+/// Maximum time allowed for any single Supabase DB write.
+const _dbWriteTimeout = Duration(seconds: 20);
 
 /// Supported operation types that can be queued.
 abstract final class SyncItemType {
@@ -116,6 +130,10 @@ class SyncQueueService extends ChangeNotifier {
 
   // ── Write ─────────────────────────────────────────────────────────────────
 
+  /// The maximum number of pending items allowed in the queue.
+  /// If this limit is reached, the oldest items are removed to prevent storage exhaustion.
+  static const int maxQueueSize = 100;
+
   /// Saves [payload] as a pending operation of the given [type].
   ///
   /// [type] must be one of the [SyncItemType] constants.
@@ -134,6 +152,27 @@ class SyncQueueService extends ChangeNotifier {
       'status': _statusPending,
     });
     await _box.put(id, item);
+
+    // Enforce capacity limit
+    if (_box.length > maxQueueSize) {
+      final entries = _box.toMap().entries.toList();
+      entries.sort((a, b) {
+        try {
+          final aJson = jsonDecode(a.value) as Map<String, dynamic>;
+          final bJson = jsonDecode(b.value) as Map<String, dynamic>;
+          final aTime = DateTime.parse(aJson['queued_at'] as String);
+          final bTime = DateTime.parse(bJson['queued_at'] as String);
+          return aTime.compareTo(bTime);
+        } catch (_) {
+          return 0;
+        }
+      });
+      final dropCount = entries.length - maxQueueSize;
+      final keysToRemove = entries.take(dropCount).map((e) => e.key).toList();
+      await _box.deleteAll(keysToRemove);
+      debugPrint('[SyncQueue] Dropped $dropCount oldest items to enforce maxQueueSize of $maxQueueSize');
+    }
+
     notifyListeners();
   }
 
@@ -316,7 +355,13 @@ class SyncQueueService extends ChangeNotifier {
         .from('maintenance_logs')
         .insert(row)
         .select()
-        .maybeSingle();
+        .maybeSingle()
+        .timeout(
+          _dbWriteTimeout,
+          onTimeout: () => throw TimeoutException(
+            '[SyncQueue] Maintenance log insert timed out after ${_dbWriteTimeout.inSeconds}s',
+          ),
+        );
     if (response == null) {
       throw StateError('Maintenance log insert returned no row.');
     }
@@ -370,13 +415,24 @@ class SyncQueueService extends ChangeNotifier {
         mediaUrls: logModel.photos,
         signatureUrl: logModel.signatureUrl,
         customerSignatureUrl: logModel.customerSignatureUrl,
+      ).timeout(
+        _pdfGenerationTimeout,
+        onTimeout: () => throw TimeoutException(
+          '[SyncQueue] PDF generation timed out after ${_pdfGenerationTimeout.inSeconds}s for log ${logModel.id}',
+        ),
       );
 
       final fileName =
           'report_${logModel.elevatorId}_${DateTime.now().millisecondsSinceEpoch}.pdf';
       await client.storage
           .from(_maintenanceReportsBucket)
-          .upload(fileName, pdfFile);
+          .upload(fileName, pdfFile)
+          .timeout(
+            _uploadTimeout,
+            onTimeout: () => throw TimeoutException(
+              '[SyncQueue] PDF upload timed out after ${_uploadTimeout.inSeconds}s: $fileName',
+            ),
+          );
 
       final publicUrl = client.storage
           .from(_maintenanceReportsBucket)
@@ -384,7 +440,13 @@ class SyncQueueService extends ChangeNotifier {
       await client
           .from('maintenance_logs')
           .update({'pdf_url': publicUrl})
-          .eq('id', logModel.id);
+          .eq('id', logModel.id)
+          .timeout(
+            _dbWriteTimeout,
+            onTimeout: () => throw TimeoutException(
+              '[SyncQueue] DB pdf_url update timed out after ${_dbWriteTimeout.inSeconds}s for log ${logModel.id}',
+            ),
+          );
       debugPrint('[SyncQueue] PDF uploaded & linked: $publicUrl');
 
       try {
@@ -486,7 +548,13 @@ class SyncQueueService extends ChangeNotifier {
           .eq('technician_id', technicianId)
           .inFilter('status', ['pending', 'in_progress'])
           .gte('scheduled_date', start)
-          .lte('scheduled_date', end);
+          .lte('scheduled_date', end)
+          .timeout(
+            _dbWriteTimeout,
+            onTimeout: () => throw TimeoutException(
+              '[SyncQueue] Schedule completion update timed out after ${_dbWriteTimeout.inSeconds}s',
+            ),
+          );
     } catch (_) {
       // Schedule completion is best-effort; don't fail the whole sync.
     }
@@ -519,7 +587,12 @@ class SyncQueueService extends ChangeNotifier {
           'maintenance_logs/${elevatorId ?? 'unknown'}/${technicianId ?? 'unknown'}_${DateTime.now().millisecondsSinceEpoch}_$index.$extension';
       index++;
 
-      await storage.upload(fileName, file);
+      await storage.upload(fileName, file).timeout(
+        _uploadTimeout,
+        onTimeout: () => throw TimeoutException(
+          '[SyncQueue] Photo upload timed out after ${_uploadTimeout.inSeconds}s: $fileName',
+        ),
+      );
       uploadedUrls.add(storage.getPublicUrl(fileName));
     }
 
@@ -548,7 +621,15 @@ class SyncQueueService extends ChangeNotifier {
     SupabaseClient client,
     Map<String, dynamic> payload,
   ) async {
-    await client.from('fault_reports').insert(payload);
+    await client
+        .from('fault_reports')
+        .insert(payload)
+        .timeout(
+          _dbWriteTimeout,
+          onTimeout: () => throw TimeoutException(
+            '[SyncQueue] Fault report insert timed out after ${_dbWriteTimeout.inSeconds}s',
+          ),
+        );
   }
 
   Future<void> _syncElevatorUpdate(
@@ -567,7 +648,13 @@ class SyncQueueService extends ChangeNotifier {
         .eq('id', id)
         .eq('version', baseVersion)
         .select()
-        .maybeSingle();
+        .maybeSingle()
+        .timeout(
+          _dbWriteTimeout,
+          onTimeout: () => throw TimeoutException(
+            '[SyncQueue] Elevator update timed out after ${_dbWriteTimeout.inSeconds}s for id: $id',
+          ),
+        );
 
     if (response == null) {
       // Version mismatch or deleted
@@ -575,7 +662,13 @@ class SyncQueueService extends ChangeNotifier {
           .from('elevators')
           .select()
           .eq('id', id)
-          .maybeSingle();
+          .maybeSingle()
+          .timeout(
+            _dbWriteTimeout,
+            onTimeout: () => throw TimeoutException(
+              '[SyncQueue] Elevator conflict-fetch timed out after ${_dbWriteTimeout.inSeconds}s for id: $id',
+            ),
+          );
       if (remote != null) {
         throw ConflictException(remoteState: remote);
       } else {

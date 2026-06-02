@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:asansor/core/services/auto_schedule_service.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 import '../../helpers/test_mocks.dart';
 
 void main() {
@@ -50,7 +51,7 @@ void main() {
           const ElevatorModel(
             id: 'e1',
             buildingName: 'A',
-            status: 'active',
+            status: ElevatorStatus.active,
           ), // No maintenanceDay
         ];
         when(
@@ -73,7 +74,7 @@ void main() {
           const ElevatorModel(
             id: 'e1',
             buildingName: 'A',
-            status: 'active',
+            status: ElevatorStatus.active,
             maintenanceDay: 15,
           ),
         ];
@@ -100,13 +101,13 @@ void main() {
           const ElevatorModel(
             id: 'e1',
             buildingName: 'A',
-            status: 'active',
+            status: ElevatorStatus.active,
             maintenanceDay: 15,
           ),
           const ElevatorModel(
             id: 'e2',
             buildingName: 'B',
-            status: 'active',
+            status: ElevatorStatus.active,
             maintenanceDay: 28,
           ),
         ];

@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/providers/connectivity_providers.dart';
+import '../../admin/repositories/schedule_repository.dart';
+import '../../fault/providers/fault_providers.dart';
 import '../models/elevator_model.dart';
 import '../repositories/elevator_repository.dart';
 
 // ── Repository ──────────────────────────────────────────────────────────────
 
 /// Provides the [ElevatorRepository] backed by the live Supabase client.
-final elevatorRepositoryProvider = Provider<ElevatorRepository>((ref) {
-  return ElevatorRepository(Supabase.instance.client);
+final elevatorRepositoryProvider = Provider<IElevatorRepository>((ref) {
+  return ElevatorRepository(ref.watch(supabaseClientProvider));
 });
 
 // ── Fault / Telemetry / Schedule Providers ───────────────────────────────────
@@ -28,20 +29,8 @@ final latestFaultDateProvider = FutureProvider.family<DateTime?, String>((
 ) async {
   if (!ref.watch(isOnlineProvider)) return null;
 
-  final client = Supabase.instance.client;
-  final response = await client
-      .from('fault_reports')
-      .select('reported_at')
-      .eq('elevator_id', elevatorId)
-      .order('reported_at', ascending: false)
-      .limit(1);
-
-  final rows = response as List<dynamic>;
-  if (rows.isEmpty) return null;
-
-  final raw = rows.first['reported_at'] as String?;
-  if (raw == null) return null;
-  return DateTime.parse(raw);
+  final repo = ref.read(faultRepositoryProvider);
+  return repo.getLatestFaultDate(elevatorId);
 });
 
 /// Returns the [DateTime] of the closest upcoming (pending) scheduled
@@ -59,24 +48,8 @@ final nextScheduledMaintenanceProvider =
     FutureProvider.family<DateTime?, String>((ref, elevatorId) async {
       if (!ref.watch(isOnlineProvider)) return null;
 
-      final client = Supabase.instance.client;
-      final now = DateTime.now().toUtc().toIso8601String();
-
-      final response = await client
-          .from('maintenance_schedules')
-          .select('scheduled_date')
-          .eq('elevator_id', elevatorId)
-          .eq('status', 'pending')
-          .gte('scheduled_date', now)
-          .order('scheduled_date', ascending: true)
-          .limit(1);
-
-      final rows = response as List<dynamic>;
-      if (rows.isEmpty) return null;
-
-      final raw = rows.first['scheduled_date'] as String?;
-      if (raw == null) return null;
-      return DateTime.parse(raw);
+      final repo = ref.read(scheduleRepositoryProvider);
+      return repo.getNextScheduledMaintenanceDate(elevatorId);
     });
 
 // ── Data Providers ───────────────────────────────────────────────────────────

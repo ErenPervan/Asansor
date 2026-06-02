@@ -3,6 +3,7 @@ import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 import 'package:asansor/core/utils/elevator_utils.dart';
 import 'package:asansor/core/widgets/loading_state.dart';
 import 'package:asansor/core/widgets/error_state.dart';
@@ -263,7 +264,7 @@ class AgendaTaskCard extends ConsumerWidget {
     return Text(label, style: style);
   }
 
-  static bool _isActive(String s) => s == 'pending' || s == 'in_progress';
+  static bool _isActive(ScheduleStatus s) => s == ScheduleStatus.pending || s == ScheduleStatus.inProgress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -409,12 +410,12 @@ class AgendaTaskCard extends ConsumerWidget {
                           child: FilledButton.icon(
                             onPressed: () {
                               // Mark in_progress then open elevator hub
-                              if (schedule.status == 'pending') {
+                              if (schedule.status == ScheduleStatus.pending) {
                                 ref
                                     .read(scheduleControllerProvider.notifier)
                                     .updateStatus(
                                       taskId: schedule.id,
-                                      status: 'in_progress',
+                                      status: ScheduleStatus.inProgress,
                                     );
                               }
                               context.push('/elevator/${schedule.elevatorId}');
@@ -442,21 +443,21 @@ class AgendaTaskCard extends ConsumerWidget {
                         Row(
                           children: [
                             Icon(
-                              schedule.status == 'completed'
+                              schedule.status == ScheduleStatus.completed
                                   ? Icons.check_circle_outline
                                   : Icons.cancel_outlined,
                               size: 14,
-                              color: schedule.status == 'completed'
+                              color: schedule.status == ScheduleStatus.completed
                                   ? colors.success
                                   : colors.outline,
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              schedule.status == 'completed'
+                              schedule.status == ScheduleStatus.completed
                                   ? 'Tamamlandı'
                                   : 'İptal Edildi',
                               style: textTheme.labelMedium?.copyWith(
-                                color: schedule.status == 'completed'
+                                color: schedule.status == ScheduleStatus.completed
                                     ? colors.success
                                     : colors.outline,
                                 fontWeight: FontWeight.w600,

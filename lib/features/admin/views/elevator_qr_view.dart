@@ -22,6 +22,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../elevator/models/elevator_model.dart';
 
 import '../../elevator/providers/elevator_providers.dart';
+import '../../../core/enums/app_enums.dart';
 
 import '../../../core/theme/app_colors.dart';
 // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
@@ -539,7 +540,7 @@ class _QrScaffold extends StatelessWidget {
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.status});
 
-  final String status;
+  final ElevatorStatus status;
 
   @override
   Widget build(BuildContext context) {
@@ -563,15 +564,15 @@ class _StatusChip extends StatelessWidget {
     );
   }
 
-  static (String, Color, Color) _styles(String s, AppThemeColors colors) {
+  static (String, Color, Color) _styles(ElevatorStatus s, AppThemeColors colors) {
     switch (s) {
-      case 'active':
+      case ElevatorStatus.active:
         return ('Aktif', colors.successContainer, colors.success);
-      case 'faulty':
-        return ('ArÃ„Â±zalÃ„Â±', colors.errorContainer, colors.error);
-      case 'under_maintenance':
-        return ('BakÃ„Â±mda', colors.warningContainer, colors.warning);
-      default:
+      case ElevatorStatus.faulty:
+        return ('Arızalı', colors.errorContainer, colors.error);
+      case ElevatorStatus.underMaintenance:
+        return ('Bakımda', colors.warningContainer, colors.warning);
+      case ElevatorStatus.inactive:
         return ('Pasif', colors.surfaceContainer, colors.outline);
     }
   }

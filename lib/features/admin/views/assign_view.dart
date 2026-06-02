@@ -17,6 +17,7 @@ import '../providers/admin_providers.dart';
 import '../providers/profile_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/enums/app_enums.dart';
 import '../../../core/theme/input_decorations.dart';
 import '../../../core/widgets/section_label.dart';
 import '../../../core/constants/app_durations.dart';
@@ -182,7 +183,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
     final textTheme = Theme.of(context).textTheme;
 
     final elevatorsAsync = ref.watch(elevatorsProvider);
-    final techniciansAsync = ref.watch(profilesByRoleProvider('technician'));
+    final techniciansAsync = ref.watch(profilesByRoleProvider(UserRole.technician));
     final controllerState = ref.watch(scheduleControllerProvider);
     final isLoading = controllerState.isLoading;
 

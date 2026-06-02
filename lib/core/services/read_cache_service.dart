@@ -4,7 +4,10 @@ import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../features/admin/models/schedule_model.dart';
+import '../../features/admin/models/checklist_item_model.dart';
 import '../../features/elevator/models/elevator_model.dart';
+import '../../features/fault/models/fault_report_model.dart';
+import '../../features/maintenance/models/maintenance_log_model.dart';
 
 // ── Box names ─────────────────────────────────────────────────────────────────
 
@@ -107,18 +110,18 @@ class ReadCacheService {
   // ── Checklists ────────────────────────────────────────────────────────────
 
   /// Persists the checklist items. Overwrites any previous value.
-  Future<void> saveChecklistItems(List<dynamic> items) async {
+  Future<void> saveChecklistItems(List<ChecklistItemModel> items) async {
     final encoded = jsonEncode(items.map((i) => i.toJson()).toList());
     await _checklistBox.put(_checklistsKey, encoded);
   }
 
   /// Returns the cached checklist items.
-  List<dynamic> loadChecklistItems(dynamic fromJson) {
+  List<ChecklistItemModel> loadChecklistItems() {
     final raw = _checklistBox.get(_checklistsKey);
     if (raw == null) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((j) => fromJson(j as Map<String, dynamic>)).toList();
+      return list.map((j) => ChecklistItemModel.fromJson(j as Map<String, dynamic>)).toList();
     } catch (_) {
       return [];
     }
@@ -127,20 +130,20 @@ class ReadCacheService {
   // ── Past Logs ─────────────────────────────────────────────────────────────
 
   /// Persists the past logs for [elevatorId]. Overwrites any previous value.
-  Future<void> savePastLogs(String elevatorId, List<dynamic> logs) async {
+  Future<void> savePastLogs(String elevatorId, List<MaintenanceLogModel> logs) async {
     if (elevatorId.isEmpty) return;
     final encoded = jsonEncode(logs.map((l) => l.toJson()).toList());
     await _pastLogsBox.put(elevatorId, encoded);
   }
 
   /// Returns the cached past logs for [elevatorId].
-  List<dynamic> loadPastLogs(String elevatorId, dynamic fromJson) {
+  List<MaintenanceLogModel> loadPastLogs(String elevatorId) {
     if (elevatorId.isEmpty) return [];
     final raw = _pastLogsBox.get(elevatorId);
     if (raw == null) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((j) => fromJson(j as Map<String, dynamic>)).toList();
+      return list.map((j) => MaintenanceLogModel.fromJson(j as Map<String, dynamic>)).toList();
     } catch (_) {
       return [];
     }
@@ -149,20 +152,74 @@ class ReadCacheService {
   // ── Faults ─────────────────────────────────────────────────────────────
 
   /// Persists active faults. Overwrites any previous value.
-  Future<void> saveFaults(List<dynamic> faults) async {
+  Future<void> saveActiveFaults(List<FaultReportModel> faults) async {
     final encoded = jsonEncode(faults.map((f) => f.toJson()).toList());
     await _faultsBox.put('active_faults', encoded);
   }
 
   /// Returns the cached active faults.
-  List<dynamic> loadFaults(dynamic fromJson) {
+  List<FaultReportModel> loadActiveFaults() {
     final raw = _faultsBox.get('active_faults');
     if (raw == null) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((j) => fromJson(j as Map<String, dynamic>)).toList();
+      return list.map((j) => FaultReportModel.fromJson(j as Map<String, dynamic>)).toList();
     } catch (_) {
       return [];
     }
+  }
+
+  /// Persists all faults. Overwrites any previous value.
+  Future<void> saveAllFaults(List<FaultReportModel> faults) async {
+    final encoded = jsonEncode(faults.map((f) => f.toJson()).toList());
+    await _faultsBox.put('all_faults', encoded);
+  }
+
+  /// Returns all cached faults.
+  List<FaultReportModel> loadAllFaults() {
+    final raw = _faultsBox.get('all_faults');
+    if (raw == null) return [];
+    try {
+      final list = jsonDecode(raw) as List<dynamic>;
+      return list.map((j) => FaultReportModel.fromJson(j as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  // ── Pending Maintenance Logs ────────────────────────────────────────────────
+
+  /// Persists pending maintenance logs. Overwrites any previous value.
+  Future<void> savePendingMaintenance(List<MaintenanceLogModel> logs) async {
+    final encoded = jsonEncode(logs.map((l) => l.toJson()).toList());
+    await _pastLogsBox.put('pending_logs', encoded);
+  }
+
+  /// Returns the cached pending maintenance logs, or an empty list if nothing is cached.
+  List<MaintenanceLogModel> loadPendingMaintenance() {
+    final raw = _pastLogsBox.get('pending_logs');
+    if (raw == null) return [];
+    try {
+      final list = jsonDecode(raw) as List<dynamic>;
+      return list
+          .map((j) => MaintenanceLogModel.fromJson(j as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  // ── Completed Today Count ───────────────────────────────────────────────────
+
+  /// Persists the completed today count. Overwrites any previous value.
+  Future<void> saveCompletedTodayCount(int count) async {
+    await _pastLogsBox.put('completed_today_count', count.toString());
+  }
+
+  /// Returns the cached completed today count, or 0 if nothing is cached.
+  int loadCompletedTodayCount() {
+    final raw = _pastLogsBox.get('completed_today_count');
+    if (raw == null) return 0;
+    return int.tryParse(raw) ?? 0;
   }
 }

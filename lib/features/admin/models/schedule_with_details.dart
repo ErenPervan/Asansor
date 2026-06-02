@@ -1,3 +1,4 @@
+import '../../../core/enums/app_enums.dart';
 import 'schedule_model.dart';
 
 /// [ScheduleModel] enriched with human-readable elevator and technician
@@ -22,12 +23,12 @@ class ScheduleWithDetails {
   String get id => schedule.id;
   String get elevatorId => schedule.elevatorId;
   DateTime get scheduledDate => schedule.scheduledDate;
-  String get status => schedule.status;
+  ScheduleStatus get status => schedule.status;
   String get priority => schedule.priority;
   String? get notes => schedule.notes;
 
-  bool get isCompleted => schedule.status == 'completed';
-  bool get isCancelled => schedule.status == 'cancelled';
+  bool get isCompleted => schedule.status == ScheduleStatus.completed;
+  bool get isCancelled => schedule.status == ScheduleStatus.cancelled;
   bool get isPeriodicMaintenance => schedule.isPeriodicMaintenance;
   bool get isUnassigned => schedule.isUnassigned;
 

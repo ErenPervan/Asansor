@@ -2,8 +2,6 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:asansor/core/services/read_cache_service.dart';
-import 'package:asansor/features/fault/models/fault_report_model.dart';
-import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 import '../../helpers/test_factories.dart';
 
 void main() {
@@ -101,7 +99,7 @@ void main() {
     test('savePastLogs empty elevatorId does nothing', () async {
       await service.savePastLogs('', [TestFactories.createMaintenanceLog()]);
       expect(
-        service.loadPastLogs('', (j) => MaintenanceLogModel.fromJson(j)),
+        service.loadPastLogs(''),
         isEmpty,
       );
     });
@@ -117,30 +115,74 @@ void main() {
 
       await service.savePastLogs('e1', logs);
 
-      final loaded = service.loadPastLogs(
-        'e1',
-        (json) => MaintenanceLogModel.fromJson(json),
-      );
+      final loaded = service.loadPastLogs('e1');
 
       expect(loaded.length, 1);
-      expect((loaded[0] as MaintenanceLogModel).notes, 'Log 1');
+      expect((loaded[0]).notes, 'Log 1');
     });
   });
 
   group('ReadCacheService - Faults', () {
-    test('save and load faults works correctly', () async {
+    test('save and load active faults works correctly', () async {
       final faults = [
         TestFactories.createFaultReport(id: 'f1', description: 'Fault 1'),
       ];
 
-      await service.saveFaults(faults);
+      await service.saveActiveFaults(faults);
 
-      final loaded = service.loadFaults(
-        (json) => FaultReportModel.fromJson(json),
-      );
+      final loaded = service.loadActiveFaults();
 
       expect(loaded.length, 1);
-      expect((loaded[0] as FaultReportModel).description, 'Fault 1');
+      expect((loaded[0]).description, 'Fault 1');
+    });
+
+    test('save and load all faults works correctly', () async {
+      final faults = [
+        TestFactories.createFaultReport(id: 'f2', description: 'Fault 2'),
+      ];
+
+      await service.saveAllFaults(faults);
+
+      final loaded = service.loadAllFaults();
+
+      expect(loaded.length, 1);
+      expect((loaded[0]).description, 'Fault 2');
+    });
+  });
+
+  group('ReadCacheService - Pending Maintenance and Completed Today Count', () {
+    test('loadPendingMaintenance returns empty list initially', () {
+      expect(service.loadPendingMaintenance(), isEmpty);
+    });
+
+    test('save and load pending maintenance works correctly', () async {
+      final logs = [
+        TestFactories.createMaintenanceLog(
+          id: 'l_pending_1',
+          elevatorId: 'e1',
+          notes: 'Pending Log 1',
+          isApproved: false,
+        ),
+      ];
+
+      await service.savePendingMaintenance(logs);
+
+      final loaded = service.loadPendingMaintenance();
+      expect(loaded.length, 1);
+      expect(loaded.first.notes, 'Pending Log 1');
+      expect(loaded.first.isApproved, isFalse);
+    });
+
+    test('loadCompletedTodayCount returns 0 initially', () {
+      expect(service.loadCompletedTodayCount(), 0);
+    });
+
+    test('save and load completed today count works correctly', () async {
+      await service.saveCompletedTodayCount(5);
+      expect(service.loadCompletedTodayCount(), 5);
+
+      await service.saveCompletedTodayCount(12);
+      expect(service.loadCompletedTodayCount(), 12);
     });
   });
 }

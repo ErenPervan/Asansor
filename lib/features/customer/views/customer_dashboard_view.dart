@@ -10,6 +10,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/offline_banner.dart';
 import '../../auth/providers/auth_providers.dart';
+import '../../../core/enums/app_enums.dart';
 import '../../elevator/models/elevator_model.dart';
 import '../../maintenance/models/maintenance_log_model.dart';
 import '../../elevator/widgets/detail/report_fault_sheet.dart';
@@ -135,8 +136,8 @@ class _ElevatorHealthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isFaulty = elevator.status == 'faulty';
-    final bool isUnderMaintenance = elevator.status == 'under_maintenance';
+    final bool isFaulty = elevator.status == ElevatorStatus.faulty;
+    final bool isUnderMaintenance = elevator.status == ElevatorStatus.underMaintenance;
 
     final colors = AppThemeColors.of(context);
     Color bgColor = colors.successContainer;
@@ -154,7 +155,7 @@ class _ElevatorHealthCard extends StatelessWidget {
       iconColor = colors.warningLight;
       iconData = Icons.handyman_outlined;
       statusText = 'Bakımda';
-    } else if (elevator.status == 'inactive') {
+    } else if (elevator.status == ElevatorStatus.inactive) {
       bgColor = colors.surfaceContainerHigh;
       iconColor = colors.onSurfaceVariant;
       iconData = Icons.not_interested_rounded;

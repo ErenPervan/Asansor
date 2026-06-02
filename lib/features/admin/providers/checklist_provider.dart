@@ -16,7 +16,7 @@ class ChecklistNotifier
 
     if (!isOnline) {
       return cache
-          .loadChecklistItems(ChecklistItemModel.fromJson)
+          .loadChecklistItems()
           .cast<ChecklistItemModel>();
     }
 
@@ -33,7 +33,7 @@ class ChecklistNotifier
       return items;
     } catch (e) {
       final cached = cache
-          .loadChecklistItems(ChecklistItemModel.fromJson)
+          .loadChecklistItems()
           .cast<ChecklistItemModel>();
       if (cached.isNotEmpty) return cached;
       rethrow;

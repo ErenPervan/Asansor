@@ -1,3 +1,5 @@
+import '../../../core/enums/app_enums.dart';
+
 /// Maps to the `elevators` table in Supabase.
 ///
 /// To enable map markers, add the following columns to your Supabase table:
@@ -43,8 +45,7 @@ class ElevatorModel {
   /// Nullable: the address column may not have a NOT NULL constraint in the DB.
   final String? address;
 
-  /// Possible values: 'active' | 'inactive' | 'under_maintenance' | 'faulty'
-  final String status;
+  final ElevatorStatus status;
 
   /// Geographic coordinates for the Live Map feature.
   /// Null when the elevator has not yet been geo-tagged.
@@ -76,7 +77,7 @@ class ElevatorModel {
       id: json['id'] as String,
       buildingName: (json['building_name'] as String?) ?? '',
       address: json['address'] as String?,
-      status: (json['status'] as String?) ?? 'unknown',
+      status: ElevatorStatus.fromDb(json['status'] as String?),
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       maintenanceDay: json['maintenance_day'] as int?,
@@ -100,7 +101,7 @@ class ElevatorModel {
       'id': id,
       'building_name': buildingName,
       'address': address,
-      'status': status,
+      'status': status.dbValue,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       if (maintenanceDay != null) 'maintenance_day': maintenanceDay,
@@ -117,7 +118,7 @@ class ElevatorModel {
     String? id,
     String? buildingName,
     String? address,
-    String? status,
+    ElevatorStatus? status,
     double? latitude,
     double? longitude,
     int? maintenanceDay,
@@ -154,7 +155,7 @@ class ElevatorModel {
   @override
   String toString() =>
       'ElevatorModel(id: $id, buildingName: $buildingName, '
-      'address: $address, status: $status, '
+      'address: $address, status: ${status.name}, '
       'model: $model, capacity: $capacity, '
       'lat: $latitude, lng: $longitude, inspection: ${inspectionStatus.name}, version: $version)';
 }

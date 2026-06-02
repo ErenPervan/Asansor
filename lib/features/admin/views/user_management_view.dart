@@ -16,10 +16,12 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 // ── Role helpers ──────────────────────────────────────────────────────────────
 
-_RoleStyle _roleStyle(BuildContext context, String role) {
+import '../../../core/enums/app_enums.dart';
+
+_RoleStyle _roleStyle(BuildContext context, UserRole role) {
   final colors = AppThemeColors.of(context);
   switch (role) {
-    case 'admin':
+    case UserRole.admin:
       return _RoleStyle(
         bg: colors.primary,
         fg: colors.surface,
@@ -27,7 +29,7 @@ _RoleStyle _roleStyle(BuildContext context, String role) {
         avatarFg: colors.surface,
         icon: Icons.admin_panel_settings_outlined,
       );
-    case 'customer':
+    case UserRole.customer:
       return _RoleStyle(
         bg: colors.successContainer,
         fg: colors.success,
@@ -88,9 +90,9 @@ class _UserManagementViewState extends ConsumerState<UserManagementView>
 
   void _refresh() {
     ref.invalidate(allProfilesProvider);
-    ref.invalidate(profilesByRoleProvider('technician'));
-    ref.invalidate(profilesByRoleProvider('customer'));
-    ref.invalidate(profilesByRoleProvider('admin'));
+    ref.invalidate(profilesByRoleProvider(UserRole.technician));
+    ref.invalidate(profilesByRoleProvider(UserRole.customer));
+    ref.invalidate(profilesByRoleProvider(UserRole.admin));
   }
 
   @override
@@ -145,7 +147,7 @@ class _UserManagementViewState extends ConsumerState<UserManagementView>
       body: TabBarView(
         controller: _tabs,
         children: const [
-          _UserListTab(role: 'technician'),
+          _UserListTab(role: UserRole.technician),
           _CustomerTab(),
           _UserListTab(role: null),
         ],
@@ -160,7 +162,7 @@ class _UserListTab extends ConsumerWidget {
   const _UserListTab({required this.role});
 
   /// Filter role — `null` means fetch all users.
-  final String? role;
+  final UserRole? role;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -186,10 +188,10 @@ class _UserListTab extends ConsumerWidget {
         data: (profiles) {
           if (profiles.isEmpty) {
             return _EmptyPane(
-              icon: role == 'technician'
+              icon: role == UserRole.technician
                   ? Icons.engineering_outlined
                   : Icons.groups_outlined,
-              message: role == 'technician'
+              message: role == UserRole.technician
                   ? 'Henüz teknisyen kaydı yok.'
                   : 'Henüz kullanıcı kaydı yok.',
             );
@@ -216,7 +218,7 @@ class _UserListTab extends ConsumerWidget {
                             Expanded(
                               child: _ProfileCard(
                                 profile: profiles[idx1],
-                                isAdminViewer: currentRole == 'admin',
+                                isAdminViewer: currentRole == UserRole.admin,
                                 onEditRole: () =>
                                     _showEditRoleSheet(context, profiles[idx1]),
                               ),
@@ -226,7 +228,7 @@ class _UserListTab extends ConsumerWidget {
                               child: idx2 < profiles.length
                                   ? _ProfileCard(
                                       profile: profiles[idx2],
-                                      isAdminViewer: currentRole == 'admin',
+                                      isAdminViewer: currentRole == UserRole.admin,
                                       onEditRole: () => _showEditRoleSheet(
                                         context,
                                         profiles[idx2],
@@ -246,7 +248,7 @@ class _UserListTab extends ConsumerWidget {
                   separatorBuilder: (context, i) => const SizedBox(height: 10),
                   itemBuilder: (context, i) => _ProfileCard(
                     profile: profiles[i],
-                    isAdminViewer: currentRole == 'admin',
+                    isAdminViewer: currentRole == UserRole.admin,
                     onEditRole: () => _showEditRoleSheet(context, profiles[i]),
                   ),
                 );
@@ -268,7 +270,7 @@ class _CustomerTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = AppThemeColors.of(context);
     final currentRole = ref.watch(roleProvider);
-    final profilesAsync = ref.watch(profilesByRoleProvider('customer'));
+    final profilesAsync = ref.watch(profilesByRoleProvider(UserRole.customer));
     final elevatorsAsync = ref.watch(elevatorsProvider);
 
     return AnimatedSwitcher(
@@ -280,7 +282,7 @@ class _CustomerTab extends ConsumerWidget {
         ),
         error: (e, _) => _ErrorPane(
           message: e.toString().replaceFirst('Exception: ', ''),
-          onRetry: () => ref.invalidate(profilesByRoleProvider('customer')),
+          onRetry: () => ref.invalidate(profilesByRoleProvider(UserRole.customer)),
         ),
         data: (customers) {
           if (customers.isEmpty) {
@@ -293,7 +295,7 @@ class _CustomerTab extends ConsumerWidget {
           return RefreshIndicator(
             color: colors.primary,
             onRefresh: () async {
-              ref.invalidate(profilesByRoleProvider('customer'));
+              ref.invalidate(profilesByRoleProvider(UserRole.customer));
               ref.invalidate(elevatorsProvider);
             },
             child: LayoutBuilder(
@@ -313,13 +315,13 @@ class _CustomerTab extends ConsumerWidget {
                             Expanded(
                               child: _ProfileCard(
                                 profile: customers[idx1],
-                                isAdminViewer: currentRole == 'admin',
+                                isAdminViewer: currentRole == UserRole.admin,
                                 elevators: elevators,
                                 onEditRole: () => _showEditRoleSheet(
                                   context,
                                   customers[idx1],
                                 ),
-                                onAssignElevator: currentRole == 'admin'
+                                onAssignElevator: currentRole == UserRole.admin
                                     ? () => _showAssignElevatorSheet(
                                         context,
                                         customers[idx1],
@@ -333,13 +335,13 @@ class _CustomerTab extends ConsumerWidget {
                               child: idx2 < customers.length
                                   ? _ProfileCard(
                                       profile: customers[idx2],
-                                      isAdminViewer: currentRole == 'admin',
+                                      isAdminViewer: currentRole == UserRole.admin,
                                       elevators: elevators,
                                       onEditRole: () => _showEditRoleSheet(
                                         context,
                                         customers[idx2],
                                       ),
-                                      onAssignElevator: currentRole == 'admin'
+                                      onAssignElevator: currentRole == UserRole.admin
                                           ? () => _showAssignElevatorSheet(
                                               context,
                                               customers[idx2],
@@ -361,10 +363,10 @@ class _CustomerTab extends ConsumerWidget {
                   separatorBuilder: (context, i) => const SizedBox(height: 10),
                   itemBuilder: (context, i) => _ProfileCard(
                     profile: customers[i],
-                    isAdminViewer: currentRole == 'admin',
+                    isAdminViewer: currentRole == UserRole.admin,
                     elevators: elevators,
                     onEditRole: () => _showEditRoleSheet(context, customers[i]),
-                    onAssignElevator: currentRole == 'admin'
+                    onAssignElevator: currentRole == UserRole.admin
                         ? () => _showAssignElevatorSheet(
                             context,
                             customers[i],
@@ -663,7 +665,7 @@ class _EditRoleSheet extends ConsumerStatefulWidget {
 }
 
 class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
-  late String _selectedRole;
+  late UserRole _selectedRole;
 
   @override
   void initState() {
@@ -697,7 +699,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
         SnackBar(
           content: Text(
             '${widget.profile.displayName} artık '
-            '${_roleTr(_selectedRole)} olarak güncellendi.',
+            '${_selectedRole.name} olarak güncellendi.',
           ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppThemeColors.of(context).success,
@@ -783,19 +785,19 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
               // Role options
               ...[
                 (
-                  'admin',
+                  UserRole.admin,
                   'Admin',
                   Icons.admin_panel_settings_outlined,
                   'Tüm yetkilere sahip yönetici',
                 ),
                 (
-                  'technician',
+                  UserRole.technician,
                   'Teknisyen',
                   Icons.engineering_outlined,
                   'Asansör bakım ve arıza yönetimi',
                 ),
                 (
-                  'customer',
+                  UserRole.customer,
                   'Müşteri',
                   Icons.person_outline,
                   'Bina sakini / asansör kullanıcısı',
@@ -1295,14 +1297,3 @@ class _ErrorPane extends StatelessWidget {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-String _roleTr(String role) {
-  switch (role) {
-    case 'admin':
-      return 'Admin';
-    case 'customer':
-      return 'Müşteri';
-    default:
-      return 'Teknisyen';
-  }
-}

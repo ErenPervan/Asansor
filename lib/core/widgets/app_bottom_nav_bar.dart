@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../enums/app_enums.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../features/admin/providers/profile_providers.dart';
@@ -12,8 +13,8 @@ class AppBottomNavBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final role = ref.watch(roleProvider) ?? 'technician';
-    final isAdmin = role == 'admin';
+    final role = ref.watch(roleProvider);
+    final isAdmin = role == UserRole.admin;
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 8,

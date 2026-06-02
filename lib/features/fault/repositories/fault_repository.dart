@@ -1,8 +1,20 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/exceptions/app_exception.dart';
 import '../models/fault_report_model.dart';
 
-class FaultRepository {
+abstract interface class IFaultRepository {
+  Future<List<FaultReportModel>> getAllFaults();
+  Future<DateTime?> getLatestFaultDate(String elevatorId);
+  Future<FaultReportModel> reportFault({required String elevatorId, required String description, String? photoUrl});
+  Future<FaultReportModel> resolveFault(String faultId, {String? resolutionNotes});
+  Future<FaultReportModel> reopenFault(String faultId);
+  Future<FaultReportModel> getFaultById(String id);
+  Future<List<FaultReportModel>> getAllActiveFaults();
+  Future<List<FaultReportModel>> getFaultsByElevatorId(String elevatorId);
+}
+
+class FaultRepository implements IFaultRepository {
   FaultRepository(this._client);
 
   final SupabaseClient _client;
@@ -11,6 +23,7 @@ class FaultRepository {
 
   // ── Read ───────────────────────────────────────────────────────────────────
 
+  @override
   Future<List<FaultReportModel>> getAllFaults() async {
     try {
       final response = await _client
@@ -23,14 +36,46 @@ class FaultRepository {
             (json) => FaultReportModel.fromJson(json as Map<String, dynamic>),
           )
           .toList();
+    } on AppException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      throw mapPostgrestException(e, 'getAllFaults');
     } catch (e) {
-      throw Exception('Tüm arızalar yüklenemedi: $e');
+      throw mapUnknownException(e, 'getAllFaults');
+    }
+  }
+
+  /// Returns the [DateTime] of the most recent fault report for this elevator,
+  /// or `null` when no fault reports exist yet.
+  @override
+  Future<DateTime?> getLatestFaultDate(String elevatorId) async {
+    try {
+      final response = await _client
+          .from(_table)
+          .select('reported_at')
+          .eq('elevator_id', elevatorId)
+          .order('reported_at', ascending: false)
+          .limit(1);
+
+      final rows = response as List<dynamic>;
+      if (rows.isEmpty) return null;
+
+      final raw = rows.first['reported_at'] as String?;
+      if (raw == null) return null;
+      return DateTime.parse(raw);
+    } on AppException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      throw mapPostgrestException(e, 'getLatestFaultDate($elevatorId)');
+    } catch (e) {
+      throw mapUnknownException(e, 'getLatestFaultDate($elevatorId)');
     }
   }
 
   // ── Write ──────────────────────────────────────────────────────────────────
 
   /// Inserts a new fault report and returns the saved record.
+  @override
   Future<FaultReportModel> reportFault({
     required String elevatorId,
     required String description,
@@ -50,10 +95,12 @@ class FaultRepository {
           .single();
 
       return FaultReportModel.fromJson(response);
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to report fault: ${e.message}');
+      throw mapPostgrestException(e, 'reportFault');
     } catch (e) {
-      throw Exception('Unexpected error while reporting fault: $e');
+      throw mapUnknownException(e, 'reportFault');
     }
   }
 
@@ -65,6 +112,7 @@ class FaultRepository {
   ///   add column if not exists resolved_at timestamptz,
   ///   add column if not exists resolution_notes text;
   /// ```
+  @override
   Future<FaultReportModel> resolveFault(
     String faultId, {
     String? resolutionNotes,
@@ -83,27 +131,17 @@ class FaultRepository {
           .single();
 
       return FaultReportModel.fromJson(response);
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      // Fall back gracefully if optional columns don't exist yet.
-      if (e.message.contains('resolved_at') ||
-          e.message.contains('resolution_notes') ||
-          e.message.contains('column') ||
-          e.message.contains('schema cache')) {
-        final response = await _client
-            .from(_table)
-            .update({'is_resolved': true})
-            .eq('id', faultId)
-            .select()
-            .single();
-        return FaultReportModel.fromJson(response);
-      }
-      throw Exception('Arıza onarılamadı: ${e.message}');
+      throw mapPostgrestException(e, 'resolveFault');
     } catch (e) {
-      throw Exception('Beklenmeyen hata: $e');
+      throw mapUnknownException(e, 'resolveFault');
     }
   }
 
   /// Re-opens a previously resolved fault.
+  @override
   Future<FaultReportModel> reopenFault(String faultId) async {
     try {
       final response = await _client
@@ -114,26 +152,19 @@ class FaultRepository {
           .single();
 
       return FaultReportModel.fromJson(response);
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      if (e.message.contains('resolved_at') ||
-          e.message.contains('schema cache')) {
-        final response = await _client
-            .from(_table)
-            .update({'is_resolved': false})
-            .eq('id', faultId)
-            .select()
-            .single();
-        return FaultReportModel.fromJson(response);
-      }
-      throw Exception('Arıza yeniden açılamadı: ${e.message}');
+      throw mapPostgrestException(e, 'reopenFault');
     } catch (e) {
-      throw Exception('Beklenmeyen hata: $e');
+      throw mapUnknownException(e, 'reopenFault');
     }
   }
 
   // ── Read ───────────────────────────────────────────────────────────────────
 
   /// Fetches a single fault report by [id].
+  @override
   Future<FaultReportModel> getFaultById(String id) async {
     try {
       final response = await _client
@@ -143,14 +174,17 @@ class FaultRepository {
           .single();
 
       return FaultReportModel.fromJson(response);
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Arıza yüklenemedi: ${e.message}');
+      throw mapPostgrestException(e, 'getFaultById($id)');
     } catch (e) {
-      throw Exception('Beklenmeyen hata: $e');
+      throw mapUnknownException(e, 'getFaultById($id)');
     }
   }
 
   /// Returns all unresolved fault reports across every elevator, newest first.
+  @override
   Future<List<FaultReportModel>> getAllActiveFaults() async {
     try {
       final response = await _client
@@ -164,14 +198,17 @@ class FaultRepository {
             (json) => FaultReportModel.fromJson(json as Map<String, dynamic>),
           )
           .toList();
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to load active faults: ${e.message}');
+      throw mapPostgrestException(e, 'getAllActiveFaults');
     } catch (e) {
-      throw Exception('Unexpected error while loading active faults: $e');
+      throw mapUnknownException(e, 'getAllActiveFaults');
     }
   }
 
   /// Returns all fault reports for a given [elevatorId], newest first.
+  @override
   Future<List<FaultReportModel>> getFaultsByElevatorId(
     String elevatorId,
   ) async {
@@ -187,14 +224,13 @@ class FaultRepository {
             (json) => FaultReportModel.fromJson(json as Map<String, dynamic>),
           )
           .toList();
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception(
-        'Failed to load faults for elevator ($elevatorId): ${e.message}',
-      );
+      throw mapPostgrestException(e, 'getFaultsByElevatorId($elevatorId)');
     } catch (e) {
-      throw Exception(
-        'Unexpected error while loading faults for elevator ($elevatorId): $e',
-      );
+      throw mapUnknownException(e, 'getFaultsByElevatorId($elevatorId)');
     }
   }
 }
+

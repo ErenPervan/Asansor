@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 
 void main() {
@@ -41,7 +42,7 @@ void main() {
       expect(model.id, 'e1');
       expect(model.buildingName, 'Apt A');
       expect(model.address, '123 Main St');
-      expect(model.status, 'active');
+      expect(model.status, ElevatorStatus.active);
       expect(model.latitude, 41.0082);
       expect(model.longitude, 28.9784);
       expect(model.maintenanceDay, 15);
@@ -71,7 +72,7 @@ void main() {
         expect(model.id, 'e2');
         expect(model.buildingName, ''); // Empty string fallback
         expect(model.address, isNull);
-        expect(model.status, 'inactive');
+        expect(model.status, ElevatorStatus.inactive);
         expect(model.latitude, isNull);
         expect(model.longitude, isNull);
         expect(model.maintenanceDay, isNull);
@@ -92,7 +93,7 @@ void main() {
         const model = ElevatorModel(
           id: 'e3',
           buildingName: 'Apt B',
-          status: 'under_maintenance',
+          status: ElevatorStatus.underMaintenance,
           version: 3,
         );
 
@@ -122,7 +123,7 @@ void main() {
         final model = ElevatorModel(
           id: 'e4',
           buildingName: 'Apt C',
-          status: 'faulty',
+          status: ElevatorStatus.faulty,
           model: 'Schindler 3300',
           capacity: 800,
           lastInspectionDate: lastIns,
@@ -145,7 +146,7 @@ void main() {
       const original = ElevatorModel(
         id: 'e5',
         buildingName: 'Apt D',
-        status: 'active',
+        status: ElevatorStatus.active,
         model: 'Kone MonoSpace',
         capacity: 450,
         inspectionStatus: InspectionStatus.blue,
@@ -153,7 +154,7 @@ void main() {
       );
 
       final updated = original.copyWith(
-        status: 'faulty',
+        status: ElevatorStatus.faulty,
         capacity: 630,
         model: 'Kone MonoSpace DX',
         inspectionStatus: InspectionStatus.red,
@@ -161,7 +162,7 @@ void main() {
 
       expect(updated.id, 'e5');
       expect(updated.buildingName, 'Apt D');
-      expect(updated.status, 'faulty');
+      expect(updated.status, ElevatorStatus.faulty);
       expect(updated.model, 'Kone MonoSpace DX');
       expect(updated.capacity, 630);
       expect(updated.inspectionStatus, InspectionStatus.red);
@@ -172,7 +173,7 @@ void main() {
       const model = ElevatorModel(
         id: 'e6',
         buildingName: 'Apt E',
-        status: 'active',
+        status: ElevatorStatus.active,
         model: 'Otis',
         capacity: 1000,
         inspectionStatus: InspectionStatus.green,

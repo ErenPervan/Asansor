@@ -43,11 +43,7 @@ class ElevatorQrView extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: colors.primary,
-              ),
+              Icon(Icons.error_outline, size: 48, color: colors.primary),
               const SizedBox(height: 12),
               Text('$e'),
               const SizedBox(height: 16),
@@ -101,9 +97,7 @@ class _QrScaffold extends StatelessWidget {
             decoration: BoxDecoration(
               color: colors.successContainer,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: colors.success.withValues(alpha: 0.3),
-              ),
+              border: Border.all(color: colors.success.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -333,7 +327,9 @@ class _QrScaffold extends StatelessWidget {
             icon: const Icon(Icons.print_outlined),
             label: Text(
               'Yazdır / Kaydet',
-              style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
             style: FilledButton.styleFrom(
               minimumSize: const Size(double.infinity, 54),
@@ -558,7 +554,10 @@ class _StatusChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700, color: fg),
+        style: textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: fg,
+        ),
       ),
     );
   }

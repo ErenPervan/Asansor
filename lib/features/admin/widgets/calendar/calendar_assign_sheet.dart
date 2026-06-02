@@ -211,10 +211,11 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
-                        ),
+                        textStyle: Theme.of(context).textTheme.titleSmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       PickerField(
@@ -237,10 +238,11 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
-                        ),
+                        textStyle: Theme.of(context).textTheme.titleSmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       PickerField(
@@ -263,10 +265,11 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
-                        ),
+                        textStyle: Theme.of(context).textTheme.titleSmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Row(
@@ -300,10 +303,11 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
-                        ),
+                        textStyle: Theme.of(context).textTheme.titleSmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
                       ),
                       const SizedBox(height: 10),
                       PrioritySelector(
@@ -320,10 +324,11 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
-                        ),
+                        textStyle: Theme.of(context).textTheme.titleSmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
@@ -332,9 +337,8 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                         decoration: InputDecoration(
                           hintText:
                               'Görev hakkında ek bilgi veya talimatlar...',
-                          hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.outline,
-                          ),
+                          hintStyle: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: AppColors.outline),
                           filled: true,
                           fillColor: AppColors.surfaceContainer,
                           border: OutlineInputBorder(
@@ -384,9 +388,8 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                               : const Icon(Icons.assignment_turned_in_outlined),
                           label: Text(
                             isSubmitting ? 'Atanıyor...' : 'Görevi Ata',
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),

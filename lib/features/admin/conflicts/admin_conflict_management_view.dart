@@ -51,10 +51,16 @@ class _ConflictBody extends StatelessWidget {
           const SliverFillRemaining(child: _EmptyState())
         else
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.md, 20, AppSpacing.md, 100),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              20,
+              AppSpacing.md,
+              100,
+            ),
             sliver: SliverList.separated(
               itemCount: conflicts.length,
-              separatorBuilder: (context, i) => const SizedBox(height: AppSpacing.md),
+              separatorBuilder: (context, i) =>
+                  const SizedBox(height: AppSpacing.md),
               itemBuilder: (context, index) =>
                   _ConflictCard(report: conflicts[index]),
             ),
@@ -319,4 +325,3 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-

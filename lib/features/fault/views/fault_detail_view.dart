@@ -39,7 +39,10 @@ class FaultDetailView extends ConsumerWidget {
           elevation: 0,
           surfaceTintColor: Colors.transparent,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: AppThemeColors.of(context).primary),
+            icon: Icon(
+              Icons.arrow_back,
+              color: AppThemeColors.of(context).primary,
+            ),
             onPressed: () => context.pop(),
           ),
           title: Text(
@@ -64,7 +67,10 @@ class FaultDetailView extends ConsumerWidget {
           elevation: 0,
           surfaceTintColor: Colors.transparent,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: AppThemeColors.of(context).primary),
+            icon: Icon(
+              Icons.arrow_back,
+              color: AppThemeColors.of(context).primary,
+            ),
             onPressed: () => context.pop(),
           ),
           title: Text(
@@ -89,9 +95,9 @@ class FaultDetailView extends ConsumerWidget {
               const SizedBox(height: 12),
               Text(
                 'Arıza yüklenemedi',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(color: AppThemeColors.of(context).onSurface),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppThemeColors.of(context).onSurface,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
@@ -340,10 +346,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                             ),
                             if (fault.isResolved &&
                                 fault.resolvedAt != null) ...[
-                              Divider(
-                                height: 20,
-                                color: colors.outlineVariant,
-                              ),
+                              Divider(height: 20, color: colors.outlineVariant),
                               _TimeRow(
                                 icon: Icons.check_circle_outline,
                                 label: 'Onarım Tarihi',
@@ -369,9 +372,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                             label: const Text('Çözüm notu ekle (isteğe bağlı)'),
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(double.infinity, 48),
-                              side: BorderSide(
-                                color: colors.outlineVariant,
-                              ),
+                              side: BorderSide(color: colors.outlineVariant),
                               foregroundColor: colors.onSurfaceVariant,
                             ),
                             onPressed: () =>
@@ -430,9 +431,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                           label: Text('$elevatorName Detayına Git'),
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 48),
-                            side: BorderSide(
-                              color: colors.outlineVariant,
-                            ),
+                            side: BorderSide(color: colors.outlineVariant),
                             foregroundColor: colors.onSurface,
                           ),
                           onPressed: () =>
@@ -474,9 +473,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                           label: Text('$elevatorName Detayına Git'),
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 48),
-                            side: BorderSide(
-                              color: colors.outlineVariant,
-                            ),
+                            side: BorderSide(color: colors.outlineVariant),
                             foregroundColor: colors.onSurface,
                           ),
                           onPressed: () =>
@@ -811,9 +808,7 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isResolved
-            ? colors.successContainer
-            : colors.errorContainer,
+        color: isResolved ? colors.successContainer : colors.errorContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

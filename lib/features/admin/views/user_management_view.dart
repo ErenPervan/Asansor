@@ -177,81 +177,83 @@ class _UserListTab extends ConsumerWidget {
           padding: EdgeInsets.all(AppSpacing.md),
           child: LoadingState(count: 4),
         ),
-      error: (e, _) => _ErrorPane(
-        message: e.toString().replaceFirst('Exception: ', ''),
-        onRetry: () => role == null
-            ? ref.invalidate(allProfilesProvider)
-            : ref.invalidate(profilesByRoleProvider(role!)),
-      ),
-      data: (profiles) {
-        if (profiles.isEmpty) {
-          return _EmptyPane(
-            icon: role == 'technician'
-                ? Icons.engineering_outlined
-                : Icons.groups_outlined,
-            message: role == 'technician'
-                ? 'Henüz teknisyen kaydı yok.'
-                : 'Henüz kullanıcı kaydı yok.',
-          );
-        }
-        return RefreshIndicator(
-          color: colors.primary,
-          onRefresh: () async => role == null
+        error: (e, _) => _ErrorPane(
+          message: e.toString().replaceFirst('Exception: ', ''),
+          onRetry: () => role == null
               ? ref.invalidate(allProfilesProvider)
               : ref.invalidate(profilesByRoleProvider(role!)),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth >= 600) {
-                return ListView.builder(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  itemCount: (profiles.length / 2).ceil(),
-                  itemBuilder: (context, i) {
-                    final idx1 = i * 2;
-                    final idx2 = i * 2 + 1;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: _ProfileCard(
-                              profile: profiles[idx1],
-                              isAdminViewer: currentRole == 'admin',
-                              onEditRole: () =>
-                                  _showEditRoleSheet(context, profiles[idx1]),
+        ),
+        data: (profiles) {
+          if (profiles.isEmpty) {
+            return _EmptyPane(
+              icon: role == 'technician'
+                  ? Icons.engineering_outlined
+                  : Icons.groups_outlined,
+              message: role == 'technician'
+                  ? 'Henüz teknisyen kaydı yok.'
+                  : 'Henüz kullanıcı kaydı yok.',
+            );
+          }
+          return RefreshIndicator(
+            color: colors.primary,
+            onRefresh: () async => role == null
+                ? ref.invalidate(allProfilesProvider)
+                : ref.invalidate(profilesByRoleProvider(role!)),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth >= 600) {
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    itemCount: (profiles.length / 2).ceil(),
+                    itemBuilder: (context, i) {
+                      final idx1 = i * 2;
+                      final idx2 = i * 2 + 1;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _ProfileCard(
+                                profile: profiles[idx1],
+                                isAdminViewer: currentRole == 'admin',
+                                onEditRole: () =>
+                                    _showEditRoleSheet(context, profiles[idx1]),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: idx2 < profiles.length
-                                ? _ProfileCard(
-                                    profile: profiles[idx2],
-                                    isAdminViewer: currentRole == 'admin',
-                                    onEditRole: () =>
-                                        _showEditRoleSheet(context, profiles[idx2]),
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: idx2 < profiles.length
+                                  ? _ProfileCard(
+                                      profile: profiles[idx2],
+                                      isAdminViewer: currentRole == 'admin',
+                                      onEditRole: () => _showEditRoleSheet(
+                                        context,
+                                        profiles[idx2],
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+                return ListView.separated(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  itemCount: profiles.length,
+                  separatorBuilder: (context, i) => const SizedBox(height: 10),
+                  itemBuilder: (context, i) => _ProfileCard(
+                    profile: profiles[i],
+                    isAdminViewer: currentRole == 'admin',
+                    onEditRole: () => _showEditRoleSheet(context, profiles[i]),
+                  ),
                 );
-              }
-              return ListView.separated(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                itemCount: profiles.length,
-                separatorBuilder: (context, i) => const SizedBox(height: 10),
-                itemBuilder: (context, i) => _ProfileCard(
-                  profile: profiles[i],
-                  isAdminViewer: currentRole == 'admin',
-                  onEditRole: () => _showEditRoleSheet(context, profiles[i]),
-                ),
-              );
-            },
-          ),
-        );
-      },
+              },
+            ),
+          );
+        },
       ),
     );
   }
@@ -276,101 +278,105 @@ class _CustomerTab extends ConsumerWidget {
           padding: EdgeInsets.all(AppSpacing.md),
           child: LoadingState(count: 4),
         ),
-      error: (e, _) => _ErrorPane(
-        message: e.toString().replaceFirst('Exception: ', ''),
-        onRetry: () => ref.invalidate(profilesByRoleProvider('customer')),
-      ),
-      data: (customers) {
-        if (customers.isEmpty) {
-          return const _EmptyPane(
-            icon: Icons.person_search_outlined,
-            message: 'Henüz müşteri kaydı yok.',
-          );
-        }
-        final elevators = elevatorsAsync.valueOrNull ?? [];
-        return RefreshIndicator(
-          color: colors.primary,
-          onRefresh: () async {
-            ref.invalidate(profilesByRoleProvider('customer'));
-            ref.invalidate(elevatorsProvider);
-          },
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth >= 600) {
-                return ListView.builder(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  itemCount: (customers.length / 2).ceil(),
-                  itemBuilder: (context, i) {
-                    final idx1 = i * 2;
-                    final idx2 = i * 2 + 1;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: _ProfileCard(
-                              profile: customers[idx1],
-                              isAdminViewer: currentRole == 'admin',
-                              elevators: elevators,
-                              onEditRole: () =>
-                                  _showEditRoleSheet(context, customers[idx1]),
-                              onAssignElevator: currentRole == 'admin'
-                                  ? () => _showAssignElevatorSheet(
-                                      context,
-                                      customers[idx1],
-                                      elevators,
-                                    )
-                                  : null,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: idx2 < customers.length
-                                ? _ProfileCard(
-                                    profile: customers[idx2],
-                                    isAdminViewer: currentRole == 'admin',
-                                    elevators: elevators,
-                                    onEditRole: () => _showEditRoleSheet(
-                                        context, customers[idx2]),
-                                    onAssignElevator: currentRole == 'admin'
-                                        ? () => _showAssignElevatorSheet(
-                                            context,
-                                            customers[idx2],
-                                            elevators,
-                                          )
-                                        : null,
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              }
-              return ListView.separated(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                itemCount: customers.length,
-                separatorBuilder: (context, i) => const SizedBox(height: 10),
-                itemBuilder: (context, i) => _ProfileCard(
-                  profile: customers[i],
-                  isAdminViewer: currentRole == 'admin',
-                  elevators: elevators,
-                  onEditRole: () => _showEditRoleSheet(context, customers[i]),
-                  onAssignElevator: currentRole == 'admin'
-                      ? () => _showAssignElevatorSheet(
-                          context,
-                          customers[i],
-                          elevators,
-                        )
-                      : null,
-                ),
-              );
+        error: (e, _) => _ErrorPane(
+          message: e.toString().replaceFirst('Exception: ', ''),
+          onRetry: () => ref.invalidate(profilesByRoleProvider('customer')),
+        ),
+        data: (customers) {
+          if (customers.isEmpty) {
+            return const _EmptyPane(
+              icon: Icons.person_search_outlined,
+              message: 'Henüz müşteri kaydı yok.',
+            );
+          }
+          final elevators = elevatorsAsync.valueOrNull ?? [];
+          return RefreshIndicator(
+            color: colors.primary,
+            onRefresh: () async {
+              ref.invalidate(profilesByRoleProvider('customer'));
+              ref.invalidate(elevatorsProvider);
             },
-          ),
-        );
-      },
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth >= 600) {
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    itemCount: (customers.length / 2).ceil(),
+                    itemBuilder: (context, i) {
+                      final idx1 = i * 2;
+                      final idx2 = i * 2 + 1;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _ProfileCard(
+                                profile: customers[idx1],
+                                isAdminViewer: currentRole == 'admin',
+                                elevators: elevators,
+                                onEditRole: () => _showEditRoleSheet(
+                                  context,
+                                  customers[idx1],
+                                ),
+                                onAssignElevator: currentRole == 'admin'
+                                    ? () => _showAssignElevatorSheet(
+                                        context,
+                                        customers[idx1],
+                                        elevators,
+                                      )
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: idx2 < customers.length
+                                  ? _ProfileCard(
+                                      profile: customers[idx2],
+                                      isAdminViewer: currentRole == 'admin',
+                                      elevators: elevators,
+                                      onEditRole: () => _showEditRoleSheet(
+                                        context,
+                                        customers[idx2],
+                                      ),
+                                      onAssignElevator: currentRole == 'admin'
+                                          ? () => _showAssignElevatorSheet(
+                                              context,
+                                              customers[idx2],
+                                              elevators,
+                                            )
+                                          : null,
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+                return ListView.separated(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  itemCount: customers.length,
+                  separatorBuilder: (context, i) => const SizedBox(height: 10),
+                  itemBuilder: (context, i) => _ProfileCard(
+                    profile: customers[i],
+                    isAdminViewer: currentRole == 'admin',
+                    elevators: elevators,
+                    onEditRole: () => _showEditRoleSheet(context, customers[i]),
+                    onAssignElevator: currentRole == 'admin'
+                        ? () => _showAssignElevatorSheet(
+                            context,
+                            customers[i],
+                            elevators,
+                          )
+                        : null,
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
@@ -413,9 +419,7 @@ class _ProfileCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colors.outlineVariant.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
             color: colors.onSurface.withValues(alpha: 0.04),
@@ -613,7 +617,9 @@ class _ProfileCard extends StatelessWidget {
                   icon: const Icon(Icons.manage_accounts_outlined, size: 14),
                   label: Text(
                     'Rol Değiştir',
-                    style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
+                    style: textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   style: TextButton.styleFrom(
                     foregroundColor: colors.onSurfaceVariant,
@@ -710,7 +716,12 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -768,7 +779,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
-              
+
               // Role options
               ...[
                 (
@@ -990,7 +1001,12 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
       expand: false,
       builder: (context, scrollController) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            0,
+          ),
           child: Column(
             children: [
               // Handle bar
@@ -1005,7 +1021,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              
+
               // Title
               Row(
                 children: [
@@ -1016,10 +1032,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                       color: colors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(
-                      Icons.elevator_outlined,
-                      color: colors.primary,
-                    ),
+                    child: Icon(Icons.elevator_outlined, color: colors.primary),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -1051,7 +1064,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                 color: colors.outlineVariant.withValues(alpha: 0.3),
               ),
               const SizedBox(height: AppSpacing.sm),
-              
+
               // Elevator list
               Expanded(
                 child: ListView(
@@ -1263,7 +1276,9 @@ class _ErrorPane extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 20),
             FilledButton.icon(

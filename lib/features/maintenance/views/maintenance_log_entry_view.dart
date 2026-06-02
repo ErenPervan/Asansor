@@ -311,10 +311,11 @@ class _MaintenanceLogEntryViewState
                       const SizedBox(height: 24),
                       Text(
                         'Bakım Kaydedildi',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colors.onSurface,
-                        ),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colors.onSurface,
+                            ),
                       ),
                     ],
                   ),
@@ -358,7 +359,9 @@ class _MaintenanceLogEntryViewState
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final sectionLabelStyle = textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
+    final sectionLabelStyle = textTheme.titleMedium?.copyWith(
+      fontWeight: FontWeight.bold,
+    );
 
     final maintenanceState = ref.watch(maintenanceControllerProvider);
     final elevatorAsync = ref.watch(elevatorByIdProvider(widget.elevatorId));
@@ -401,8 +404,10 @@ class _MaintenanceLogEntryViewState
                       children: [
                         Text(
                           elevator.buildingName,
-                          style: textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.bold, color: colors.onSurface),
+                          style: textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colors.onSurface,
+                          ),
                         ),
                         if (elevator.address != null &&
                             elevator.address!.isNotEmpty) ...[
@@ -549,10 +554,11 @@ class _MaintenanceLogEntryViewState
                                             ), // align with scaled checkbox center
                                             Text(
                                               item.label,
-                                              style: textTheme.bodyLarge?.copyWith(
-                                                fontWeight: FontWeight.w500,
-                                                color: colors.onSurface,
-                                              ),
+                                              style: textTheme.bodyLarge
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w500,
+                                                    color: colors.onSurface,
+                                                  ),
                                             ),
                                             if (item
                                                 .description
@@ -560,9 +566,10 @@ class _MaintenanceLogEntryViewState
                                               const SizedBox(height: 4),
                                               Text(
                                                 item.description,
-                                                style: textTheme.bodyMedium?.copyWith(
-                                                  color: colors.outline,
-                                                ),
+                                                style: textTheme.bodyMedium
+                                                    ?.copyWith(
+                                                      color: colors.outline,
+                                                    ),
                                               ),
                                             ],
                                           ],
@@ -797,7 +804,10 @@ class _MaintenanceLogEntryViewState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500)),
+          Text(
+            label,
+            style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
+          ),
           const SizedBox(height: 4),
           Container(
             decoration: BoxDecoration(

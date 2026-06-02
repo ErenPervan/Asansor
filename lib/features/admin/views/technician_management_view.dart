@@ -40,7 +40,8 @@ class TechnicianManagementView extends ConsumerWidget {
         ],
       ),
       body: dataAsync.when(
-        loading: () => Center(child: CircularProgressIndicator(color: colors.primary)),
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: colors.primary)),
         error: (e, st) => _ErrorBody(
           error: e,
           onRetry: () => ref.invalidate(technicianManagementProvider),
@@ -88,7 +89,7 @@ class _TechnicianList extends StatelessWidget {
               final rowIndex = i - 1;
               final idx1 = rowIndex * 2;
               final idx2 = rowIndex * 2 + 1;
-              
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
@@ -105,7 +106,8 @@ class _TechnicianList extends StatelessWidget {
                       child: idx2 < stats.length
                           ? _TechnicianCard(
                               stats: stats[idx2],
-                              onTap: () => _showDetailSheet(context, stats[idx2]),
+                              onTap: () =>
+                                  _showDetailSheet(context, stats[idx2]),
                             )
                           : const SizedBox.shrink(),
                     ),
@@ -359,7 +361,11 @@ class _TechnicianCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              _MonthlyBadge(count: stats.monthlyCompleted, colors: colors, textTheme: textTheme),
+                              _MonthlyBadge(
+                                count: stats.monthlyCompleted,
+                                colors: colors,
+                                textTheme: textTheme,
+                              ),
                             ],
                           ),
                           if (profile.email != null &&
@@ -564,7 +570,11 @@ class _TechnicianCard extends StatelessWidget {
 // ── Monthly badge ─────────────────────────────────────────────────────────────
 
 class _MonthlyBadge extends StatelessWidget {
-  const _MonthlyBadge({required this.count, required this.colors, required this.textTheme});
+  const _MonthlyBadge({
+    required this.count,
+    required this.colors,
+    required this.textTheme,
+  });
 
   final int count;
   final AppThemeColors colors;
@@ -575,9 +585,7 @@ class _MonthlyBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: count > 0
-            ? colors.successContainer
-            : colors.surfaceContainer,
+        color: count > 0 ? colors.successContainer : colors.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -684,9 +692,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 22,
-                      backgroundColor: colors.primary.withValues(
-                        alpha: 0.12,
-                      ),
+                      backgroundColor: colors.primary.withValues(alpha: 0.12),
                       child: Text(
                         stats.profile.initials,
                         style: textTheme.labelLarge?.copyWith(
@@ -803,9 +809,7 @@ class _TimelineTaskItem extends StatelessWidget {
                     time,
                     style: textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: task.isCompleted
-                          ? colors.success
-                          : colors.primary,
+                      color: task.isCompleted ? colors.success : colors.primary,
                     ),
                   ),
                 ),
@@ -884,9 +888,10 @@ class _TimelineTaskItem extends StatelessWidget {
                                         Expanded(
                                           child: Text(
                                             task.address!,
-                                            style: textTheme.labelSmall?.copyWith(
-                                              color: colors.outline,
-                                            ),
+                                            style: textTheme.labelSmall
+                                                ?.copyWith(
+                                                  color: colors.outline,
+                                                ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -914,8 +919,16 @@ class _TimelineTaskItem extends StatelessWidget {
                                     spacing: 6,
                                     runSpacing: 4,
                                     children: [
-                                      _SmallBadge.status(context, task.status, textTheme),
-                                      _SmallBadge.priority(context, task.priority, textTheme),
+                                      _SmallBadge.status(
+                                        context,
+                                        task.status,
+                                        textTheme,
+                                      ),
+                                      _SmallBadge.priority(
+                                        context,
+                                        task.priority,
+                                        textTheme,
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -962,26 +975,27 @@ class _TimelineTaskItem extends StatelessWidget {
 // ── Small badge ───────────────────────────────────────────────────────────────
 
 class _SmallBadge extends StatelessWidget {
-  const _SmallBadge({required this.label, required this.bg, required this.fg, required this.textTheme});
+  const _SmallBadge({
+    required this.label,
+    required this.bg,
+    required this.fg,
+    required this.textTheme,
+  });
 
   final String label;
   final Color bg;
   final Color fg;
   final TextTheme textTheme;
 
-  factory _SmallBadge.status(BuildContext context, String s, TextTheme textTheme) {
+  factory _SmallBadge.status(
+    BuildContext context,
+    String s,
+    TextTheme textTheme,
+  ) {
     final colors = AppThemeColors.of(context);
     final (lbl, bg, fg) = switch (s) {
-      'completed' => (
-        'TAMAMLANDI',
-        colors.successContainer,
-        colors.success,
-      ),
-      'in_progress' => (
-        'DEVAM',
-        colors.warningContainer,
-        colors.warning,
-      ),
+      'completed' => ('TAMAMLANDI', colors.successContainer, colors.success),
+      'in_progress' => ('DEVAM', colors.warningContainer, colors.warning),
       'cancelled' => (
         'İPTAL',
         colors.surfaceContainerHigh,
@@ -992,7 +1006,11 @@ class _SmallBadge extends StatelessWidget {
     return _SmallBadge(label: lbl, bg: bg, fg: fg, textTheme: textTheme);
   }
 
-  factory _SmallBadge.priority(BuildContext context, String p, TextTheme textTheme) {
+  factory _SmallBadge.priority(
+    BuildContext context,
+    String p,
+    TextTheme textTheme,
+  ) {
     final colors = AppThemeColors.of(context);
     final (lbl, bg, fg) = switch (p) {
       'emergency' => ('ACİL', colors.errorContainer, colors.error),
@@ -1061,7 +1079,9 @@ class _EmptyBody extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             'Kullanıcı yönetiminden teknisyen rolü atayın.',
-            style: textTheme.labelMedium?.copyWith(color: colors.onSurfaceVariant),
+            style: textTheme.labelMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -1087,11 +1107,7 @@ class _ErrorBody extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.cloud_off_outlined,
-              size: 48,
-              color: colors.outline,
-            ),
+            Icon(Icons.cloud_off_outlined, size: 48, color: colors.outline),
             const SizedBox(height: 12),
             Text(
               'Veriler yüklenemedi',

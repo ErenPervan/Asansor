@@ -61,7 +61,9 @@ class HomeView extends ConsumerWidget {
             const OfflineBanner(),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: screenW > 600 ? 40 : 24),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenW > 600 ? 40 : 24,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

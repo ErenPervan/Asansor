@@ -160,14 +160,18 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                   color: colors.primary,
                   shape: BoxShape.circle,
                 ),
-                todayTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.primary,
-                  fontWeight: FontWeight.w700,
-                ) ?? const TextStyle(),
-                selectedTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ) ?? const TextStyle(),
+                todayTextStyle:
+                    Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: colors.primary,
+                      fontWeight: FontWeight.w700,
+                    ) ??
+                    const TextStyle(),
+                selectedTextStyle:
+                    Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ) ??
+                    const TextStyle(),
                 markersMaxCount: 4,
                 markerDecoration: BoxDecoration(
                   color: colors.warning,
@@ -178,10 +182,12 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
               headerStyle: HeaderStyle(
                 titleCentered: true,
                 formatButtonVisible: false,
-                titleTextStyle: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: colors.onSurface,
-                ) ?? const TextStyle(),
+                titleTextStyle:
+                    textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colors.onSurface,
+                    ) ??
+                    const TextStyle(),
                 leftChevronIcon: Icon(
                   Icons.chevron_left,
                   color: colors.primary,
@@ -192,14 +198,18 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                 ),
               ),
               daysOfWeekStyle: DaysOfWeekStyle(
-                weekdayStyle: textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colors.outline,
-                ) ?? const TextStyle(),
-                weekendStyle: textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colors.error,
-                ) ?? const TextStyle(),
+                weekdayStyle:
+                    textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colors.outline,
+                    ) ??
+                    const TextStyle(),
+                weekendStyle:
+                    textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colors.error,
+                    ) ??
+                    const TextStyle(),
               ),
             ),
           ),
@@ -319,7 +329,9 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
         final colors = AppThemeColors.of(ctx);
         return AlertDialog(
           title: const Text('Görevi İptal Et'),
-          content: const Text('Bu görevi iptal etmek istediğinize emin misiniz?'),
+          content: const Text(
+            'Bu görevi iptal etmek istediğinize emin misiniz?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),

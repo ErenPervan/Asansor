@@ -102,7 +102,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
         appBar: AppBar(
           title: Text(
             'Asansör Ekle',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
           ),
         ),
         body: Form(
@@ -197,7 +199,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                   decoration: BoxDecoration(
                     color: AppThemeColors.of(context).surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppThemeColors.of(context).outlineVariant),
+                    border: Border.all(
+                      color: AppThemeColors.of(context).outlineVariant,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -215,12 +219,15 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                               ? 'GPS Konumu (İsteğe Bağlı)'
                               : 'GPS Konumu • ${_selectedLatLng!.latitude.toStringAsFixed(5)}, '
                                     '${_selectedLatLng!.longitude.toStringAsFixed(5)}',
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: _showLocation
-                                ? AppThemeColors.of(context).primary
-                                : AppThemeColors.of(context).onSurfaceVariant,
-                          ),
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: _showLocation
+                                    ? AppThemeColors.of(context).primary
+                                    : AppThemeColors.of(
+                                        context,
+                                      ).onSurfaceVariant,
+                              ),
                         ),
                       ),
                       Icon(
@@ -269,21 +276,23 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                       userAgentPackageName: 'com.asansor.app',
                                     ),
-                                      if (_selectedLatLng != null)
-                                        MarkerLayer(
-                                          markers: [
-                                            Marker(
-                                              point: _selectedLatLng!,
-                                              width: 44,
-                                              height: 44,
-                                              child: Icon(
-                                                Icons.location_pin,
-                                                color: AppThemeColors.of(context).primary,
-                                                size: 36,
-                                              ),
+                                    if (_selectedLatLng != null)
+                                      MarkerLayer(
+                                        markers: [
+                                          Marker(
+                                            point: _selectedLatLng!,
+                                            width: 44,
+                                            height: 44,
+                                            child: Icon(
+                                              Icons.location_pin,
+                                              color: AppThemeColors.of(
+                                                context,
+                                              ).primary,
+                                              size: 36,
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
+                                      ),
                                   ],
                                 ),
                               ),
@@ -293,9 +302,12 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 'Haritaya dokunarak konum pinini belirleyin.',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppThemeColors.of(context).onSurfaceVariant,
-                                ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: AppThemeColors.of(
+                                        context,
+                                      ).onSurfaceVariant,
+                                    ),
                               ),
                             ),
                             const SizedBox(height: 12),
@@ -351,9 +363,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                     : const Icon(Icons.add_rounded),
                 label: Text(
                   isLoading ? 'Oluşturuluyor…' : 'Asansör Oluştur',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 54),
@@ -599,7 +611,11 @@ class _StatusChip extends StatelessWidget {
     );
   }
 
-  static (Color, Color) _colors(String val, bool selected, AppThemeColors colors) {
+  static (Color, Color) _colors(
+    String val,
+    bool selected,
+    AppThemeColors colors,
+  ) {
     if (!selected) return (colors.surface, colors.outline);
     switch (val) {
       case 'active':

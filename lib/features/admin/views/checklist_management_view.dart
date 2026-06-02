@@ -304,9 +304,7 @@ class ChecklistManagementView extends ConsumerWidget {
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 14,
                                 ),
-                                side: BorderSide(
-                                  color: colors.outlineVariant,
-                                ),
+                                side: BorderSide(color: colors.outlineVariant),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusMd,
@@ -405,11 +403,7 @@ class ChecklistManagementView extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: Icon(
-          Icons.delete_outline_rounded,
-          color: colors.error,
-          size: 36,
-        ),
+        icon: Icon(Icons.delete_outline_rounded, color: colors.error, size: 36),
         title: const Text('Kalemi Sil'),
         content: RichText(
           text: TextSpan(
@@ -552,10 +546,7 @@ class _ChecklistCard extends StatelessWidget {
             color: colors.errorContainer,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
-          child: Icon(
-            Icons.delete_outline_rounded,
-            color: colors.error,
-          ),
+          child: Icon(Icons.delete_outline_rounded, color: colors.error),
         ),
         child: Material(
           color: colors.surface,
@@ -689,7 +680,9 @@ class _EmptyState extends StatelessWidget {
               icon: const Icon(Icons.add_rounded),
               label: Text(
                 'İlk Kalemi Ekle',
-                style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+                style: textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               style: FilledButton.styleFrom(
                 backgroundColor: colors.primary,

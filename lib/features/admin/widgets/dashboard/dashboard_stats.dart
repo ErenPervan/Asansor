@@ -240,12 +240,14 @@ class DashboardStatCard extends StatelessWidget {
           AnimatedCounter(
             value: value,
             duration: const Duration(milliseconds: 900),
-            style: textTheme.headlineLarge?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: valueFg,
-              letterSpacing: -1.5,
-              height: 1,
-            ) ?? const TextStyle(),
+            style:
+                textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: valueFg,
+                  letterSpacing: -1.5,
+                  height: 1,
+                ) ??
+                const TextStyle(),
           ),
           const SizedBox(height: 5),
           Text(

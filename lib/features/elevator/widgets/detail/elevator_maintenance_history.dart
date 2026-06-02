@@ -108,11 +108,7 @@ class MaintenanceHistorySectionState
                   tooltip: 'Yenile',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  icon: Icon(
-                    Icons.refresh,
-                    size: 18,
-                    color: colors.outline,
-                  ),
+                  icon: Icon(Icons.refresh, size: 18, color: colors.outline),
                   onPressed: () =>
                       ref.invalidate(logsByElevatorProvider(widget.elevatorId)),
                 ),

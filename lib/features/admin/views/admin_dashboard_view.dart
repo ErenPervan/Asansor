@@ -67,43 +67,55 @@ class AdminDashboardView extends ConsumerWidget {
               AddElevatorBanner(
                 onTap: () => context.push('/admin/add-elevator'),
               ),
-              LayoutBuilder(builder: (context, constraints) {
-                final cards = [
-                  DashboardMapCard(onTap: () => context.push('/admin/map')),
-                  UserManagementCard(onTap: () => context.push('/admin/users')),
-                  DashboardCalendarCard(
-                    onTap: () => context.push('/admin/calendar'),
-                  ),
-                  MasterCalendarCard(
-                    onTap: () => context.push('/admin/master-calendar'),
-                  ),
-                  TechnicianDirCard(
-                    onTap: () => context.push('/admin/technicians'),
-                  ),
-                  ChecklistCard(onTap: () => context.push('/admin/checklists')),
-                  StatisticsCard(onTap: () => context.push('/admin/statistics')),
-                ];
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final cards = [
+                    DashboardMapCard(onTap: () => context.push('/admin/map')),
+                    UserManagementCard(
+                      onTap: () => context.push('/admin/users'),
+                    ),
+                    DashboardCalendarCard(
+                      onTap: () => context.push('/admin/calendar'),
+                    ),
+                    MasterCalendarCard(
+                      onTap: () => context.push('/admin/master-calendar'),
+                    ),
+                    TechnicianDirCard(
+                      onTap: () => context.push('/admin/technicians'),
+                    ),
+                    ChecklistCard(
+                      onTap: () => context.push('/admin/checklists'),
+                    ),
+                    StatisticsCard(
+                      onTap: () => context.push('/admin/statistics'),
+                    ),
+                  ];
 
-                if (constraints.maxWidth >= 600) {
-                  return Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: cards.map((c) => SizedBox(
-                      width: (constraints.maxWidth - 12) / 2,
-                      child: c,
-                    )).toList(),
-                  );
-                } else {
-                  return Column(
-                    children: [
-                      for (int i = 0; i < cards.length; i++) ...[
-                        cards[i],
-                        if (i < cards.length - 1) const SizedBox(height: 12),
+                  if (constraints.maxWidth >= 600) {
+                    return Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: cards
+                          .map(
+                            (c) => SizedBox(
+                              width: (constraints.maxWidth - 12) / 2,
+                              child: c,
+                            ),
+                          )
+                          .toList(),
+                    );
+                  } else {
+                    return Column(
+                      children: [
+                        for (int i = 0; i < cards.length; i++) ...[
+                          cards[i],
+                          if (i < cards.length - 1) const SizedBox(height: 12),
+                        ],
                       ],
-                    ],
-                  );
-                }
-              }),
+                    );
+                  }
+                },
+              ),
               const SizedBox(height: 32),
               DashboardScheduleList(
                 schedules: schedules,
@@ -121,9 +133,9 @@ class AdminDashboardView extends ConsumerWidget {
         icon: const Icon(Icons.assignment_ind_outlined),
         label: Text(
           'Görev Ata',
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
     );

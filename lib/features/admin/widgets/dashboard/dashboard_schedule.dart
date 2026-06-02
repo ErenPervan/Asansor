@@ -98,9 +98,7 @@ class DashboardScheduleCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colors.outlineVariant.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
             color: colors.onSurface.withValues(alpha: 0.03),
@@ -116,7 +114,10 @@ class DashboardScheduleCard extends StatelessWidget {
             width: 10,
             height: 10,
             decoration: BoxDecoration(
-              color: StatusTokens.scheduleForegroundDynamic(context, schedule.status),
+              color: StatusTokens.scheduleForegroundDynamic(
+                context,
+                schedule.status,
+              ),
               shape: BoxShape.circle,
             ),
           ),
@@ -139,9 +140,7 @@ class DashboardScheduleCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     address!,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colors.outline,
-                    ),
+                    style: textTheme.bodySmall?.copyWith(color: colors.outline),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -189,14 +188,20 @@ class DashboardScheduleCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: StatusTokens.scheduleBackgroundDynamic(context, schedule.status),
+              color: StatusTokens.scheduleBackgroundDynamic(
+                context,
+                schedule.status,
+              ),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               StatusTokens.scheduleLabel(schedule.status),
               style: textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: StatusTokens.scheduleForegroundDynamic(context, schedule.status),
+                color: StatusTokens.scheduleForegroundDynamic(
+                  context,
+                  schedule.status,
+                ),
               ),
             ),
           ),

@@ -132,7 +132,9 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppThemeColors.of(context).primary.withValues(alpha: 0.1),
+                  color: AppThemeColors.of(
+                    context,
+                  ).primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -156,15 +158,25 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(64),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, 12),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              0,
+              AppSpacing.md,
+              12,
+            ),
             child: TextField(
               controller: _searchController,
               onChanged: (v) => setState(() => _query = v),
-              style: TextStyle(color: AppThemeColors.of(context).onSurface, fontSize: 14),
+              style: TextStyle(
+                color: AppThemeColors.of(context).onSurface,
+                fontSize: 14,
+              ),
               decoration: InputDecoration(
                 hintText: 'Bina adı veya adres ile ara…',
                 hintStyle: TextStyle(
-                  color: AppThemeColors.of(context).outline.withValues(alpha: 0.8),
+                  color: AppThemeColors.of(
+                    context,
+                  ).outline.withValues(alpha: 0.8),
                 ),
                 prefixIcon: Icon(
                   Icons.search,
@@ -201,7 +213,9 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: AppThemeColors.of(context).primary.withValues(alpha: 0.4),
+                    color: AppThemeColors.of(
+                      context,
+                    ).primary.withValues(alpha: 0.4),
                   ),
                 ),
               ),
@@ -220,7 +234,10 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           // Status Filters
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 12,
+            ),
             child: Row(
               children: [
                 _StatusFilterChip(
@@ -282,7 +299,8 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                 if (items.isEmpty) {
                   return EmptyState(
                     icon: Icons.search_off_outlined,
-                    message: 'Sonuç Yok\n\n"$_query" ile eşleşen asansör bulunamadı.',
+                    message:
+                        'Sonuç Yok\n\n"$_query" ile eşleşen asansör bulunamadı.',
                   );
                 }
 
@@ -292,20 +310,42 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                     key: ValueKey('list-$_selectedStatus-$_query'),
                     color: AppThemeColors.of(context).primary,
                     onRefresh: () async => ref.invalidate(elevatorsProvider),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (constraints.maxWidth >= 600) {
-                        return GridView.builder(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth >= 600) {
+                          return GridView.builder(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: 8,
+                            ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 16,
+                                  mainAxisExtent: 104,
+                                ),
+                            itemCount: items.length,
+                            itemBuilder: (context, index) {
+                              final elevator = items[index];
+                              return FadeInSlide(
+                                index: index,
+                                child: _ElevatorCard(
+                                  elevator: elevator,
+                                  onTap: () =>
+                                      context.push('/elevator/${elevator.id}'),
+                                ),
+                              );
+                            },
+                          );
+                        }
+                        return ListView.separated(
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.md,
                             vertical: 8,
                           ),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisExtent: 104,
-                          ),
                           itemCount: items.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final elevator = items[index];
                             return FadeInSlide(
@@ -318,30 +358,9 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                             );
                           },
                         );
-                      }
-                      return ListView.separated(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                          vertical: 8,
-                        ),
-                        itemCount: items.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final elevator = items[index];
-                          return FadeInSlide(
-                            index: index,
-                            child: _ElevatorCard(
-                              elevator: elevator,
-                              onTap: () =>
-                                  context.push('/elevator/${elevator.id}'),
-                            ),
-                          );
-                        },
-                      );
-                    },
+                      },
+                    ),
                   ),
-                ),
                 );
               },
             ),
@@ -488,7 +507,6 @@ class _ElevatorCard extends StatelessWidget {
     );
   }
 }
-
 
 class _StatusFilterChip extends StatelessWidget {
   const _StatusFilterChip({

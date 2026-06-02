@@ -43,13 +43,13 @@ class AutoScheduleResult {
 class AutoScheduleService {
   AutoScheduleService(
     SupabaseClient client, {
-    @visibleForTesting ElevatorRepository? elevatorRepo,
-    @visibleForTesting ScheduleRepository? scheduleRepo,
+    @visibleForTesting IElevatorRepository? elevatorRepo,
+    @visibleForTesting IScheduleRepository? scheduleRepo,
   }) : _elevatorRepo = elevatorRepo ?? ElevatorRepository(client),
        _scheduleRepo = scheduleRepo ?? ScheduleRepository(client);
 
-  final ElevatorRepository _elevatorRepo;
-  final ScheduleRepository _scheduleRepo;
+  final IElevatorRepository _elevatorRepo;
+  final IScheduleRepository _scheduleRepo;
 
   /// Generates periodic maintenance tasks for the calendar month of [targetMonth].
   ///

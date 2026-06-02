@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/enums/app_enums.dart';
 import '../../../core/providers/connectivity_providers.dart';
 import '../../../core/services/auto_schedule_service.dart';
 import '../../auth/providers/auth_providers.dart';
@@ -17,12 +17,8 @@ import 'profile_providers.dart';
 
 // ── Repository providers ──────────────────────────────────────────────────────
 
-final scheduleRepositoryProvider = Provider<ScheduleRepository>((ref) {
-  return ScheduleRepository(Supabase.instance.client);
-});
-
-final adminRepositoryProvider = Provider<AdminRepository>((ref) {
-  return AdminRepository(Supabase.instance.client);
+final adminRepositoryProvider = Provider<IAdminRepository>((ref) {
+  return AdminRepository(ref.watch(supabaseClientProvider));
 });
 
 // ── Read providers ────────────────────────────────────────────────────────────
@@ -160,7 +156,7 @@ class ScheduleController extends AsyncNotifier<ScheduleModel?> {
 
   Future<void> updateStatus({
     required String taskId,
-    required String status,
+    required ScheduleStatus status,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
@@ -237,34 +233,8 @@ final masterCalendarFilterProvider =
 /// and profile tables.  Rebuilt when any of the three source providers change.
 final allSchedulesWithDetailsProvider =
     FutureProvider.autoDispose<List<ScheduleWithDetails>>((ref) async {
-      // Fetch concurrently.
-      final schedulesFuture = ref.watch(allSchedulesProvider.future);
-      final elevatorsFuture = ref.watch(elevatorsProvider.future);
-      final profilesFuture = ref.watch(allProfilesProvider.future);
-
-      final schedules = await schedulesFuture;
-      final elevators = await elevatorsFuture;
-      final profiles = await profilesFuture;
-
-      final elevMap = {for (final e in elevators) e.id: e};
-      final profMap = {for (final ProfileModel p in profiles) p.id: p};
-
-      return schedules.map((s) {
-        final elev = elevMap[s.elevatorId];
-        final prof = profMap[s.technicianId];
-        // Empty technicianId means the task is auto-generated and not yet
-        // assigned to anyone.  Show "Atanmamış" so admins can identify it.
-        final techName = s.isUnassigned
-            ? 'Atanmamış'
-            : (prof?.displayName ?? 'Teknisyen');
-        return ScheduleWithDetails(
-          schedule: s,
-          buildingName: elev?.buildingName ?? 'Asansör',
-          address: elev?.address,
-          technicianName: techName,
-          technicianId: s.technicianId,
-        );
-      }).toList();
+      final repo = ref.watch(scheduleRepositoryProvider);
+      return repo.getAllSchedulesWithDetails();
     });
 
 // ── Auto-Schedule ─────────────────────────────────────────────────────────────
@@ -297,7 +267,7 @@ class AutoScheduleController
   Future<void> generate(DateTime targetMonth) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final service = AutoScheduleService(Supabase.instance.client);
+      final service = AutoScheduleService(ref.read(supabaseClientProvider));
       final result = await service.generateMonthlyMaintenances(targetMonth);
 
       // Refresh all calendar providers so new tasks appear immediately.
@@ -333,7 +303,7 @@ final technicianManagementProvider =
       final repo = ref.read(scheduleRepositoryProvider);
 
       // Start all fetches concurrently.
-      final techFuture = ref.watch(profilesByRoleProvider('technician').future);
+      final techFuture = ref.watch(profilesByRoleProvider(UserRole.technician).future);
       final elevFuture = ref.watch(elevatorsProvider.future);
       final todayFuture = repo.getTodayAllSchedules();
       final monthFuture = repo.getMonthlyCompletedCountPerTechnician();
@@ -366,7 +336,7 @@ final technicianManagementProvider =
         return TechnicianStats(
           profile: profile,
           todayTasks: todayTasks,
-          todayCompleted: myToday.where((s) => s.status == 'completed').length,
+          todayCompleted: myToday.where((s) => s.status == ScheduleStatus.completed).length,
           monthlyCompleted: monthlyCount[profile.id] ?? 0,
         );
       }).toList();

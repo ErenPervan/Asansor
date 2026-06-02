@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:asansor/features/admin/models/schedule_model.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 import '../../../helpers/test_factories.dart';
 
 void main() {
@@ -27,7 +28,7 @@ void main() {
       expect(model.elevatorId, 'e1');
       expect(model.technicianId, 't1');
       expect(model.scheduledDate, scheduledDate);
-      expect(model.status, 'in_progress');
+      expect(model.status, ScheduleStatus.inProgress);
       expect(model.priority, 'high');
       expect(model.taskType, 'periodic_maintenance');
       expect(model.notes, 'Bring tools');
@@ -47,7 +48,7 @@ void main() {
         model.scheduledDate,
         DateTime.fromMillisecondsSinceEpoch(0),
       ); // Default when null
-      expect(model.status, 'pending'); // Default
+      expect(model.status, ScheduleStatus.pending); // Default
       expect(model.priority, 'normal'); // Default
       expect(model.taskType, 'manual'); // Default
       expect(model.notes, isNull);
@@ -92,13 +93,13 @@ void main() {
     test('copyWith updates fields', () {
       final original = TestFactories.createSchedule(
         id: 'orig',
-        status: 'pending',
+        status: ScheduleStatus.pending,
       );
 
-      final updated = original.copyWith(status: 'completed', priority: 'high');
+      final updated = original.copyWith(status: ScheduleStatus.completed, priority: 'high');
 
       expect(updated.id, 'orig');
-      expect(updated.status, 'completed');
+      expect(updated.status, ScheduleStatus.completed);
       expect(updated.priority, 'high');
     });
 
@@ -106,7 +107,7 @@ void main() {
       final model = TestFactories.createSchedule(
         id: 's123',
         elevatorId: 'e456',
-        status: 'pending',
+        status: ScheduleStatus.pending,
         priority: 'normal',
       );
 

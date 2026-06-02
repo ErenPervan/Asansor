@@ -19,6 +19,10 @@
 ///   created_by      uuid
 ///   created_at      timestamptz
 /// ```
+library;
+
+import '../../../core/enums/app_enums.dart';
+
 class ScheduleModel {
   const ScheduleModel({
     required this.id,
@@ -42,8 +46,7 @@ class ScheduleModel {
   /// ISO-8601 timestamp for when the maintenance is scheduled.
   final DateTime scheduledDate;
 
-  /// One of: 'pending' | 'in_progress' | 'completed' | 'cancelled'
-  final String status;
+  final ScheduleStatus status;
 
   /// One of: 'low' | 'normal' | 'high' | 'emergency'
   final String priority;
@@ -66,7 +69,7 @@ class ScheduleModel {
       scheduledDate: json['scheduled_date'] != null
           ? DateTime.parse(json['scheduled_date'] as String)
           : DateTime.fromMillisecondsSinceEpoch(0),
-      status: (json['status'] as String?) ?? 'pending',
+      status: ScheduleStatus.fromDb(json['status'] as String?),
       priority: (json['priority'] as String?) ?? 'normal',
       taskType: (json['task_type'] as String?) ?? 'manual',
       notes: json['notes'] as String?,
@@ -82,7 +85,7 @@ class ScheduleModel {
     'elevator_id': elevatorId,
     if (technicianId.isNotEmpty) 'technician_id': technicianId,
     'scheduled_date': scheduledDate.toIso8601String(),
-    'status': status,
+    'status': status.dbValue,
     'priority': priority,
     'task_type': taskType,
     'notes': notes,
@@ -94,7 +97,7 @@ class ScheduleModel {
     String? elevatorId,
     String? technicianId,
     DateTime? scheduledDate,
-    String? status,
+    ScheduleStatus? status,
     String? priority,
     String? taskType,
     String? notes,
@@ -118,6 +121,6 @@ class ScheduleModel {
   @override
   String toString() =>
       'ScheduleModel(id: $id, elevatorId: $elevatorId, '
-      'technicianId: $technicianId, status: $status, priority: $priority, '
+      'technicianId: $technicianId, status: ${status.name}, priority: $priority, '
       'taskType: $taskType, scheduledDate: $scheduledDate)';
 }

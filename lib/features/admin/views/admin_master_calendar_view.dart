@@ -13,6 +13,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../models/schedule_with_details.dart';
 
 import '../providers/admin_providers.dart';
+import '../../../core/enums/app_enums.dart';
 
 import '../../../core/theme/app_colors.dart';
 
@@ -291,7 +292,7 @@ class _AdminMasterCalendarViewState
           .toList();
     }
     if (filter.status != null) {
-      result = result.where((s) => s.status == filter.status).toList();
+      result = result.where((s) => s.status.name == filter.status).toList();
     }
     return result;
   }
@@ -449,7 +450,7 @@ class _CalendarSection extends StatelessWidget {
   /// GREEN â†’ all active tasks are completed.
   /// AMBER â†’ â‰¥1 pending/in-progress task.
   static Color? _markerColor(List<ScheduleWithDetails> events) {
-    final active = events.where((e) => e.status != 'cancelled').toList();
+    final active = events.where((e) => e.status != ScheduleStatus.cancelled).toList();
     if (active.isEmpty) return null;
 
     if (active.any(
@@ -681,7 +682,7 @@ class _MasterTaskCard extends StatelessWidget {
                             _TaskStatusBadge(status: task.status),
                             if (task.isPeriodicMaintenance)
                               _Badge(
-                                label: 'PERÄ°YODÄ°K',
+                                label: 'PERİYODİK',
                                 bg: colors.primaryContainer,
                                 fg: colors.primary,
                               ),
@@ -740,8 +741,7 @@ class _MasterTaskCard extends StatelessWidget {
 
 class _StatusIcon extends StatelessWidget {
   const _StatusIcon({required this.status});
-
-  final String status;
+  final ScheduleStatus status;
 
   @override
   Widget build(BuildContext context) {
@@ -749,14 +749,14 @@ class _StatusIcon extends StatelessWidget {
     return Icon(icon, size: 18, color: color);
   }
 
-  static (IconData, Color) _data(BuildContext context, String s) {
+  static (IconData, Color) _data(BuildContext context, ScheduleStatus s) {
     final colors = AppThemeColors.of(context);
     switch (s) {
-      case 'completed':
+      case ScheduleStatus.completed:
         return (Icons.check_circle_rounded, colors.success);
-      case 'in_progress':
+      case ScheduleStatus.inProgress:
         return (Icons.autorenew_rounded, colors.warning);
-      case 'cancelled':
+      case ScheduleStatus.cancelled:
         return (Icons.cancel_rounded, colors.onSurfaceVariant);
       default: // pending
         return (Icons.schedule_rounded, colors.outline);
@@ -800,8 +800,7 @@ class _PriorityBadge extends StatelessWidget {
 
 class _TaskStatusBadge extends StatelessWidget {
   const _TaskStatusBadge({required this.status});
-
-  final String status;
+  final ScheduleStatus status;
 
   @override
   Widget build(BuildContext context) {
@@ -809,17 +808,17 @@ class _TaskStatusBadge extends StatelessWidget {
     return _Badge(label: label, bg: bg, fg: fg);
   }
 
-  static (String, Color, Color) _styles(BuildContext context, String s) {
+  static (String, Color, Color) _styles(BuildContext context, ScheduleStatus s) {
     final colors = AppThemeColors.of(context);
     switch (s) {
-      case 'completed':
+      case ScheduleStatus.completed:
         return ('TAMAMLANDI', colors.successContainer, colors.success);
-      case 'in_progress':
+      case ScheduleStatus.inProgress:
         return ('DEVAM', colors.warningContainer, colors.warning);
-      case 'cancelled':
-        return ('Ä°PTAL', colors.surfaceContainerHigh, colors.onSurfaceVariant);
+      case ScheduleStatus.cancelled:
+        return ('İPTAL', colors.surfaceContainerHigh, colors.onSurfaceVariant);
       default: // pending
-        return ('BEKLÄ°YOR', colors.surfaceContainer, colors.onSurface);
+        return ('BEKLİYOR', colors.surfaceContainer, colors.onSurface);
     }
   }
 }

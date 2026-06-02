@@ -1,8 +1,18 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/exceptions/app_exception.dart';
 import '../models/profile_model.dart';
 
-class ProfileRepository {
+abstract interface class IProfileRepository {
+  Future<ProfileModel?> getProfile(String userId);
+  Future<List<ProfileModel>> getAllProfiles();
+  Future<List<ProfileModel>> getProfilesByRole(String role);
+  Future<ProfileModel> updateRole(String userId, String newRole);
+  Future<ProfileModel> updateCustomerElevator(String userId, String? elevatorId);
+  Future<ProfileModel> updateProfile({required String userId, String? fullName, String? phone});
+}
+
+class ProfileRepository implements IProfileRepository {
   ProfileRepository(this._client);
 
   final SupabaseClient _client;
@@ -11,6 +21,7 @@ class ProfileRepository {
   // ── Read ───────────────────────────────────────────────────────────────────
 
   /// Returns the profile for a single [userId], or `null` if none exists yet.
+  @override
   Future<ProfileModel?> getProfile(String userId) async {
     try {
       final response = await _client
@@ -21,14 +32,17 @@ class ProfileRepository {
 
       if (response == null) return null;
       return ProfileModel.fromJson(response);
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to load profile ($userId): ${e.message}');
+      throw mapPostgrestException(e, 'getProfile($userId)');
     } catch (e) {
-      throw Exception('Unexpected error loading profile: $e');
+      throw mapUnknownException(e, 'getProfile($userId)');
     }
   }
 
   /// Returns every profile row, ordered by role then name.
+  @override
   Future<List<ProfileModel>> getAllProfiles() async {
     try {
       final response = await _client
@@ -40,14 +54,17 @@ class ProfileRepository {
       return (response as List)
           .map((json) => ProfileModel.fromJson(json as Map<String, dynamic>))
           .toList();
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to load profiles: ${e.message}');
+      throw mapPostgrestException(e, 'getAllProfiles');
     } catch (e) {
-      throw Exception('Unexpected error loading profiles: $e');
+      throw mapUnknownException(e, 'getAllProfiles');
     }
   }
 
   /// Returns profiles filtered by [role] (`'admin'` | `'technician'` | `'customer'`).
+  @override
   Future<List<ProfileModel>> getProfilesByRole(String role) async {
     try {
       final response = await _client
@@ -59,10 +76,12 @@ class ProfileRepository {
       return (response as List)
           .map((json) => ProfileModel.fromJson(json as Map<String, dynamic>))
           .toList();
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to load $role profiles: ${e.message}');
+      throw mapPostgrestException(e, 'getProfilesByRole($role)');
     } catch (e) {
-      throw Exception('Unexpected error loading $role profiles: $e');
+      throw mapUnknownException(e, 'getProfilesByRole($role)');
     }
   }
 
@@ -72,6 +91,7 @@ class ProfileRepository {
   ///
   /// Requires the caller to be an admin (enforced by Supabase RLS).
   /// Accepted values: `'admin'` | `'technician'` | `'customer'`
+  @override
   Future<ProfileModel> updateRole(String userId, String newRole) async {
     assert(
       const ['admin', 'technician', 'customer'].contains(newRole),
@@ -86,16 +106,19 @@ class ProfileRepository {
           .single();
 
       return ProfileModel.fromJson(response);
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to update role for $userId: ${e.message}');
+      throw mapPostgrestException(e, 'updateRole($userId)');
     } catch (e) {
-      throw Exception('Unexpected error updating role: $e');
+      throw mapUnknownException(e, 'updateRole($userId)');
     }
   }
 
   /// Updates (or clears) the elevator linked to a customer profile.
   ///
   /// Pass `null` for [elevatorId] to unlink the elevator.
+  @override
   Future<ProfileModel> updateCustomerElevator(
     String userId,
     String? elevatorId,
@@ -109,16 +132,17 @@ class ProfileRepository {
           .single();
 
       return ProfileModel.fromJson(response);
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception(
-        'Failed to update elevator for customer $userId: ${e.message}',
-      );
+      throw mapPostgrestException(e, 'updateCustomerElevator($userId)');
     } catch (e) {
-      throw Exception('Unexpected error updating customer elevator: $e');
+      throw mapUnknownException(e, 'updateCustomerElevator($userId)');
     }
   }
 
   /// Updates name and/or phone of [userId]'s profile.
+  @override
   Future<ProfileModel> updateProfile({
     required String userId,
     String? fullName,
@@ -137,10 +161,13 @@ class ProfileRepository {
           .single();
 
       return ProfileModel.fromJson(response);
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to update profile for $userId: ${e.message}');
+      throw mapPostgrestException(e, 'updateProfile($userId)');
     } catch (e) {
-      throw Exception('Unexpected error updating profile: $e');
+      throw mapUnknownException(e, 'updateProfile($userId)');
     }
   }
 }
+

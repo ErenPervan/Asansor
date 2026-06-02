@@ -9,6 +9,7 @@ import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../core/widgets/offline_banner.dart';
 import '../../admin/providers/admin_providers.dart';
 import '../../admin/providers/profile_providers.dart';
+import '../../../core/enums/app_enums.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/providers/elevator_providers.dart';
 import '../../fault/providers/fault_providers.dart';
@@ -21,24 +22,12 @@ import '../widgets/home/home_top_app_bar.dart';
 
 // ── HomeView ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-class HomeView extends ConsumerWidget {
+class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final authState = ref.watch(authControllerProvider);
-    final activeFaults = ref.watch(activeFaultsProvider);
-    final mySchedules = ref.watch(technicianScheduleStreamProvider);
-    final elevators = ref.watch(elevatorsProvider);
-    final completedCount = ref.watch(completedTodayCountProvider);
-    final adminStatsAsync = ref.watch(adminStatsProvider);
-
-    final pendingCount = ref.watch(pendingSyncCountProvider);
-    final isOnline = ref.watch(isOnlineProvider);
-    final userEmail = authState.valueOrNull?.email ?? '';
-    final role = ref.watch(roleProvider) ?? 'technician';
-    final isAdmin = role == 'admin';
     final screenW = MediaQuery.of(context).size.width;
     final bottomInset = MediaQuery.paddingOf(context).bottom;
 
@@ -47,16 +36,27 @@ class HomeView extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            TopAppBar(
-              userEmail: userEmail,
-              pendingSyncCount: pendingCount,
-              isOnline: isOnline,
-              isAdmin: isAdmin,
-              activeFaultCount: isAdmin
-                  ? (adminStatsAsync.valueOrNull?.activeFaults ?? 0)
-                  : (activeFaults.valueOrNull?.length ?? 0),
-              onSignOut: () =>
-                  ref.read(authControllerProvider.notifier).signOut(),
+            Consumer(
+              builder: (context, ref, _) {
+                final authState = ref.watch(authControllerProvider);
+                final pendingCount = ref.watch(pendingSyncCountProvider);
+                final isOnline = ref.watch(isOnlineProvider);
+                final role = ref.watch(roleProvider);
+                final isAdmin = role == UserRole.admin;
+                
+                final activeFaultCount = isAdmin 
+                    ? (ref.watch(adminStatsProvider).valueOrNull?.activeFaults ?? 0)
+                    : (ref.watch(activeFaultsProvider).valueOrNull?.length ?? 0);
+
+                return TopAppBar(
+                  userEmail: authState.valueOrNull?.email ?? '',
+                  pendingSyncCount: pendingCount,
+                  isOnline: isOnline,
+                  isAdmin: isAdmin,
+                  activeFaultCount: activeFaultCount,
+                  onSignOut: () => ref.read(authControllerProvider.notifier).signOut(),
+                );
+              },
             ),
             // Shown only when the device is offline; renders nothing otherwise.
             const OfflineBanner(),
@@ -69,27 +69,43 @@ class HomeView extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: AppSpacing.md),
-                    ActiveFaultsSection(
-                      activeFaults: activeFaults,
-                      elevators: elevators.valueOrNull,
+                    Consumer(
+                      builder: (context, ref, _) {
+                        return ActiveFaultsSection(
+                          activeFaults: ref.watch(activeFaultsProvider),
+                          elevators: ref.watch(elevatorsProvider).valueOrNull,
+                        );
+                      }
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    DailyAgendaSection(
-                      mySchedules: mySchedules,
-                      elevators: elevators.valueOrNull,
+                    Consumer(
+                      builder: (context, ref, _) {
+                        return DailyAgendaSection(
+                          mySchedules: ref.watch(technicianScheduleStreamProvider),
+                          elevators: ref.watch(elevatorsProvider).valueOrNull,
+                        );
+                      }
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    StatsSection(
-                      activeFaultCount: isAdmin
-                          ? (adminStatsAsync.valueOrNull?.activeFaults ?? 0)
-                          : (activeFaults.valueOrNull?.length ?? 0),
-                      completedCount: isAdmin
-                          ? (adminStatsAsync.valueOrNull?.completedThisMonth ??
-                                0)
-                          : (completedCount.valueOrNull ?? 0),
-                      completedLabel: isAdmin
-                          ? 'BU AY TAMAMLANAN'
-                          : 'TAMAMLANAN',
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final role = ref.watch(roleProvider);
+                        final isAdmin = role == UserRole.admin;
+                        
+                        final activeFaultCount = isAdmin 
+                            ? (ref.watch(adminStatsProvider).valueOrNull?.activeFaults ?? 0)
+                            : (ref.watch(activeFaultsProvider).valueOrNull?.length ?? 0);
+                            
+                        final completedCount = isAdmin
+                            ? (ref.watch(adminStatsProvider).valueOrNull?.completedThisMonth ?? 0)
+                            : (ref.watch(completedTodayCountProvider).valueOrNull ?? 0);
+                            
+                        return StatsSection(
+                          activeFaultCount: activeFaultCount,
+                          completedCount: completedCount,
+                          completedLabel: isAdmin ? 'BU AY TAMAMLANAN' : 'TAMAMLANAN',
+                        );
+                      }
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     ElevatorsShortcutCard(

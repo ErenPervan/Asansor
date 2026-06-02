@@ -1,13 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/providers/connectivity_providers.dart';
 import '../repositories/auth_repository.dart';
 
 // ── Repository ──────────────────────────────────────────────────────────────
 
 /// Provides the [AuthRepository] backed by the live Supabase client.
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepository(Supabase.instance.client);
+final authRepositoryProvider = Provider<IAuthRepository>((ref) {
+  return AuthRepository(ref.watch(supabaseClientProvider));
 });
 
 // ── Session Stream ───────────────────────────────────────────────────────────
@@ -16,7 +17,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 ///
 /// Returns `null` when the user is not authenticated.
 final authStateProvider = StreamProvider<User?>((ref) {
-  return Supabase.instance.client.auth.onAuthStateChange.map(
+  return ref.watch(supabaseClientProvider).auth.onAuthStateChange.map(
     (event) => event.session?.user,
   );
 });

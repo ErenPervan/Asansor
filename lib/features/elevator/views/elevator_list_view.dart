@@ -8,6 +8,7 @@ import '../../../../core/widgets/animations/fade_in_slide.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/offline_banner.dart';
+import '../../../core/enums/app_enums.dart';
 import '../models/elevator_model.dart';
 import '../providers/elevator_providers.dart';
 
@@ -22,9 +23,9 @@ typedef _StatusStyle = ({
   IconData icon,
 });
 
-_StatusStyle _statusStyle(String status, AppThemeColors colors) {
-  switch (status.toLowerCase()) {
-    case 'active':
+_StatusStyle _statusStyle(ElevatorStatus status, AppThemeColors colors) {
+  switch (status) {
+    case ElevatorStatus.active:
       return (
         bg: colors.successContainer,
         fg: colors.success,
@@ -33,7 +34,7 @@ _StatusStyle _statusStyle(String status, AppThemeColors colors) {
         label: 'Aktif',
         icon: Icons.check_circle_outline,
       );
-    case 'faulty':
+    case ElevatorStatus.faulty:
       return (
         bg: colors.errorContainer,
         fg: colors.error,
@@ -42,7 +43,7 @@ _StatusStyle _statusStyle(String status, AppThemeColors colors) {
         label: 'Arızalı',
         icon: Icons.error_outline,
       );
-    case 'under_maintenance':
+    case ElevatorStatus.underMaintenance:
       return (
         bg: colors.warningContainer,
         fg: colors.warning,
@@ -51,7 +52,7 @@ _StatusStyle _statusStyle(String status, AppThemeColors colors) {
         label: 'Bakımda',
         icon: Icons.build_outlined,
       );
-    case 'inactive':
+    case ElevatorStatus.inactive:
       return (
         bg: colors.surfaceContainer,
         fg: colors.outline,
@@ -59,15 +60,6 @@ _StatusStyle _statusStyle(String status, AppThemeColors colors) {
         iconFg: colors.outline,
         label: 'Pasif',
         icon: Icons.pause_circle_outline,
-      );
-    default:
-      return (
-        bg: colors.surfaceContainer,
-        fg: colors.outline,
-        iconBg: colors.surfaceContainer,
-        iconFg: colors.outline,
-        label: 'Bilinmiyor',
-        icon: Icons.help_outline,
       );
   }
 }
@@ -96,7 +88,7 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
     var filtered = all;
     if (_selectedStatus != 'all') {
       filtered = filtered
-          .where((e) => e.status.toLowerCase() == _selectedStatus)
+          .where((e) => e.status.name == _selectedStatus)
           .toList();
     }
     if (_query.trim().isEmpty) return filtered;

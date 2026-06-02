@@ -1,8 +1,17 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/exceptions/app_exception.dart';
 import '../models/maintenance_log_model.dart';
 
-class MaintenanceRepository {
+abstract interface class IMaintenanceRepository {
+  Future<MaintenanceLogModel> addLog({required String elevatorId, required String technicianId, required String notes, required DateTime maintenanceDate, Map<String, dynamic>? checklist, List<String>? photos, String? signatureUrl, String? customerSignatureUrl});
+  Future<List<MaintenanceLogModel>> getAllPendingLogs();
+  Future<int> getCompletedTodayCount();
+  Future<List<MaintenanceLogModel>> getLogsForReport(String elevatorId, {int months = 6});
+  Future<List<MaintenanceLogModel>> getLogsByElevatorId(String elevatorId);
+}
+
+class MaintenanceRepository implements IMaintenanceRepository {
   MaintenanceRepository(this._client);
 
   final SupabaseClient _client;
@@ -16,6 +25,7 @@ class MaintenanceRepository {
   /// [notes] — free-text notes about the maintenance activity.
   /// [maintenanceDate] — date/time the maintenance was performed.
   /// [checklist] — the checked states of checklist items.
+  @override
   Future<MaintenanceLogModel> addLog({
     required String elevatorId,
     required String technicianId,
@@ -44,15 +54,18 @@ class MaintenanceRepository {
           .single();
 
       return MaintenanceLogModel.fromJson(response);
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to add maintenance log: ${e.message}');
+      throw mapPostgrestException(e, 'addLog');
     } catch (e) {
-      throw Exception('Unexpected error while adding maintenance log: $e');
+      throw mapUnknownException(e, 'addLog');
     }
   }
 
   /// Returns all pending (unapproved) maintenance logs across every elevator,
   /// ordered soonest-first so the most urgent work appears at the top.
+  @override
   Future<List<MaintenanceLogModel>> getAllPendingLogs() async {
     try {
       final response = await _client
@@ -67,16 +80,17 @@ class MaintenanceRepository {
                 MaintenanceLogModel.fromJson(json as Map<String, dynamic>),
           )
           .toList();
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to load pending maintenance logs: ${e.message}');
+      throw mapPostgrestException(e, 'getAllPendingLogs');
     } catch (e) {
-      throw Exception(
-        'Unexpected error while loading pending maintenance logs: $e',
-      );
+      throw mapUnknownException(e, 'getAllPendingLogs');
     }
   }
 
   /// Returns the count of maintenance logs marked as approved today (UTC).
+  @override
   Future<int> getCompletedTodayCount() async {
     try {
       final now = DateTime.now().toUtc();
@@ -88,18 +102,22 @@ class MaintenanceRepository {
           .select('id')
           .eq('is_approved', true)
           .gte('maintenance_date', startOfDay.toIso8601String())
-          .lt('maintenance_date', endOfDay.toIso8601String());
+          .lt('maintenance_date', endOfDay.toIso8601String())
+          .count(CountOption.exact);
 
-      return (response as List<dynamic>).length;
+      return response.count;
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception('Failed to load completed count: ${e.message}');
+      throw mapPostgrestException(e, 'getCompletedTodayCount');
     } catch (e) {
-      throw Exception('Unexpected error while loading completed count: $e');
+      throw mapUnknownException(e, 'getCompletedTodayCount');
     }
   }
 
   /// Returns maintenance logs for a given [elevatorId] within the last
   /// [months] months, newest first. Used for transparency report generation.
+  @override
   Future<List<MaintenanceLogModel>> getLogsForReport(
     String elevatorId, {
     int months = 6,
@@ -122,14 +140,12 @@ class MaintenanceRepository {
                 MaintenanceLogModel.fromJson(json as Map<String, dynamic>),
           )
           .toList();
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception(
-        'Failed to load report logs for elevator ($elevatorId): ${e.message}',
-      );
+      throw mapPostgrestException(e, 'getLogsForReport($elevatorId)');
     } catch (e) {
-      throw Exception(
-        'Unexpected error while loading report logs for elevator ($elevatorId): $e',
-      );
+      throw mapUnknownException(e, 'getLogsForReport($elevatorId)');
     }
   }
 
@@ -140,6 +156,7 @@ class MaintenanceRepository {
   /// `profiles:technician_id(full_name)` tells PostgREST to follow the FK
   /// `maintenance_logs.technician_id → profiles.id` and embed the result as
   /// a nested `profiles` map on each row.
+  @override
   Future<List<MaintenanceLogModel>> getLogsByElevatorId(
     String elevatorId,
   ) async {
@@ -157,14 +174,13 @@ class MaintenanceRepository {
                 MaintenanceLogModel.fromJson(json as Map<String, dynamic>),
           )
           .toList();
+    } on AppException {
+      rethrow;
     } on PostgrestException catch (e) {
-      throw Exception(
-        'Failed to load maintenance logs for elevator ($elevatorId): ${e.message}',
-      );
+      throw mapPostgrestException(e, 'getLogsByElevatorId($elevatorId)');
     } catch (e) {
-      throw Exception(
-        'Unexpected error while loading logs for elevator ($elevatorId): $e',
-      );
+      throw mapUnknownException(e, 'getLogsByElevatorId($elevatorId)');
     }
   }
 }
+

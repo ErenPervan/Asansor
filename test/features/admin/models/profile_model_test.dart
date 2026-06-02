@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:asansor/features/admin/models/profile_model.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 import '../../../helpers/test_factories.dart';
 
 void main() {
@@ -20,7 +21,7 @@ void main() {
       expect(model.email, 'user@test.com');
       expect(model.fullName, 'Ali Yılmaz');
       expect(model.phone, '5551234567');
-      expect(model.role, 'admin');
+      expect(model.role, UserRole.admin);
       expect(model.elevatorId, 'e1');
     });
 
@@ -33,7 +34,7 @@ void main() {
       expect(model.email, isNull);
       expect(model.fullName, isNull);
       expect(model.phone, isNull);
-      expect(model.role, 'technician'); // Default role
+      expect(model.role, UserRole.technician); // Default role
       expect(model.elevatorId, isNull);
     });
 
@@ -43,7 +44,7 @@ void main() {
         email: 'x@x.com',
         fullName: 'Test X',
         phone: '123',
-        role: 'customer',
+        role: UserRole.customer,
         elevatorId: 'e3',
       );
 
@@ -122,59 +123,55 @@ void main() {
 
     group('roleTr', () {
       test('translates roles correctly', () {
-        expect(TestFactories.createProfile(role: 'admin').roleTr, 'Admin');
+        expect(TestFactories.createProfile(role: UserRole.admin).roleTr, 'Admin');
         expect(
-          TestFactories.createProfile(role: 'technician').roleTr,
+          TestFactories.createProfile(role: UserRole.technician).roleTr,
           'Teknisyen',
         );
-        expect(TestFactories.createProfile(role: 'customer').roleTr, 'Müşteri');
-        expect(
-          TestFactories.createProfile(role: 'unknown').roleTr,
-          'unknown',
-        ); // Fallback
+        expect(TestFactories.createProfile(role: UserRole.customer).roleTr, 'Müşteri');
       });
     });
 
     group('role booleans', () {
       test('isAdmin', () {
-        expect(TestFactories.createProfile(role: 'admin').isAdmin, isTrue);
+        expect(TestFactories.createProfile(role: UserRole.admin).isAdmin, isTrue);
         expect(
-          TestFactories.createProfile(role: 'technician').isAdmin,
+          TestFactories.createProfile(role: UserRole.technician).isAdmin,
           isFalse,
         );
       });
 
       test('isTechnician', () {
         expect(
-          TestFactories.createProfile(role: 'technician').isTechnician,
+          TestFactories.createProfile(role: UserRole.technician).isTechnician,
           isTrue,
         );
         expect(
-          TestFactories.createProfile(role: 'customer').isTechnician,
+          TestFactories.createProfile(role: UserRole.customer).isTechnician,
           isFalse,
         );
       });
 
       test('isCustomer', () {
         expect(
-          TestFactories.createProfile(role: 'customer').isCustomer,
+          TestFactories.createProfile(role: UserRole.customer).isCustomer,
           isTrue,
         );
-        expect(TestFactories.createProfile(role: 'admin').isCustomer, isFalse);
+        expect(TestFactories.createProfile(role: UserRole.admin).isCustomer, isFalse);
       });
     });
 
     test('copyWith updates fields', () {
       final original = TestFactories.createProfile(
         id: '1',
-        role: 'technician',
+        role: UserRole.technician,
         elevatorId: 'e1',
       );
 
-      final updated = original.copyWith(role: 'admin');
+      final updated = original.copyWith(role: UserRole.admin);
 
       expect(updated.id, '1');
-      expect(updated.role, 'admin');
+      expect(updated.role, UserRole.admin);
       expect(updated.elevatorId, 'e1');
 
       final cleared = original.copyWith(clearElevatorId: true);

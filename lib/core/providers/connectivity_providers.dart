@@ -29,6 +29,22 @@ final isOnlineProvider = Provider<bool>((ref) {
       );
 });
 
+// ── Supabase Client ───────────────────────────────────────────────────────────
+
+/// Single Riverpod-managed reference to the live [SupabaseClient].
+///
+/// **Always inject the client through this provider** — never call
+/// `Supabase.instance.client` directly inside providers or repositories.
+/// This makes every consumer overridable in unit tests:
+/// ```dart
+/// final container = ProviderContainer(overrides: [
+///   supabaseClientProvider.overrideWithValue(mockClient),
+/// ]);
+/// ```
+final supabaseClientProvider = Provider<SupabaseClient>((ref) {
+  return Supabase.instance.client;
+});
+
 // ── Read Cache ────────────────────────────────────────────────────────────────
 
 /// Single shared [ReadCacheService] instance backed by the open Hive boxes.
@@ -70,7 +86,7 @@ final pendingSyncCountProvider = Provider<int>((ref) {
 ///
 /// Kept alive at the app-root level (watched inside [AsansorApp]) so it runs
 /// for the full app lifetime regardless of which screen is visible.
-final autoSyncProvider = Provider<void>((ref) {
+void setupAutoSyncListener(WidgetRef ref) {
   ref.listen<AsyncValue<List<ConnectivityResult>>>(connectivityStreamProvider, (
     previous,
     next,
@@ -90,9 +106,9 @@ final autoSyncProvider = Provider<void>((ref) {
       if (wasOffline) {
         final queue = ref.read(syncQueueServiceProvider);
         if (queue.hasPending) {
-          queue.flush(Supabase.instance.client);
+          queue.flush(ref.read(supabaseClientProvider));
         }
       }
     });
   });
-});
+}

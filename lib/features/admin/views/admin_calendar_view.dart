@@ -18,6 +18,7 @@ import '../providers/admin_providers.dart';
 import '../providers/profile_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/enums/app_enums.dart';
 import '../widgets/calendar/calendar_task_card.dart';
 import '../widgets/calendar/calendar_assign_sheet.dart';
 
@@ -88,7 +89,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
 
     final schedulesAsync = ref.watch(allSchedulesProvider);
     final elevatorsAsync = ref.watch(elevatorsProvider);
-    final techsAsync = ref.watch(profilesByRoleProvider('technician'));
+    final techsAsync = ref.watch(profilesByRoleProvider(UserRole.technician));
 
     final allSchedules = schedulesAsync.valueOrNull ?? [];
     final elevators = elevatorsAsync.valueOrNull;
@@ -298,8 +299,8 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                         techs,
                       ),
                       onCancel:
-                          selectedEvents[i].status == 'pending' ||
-                              selectedEvents[i].status == 'in_progress'
+                          selectedEvents[i].status == ScheduleStatus.pending ||
+                              selectedEvents[i].status == ScheduleStatus.inProgress
                           ? () => _confirmCancel(context, selectedEvents[i].id)
                           : null,
                     ),
@@ -344,7 +345,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                 Navigator.pop(ctx);
                 ref
                     .read(scheduleControllerProvider.notifier)
-                    .updateStatus(taskId: taskId, status: 'cancelled');
+                    .updateStatus(taskId: taskId, status: ScheduleStatus.cancelled);
               },
               child: const Text('İptal Et'),
             ),

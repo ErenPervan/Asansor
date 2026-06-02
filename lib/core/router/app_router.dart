@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../enums/app_enums.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/admin/providers/profile_providers.dart';
@@ -15,6 +17,7 @@ import '../../features/admin/views/admin_map_view.dart';
 import '../../features/admin/views/assign_view.dart';
 import '../../features/admin/views/checklist_management_view.dart';
 import '../../features/admin/views/user_management_view.dart';
+import '../../features/auth/views/loading_view.dart';
 import '../../features/auth/views/login_view.dart';
 import '../../features/customer/views/customer_dashboard_view.dart';
 import '../../features/elevator/views/customer_no_elevator_view.dart';
@@ -35,7 +38,12 @@ import '../../features/admin/views/admin_statistics_dashboard.dart';
 class _AuthChangeNotifier extends ChangeNotifier {
   _AuthChangeNotifier() {
     _subscription = Supabase.instance.client.auth.onAuthStateChange.listen(
-      (AuthState _) => notifyListeners(),
+      (AuthState state) {
+        if (state.session == null) {
+          routerRoleNotifier.clear();
+        }
+        notifyListeners();
+      },
     );
   }
 
@@ -67,9 +75,10 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 // ── Router ────────────────────────────────────────────────────────────────────
 
-final GoRouter appRouter = GoRouter(
-  navigatorKey: navigatorKey, // ← GoRouter now owns the key's Navigator
-  initialLocation: '/',
+final appRouterProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    navigatorKey: navigatorKey, // ← GoRouter now owns the key's Navigator
+    initialLocation: '/',
 
   // Refresh whenever auth state OR the resolved role changes so that the
   // admin-route guard is re-evaluated as soon as the profile is loaded.
@@ -89,9 +98,8 @@ final GoRouter appRouter = GoRouter(
   ///    Customers are also blocked from all other routes (home, scan, admin).
   ///
   /// Note on rules 3 & 4: while the role is `null` (still loading but user is
-  /// authenticated) the request is allowed through to avoid a redirect loop.
-  /// The router is refreshed the moment [routerRoleNotifier] emits a confirmed
-  /// role, so the correct guard fires on the next evaluation.
+  /// authenticated), the user is redirected to `/loading`. Once the role is
+  /// confirmed, the router is refreshed and the correct guard fires.
   redirect: (BuildContext context, GoRouterState state) {
     final isAuthenticated = Supabase.instance.client.auth.currentUser != null;
     final loc = state.matchedLocation;
@@ -103,13 +111,26 @@ final GoRouter appRouter = GoRouter(
 
     final role = routerRoleNotifier.role;
 
+    // ── ROLE IS STILL LOADING ──────────────────────────────────────────────
+    if (isAuthenticated && role == null) {
+      // Block ALL protected routes until the role is confirmed.
+      // Show a loading splash instead of leaking any screen.
+      if (loc != '/loading') return '/loading';
+      return null;
+    }
+
+    // If we are on loading but role is now known, go home.
+    if (loc == '/loading' && role != null) {
+      return '/';
+    }
+
     // Rule 3 — admin route guard.
     if (loc.startsWith('/admin')) {
-      if (role != null && role != 'admin') return '/';
+      if (role != UserRole.admin) return '/';
     }
 
     // Rule 4 — customer-scoped routing.
-    if (role == 'customer') {
+    if (role == UserRole.customer) {
       final custElevatorId = routerRoleNotifier.elevatorId;
       final isOnNoElevatorPage = loc == '/customer/no-elevator';
       final isOnDashboard = loc == '/customer/dashboard';
@@ -132,6 +153,7 @@ final GoRouter appRouter = GoRouter(
   },
 
   routes: [
+    GoRoute(path: '/loading', builder: (context, state) => const LoadingView()),
     GoRoute(path: '/login', builder: (context, state) => const LoginView()),
     GoRoute(path: '/', builder: (context, state) => const HomeView()),
     // `/home` is a stable alias used in FCM notification data payloads so that
@@ -225,4 +247,5 @@ final GoRouter appRouter = GoRouter(
       builder: (context, _) => const CustomerNoElevatorView(),
     ),
   ],
-);
+  );
+});

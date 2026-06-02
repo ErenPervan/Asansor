@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:intl/intl.dart';
+import '../../../core/enums/app_enums.dart';
 
 import '../models/technician_stats.dart';
 
@@ -991,19 +992,19 @@ class _SmallBadge extends StatelessWidget {
 
   factory _SmallBadge.status(
     BuildContext context,
-    String s,
+    ScheduleStatus s,
     TextTheme textTheme,
   ) {
     final colors = AppThemeColors.of(context);
     final (lbl, bg, fg) = switch (s) {
-      'completed' => ('TAMAMLANDI', colors.successContainer, colors.success),
-      'in_progress' => ('DEVAM', colors.warningContainer, colors.warning),
-      'cancelled' => (
-        'Ä°PTAL',
+      ScheduleStatus.completed => ('TAMAMLANDI', colors.successContainer, colors.success),
+      ScheduleStatus.inProgress => ('DEVAM', colors.warningContainer, colors.warning),
+      ScheduleStatus.cancelled => (
+        'İPTAL',
         colors.surfaceContainerHigh,
         colors.onSurfaceVariant,
       ),
-      _ => ('BEKLÄ°YOR', colors.surfaceContainer, colors.onSurface),
+      _ => ('BEKLİYOR', colors.surfaceContainer, colors.onSurface),
     };
     return _SmallBadge(label: lbl, bg: bg, fg: fg, textTheme: textTheme);
   }

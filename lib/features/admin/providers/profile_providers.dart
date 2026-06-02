@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/enums/app_enums.dart';
 
+import '../../../core/providers/connectivity_providers.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../models/profile_model.dart';
 import '../repositories/profile_repository.dart';
@@ -13,23 +14,30 @@ import '../repositories/profile_repository.dart';
 // whenever the current user's profile loads or the session changes.
 
 class RouterRoleNotifier extends ChangeNotifier {
-  String? _role;
+  UserRole? _role;
   String? _elevatorId;
 
-  /// The currently cached role (`'admin'` | `'technician'` | `'customer'` | `null`).
+  /// The currently cached role.
   ///
   /// `null` means either the user is not signed in, or the profile is still loading.
-  String? get role => _role;
+  UserRole? get role => _role;
 
   /// For `customer` role: the elevator UUID linked to this user's profile.
   /// `null` when the role is not `'customer'`, the profile is loading,
   /// or the customer has no elevator assigned yet.
   String? get elevatorId => _elevatorId;
 
-  void _update(String? role, String? elevatorId) {
+  void update(UserRole? role, String? elevatorId) {
     if (_role == role && _elevatorId == elevatorId) return;
     _role = role;
     _elevatorId = elevatorId;
+    notifyListeners();
+  }
+
+  void clear() {
+    if (_role == null && _elevatorId == null) return;
+    _role = null;
+    _elevatorId = null;
     notifyListeners();
   }
 }
@@ -39,8 +47,8 @@ final routerRoleNotifier = RouterRoleNotifier();
 
 // ── Repository ────────────────────────────────────────────────────────────────
 
-final profileRepositoryProvider = Provider<ProfileRepository>(
-  (_) => ProfileRepository(Supabase.instance.client),
+final profileRepositoryProvider = Provider<IProfileRepository>(
+  (ref) => ProfileRepository(ref.watch(supabaseClientProvider)),
 );
 
 // ── Current user profile ──────────────────────────────────────────────────────
@@ -54,7 +62,6 @@ final currentProfileProvider = FutureProvider<ProfileModel?>((ref) async {
   final user = ref.watch(authControllerProvider).valueOrNull;
 
   if (user == null) {
-    routerRoleNotifier._update(null, null);
     return null;
   }
 
@@ -63,7 +70,9 @@ final currentProfileProvider = FutureProvider<ProfileModel?>((ref) async {
 
   // Propagate role + elevatorId to the router so it can enforce both the
   // admin guard and the customer-scoped elevator redirect synchronously.
-  routerRoleNotifier._update(
+  // Note: While this is a side-effect in a provider, we rely on it to feed
+  // GoRouter synchronously. It is cleared atomically in _AuthChangeNotifier.
+  routerRoleNotifier.update(
     profile?.role,
     profile?.isCustomer == true ? profile?.elevatorId : null,
   );
@@ -71,15 +80,14 @@ final currentProfileProvider = FutureProvider<ProfileModel?>((ref) async {
   return profile;
 });
 
-/// Exposes the current user's role string (`'admin'` | `'technician'` |
-/// `'customer'` | `null`).
+/// Exposes the current user's role (`UserRole`).
 ///
 /// Use this provider in UI to conditionally show admin controls:
 /// ```dart
 /// final role = ref.watch(roleProvider);
-/// if (role == 'admin') ...
+/// if (role == UserRole.admin) ...
 /// ```
-final roleProvider = Provider<String?>(
+final roleProvider = Provider<UserRole?>(
   (ref) => ref.watch(currentProfileProvider).valueOrNull?.role,
 );
 
@@ -94,8 +102,8 @@ final allProfilesProvider = FutureProvider<List<ProfileModel>>((ref) {
 ///
 /// Usage: `ref.watch(profilesByRoleProvider('technician'))`
 final profilesByRoleProvider =
-    FutureProvider.family<List<ProfileModel>, String>((ref, role) {
-      return ref.watch(profileRepositoryProvider).getProfilesByRole(role);
+    FutureProvider.family<List<ProfileModel>, UserRole>((ref, role) {
+      return ref.watch(profileRepositoryProvider).getProfilesByRole(role.dbValue);
     });
 
 // ── Mutation notifier ─────────────────────────────────────────────────────────
@@ -110,10 +118,10 @@ class ProfileUpdateController extends AutoDisposeAsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
-  Future<void> updateRole(String userId, String newRole) async {
+  Future<void> updateRole(String userId, UserRole newRole) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(profileRepositoryProvider).updateRole(userId, newRole);
+      await ref.read(profileRepositoryProvider).updateRole(userId, newRole.dbValue);
       _invalidateAllLists(ref);
       // Refresh the current user's own profile in case they edited themselves.
       ref.invalidate(currentProfileProvider);
@@ -144,7 +152,7 @@ final profileUpdateControllerProvider =
 
 void _invalidateAllLists(Ref ref) {
   ref.invalidate(allProfilesProvider);
-  ref.invalidate(profilesByRoleProvider('admin'));
-  ref.invalidate(profilesByRoleProvider('technician'));
-  ref.invalidate(profilesByRoleProvider('customer'));
+  ref.invalidate(profilesByRoleProvider(UserRole.admin));
+  ref.invalidate(profilesByRoleProvider(UserRole.technician));
+  ref.invalidate(profilesByRoleProvider(UserRole.customer));
 }

@@ -137,7 +137,8 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
     // fires regardless of which screen is currently shown.  Previously this
     // was only watched inside HomeView, which meant the listener would die
     // whenever the technician navigated to another screen via context.go().
-    ref.watch(autoSyncProvider);
+    setupAutoSyncListener(ref);
+    final goRouter = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
       title: 'Asansor',
@@ -155,7 +156,7 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
       // `navigatorKey` is owned by `appRouter` (passed via GoRouter constructor).
       // MaterialApp.router does not accept a separate navigatorKey; the key
       // is accessed through `navigatorKey` exported from app_router.dart.
-      routerConfig: appRouter,
+      routerConfig: goRouter,
     );
   }
 }

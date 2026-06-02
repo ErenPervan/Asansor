@@ -7,6 +7,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart';
 
+import '../enums/app_enums.dart';
 import '../../features/maintenance/models/maintenance_log_model.dart';
 import '../../features/elevator/models/elevator_model.dart';
 
@@ -929,18 +930,16 @@ class PdfService {
   String _shortId(String id) =>
       id.length > 8 ? 'Ã¢â‚¬Â¦${id.substring(id.length - 8)}' : id;
 
-  String _statusTr(String status) {
-    switch (status.toLowerCase()) {
-      case 'active':
+  String _statusTr(ElevatorStatus status) {
+    switch (status) {
+      case ElevatorStatus.active:
         return 'Aktif';
-      case 'faulty':
+      case ElevatorStatus.faulty:
         return 'ArÃ„Â±zalÃ„Â±';
-      case 'under_maintenance':
+      case ElevatorStatus.underMaintenance:
         return 'BakÃ„Â±mda';
-      case 'inactive':
+      case ElevatorStatus.inactive:
         return 'Pasif';
-      default:
-        return 'Bilinmiyor';
     }
   }
 }

@@ -4,13 +4,14 @@ import 'package:asansor/features/fault/models/fault_report_model.dart';
 import 'package:asansor/features/admin/models/schedule_model.dart';
 import 'package:asansor/features/admin/models/profile_model.dart';
 import 'package:asansor/features/admin/models/technician_stats.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
 /// Testlerde kullanılacak standart/örnek modeller üreten factory yardımcıları.
 class TestFactories {
   static ElevatorModel createElevator({
     String id = 'elev-1',
     String buildingName = 'Test Building',
-    String status = 'active',
+    ElevatorStatus status = ElevatorStatus.active,
     String? address = 'Test Address',
     String? model = 'Model X',
     int? capacity = 800,
@@ -80,7 +81,7 @@ class TestFactories {
     String elevatorId = 'elev-1',
     String technicianId = 'tech-1',
     DateTime? scheduledDate,
-    String status = 'pending',
+    ScheduleStatus status = ScheduleStatus.pending,
     String priority = 'normal',
     String taskType = 'manual',
     String? notes,
@@ -102,7 +103,7 @@ class TestFactories {
     String? email = 'test@test.com',
     String? fullName = 'Test User',
     String? phone,
-    String role = 'technician',
+    UserRole role = UserRole.technician,
     String? elevatorId,
   }) {
     return ProfileModel(
@@ -119,7 +120,7 @@ class TestFactories {
     String buildingName = 'Test Building',
     String? address,
     DateTime? scheduledTime,
-    String status = 'pending',
+    ScheduleStatus status = ScheduleStatus.pending,
     String priority = 'normal',
     String elevatorId = 'elev-1',
     String? notes,

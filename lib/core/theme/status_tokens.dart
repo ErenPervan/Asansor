@@ -1,109 +1,106 @@
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import '../enums/app_enums.dart';
 
 abstract final class StatusTokens {
-  static String scheduleLabel(String status) {
+  static String scheduleLabel(ScheduleStatus status) {
     switch (status) {
-      case 'in_progress':
+      case ScheduleStatus.inProgress:
         return 'Devam Ediyor';
-      case 'completed':
+      case ScheduleStatus.completed:
         return 'Tamamlandı';
-      case 'cancelled':
+      case ScheduleStatus.cancelled:
         return 'İptal Edildi';
-      default:
+      case ScheduleStatus.pending:
         return 'Bekliyor';
     }
   }
 
-  static Color scheduleBackground(String status) {
+  static Color scheduleBackground(ScheduleStatus status) {
     switch (status) {
-      case 'in_progress':
+      case ScheduleStatus.inProgress:
         return AppColors.warningContainer;
-      case 'completed':
+      case ScheduleStatus.completed:
         return AppColors.successContainer;
-      case 'cancelled':
+      case ScheduleStatus.cancelled:
         return AppColors.errorContainer;
-      default:
+      case ScheduleStatus.pending:
         return AppColors.surfaceContainer;
     }
   }
 
-  static Color scheduleForeground(String status) {
+  static Color scheduleForeground(ScheduleStatus status) {
     switch (status) {
-      case 'in_progress':
+      case ScheduleStatus.inProgress:
         return AppColors.warning;
-      case 'completed':
+      case ScheduleStatus.completed:
         return AppColors.success;
-      case 'cancelled':
+      case ScheduleStatus.cancelled:
         return AppColors.onErrorContainer;
-      default:
+      case ScheduleStatus.pending:
         return AppColors.onSurfaceVariant;
     }
   }
 
-  static Color scheduleBackgroundDynamic(BuildContext context, String status) {
+  static Color scheduleBackgroundDynamic(BuildContext context, ScheduleStatus status) {
     final colors = AppThemeColors.of(context);
     switch (status) {
-      case 'in_progress':
+      case ScheduleStatus.inProgress:
         return colors.warningContainer;
-      case 'completed':
+      case ScheduleStatus.completed:
         return colors.successContainer;
-      case 'cancelled':
+      case ScheduleStatus.cancelled:
         return colors.errorContainer;
-      default:
+      case ScheduleStatus.pending:
         return colors.surfaceContainer;
     }
   }
 
-  static Color scheduleForegroundDynamic(BuildContext context, String status) {
+  static Color scheduleForegroundDynamic(BuildContext context, ScheduleStatus status) {
     final colors = AppThemeColors.of(context);
     switch (status) {
-      case 'in_progress':
+      case ScheduleStatus.inProgress:
         return colors.warning;
-      case 'completed':
+      case ScheduleStatus.completed:
         return colors.success;
-      case 'cancelled':
+      case ScheduleStatus.cancelled:
         return colors.onErrorContainer;
-      default:
+      case ScheduleStatus.pending:
         return colors.onSurfaceVariant;
     }
   }
 
   static Color elevatorBadgeBackgroundDynamic(
     BuildContext context,
-    String status,
+    ElevatorStatus status,
   ) {
     final colors = AppThemeColors.of(context);
-    switch (status.toLowerCase()) {
-      case 'active':
+    switch (status) {
+      case ElevatorStatus.active:
         return colors.success;
-      case 'faulty':
+      case ElevatorStatus.faulty:
         return colors.errorContainer;
-      case 'under_maintenance':
+      case ElevatorStatus.underMaintenance:
         return colors.warningContainer;
-      case 'inactive':
-        return colors.surfaceContainer;
-      default:
+      case ElevatorStatus.inactive:
         return colors.surfaceContainer;
     }
   }
 
   static Color elevatorBadgeForegroundDynamic(
     BuildContext context,
-    String status,
+    ElevatorStatus status,
   ) {
     final colors = AppThemeColors.of(context);
-    switch (status.toLowerCase()) {
-      case 'active':
+    switch (status) {
+      case ElevatorStatus.active:
         return Colors.white;
-      case 'faulty':
+      case ElevatorStatus.faulty:
         return colors.onErrorContainer;
-      case 'under_maintenance':
+      case ElevatorStatus.underMaintenance:
         return colors.warning;
-      case 'inactive':
-        return colors.outline;
-      default:
+      case ElevatorStatus.inactive:
         return colors.outline;
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/enums/app_enums.dart';
 
 Color getPriorityColor(String p) {
   switch (p) {
@@ -27,28 +28,28 @@ String getPriorityLabel(String p) {
   }
 }
 
-String getStatusLabel(String s) {
+String getStatusLabel(ScheduleStatus s) {
   switch (s) {
-    case 'in_progress':
+    case ScheduleStatus.inProgress:
       return 'Devam Ediyor';
-    case 'completed':
+    case ScheduleStatus.completed:
       return 'Tamamlandı';
-    case 'cancelled':
+    case ScheduleStatus.cancelled:
       return 'İptal';
-    default:
+    case ScheduleStatus.pending:
       return 'Bekliyor';
   }
 }
 
-Color getStatusColor(String s) {
+Color getStatusColor(ScheduleStatus s) {
   switch (s) {
-    case 'in_progress':
+    case ScheduleStatus.inProgress:
       return AppColors.primary;
-    case 'completed':
+    case ScheduleStatus.completed:
       return AppColors.success;
-    case 'cancelled':
+    case ScheduleStatus.cancelled:
       return AppColors.outline;
-    default:
+    case ScheduleStatus.pending:
       return AppColors.warning;
   }
 }

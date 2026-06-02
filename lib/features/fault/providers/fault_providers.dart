@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'dart:async';
 import '../../../core/providers/connectivity_providers.dart';
@@ -10,8 +9,8 @@ import '../repositories/fault_repository.dart';
 // ── Repository ──────────────────────────────────────────────────────────────
 
 /// Provides the [FaultRepository] backed by the live Supabase client.
-final faultRepositoryProvider = Provider<FaultRepository>((ref) {
-  return FaultRepository(Supabase.instance.client);
+final faultRepositoryProvider = Provider<IFaultRepository>((ref) {
+  return FaultRepository(ref.watch(supabaseClientProvider));
 });
 
 // ── Data Providers ───────────────────────────────────────────────────────────
@@ -23,18 +22,18 @@ final allFaultsProvider = FutureProvider<List<FaultReportModel>>((ref) async {
   final cache = ref.read(readCacheServiceProvider);
 
   if (!isOnline) {
-    return cache.loadFaults(FaultReportModel.fromJson).cast<FaultReportModel>();
+    return cache.loadAllFaults();
   }
 
   try {
     final repo = ref.watch(faultRepositoryProvider);
     final data = await repo.getAllFaults();
     // Cache the faults for offline use
-    unawaited(cache.saveFaults(data));
+    unawaited(cache.saveAllFaults(data));
     return data;
   } catch (e) {
     final cached = cache
-        .loadFaults(FaultReportModel.fromJson)
+        .loadAllFaults()
         .cast<FaultReportModel>();
     if (cached.isNotEmpty) return cached;
     rethrow;
@@ -55,17 +54,17 @@ final activeFaultsProvider = FutureProvider<List<FaultReportModel>>((
   final cache = ref.read(readCacheServiceProvider);
 
   if (!isOnline) {
-    return cache.loadFaults(FaultReportModel.fromJson).cast<FaultReportModel>();
+    return cache.loadActiveFaults();
   }
 
   try {
     final repo = ref.watch(faultRepositoryProvider);
     final data = await repo.getAllActiveFaults();
-    unawaited(cache.saveFaults(data));
+    unawaited(cache.saveActiveFaults(data));
     return data;
   } catch (e) {
     final cached = cache
-        .loadFaults(FaultReportModel.fromJson)
+        .loadActiveFaults()
         .cast<FaultReportModel>();
     if (cached.isNotEmpty) return cached;
     rethrow;
@@ -94,7 +93,7 @@ final faultByIdProvider = FutureProvider.autoDispose
 // ── Report Notifier ──────────────────────────────────────────────────────────
 
 /// Holds the state of an in-flight fault report submission.
-class FaultController extends AsyncNotifier<FaultReportModel?> {
+class FaultController extends AutoDisposeAsyncNotifier<FaultReportModel?> {
   @override
   Future<FaultReportModel?> build() async => null;
 
@@ -154,7 +153,7 @@ class FaultController extends AsyncNotifier<FaultReportModel?> {
 }
 
 final faultControllerProvider =
-    AsyncNotifierProvider<FaultController, FaultReportModel?>(
+    AutoDisposeAsyncNotifierProvider<FaultController, FaultReportModel?>(
       FaultController.new,
     );
 

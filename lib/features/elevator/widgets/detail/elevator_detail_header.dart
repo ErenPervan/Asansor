@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/status_tokens.dart';
+import '../../../../core/enums/app_enums.dart';
 import '../../models/elevator_model.dart';
 import '../../../../core/widgets/info_card.dart';
 
@@ -177,16 +178,15 @@ class DetailMetaCell extends StatelessWidget {
 class DetailStatusBadge extends StatelessWidget {
   const DetailStatusBadge({super.key, required this.status});
 
-  final String status;
+  final ElevatorStatus status;
 
   @override
   Widget build(BuildContext context) {
-    final label = switch (status.toLowerCase()) {
-      'active' => 'DURUM: AKTİF',
-      'faulty' => 'DURUM: ARIZALI',
-      'under_maintenance' => 'DURUM: BAKIMDA',
-      'inactive' => 'DURUM: PASİF',
-      _ => 'DURUM: BİLİNMİYOR',
+    final label = switch (status) {
+      ElevatorStatus.active => 'DURUM: AKTİF',
+      ElevatorStatus.faulty => 'DURUM: ARIZALI',
+      ElevatorStatus.underMaintenance => 'DURUM: BAKIMDA',
+      ElevatorStatus.inactive => 'DURUM: PASİF',
     };
 
     final bg = StatusTokens.elevatorBadgeBackgroundDynamic(context, status);

@@ -9,6 +9,7 @@ import '../../../elevator/providers/elevator_providers.dart';
 import '../../models/profile_model.dart';
 import '../../providers/admin_providers.dart';
 import '../../providers/profile_providers.dart';
+import '../../../../core/enums/app_enums.dart';
 import 'calendar_pickers.dart';
 
 // ── AssignTaskSheet ──────────────────────────────────────────────────────────
@@ -150,7 +151,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
   @override
   Widget build(BuildContext context) {
     final elevatorsAsync = ref.watch(elevatorsProvider);
-    final techsAsync = ref.watch(profilesByRoleProvider('technician'));
+    final techsAsync = ref.watch(profilesByRoleProvider(UserRole.technician));
     final isSubmitting = ref.watch(scheduleControllerProvider).isLoading;
 
     return DraggableScrollableSheet(

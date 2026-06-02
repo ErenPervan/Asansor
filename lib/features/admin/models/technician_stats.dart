@@ -1,3 +1,4 @@
+import '../../../core/enums/app_enums.dart';
 import 'profile_model.dart';
 
 /// A single scheduled task enriched with elevator display info.
@@ -17,8 +18,7 @@ class TechnicianTask {
   final String? address;
   final DateTime scheduledTime;
 
-  /// One of: 'pending' | 'in_progress' | 'completed' | 'cancelled'
-  final String status;
+  final ScheduleStatus status;
 
   /// One of: 'low' | 'normal' | 'high' | 'emergency'
   final String priority;
@@ -26,8 +26,8 @@ class TechnicianTask {
   final String elevatorId;
   final String? notes;
 
-  bool get isCompleted => status == 'completed';
-  bool get isActive => status == 'pending' || status == 'in_progress';
+  bool get isCompleted => status == ScheduleStatus.completed;
+  bool get isActive => status == ScheduleStatus.pending || status == ScheduleStatus.inProgress;
 }
 
 /// Aggregated stats for a single technician for the current day and month.

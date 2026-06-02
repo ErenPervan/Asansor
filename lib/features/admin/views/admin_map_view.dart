@@ -22,6 +22,7 @@ import '../models/schedule_model.dart';
 import '../providers/admin_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/enums/app_enums.dart';
 import '../../../core/widgets/loading_state.dart';
 
 // Marker colours (match Google Maps palette for familiarity)
@@ -77,7 +78,7 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
     final today = DateTime.now();
     final hasTodayMaintenance =
         allSchedules.valueOrNull?.any((s) {
-          if (s.elevatorId != elevatorId || s.status != 'pending') return false;
+          if (s.elevatorId != elevatorId || s.status != ScheduleStatus.pending) return false;
           final d = s.scheduledDate.toLocal();
           return d.year == today.year &&
               d.month == today.month &&

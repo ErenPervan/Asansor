@@ -9,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../router/app_router.dart'; // exposes appRouter + navigatorKey
+import 'package:go_router/go_router.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Background handler (MUST be a top-level function, not a class method)
@@ -165,10 +166,17 @@ class NotificationService {
       }
 
       // Keep the token fresh.
+      // IMPORTANT: do NOT capture [client] in the closure — it may belong to
+      // an already-signed-out session by the time onTokenRefresh fires.
+      // Instead, read Supabase.instance.client at the moment the event fires
+      // so we always act on the currently authenticated session.
       await _tokenRefreshSub?.cancel();
       _tokenRefreshSub = _messaging.onTokenRefresh.listen((newToken) {
         debugPrint('[FCM] Token refreshed: $newToken');
-        unawaited(_updateToken(client, newToken));
+        // Guard: if the user has already signed out in the race window,
+        // currentUser will be null — _updateToken will bail out safely.
+        final currentClient = Supabase.instance.client;
+        unawaited(_updateToken(currentClient, newToken));
       });
     } catch (e) {
       debugPrint('[FCM] saveTokenToSupabase error: $e');
@@ -230,18 +238,21 @@ class NotificationService {
           .select('id')
           .eq('role', 'admin');
 
+      final futures = <Future<void>>[];
       for (final row in admins as List) {
         final adminId = (row as Map<String, dynamic>)['id'] as String?;
         if (adminId != null) {
-          await notifyUser(
+          futures.add(notifyUser(
             client: client,
             toUserId: adminId,
             title: title,
             body: body,
             data: data,
-          );
+          ));
         }
       }
+      
+      await Future.wait(futures);
     } catch (_) {}
   }
 
@@ -350,7 +361,9 @@ class NotificationService {
       final mounted = navigatorKey.currentState?.mounted ?? false;
       if (mounted) {
         debugPrint('[FCM] Navigating → $destination ✅');
-        appRouter.go(destination);
+        if (navigatorKey.currentContext != null) {
+          GoRouter.of(navigatorKey.currentContext!).go(destination);
+        }
       } else if (retries < 5) {
         // Navigator not ready yet — retry after the next frame.
         debugPrint('[FCM] Navigator not mounted, retry ${retries + 1}/5…');

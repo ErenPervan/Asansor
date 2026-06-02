@@ -6,6 +6,7 @@ import '../providers/admin_analytics_provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/animations/fade_in_slide.dart';
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
@@ -47,21 +48,22 @@ class _AdminStatisticsDashboardState
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     final analyticsAsync = ref.watch(adminAnalyticsProvider);
 
     return Scaffold(
-      backgroundColor: AppThemeColors.of(context).background,
-      appBar: _buildAppBar(context),
+      backgroundColor: colors.background,
+      appBar: _buildAppBar(context, colors),
       body: RefreshIndicator(
-        color: AppColors.blue,
+        color: colors.primary,
         onRefresh: () async {
           ref.invalidate(adminAnalyticsProvider);
           await ref.read(adminAnalyticsProvider.future);
         },
         child: analyticsAsync.when(
-          data: (data) => _buildContent(data),
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.blue),
+          data: (data) => _buildContent(context, data, colors),
+          loading: () => Center(
+            child: CircularProgressIndicator(color: colors.primary),
           ),
           error: (err, stack) => _buildError(err),
         ),
@@ -69,15 +71,15 @@ class _AdminStatisticsDashboardState
     );
   }
 
-  Widget _buildContent(AdminAnalyticsState data) {
+  Widget _buildContent(BuildContext context, AdminAnalyticsState data, AppThemeColors colors) {
     final kpiCards = [
       _KpiData(
         value: data.activeFaults.toString(),
         label: 'Aktif Arızalar',
         subtitle: 'Çözüm bekliyor',
         icon: Icons.warning_amber_rounded,
-        color: AppColors.error,
-        bg: AppColors.errorContainer,
+        color: colors.error,
+        bg: colors.errorContainer,
         trend: 'Güncel',
         trendUp: false,
       ),
@@ -86,8 +88,8 @@ class _AdminStatisticsDashboardState
         label: 'Bu Ay Çözülen',
         subtitle: 'Tamamlanan görevler',
         icon: Icons.check_circle_outline_rounded,
-        color: AppColors.success,
-        bg: AppColors.successContainer,
+        color: colors.success,
+        bg: colors.successContainer,
         trend: 'Bu ay',
         trendUp: true,
       ),
@@ -96,8 +98,8 @@ class _AdminStatisticsDashboardState
         label: 'Toplam Asansör',
         subtitle: 'Sistemde kayıtlı',
         icon: Icons.elevator_rounded,
-        color: AppColors.blue,
-        bg: AppColors.blueSoft,
+        color: colors.primary,
+        bg: colors.primaryContainer,
         trend: 'Sistem geneli',
         trendUp: true,
       ),
@@ -106,8 +108,8 @@ class _AdminStatisticsDashboardState
         label: 'Bekleyen Bakım',
         subtitle: 'Bu ay planlanmış',
         icon: Icons.pending_actions_rounded,
-        color: AppColors.warning,
-        bg: AppColors.warningContainer,
+        color: colors.warning,
+        bg: colors.warningContainer,
         trend: 'Planlanmış',
         trendUp: false,
       ),
@@ -126,23 +128,29 @@ class _AdminStatisticsDashboardState
           const SizedBox(height: 16),
           _KpiGrid(kpiCards: kpiCards),
           const SizedBox(height: 32),
-          const _SectionHeader(
+          _SectionHeader(
             title: 'Aylık Arıza Trendi',
             subtitle: 'Son 6 aylık arıza kayıtları',
-            trailing: _LegendDot(color: AppColors.blueAccent, label: 'Arıza'),
+            trailing: _LegendDot(color: colors.primary, label: 'Arıza'),
           ),
           const SizedBox(height: 16),
-          _BarChartCard(monthlyFaults: data.monthlyFaults),
+          FadeInSlide(
+            index: 1,
+            child: _BarChartCard(monthlyFaults: data.monthlyFaults),
+          ),
           const SizedBox(height: 32),
           const _SectionHeader(
             title: 'Arıza Dağılımı',
             subtitle: 'Bileşen bazında analiz',
           ),
           const SizedBox(height: 16),
-          _PieChartCard(
-            pieSlices: data.faultCategories,
-            touchedIndex: _touchedPieIndex,
-            onTouch: (i) => setState(() => _touchedPieIndex = i),
+          FadeInSlide(
+            index: 2,
+            child: _PieChartCard(
+              pieSlices: data.faultCategories,
+              touchedIndex: _touchedPieIndex,
+              onTouch: (i) => setState(() => _touchedPieIndex = i),
+            ),
           ),
           const SizedBox(height: 32),
           const _SectionHeader(
@@ -165,16 +173,13 @@ class _AdminStatisticsDashboardState
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, AppThemeColors colors) {
+    final textTheme = Theme.of(context).textTheme;
     return PreferredSize(
       preferredSize: const Size.fromHeight(72),
       child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppColors.navy, AppColors.navyMid],
-          ),
+        decoration: BoxDecoration(
+          color: colors.primary,
         ),
         child: SafeArea(
           child: Padding(
@@ -182,33 +187,31 @@ class _AdminStatisticsDashboardState
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
+                    color: colors.onPrimary,
                     size: 20,
                   ),
                   onPressed: () => context.pop(),
                 ),
                 const SizedBox(width: 4),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'İstatistikler & Analizler',
-                        style: TextStyle(
-                          fontSize: 17,
+                        style: textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: colors.onPrimary,
                           letterSpacing: -0.3,
                         ),
                       ),
                       Text(
                         'Yönetici Paneli',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white60,
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colors.onPrimary.withValues(alpha: 0.6),
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -221,10 +224,10 @@ class _AdminStatisticsDashboardState
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.12),
+                    color: colors.onPrimary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.15),
+                      color: colors.onPrimary.withValues(alpha: 0.15),
                     ),
                   ),
                   child: Row(
@@ -232,17 +235,16 @@ class _AdminStatisticsDashboardState
                       Container(
                         width: 7,
                         height: 7,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF4ADE80),
+                        decoration: BoxDecoration(
+                          color: colors.successLight,
                           shape: BoxShape.circle,
                         ),
                       ),
                       const SizedBox(width: 6),
-                      const Text(
+                      Text(
                         'Canlı',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.white,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: colors.onPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -274,6 +276,8 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -283,19 +287,17 @@ class _SectionHeader extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 18,
+                style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: AppColors.onSurface,
+                  color: colors.onSurface,
                   letterSpacing: -0.5,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.outline,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colors.outline,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -316,6 +318,8 @@ class _LegendDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -327,9 +331,8 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 5),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: AppColors.onSurfaceVariant,
+          style: textTheme.labelSmall?.copyWith(
+            color: colors.onSurfaceVariant,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -371,12 +374,12 @@ class _KpiCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppThemeColors.of(context).surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: AppThemeColors.of(context).outline),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: AppThemeColors.of(context).onSurface.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -401,8 +404,8 @@ class _KpiCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: data.trendUp
-                      ? AppColors.successContainer
-                      : AppColors.errorContainer.withValues(alpha: 0.6),
+                      ? AppThemeColors.of(context).successContainer
+                      : AppThemeColors.of(context).errorContainer.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -413,7 +416,7 @@ class _KpiCard extends StatelessWidget {
                           ? Icons.trending_up_rounded
                           : Icons.trending_down_rounded,
                       size: 11,
-                      color: data.trendUp ? AppColors.success : AppColors.error,
+                      color: data.trendUp ? AppThemeColors.of(context).success : AppThemeColors.of(context).error,
                     ),
                   ],
                 ),
@@ -423,8 +426,7 @@ class _KpiCard extends StatelessWidget {
           const Spacer(),
           Text(
             data.value,
-            style: TextStyle(
-              fontSize: 30,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w800,
               color: data.color,
               letterSpacing: -1.5,
@@ -434,10 +436,9 @@ class _KpiCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             data.label,
-            style: const TextStyle(
-              fontSize: 11,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.w700,
-              color: AppColors.onSurface,
+              color: AppThemeColors.of(context).onSurface,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -445,9 +446,8 @@ class _KpiCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             data.trend,
-            style: TextStyle(
-              fontSize: 10,
-              color: data.trendUp ? AppColors.success : AppColors.outline,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: data.trendUp ? AppThemeColors.of(context).success : AppThemeColors.of(context).outline,
               fontWeight: FontWeight.w500,
             ),
             maxLines: 1,
@@ -474,9 +474,9 @@ class _BarChartCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppThemeColors.of(context).surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: AppThemeColors.of(context).outline),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -493,7 +493,7 @@ class _BarChartCard extends StatelessWidget {
             barTouchData: BarTouchData(
               enabled: true,
               touchTooltipData: BarTouchTooltipData(
-                getTooltipColor: (_) => AppColors.navy,
+                getTooltipColor: (_) => AppThemeColors.of(context).onSurface,
                 tooltipBorderRadius: const BorderRadius.all(
                   Radius.circular(10),
                 ),
@@ -502,19 +502,19 @@ class _BarChartCard extends StatelessWidget {
                   vertical: 8,
                 ),
                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                  final colors = AppThemeColors.of(context);
+                  final textTheme = Theme.of(context).textTheme;
                   return BarTooltipItem(
                     '${monthlyFaults[groupIndex].month}\n',
-                    const TextStyle(
-                      color: Colors.white60,
-                      fontSize: 11,
+                    textTheme.labelSmall!.copyWith(
+                      color: colors.surface.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w500,
                     ),
                     children: [
                       TextSpan(
                         text: '${rod.toY.toInt()} arıza',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
+                        style: textTheme.titleSmall?.copyWith(
+                          color: colors.surface,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -537,10 +537,9 @@ class _BarChartCard extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
                         monthlyFaults[i].month,
-                        style: const TextStyle(
-                          fontSize: 11,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.onSurfaceVariant,
+                          color: AppThemeColors.of(context).onSurfaceVariant,
                         ),
                       ),
                     );
@@ -556,9 +555,8 @@ class _BarChartCard extends StatelessWidget {
                     if (value % 5 != 0) return const SizedBox.shrink();
                     return Text(
                       value.toInt().toString(),
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: AppColors.outline,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppThemeColors.of(context).outline,
                         fontWeight: FontWeight.w500,
                       ),
                     );
@@ -577,7 +575,7 @@ class _BarChartCard extends StatelessWidget {
               drawVerticalLine: false,
               horizontalInterval: 5,
               getDrawingHorizontalLine: (value) => FlLine(
-                color: AppColors.outline,
+                color: AppThemeColors.of(context).outline,
                 strokeWidth: 1,
                 dashArray: [4, 4],
               ),
@@ -587,6 +585,7 @@ class _BarChartCard extends StatelessWidget {
               final i = entry.key;
               final data = entry.value;
               final isLast = i == monthlyFaults.length - 1;
+              final colors = AppThemeColors.of(context);
               return BarChartGroupData(
                 x: i,
                 barRods: [
@@ -600,10 +599,10 @@ class _BarChartCard extends StatelessWidget {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: isLast
-                          ? [AppColors.blueAccent, AppColors.blue]
+                          ? [colors.primaryDark, colors.primary]
                           : [
-                              AppColors.blueAccent.withValues(alpha: 0.35),
-                              AppColors.blueAccent.withValues(alpha: 0.65),
+                              colors.primary.withValues(alpha: 0.35),
+                              colors.primary.withValues(alpha: 0.65),
                             ],
                     ),
                   ),
@@ -633,15 +632,16 @@ class _PieChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: colors.outline),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: AppThemeColors.of(context).onSurface.withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -737,25 +737,23 @@ class _PieChartCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               slice.label,
-                              style: TextStyle(
-                                fontSize: 12,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 fontWeight: isTouched
                                     ? FontWeight.w700
                                     : FontWeight.w500,
                                 color: isTouched
-                                    ? AppColors.onSurface
-                                    : AppColors.onSurfaceVariant,
+                                    ? colors.onSurface
+                                    : colors.onSurfaceVariant,
                               ),
                             ),
                           ),
                           Text(
                             '${slice.percent.toInt()}%',
-                            style: TextStyle(
-                              fontSize: 13,
+                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: isTouched
                                   ? slice.color
-                                  : AppColors.onSurface,
+                                  : colors.onSurface,
                             ),
                           ),
                         ],
@@ -790,42 +788,43 @@ class _QuickAction {
   final String route;
 }
 
-final _quickActions = [
-  const _QuickAction(
-    label: 'Rapor İndir',
-    icon: Icons.download_rounded,
-    color: AppColors.blue,
-    bg: AppColors.blueSoft,
-    route: '',
-  ),
-  const _QuickAction(
-    label: 'Arızalar',
-    icon: Icons.build_circle_outlined,
-    color: AppColors.error,
-    bg: AppColors.errorContainer,
-    route: '/',
-  ),
-  const _QuickAction(
-    label: 'Harita',
-    icon: Icons.map_outlined,
-    color: AppColors.teal,
-    bg: AppColors.tealSurface,
-    route: '/admin/map',
-  ),
-  const _QuickAction(
-    label: 'Teknisyenler',
-    icon: Icons.engineering_outlined,
-    color: AppColors.violet,
-    bg: AppColors.violetSurface,
-    route: '/admin/technicians',
-  ),
-];
-
 class _QuickActionsGrid extends StatelessWidget {
   const _QuickActionsGrid();
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final quickActions = [
+      _QuickAction(
+        label: 'Rapor İndir',
+        icon: Icons.download_rounded,
+        color: colors.primary,
+        bg: colors.primaryContainer,
+        route: '',
+      ),
+      _QuickAction(
+        label: 'Arızalar',
+        icon: Icons.build_circle_outlined,
+        color: colors.error,
+        bg: colors.errorContainer,
+        route: '/',
+      ),
+      _QuickAction(
+        label: 'Harita',
+        icon: Icons.map_outlined,
+        color: colors.teal,
+        bg: colors.tealContainer,
+        route: '/admin/map',
+      ),
+      _QuickAction(
+        label: 'Teknisyenler',
+        icon: Icons.engineering_outlined,
+        color: colors.violet,
+        bg: colors.violetContainer,
+        route: '/admin/technicians',
+      ),
+    ];
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -835,9 +834,9 @@ class _QuickActionsGrid extends StatelessWidget {
         crossAxisSpacing: 12,
         childAspectRatio: 0.85,
       ),
-      itemCount: _quickActions.length,
+      itemCount: quickActions.length,
       itemBuilder: (_, i) {
-        final action = _quickActions[i];
+        final action = quickActions[i];
         return GestureDetector(
           onTap: () {
             if (action.route.isNotEmpty) {
@@ -846,12 +845,12 @@ class _QuickActionsGrid extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: colors.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.outline),
+              border: Border.all(color: colors.outline),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
+                  color: colors.onSurface.withValues(alpha: 0.03),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -872,10 +871,9 @@ class _QuickActionsGrid extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   action.label,
-                  style: const TextStyle(
-                    fontSize: 10,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.onSurface,
+                    color: colors.onSurface,
                   ),
                   textAlign: TextAlign.center,
                 ),

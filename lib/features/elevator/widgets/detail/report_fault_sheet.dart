@@ -59,8 +59,8 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
               ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: fault.isOfflineQueued
-                  ? const Color(0xFFD97706)
-                  : const Color(0xFF155724),
+                  ? AppColors.warningLight
+                  : AppColors.success,
               duration: fault.isOfflineQueued
                   ? const Duration(seconds: 5)
                   : const Duration(seconds: 3),

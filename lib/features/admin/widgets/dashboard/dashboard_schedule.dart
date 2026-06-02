@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:asansor/core/widgets/empty_state.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/status_tokens.dart';
 import 'package:asansor/core/utils/elevator_utils.dart';
@@ -21,24 +22,26 @@ class DashboardScheduleList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Tüm Görevler',
-          style: TextStyle(
-            fontSize: 20,
+          style: textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w800,
-            color: AppColors.onSurface,
+            color: colors.onSurface,
             letterSpacing: -0.5,
           ),
         ),
         const SizedBox(height: 16),
         schedules.when(
-          loading: () => const Center(
+          loading: () => Center(
             child: Padding(
-              padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(color: AppColors.primary),
+              padding: const EdgeInsets.all(32),
+              child: CircularProgressIndicator(color: colors.primary),
             ),
           ),
           error: (e, _) => ErrorBanner(
@@ -46,22 +49,9 @@ class DashboardScheduleList extends StatelessWidget {
           ),
           data: (list) {
             if (list.isEmpty) {
-              return Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainer,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.event_note_outlined, color: AppColors.outline),
-                    SizedBox(width: 12),
-                    Text(
-                      'Henüz atanmış görev bulunmuyor.',
-                      style: TextStyle(color: AppColors.outline),
-                    ),
-                  ],
-                ),
+              return const EmptyState(
+                message: 'Henüz atanmış görev bulunmuyor.',
+                icon: Icons.event_note_outlined,
               );
             }
             return ListView.separated(
@@ -100,17 +90,20 @@ class DashboardScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+          color: colors.outlineVariant.withValues(alpha: 0.4),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: colors.onSurface.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -123,7 +116,7 @@ class DashboardScheduleCard extends StatelessWidget {
             width: 10,
             height: 10,
             decoration: BoxDecoration(
-              color: StatusTokens.scheduleForeground(schedule.status),
+              color: StatusTokens.scheduleForegroundDynamic(context, schedule.status),
               shape: BoxShape.circle,
             ),
           ),
@@ -135,10 +128,9 @@ class DashboardScheduleCard extends StatelessWidget {
               children: [
                 Text(
                   elevatorName,
-                  style: const TextStyle(
+                  style: textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.onSurface,
-                    fontSize: 15,
+                    color: colors.onSurface,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -147,9 +139,8 @@ class DashboardScheduleCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     address!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.outline,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colors.outline,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -158,24 +149,23 @@ class DashboardScheduleCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.schedule_outlined,
                       size: 13,
-                      color: AppColors.onSurfaceVariant,
+                      color: colors.onSurfaceVariant,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       _shortDate(schedule.scheduledDate),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.onSurfaceVariant,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(
+                    Icon(
                       Icons.person_outline,
                       size: 13,
-                      color: AppColors.onSurfaceVariant,
+                      color: colors.onSurfaceVariant,
                     ),
                     const SizedBox(width: 4),
                     Expanded(
@@ -183,9 +173,8 @@ class DashboardScheduleCard extends StatelessWidget {
                         schedule.technicianId.length >= 8
                             ? '…${schedule.technicianId.substring(schedule.technicianId.length - 8)}'
                             : schedule.technicianId,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.onSurfaceVariant,
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -200,15 +189,14 @@ class DashboardScheduleCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: StatusTokens.scheduleBackground(schedule.status),
+              color: StatusTokens.scheduleBackgroundDynamic(context, schedule.status),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               StatusTokens.scheduleLabel(schedule.status),
-              style: TextStyle(
-                fontSize: 11,
+              style: textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: StatusTokens.scheduleForeground(schedule.status),
+                color: StatusTokens.scheduleForegroundDynamic(context, schedule.status),
               ),
             ),
           ),

@@ -15,150 +15,152 @@ class StatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        // Left â€” completed (primary background)
-        Expanded(
-          child: Semantics(
-            label: 'Tamamlanan bakım sayısı: $completedCount',
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppColors.primary, AppColors.primaryDark],
-                  ),
-                  borderRadius: BorderRadius.circular(32),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      Icons.check_circle_outline,
-                      color: Colors.white,
-                      size: 32,
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final ratio = constraints.maxWidth > 600 ? 1.5 : 1.0;
+        return Row(
+          children: [
+            // Left — completed (primary background)
+            Expanded(
+              child: Semantics(
+                label: 'Tamamlanan bakım sayısı: $completedCount',
+                child: AspectRatio(
+                  aspectRatio: ratio,
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [colors.primary, colors.primaryDark],
+                      ),
+                      borderRadius: BorderRadius.circular(32),
                     ),
-                    Column(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: const [
-                            Icon(
-                              Icons.check_circle,
-                              size: 14,
-                              color: Colors.white,
+                        const Icon(
+                          Icons.check_circle_outline,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.check_circle,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Tamamlandı',
+                                  style: textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: 6),
+                            const SizedBox(height: 6),
                             Text(
-                              'TamamlandÄ±',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
+                              '$completedCount',
+                              style: textTheme.displaySmall?.copyWith(
+                                fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '$completedCount',
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          completedLabel,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white70,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        // Right â€” active faults (surface background)
-        Expanded(
-          child: Semantics(
-            label: 'Açık arıza sayısı: $activeFaultCount',
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerHigh,
-                  borderRadius: BorderRadius.circular(32),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      color: AppColors.onSurfaceVariant,
-                      size: 32,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: const [
-                            Icon(
-                              Icons.error_outline,
-                              size: 14,
-                              color: AppColors.onSurfaceVariant,
-                            ),
-                            SizedBox(width: 6),
                             Text(
-                              'AÃ§Ä±k ArÄ±za',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.onSurfaceVariant,
+                              completedLabel,
+                              style: textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white70,
+                                letterSpacing: 1.5,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '$activeFaultCount',
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.onSurface,
-                          ),
-                        ),
-                        const Text(
-                          'AÃ‡IK ARIZA',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.onSurfaceVariant,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ],
+            const SizedBox(width: 16),
+            // Right — active faults (surface background)
+            Expanded(
+              child: Semantics(
+                label: 'Açık arıza sayısı: $activeFaultCount',
+                child: AspectRatio(
+                  aspectRatio: ratio,
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: colors.surfaceContainerHigh,
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: colors.onSurfaceVariant,
+                          size: 32,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  size: 14,
+                                  color: colors.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Açık Arıza',
+                                  style: textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              '$activeFaultCount',
+                              style: textTheme.displaySmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: colors.onSurface,
+                              ),
+                            ),
+                            Text(
+                              'AÇIK ARIZA',
+                              style: textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: colors.onSurfaceVariant,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -172,6 +174,9 @@ class ElevatorsShortcutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Semantics(
       button: true,
       label: 'Asansörlerim listesine git',
@@ -183,15 +188,15 @@ class ElevatorsShortcutCard extends StatelessWidget {
           onTap: onTap,
           child: Ink(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [AppColors.primary, AppColors.primaryDark],
+                colors: [colors.primary, colors.primaryDark],
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.28),
+                  color: colors.primary.withValues(alpha: 0.28),
                   blurRadius: 18,
                   offset: const Offset(0, 8),
                 ),
@@ -215,24 +220,22 @@ class ElevatorsShortcutCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'AsansÃ¶rlerim',
-                          style: TextStyle(
-                            fontSize: 16,
+                          'Asansörlerim',
+                          style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                             letterSpacing: -0.3,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'Sistemdeki tÃ¼m asansÃ¶rleri listele ve ara',
-                          style: TextStyle(
-                            fontSize: 12,
+                          'Sistemdeki tüm asansörleri listele ve ara',
+                          style: textTheme.bodySmall?.copyWith(
                             color: Colors.white70,
                             height: 1.3,
                           ),

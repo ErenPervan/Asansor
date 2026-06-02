@@ -25,24 +25,25 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return Container(
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.surface,
+        color: backgroundColor ?? colors.surface,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
           color:
               borderColor ??
               (accentColor != null
                   ? accentColor!.withValues(alpha: 0.3)
-                  : AppColors.outlineVariant),
+                  : colors.outlineVariant),
         ),
         boxShadow:
             boxShadow ??
             [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: colors.onSurface.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

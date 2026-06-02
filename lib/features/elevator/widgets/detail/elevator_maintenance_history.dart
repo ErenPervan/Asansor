@@ -49,7 +49,7 @@ class MaintenanceHistorySectionState
             'PDF oluşturulamadı: ${e.toString().replaceFirst('Exception: ', '')}',
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppThemeColors.of(context).error,
         ),
       );
     } finally {
@@ -60,6 +60,8 @@ class MaintenanceHistorySectionState
   @override
   Widget build(BuildContext context) {
     final logsAsync = ref.watch(logsByElevatorProvider(widget.elevatorId));
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,12 +70,11 @@ class MaintenanceHistorySectionState
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Bakım Geçmişi',
-              style: TextStyle(
-                fontSize: 20,
+              style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
+                color: colors.onSurface,
                 letterSpacing: -0.4,
               ),
             ),
@@ -83,21 +84,21 @@ class MaintenanceHistorySectionState
                 Tooltip(
                   message: 'PDF Rapor Oluştur (Son 6 Ay)',
                   child: _generatingPdf
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppColors.primary,
+                            color: colors.primary,
                           ),
                         )
                       : IconButton(
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.picture_as_pdf_outlined,
                             size: 22,
-                            color: AppColors.primary,
+                            color: colors.primary,
                           ),
                           onPressed: _generateAndPreviewPdf,
                         ),
@@ -107,10 +108,10 @@ class MaintenanceHistorySectionState
                   tooltip: 'Yenile',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.refresh,
                     size: 18,
-                    color: AppColors.outline,
+                    color: colors.outline,
                   ),
                   onPressed: () =>
                       ref.invalidate(logsByElevatorProvider(widget.elevatorId)),
@@ -123,21 +124,21 @@ class MaintenanceHistorySectionState
 
         // Timeline content
         logsAsync.when(
-          loading: () => const Center(
+          loading: () => Center(
             child: Padding(
-              padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(color: AppColors.primary),
+              padding: const EdgeInsets.all(32),
+              child: CircularProgressIndicator(color: colors.primary),
             ),
           ),
           error: (err, _) => Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.errorContainer,
+              color: colors.errorContainer,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               err.toString().replaceFirst('Exception: ', ''),
-              style: const TextStyle(color: AppColors.onErrorContainer),
+              style: TextStyle(color: colors.onErrorContainer),
             ),
           ),
           data: (logs) {
@@ -145,22 +146,22 @@ class MaintenanceHistorySectionState
               return Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerLow,
+                  color: colors.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Center(
+                child: Center(
                   child: Column(
                     children: [
                       Icon(
                         Icons.history,
                         size: 40,
-                        color: AppColors.outlineVariant,
+                        color: colors.outlineVariant,
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
                         'Henüz bakım kaydı yok.',
-                        style: TextStyle(
-                          color: AppColors.outline,
+                        style: textTheme.titleSmall?.copyWith(
+                          color: colors.outline,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -199,6 +200,8 @@ class TimelineItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
     // IntrinsicHeight ensures the connecting line fills the full card height.
     return IntrinsicHeight(
       child: Row(
@@ -217,10 +220,10 @@ class TimelineItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     // Approved → primary dot; pending → outline-variant dot
                     color: log.isApproved
-                        ? AppColors.primary
-                        : AppColors.outlineVariant,
+                        ? colors.primary
+                        : colors.outlineVariant,
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.background, width: 3),
+                    border: Border.all(color: colors.background, width: 3),
                   ),
                 ),
                 // Connector line (hidden on last item)
@@ -229,7 +232,7 @@ class TimelineItem extends StatelessWidget {
                     child: Container(
                       width: 2,
                       margin: const EdgeInsets.only(top: 4),
-                      color: AppColors.outlineVariant.withValues(alpha: 0.3),
+                      color: colors.outlineVariant.withValues(alpha: 0.3),
                     ),
                   ),
               ],
@@ -256,16 +259,18 @@ class TimelineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final dateStr = _fmtDate(log.maintenanceDate);
 
     return InfoCard(
       padding: const EdgeInsets.all(20),
       radius: 12,
-      backgroundColor: AppColors.surfaceContainerLowest,
+      backgroundColor: colors.surfaceContainerLowest,
       borderColor: Colors.transparent,
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.04),
+          color: colors.onSurface.withValues(alpha: 0.04),
           blurRadius: 8,
           offset: const Offset(0, 2),
         ),
@@ -280,27 +285,26 @@ class TimelineCard extends StatelessWidget {
             children: [
               Text(
                 dateStr,
-                style: TextStyle(
-                  fontSize: 11,
+                style: textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                   // Approved uses primary colour, pending uses outline
-                  color: log.isApproved ? AppColors.primary : AppColors.outline,
+                  color: log.isApproved ? colors.primary : colors.outline,
                   letterSpacing: 0.6,
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerLow,
+                  color: colors.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.person_outline,
                       size: 12,
-                      color: AppColors.onSurfaceVariant,
+                      color: colors.onSurfaceVariant,
                     ),
                     const SizedBox(width: 3),
                     Text(
@@ -308,10 +312,9 @@ class TimelineCard extends StatelessWidget {
                           (log.technicianId.length > 8
                               ? log.technicianId.substring(0, 8)
                               : log.technicianId),
-                      style: const TextStyle(
-                        fontSize: 10,
+                      style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: AppColors.onSurfaceVariant,
+                        color: colors.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -324,10 +327,9 @@ class TimelineCard extends StatelessWidget {
           // Notes text (italic like the Stitch design)
           Text(
             '"${log.notes ?? 'Not belirtilmemiş'}"',
-            style: const TextStyle(
-              fontSize: 13,
+            style: textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.onSurface,
+              color: colors.onSurface,
               fontStyle: FontStyle.italic,
               height: 1.4,
             ),
@@ -340,13 +342,13 @@ class TimelineCard extends StatelessWidget {
               StatusChip(
                 label: log.isApproved ? 'ONAYLANDI' : 'BEKLİYOR',
                 bg: log.isApproved
-                    ? AppColors
+                    ? colors
                           .errorContainer // secondary-container
-                    : AppColors.surfaceContainer,
+                    : colors.surfaceContainer,
                 fg: log.isApproved
-                    ? AppColors
+                    ? colors
                           .onErrorContainer // on-secondary-container
-                    : AppColors.onSurfaceVariant,
+                    : colors.onSurfaceVariant,
               ),
             ],
           ),
@@ -378,8 +380,7 @@ class StatusChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 10,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w700,
           color: fg,
           letterSpacing: 0.4,

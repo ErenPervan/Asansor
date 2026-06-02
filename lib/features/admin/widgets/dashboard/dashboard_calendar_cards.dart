@@ -10,6 +10,10 @@ class DashboardCalendarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -19,14 +23,14 @@ class DashboardCalendarCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainerLowest,
+            color: colors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: AppColors.outlineVariant.withValues(alpha: 0.4),
+              color: colors.outlineVariant.withValues(alpha: 0.4),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
+                color: colors.onSurface.withValues(alpha: 0.03),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -35,38 +39,36 @@ class DashboardCalendarCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: iconSize,
+                height: iconSize,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1B6B3A).withValues(alpha: 0.08),
+                  color: colors.calendarGreen.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.calendar_month_outlined,
-                  color: Color(0xFF1B6B3A),
+                  color: colors.calendarGreen,
                   size: 28,
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Bakım Takvimi',
-                      style: TextStyle(
-                        fontSize: 15,
+                      style: textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
+                        color: colors.onSurface,
                         letterSpacing: -0.2,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
                       'Görevleri planla, teknisyen ata ve takvimi yönet',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.onSurfaceVariant,
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
                         height: 1.3,
                       ),
                     ),
@@ -74,9 +76,9 @@ class DashboardCalendarCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
-                color: AppColors.outline,
+                color: colors.outline,
                 size: 14,
               ),
             ],
@@ -96,6 +98,10 @@ class MasterCalendarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -109,15 +115,15 @@ class MasterCalendarCard extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppColors.primary.withValues(alpha: 0.06),
-                AppColors.primary.withValues(alpha: 0.02),
+                colors.primary.withValues(alpha: 0.06),
+                colors.primary.withValues(alpha: 0.02),
               ],
             ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+            border: Border.all(color: colors.primary.withValues(alpha: 0.2)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
+                color: colors.onSurface.withValues(alpha: 0.03),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -126,38 +132,36 @@ class MasterCalendarCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: iconSize,
+                height: iconSize,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: colors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.grid_view_rounded,
-                  color: AppColors.primary,
+                  color: colors.primary,
                   size: 28,
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Ana Takvim',
-                      style: TextStyle(
-                        fontSize: 15,
+                      style: textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: AppColors.onSurface,
+                        color: colors.onSurface,
                         letterSpacing: -0.2,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
                       'Tüm görevlerin genel görünümü, filtrele ve izle',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.onSurfaceVariant,
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
                         height: 1.3,
                       ),
                     ),
@@ -165,9 +169,9 @@ class MasterCalendarCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
-                color: AppColors.primary,
+                color: colors.primary,
                 size: 14,
               ),
             ],

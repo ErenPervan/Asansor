@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Asansor (Dev)",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": [
+        "--dart-define-from-file",
+        ".env"
+      ]
+    },
+    {
+      "name": "Asansor (Release)",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": [
+        "--dart-define-from-file",
+        ".env"
+      ],
+      "flutterMode": "release"
+    }
+  ]
+}

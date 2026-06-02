@@ -82,6 +82,9 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     final schedulesAsync = ref.watch(allSchedulesProvider);
     final elevatorsAsync = ref.watch(elevatorsProvider);
     final techsAsync = ref.watch(profilesByRoleProvider('technician'));
@@ -100,13 +103,16 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
     });
 
     return Scaffold(
-      backgroundColor: AppThemeColors.of(context).background,
+      backgroundColor: colors.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: colors.primary,
         foregroundColor: Colors.white,
-        title: const Text(
+        title: Text(
           'Bakım Takvimi',
-          style: TextStyle(fontWeight: FontWeight.w700),
+          style: textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
         ),
         actions: [
           if (schedulesAsync.isLoading)
@@ -132,7 +138,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
         children: [
           // ── Calendar ─────────────────────────────────────────────────────
           Container(
-            color: AppColors.surfaceContainerLowest,
+            color: colors.surfaceContainerLowest,
             child: TableCalendar<ScheduleModel>(
               firstDay: DateTime.utc(2020, 1, 1),
               lastDay: DateTime.utc(2030, 12, 31),
@@ -147,61 +153,58 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
               calendarStyle: CalendarStyle(
                 outsideDaysVisible: false,
                 todayDecoration: BoxDecoration(
-                  color: AppColors.primaryDark.withValues(alpha: 0.3),
+                  color: colors.primaryDark.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
-                selectedDecoration: const BoxDecoration(
-                  color: AppColors.primary,
+                selectedDecoration: BoxDecoration(
+                  color: colors.primary,
                   shape: BoxShape.circle,
                 ),
-                todayTextStyle: const TextStyle(
-                  color: AppColors.primary,
+                todayTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colors.primary,
                   fontWeight: FontWeight.w700,
-                ),
-                selectedTextStyle: const TextStyle(
+                ) ?? const TextStyle(),
+                selectedTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
-                ),
+                ) ?? const TextStyle(),
                 markersMaxCount: 4,
-                markerDecoration: const BoxDecoration(
-                  color: AppColors.warning,
+                markerDecoration: BoxDecoration(
+                  color: colors.warning,
                   shape: BoxShape.circle,
                 ),
                 markerSize: 5,
               ),
-              headerStyle: const HeaderStyle(
+              headerStyle: HeaderStyle(
                 titleCentered: true,
                 formatButtonVisible: false,
-                titleTextStyle: TextStyle(
-                  fontSize: 16,
+                titleTextStyle: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.onSurface,
-                ),
+                  color: colors.onSurface,
+                ) ?? const TextStyle(),
                 leftChevronIcon: Icon(
                   Icons.chevron_left,
-                  color: AppColors.primary,
+                  color: colors.primary,
                 ),
                 rightChevronIcon: Icon(
                   Icons.chevron_right,
-                  color: AppColors.primary,
+                  color: colors.primary,
                 ),
               ),
-              daysOfWeekStyle: const DaysOfWeekStyle(
-                weekdayStyle: TextStyle(
-                  fontSize: 12,
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekdayStyle: textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.outline,
-                ),
-                weekendStyle: TextStyle(
-                  fontSize: 12,
+                  color: colors.outline,
+                ) ?? const TextStyle(),
+                weekendStyle: textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.error,
-                ),
+                  color: colors.error,
+                ) ?? const TextStyle(),
               ),
             ),
           ),
 
-          const Divider(height: 1, color: AppColors.outlineVariant),
+          Divider(height: 1, color: colors.outlineVariant),
 
           // ── Selected day header ───────────────────────────────────────────
           Padding(
@@ -210,10 +213,9 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
               children: [
                 Text(
                   '${_selectedDay.day}/${_selectedDay.month}/${_selectedDay.year}',
-                  style: const TextStyle(
-                    fontSize: 15,
+                  style: textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.onSurface,
+                    color: colors.onSurface,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -224,17 +226,16 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                   ),
                   decoration: BoxDecoration(
                     color: selectedEvents.isEmpty
-                        ? AppColors.surfaceContainer
-                        : AppColors.primaryDark,
+                        ? colors.surfaceContainer
+                        : colors.primaryDark,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '${selectedEvents.length} Görev',
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: selectedEvents.isEmpty
-                          ? AppColors.outline
+                          ? colors.outline
                           : Colors.white,
                     ),
                   ),
@@ -253,22 +254,20 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                         Icon(
                           Icons.event_available_outlined,
                           size: 48,
-                          color: AppColors.outline.withValues(alpha: 0.5),
+                          color: colors.outline.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'Bu gün için görev yok.',
-                          style: TextStyle(
-                            color: AppColors.outline,
-                            fontSize: 14,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colors.outline,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Yeni görev atamak için + butonuna bas.',
-                          style: TextStyle(
-                            color: AppColors.outline.withValues(alpha: 0.6),
-                            fontSize: 12,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colors.outline.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -299,12 +298,15 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openAssignSheet,
-        backgroundColor: AppColors.primary,
+        backgroundColor: colors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text(
+        label: Text(
           'Görev Ata',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -313,26 +315,29 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
   void _confirmCancel(BuildContext context, String taskId) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Görevi İptal Et'),
-        content: const Text('Bu görevi iptal etmek istediğinize emin misiniz?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Vazgeç'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () {
-              Navigator.pop(ctx);
-              ref
-                  .read(scheduleControllerProvider.notifier)
-                  .updateStatus(taskId: taskId, status: 'cancelled');
-            },
-            child: const Text('İptal Et'),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final colors = AppThemeColors.of(ctx);
+        return AlertDialog(
+          title: const Text('Görevi İptal Et'),
+          content: const Text('Bu görevi iptal etmek istediğinize emin misiniz?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Vazgeç'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: colors.error),
+              onPressed: () {
+                Navigator.pop(ctx);
+                ref
+                    .read(scheduleControllerProvider.notifier)
+                    .updateStatus(taskId: taskId, status: 'cancelled');
+              },
+              child: const Text('İptal Et'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

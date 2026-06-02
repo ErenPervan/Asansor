@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/connectivity_providers.dart';
+import '../theme/app_colors.dart';
 
 /// A slim amber banner that appears at the top of a screen whenever the device
 /// has no internet connection.
@@ -28,25 +29,26 @@ class OfflineBanner extends ConsumerWidget {
     final isOnline = ref.watch(isOnlineProvider);
     if (isOnline) return const SizedBox.shrink();
 
+    final colors = AppThemeColors.of(context);
+
     return Material(
-      color: const Color(0xFFFEF3C7), // amber-100
+      color: colors.warningContainer,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.cloud_off_rounded,
               size: 16,
-              color: Color(0xFF92400E), // amber-800
+              color: colors.warning,
             ),
             const SizedBox(width: 8),
-            const Expanded(
+            Expanded(
               child: Text(
                 'Çevrimdışı Mod – Son yedeklenen veriler gösteriliyor',
-                style: TextStyle(
-                  fontSize: 12,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF92400E), // amber-800
+                  color: colors.warning,
                   height: 1.3,
                 ),
               ),

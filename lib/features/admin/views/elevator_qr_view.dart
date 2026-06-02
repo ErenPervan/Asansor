@@ -31,6 +31,7 @@ class ElevatorQrView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppThemeColors.of(context);
     final elevAsync = ref.watch(elevatorByIdProvider(elevatorId));
 
     return elevAsync.when(
@@ -42,10 +43,10 @@ class ElevatorQrView extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.error_outline,
                 size: 48,
-                color: AppColors.primary,
+                color: colors.primary,
               ),
               const SizedBox(height: 12),
               Text('$e'),
@@ -73,12 +74,15 @@ class _QrScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: AppThemeColors.of(context).background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'QR Kodu',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
         actions: [
           IconButton(
@@ -95,17 +99,17 @@ class _QrScaffold extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: AppColors.successContainer,
+              color: colors.successContainer,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: AppColors.success.withValues(alpha: 0.3),
+                color: colors.success.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.check_circle_rounded,
-                  color: AppColors.success,
+                  color: colors.success,
                   size: 22,
                 ),
                 const SizedBox(width: 10),
@@ -113,20 +117,18 @@ class _QrScaffold extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Asansör başarıyla oluşturuldu!',
-                        style: TextStyle(
-                          fontSize: 14,
+                        style: textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: AppColors.success,
+                          color: colors.success,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         'QR kodu yazdırın ve asansöre yapıştırın.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.success.withValues(alpha: 0.8),
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colors.success.withValues(alpha: 0.8),
                         ),
                       ),
                     ],
@@ -142,12 +144,12 @@ class _QrScaffold extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: colors.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.outlineVariant),
+              border: Border.all(color: colors.outlineVariant),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: colors.onSurface.withValues(alpha: 0.04),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -159,12 +161,12 @@ class _QrScaffold extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: colors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.elevator_outlined,
-                    color: AppColors.primary,
+                    color: colors.primary,
                     size: 26,
                   ),
                 ),
@@ -175,10 +177,9 @@ class _QrScaffold extends StatelessWidget {
                     children: [
                       Text(
                         elevator.buildingName,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: AppColors.onSurface,
+                          color: colors.onSurface,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -188,18 +189,17 @@ class _QrScaffold extends StatelessWidget {
                         const SizedBox(height: 3),
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.location_on_outlined,
                               size: 13,
-                              color: AppColors.outline,
+                              color: colors.outline,
                             ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 elevator.address!,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.outline,
+                                style: textTheme.labelSmall?.copyWith(
+                                  color: colors.outline,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -222,17 +222,17 @@ class _QrScaffold extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: colors.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.outlineVariant),
+              border: Border.all(color: colors.outlineVariant),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.07),
+                  color: colors.primary.withValues(alpha: 0.07),
                   blurRadius: 20,
                   offset: const Offset(0, 6),
                 ),
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: colors.onSurface.withValues(alpha: 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -244,18 +244,17 @@ class _QrScaffold extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.qr_code_2_rounded,
                       size: 16,
-                      color: AppColors.primary,
+                      color: colors.primary,
                     ),
                     const SizedBox(width: 6),
-                    const Text(
+                    Text(
                       'ASANSÖR QR KODU',
-                      style: TextStyle(
-                        fontSize: 11,
+                      style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: AppColors.primary,
+                        color: colors.primary,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -271,7 +270,7 @@ class _QrScaffold extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.outlineVariant),
+                      border: Border.all(color: colors.outlineVariant),
                     ),
                     child: QrImageView(
                       data: elevator.id,
@@ -280,11 +279,11 @@ class _QrScaffold extends StatelessWidget {
                       errorCorrectionLevel: QrErrorCorrectLevel.H,
                       eyeStyle: const QrEyeStyle(
                         eyeShape: QrEyeShape.square,
-                        color: Color(0xFF0F172A),
+                        color: AppColors.onSurface,
                       ),
                       dataModuleStyle: const QrDataModuleStyle(
                         dataModuleShape: QrDataModuleShape.square,
-                        color: Color(0xFF0F172A),
+                        color: AppColors.onSurface,
                       ),
                     ),
                   ),
@@ -299,15 +298,14 @@ class _QrScaffold extends StatelessWidget {
                     vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceContainer,
+                    color: colors.surfaceContainer,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: SelectableText(
                     elevator.id,
-                    style: const TextStyle(
-                      fontSize: 10,
+                    style: textTheme.labelSmall?.copyWith(
                       fontFamily: 'monospace',
-                      color: AppColors.onSurfaceVariant,
+                      color: colors.onSurfaceVariant,
                       letterSpacing: 0.5,
                     ),
                     textAlign: TextAlign.center,
@@ -319,9 +317,8 @@ class _QrScaffold extends StatelessWidget {
                 Text(
                   'Bu QR kodu tarayarak asansör bilgilerine ulaşabilirsiniz.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.outline,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colors.outline,
                     height: 1.5,
                   ),
                 ),
@@ -334,13 +331,14 @@ class _QrScaffold extends StatelessWidget {
           // ── Actions ───────────────────────────────────────────────
           FilledButton.icon(
             icon: const Icon(Icons.print_outlined),
-            label: const Text(
+            label: Text(
               'Yazdır / Kaydet',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+              style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
             style: FilledButton.styleFrom(
               minimumSize: const Size(double.infinity, 54),
-              backgroundColor: AppColors.primary,
+              backgroundColor: colors.primary,
+              foregroundColor: colors.surface,
             ),
             onPressed: () => _printQr(context, elevator),
           ),
@@ -352,8 +350,8 @@ class _QrScaffold extends StatelessWidget {
             label: const Text('Asansör Detayına Git'),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 50),
-              side: const BorderSide(color: AppColors.outlineVariant),
-              foregroundColor: AppColors.onSurface,
+              side: BorderSide(color: colors.outlineVariant),
+              foregroundColor: colors.onSurface,
             ),
             onPressed: () => context.push('/elevator/${elevator.id}'),
           ),
@@ -365,7 +363,7 @@ class _QrScaffold extends StatelessWidget {
             label: const Text('Yeni Asansör Ekle'),
             style: TextButton.styleFrom(
               minimumSize: const Size(double.infinity, 48),
-              foregroundColor: AppColors.primary,
+              foregroundColor: colors.primary,
             ),
             onPressed: () => context.pushReplacement('/admin/add-elevator'),
           ),
@@ -382,10 +380,11 @@ class _QrScaffold extends StatelessWidget {
       );
     } catch (e) {
       if (context.mounted) {
+        final colors = AppThemeColors.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Yazdırma hatası: $e'),
-            backgroundColor: AppColors.primary,
+            backgroundColor: colors.primary,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -547,7 +546,10 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (label, bg, fg) = _styles(status);
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    final (label, bg, fg) = _styles(status, colors);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
@@ -556,21 +558,21 @@ class _StatusChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: fg),
+        style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700, color: fg),
       ),
     );
   }
 
-  static (String, Color, Color) _styles(String s) {
+  static (String, Color, Color) _styles(String s, AppThemeColors colors) {
     switch (s) {
       case 'active':
-        return ('Aktif', AppColors.successContainer, AppColors.success);
+        return ('Aktif', colors.successContainer, colors.success);
       case 'faulty':
-        return ('Arızalı', const Color(0xFFFEE2E2), AppColors.primary);
+        return ('Arızalı', colors.errorContainer, colors.error);
       case 'under_maintenance':
-        return ('Bakımda', const Color(0xFFFFF7ED), const Color(0xFF92400E));
+        return ('Bakımda', colors.warningContainer, colors.warning);
       default:
-        return ('Pasif', AppColors.surfaceContainer, AppColors.outline);
+        return ('Pasif', colors.surfaceContainer, colors.outline);
     }
   }
 }

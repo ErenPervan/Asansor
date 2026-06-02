@@ -31,13 +31,13 @@ class CustomerDashboardView extends ConsumerWidget {
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.onSurface,
+        backgroundColor: AppThemeColors.of(context).surface,
+        foregroundColor: AppThemeColors.of(context).onSurface,
         elevation: 0,
         actions: [
           IconButton(
             tooltip: 'Çıkış Yap',
-            icon: const Icon(Icons.logout, color: AppColors.error),
+            icon: Icon(Icons.logout, color: AppThemeColors.of(context).error),
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
@@ -53,7 +53,8 @@ class CustomerDashboardView extends ConsumerWidget {
                     ),
                     FilledButton(
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.error,
+                        backgroundColor: AppThemeColors.of(context).error,
+                        foregroundColor: AppThemeColors.of(context).onError,
                       ),
                       onPressed: () => Navigator.of(context).pop(true),
                       child: const Text('Çıkış Yap'),
@@ -136,24 +137,25 @@ class _ElevatorHealthCard extends StatelessWidget {
     final bool isFaulty = elevator.status == 'faulty';
     final bool isUnderMaintenance = elevator.status == 'under_maintenance';
 
-    Color bgColor = AppColors.successContainer;
-    Color iconColor = AppColors.success;
+    final colors = AppThemeColors.of(context);
+    Color bgColor = colors.successContainer;
+    Color iconColor = colors.success;
     IconData iconData = Icons.check_circle_outline;
     String statusText = 'Aktif ve Sorunsuz';
 
     if (isFaulty) {
-      bgColor = AppColors.errorContainer;
-      iconColor = AppColors.error;
+      bgColor = colors.errorContainer;
+      iconColor = colors.error;
       iconData = Icons.warning_amber_rounded;
       statusText = 'Arızalı';
     } else if (isUnderMaintenance) {
-      bgColor = AppColors.warningContainer;
-      iconColor = AppColors.warningLight;
+      bgColor = colors.warningContainer;
+      iconColor = colors.warningLight;
       iconData = Icons.handyman_outlined;
       statusText = 'Bakımda';
     } else if (elevator.status == 'inactive') {
-      bgColor = AppColors.surfaceContainerHigh;
-      iconColor = AppColors.onSurfaceVariant;
+      bgColor = colors.surfaceContainerHigh;
+      iconColor = colors.onSurfaceVariant;
       iconData = Icons.not_interested_rounded;
       statusText = 'Devre Dışı';
     }
@@ -215,10 +217,11 @@ class _ReportFaultButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return FilledButton.icon(
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.error,
-        foregroundColor: AppColors.onError,
+        backgroundColor: colors.error,
+        foregroundColor: colors.onError,
         padding: const EdgeInsets.symmetric(vertical: 20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 4,
@@ -328,9 +331,9 @@ class _MaintenanceLogList extends StatelessWidget {
                 ),
                 trailing: hasPdf
                     ? IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.picture_as_pdf,
-                          color: AppColors.error,
+                          color: AppThemeColors.of(context).error,
                         ),
                         tooltip: 'Raporu İndir',
                         onPressed: () async {

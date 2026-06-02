@@ -49,14 +49,13 @@ class DailyAgendaSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text(
+                Text(
                   'Günlük Ajanda',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.onSurface,
-                    letterSpacing: -0.5,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: AppThemeColors.of(context).onSurface,
+                        letterSpacing: -0.5,
+                      ),
                 ),
                 const SizedBox(width: 8),
                 // Live dot — visible only when the stream is active
@@ -66,8 +65,8 @@ class DailyAgendaSection extends StatelessWidget {
                   data: (s) => Container(
                     width: 7,
                     height: 7,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF2E7D32),
+                    decoration: BoxDecoration(
+                      color: AppThemeColors.of(context).success,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -146,11 +145,10 @@ class DailyAgendaSection extends StatelessWidget {
                         ),
                         child: Text(
                           '+${upcomingTasks.length - 3} daha görev var. Tümünü gör',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                color: AppThemeColors.of(context).primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                       ),
                     ),
@@ -178,33 +176,32 @@ class AgendaGroupHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return Row(
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: highlight ? AppColors.primary : AppColors.onSurfaceVariant,
-            letterSpacing: 0.3,
-          ),
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: highlight ? colors.primary : colors.onSurfaceVariant,
+                letterSpacing: 0.3,
+              ),
         ),
         const SizedBox(width: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
           decoration: BoxDecoration(
             color: highlight
-                ? AppColors.primary.withValues(alpha: 0.1)
-                : AppColors.surfaceContainer,
+                ? colors.primary.withValues(alpha: 0.1)
+                : colors.surfaceContainer,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
             '$count',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: highlight ? AppColors.primary : AppColors.outline,
-            ),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: highlight ? colors.primary : colors.outline,
+                ),
           ),
         ),
       ],
@@ -224,37 +221,50 @@ class AgendaTaskCard extends ConsumerWidget {
   final ElevatorModel? elevator;
   final String dateLabel;
 
-  static Color _priorityColor(String p) {
+  static Color _priorityColor(String p, AppThemeColors colors) {
     switch (p) {
       case 'low':
-        return const Color(0xFF78909C);
+        return colors.outline;
       case 'high':
-        return const Color(0xFFE65100);
+        return colors.warning;
       case 'emergency':
-        return const Color(0xFFBA1A1A);
+        return colors.error;
       default:
-        return AppColors.primary;
+        return colors.primary;
     }
   }
 
-  static String _priorityLabel(String p) {
-    switch (p) {
-      case 'low':
-        return 'Düşük';
-      case 'high':
-        return 'Yüksek';
-      case 'emergency':
-        return '⚠️ Acil';
-      default:
-        return 'Normal';
+  static Widget _buildPriorityLabel(String p, Color color, TextTheme textTheme) {
+    final style = textTheme.labelSmall?.copyWith(
+      fontWeight: FontWeight.w700,
+      color: color,
+    );
+    if (p == 'emergency') {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.warning_rounded, size: 10, color: color),
+          const SizedBox(width: 2),
+          Text('Acil', style: style),
+        ],
+      );
     }
+    final label = switch (p) {
+      'low' => 'Düşük',
+      'high' => 'Yüksek',
+      _ => 'Normal',
+    };
+    return Text(label, style: style);
   }
 
   static bool _isActive(String s) => s == 'pending' || s == 'in_progress';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pColor = _priorityColor(schedule.priority);
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    final pColor = _priorityColor(schedule.priority, colors);
     final isEmergency = schedule.priority == 'emergency';
     final shortElevatorId = schedule.elevatorId.length > 6
         ? schedule.elevatorId.substring(0, 6)
@@ -265,17 +275,17 @@ class AgendaTaskCard extends ConsumerWidget {
       child: Container(
         decoration: BoxDecoration(
           color: isEmergency
-              ? const Color(0xFFFFDAD6).withValues(alpha: 0.4)
-              : AppColors.surfaceContainerLowest,
+              ? colors.errorContainer.withValues(alpha: 0.4)
+              : colors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isEmergency
-                ? const Color(0xFFBA1A1A).withValues(alpha: 0.3)
-                : AppColors.outlineVariant.withValues(alpha: 0.4),
+                ? colors.error.withValues(alpha: 0.3)
+                : colors.outlineVariant.withValues(alpha: 0.4),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
+              color: colors.onSurface.withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -312,11 +322,10 @@ class AgendaTaskCard extends ConsumerWidget {
                           const SizedBox(width: 4),
                           Text(
                             dateLabel,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: pColor,
-                            ),
+                            style: textTheme.labelMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: pColor,
+                                ),
                           ),
                           const Spacer(),
                           Container(
@@ -328,14 +337,7 @@ class AgendaTaskCard extends ConsumerWidget {
                               color: pColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: Text(
-                              _priorityLabel(schedule.priority),
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: pColor,
-                              ),
-                            ),
+                            child: _buildPriorityLabel(schedule.priority, pColor, textTheme),
                           ),
                         ],
                       ),
@@ -343,11 +345,10 @@ class AgendaTaskCard extends ConsumerWidget {
                       // Building name
                       Text(
                         elevator?.buildingName ?? 'Asansör $shortElevatorId',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                          color: AppColors.onSurface,
-                        ),
+                        style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: colors.onSurface,
+                            ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -357,19 +358,18 @@ class AgendaTaskCard extends ConsumerWidget {
                           padding: const EdgeInsets.only(top: 2),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on_outlined,
                                 size: 12,
-                                color: AppColors.outline,
+                                color: colors.outline,
                               ),
                               const SizedBox(width: 3),
                               Expanded(
                                 child: Text(
                                   elevator!.address!,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.outline,
-                                  ),
+                                  style: textTheme.bodySmall?.copyWith(
+                                        color: colors.outline,
+                                      ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -382,11 +382,10 @@ class AgendaTaskCard extends ConsumerWidget {
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
                             schedule.notes!,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.onSurfaceVariant,
-                              fontStyle: FontStyle.italic,
-                            ),
+                            style: textTheme.bodySmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  fontStyle: FontStyle.italic,
+                                ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -420,12 +419,12 @@ class AgendaTaskCard extends ConsumerWidget {
                               Icons.play_arrow_rounded,
                               size: 18,
                             ),
-                            label: const Text(
+                            label: Text(
                               'İşe Başla',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 13,
-                              ),
+                              style: textTheme.labelLarge?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
                             ),
                           ),
                         )
@@ -438,21 +437,20 @@ class AgendaTaskCard extends ConsumerWidget {
                                   : Icons.cancel_outlined,
                               size: 14,
                               color: schedule.status == 'completed'
-                                  ? const Color(0xFF2E7D32)
-                                  : AppColors.outline,
+                                  ? colors.success
+                                  : colors.outline,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               schedule.status == 'completed'
                                   ? 'Tamamlandı'
                                   : 'İptal Edildi',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: schedule.status == 'completed'
-                                    ? const Color(0xFF2E7D32)
-                                    : AppColors.outline,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: textTheme.labelMedium?.copyWith(
+                                    color: schedule.status == 'completed'
+                                        ? colors.success
+                                        : colors.outline,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ],
                         ),

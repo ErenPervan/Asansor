@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/loading_state.dart';
+import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/error_state.dart';
 import '../../../../core/widgets/animations/fade_in_slide.dart';
-
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/offline_banner.dart';
 import '../models/elevator_model.dart';
 import '../providers/elevator_providers.dart';
@@ -20,50 +22,50 @@ typedef _StatusStyle = ({
   IconData icon,
 });
 
-_StatusStyle _statusStyle(String status) {
+_StatusStyle _statusStyle(String status, AppThemeColors colors) {
   switch (status.toLowerCase()) {
     case 'active':
       return (
-        bg: AppColors.successContainer,
-        fg: AppColors.success,
-        iconBg: AppColors.successContainer,
-        iconFg: AppColors.success,
+        bg: colors.successContainer,
+        fg: colors.success,
+        iconBg: colors.successContainer,
+        iconFg: colors.success,
         label: 'Aktif',
         icon: Icons.check_circle_outline,
       );
     case 'faulty':
       return (
-        bg: AppColors.errorContainer,
-        fg: AppColors.error,
-        iconBg: AppColors.errorContainer,
-        iconFg: AppColors.error,
+        bg: colors.errorContainer,
+        fg: colors.error,
+        iconBg: colors.errorContainer,
+        iconFg: colors.error,
         label: 'Arızalı',
         icon: Icons.error_outline,
       );
     case 'under_maintenance':
       return (
-        bg: AppColors.warningContainer,
-        fg: AppColors.warning,
-        iconBg: AppColors.warningContainer,
-        iconFg: AppColors.warning,
+        bg: colors.warningContainer,
+        fg: colors.warning,
+        iconBg: colors.warningContainer,
+        iconFg: colors.warning,
         label: 'Bakımda',
         icon: Icons.build_outlined,
       );
     case 'inactive':
       return (
-        bg: AppColors.surfaceContainer,
-        fg: AppColors.outline,
-        iconBg: AppColors.surfaceContainer,
-        iconFg: AppColors.outline,
+        bg: colors.surfaceContainer,
+        fg: colors.outline,
+        iconBg: colors.surfaceContainer,
+        iconFg: colors.outline,
         label: 'Pasif',
         icon: Icons.pause_circle_outline,
       );
     default:
       return (
-        bg: AppColors.surfaceContainer,
-        fg: AppColors.outline,
-        iconBg: AppColors.surfaceContainer,
-        iconFg: AppColors.outline,
+        bg: colors.surfaceContainer,
+        fg: colors.outline,
+        iconBg: colors.surfaceContainer,
+        iconFg: colors.outline,
         label: 'Bilinmiyor',
         icon: Icons.help_outline,
       );
@@ -114,37 +116,30 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
       backgroundColor: AppThemeColors.of(context).background,
       // ── App Bar ──────────────────────────────────────────────────────────
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          'Asansörlerim',
-          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.3),
-        ),
+        title: const Text('Asansörlerim'),
         actions: [
           // Show total count badge while data is available.
           elevatorsAsync.maybeWhen(
             data: (all) => Center(
               child: Container(
-                margin: const EdgeInsets.only(right: 16),
+                margin: const EdgeInsets.only(right: AppSpacing.md),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
+                  color: AppThemeColors.of(context).primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${all.length} Asansör',
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: AppThemeColors.of(context).primary,
                   ),
                 ),
               ),
@@ -161,27 +156,27 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(64),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, 12),
             child: TextField(
               controller: _searchController,
               onChanged: (v) => setState(() => _query = v),
-              style: const TextStyle(color: AppColors.onSurface, fontSize: 14),
+              style: TextStyle(color: AppThemeColors.of(context).onSurface, fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'Bina adı veya adres ile ara…',
                 hintStyle: TextStyle(
-                  color: AppColors.outline.withValues(alpha: 0.8),
+                  color: AppThemeColors.of(context).outline.withValues(alpha: 0.8),
                 ),
-                prefixIcon: const Icon(
+                prefixIcon: Icon(
                   Icons.search,
-                  color: AppColors.outline,
+                  color: AppThemeColors.of(context).outline,
                   size: 20,
                 ),
                 suffixIcon: _query.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.close,
                           size: 18,
-                          color: AppColors.outline,
+                          color: AppThemeColors.of(context).outline,
                         ),
                         onPressed: () {
                           _searchController.clear();
@@ -190,9 +185,9 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                       )
                     : null,
                 filled: true,
-                fillColor: AppColors.surfaceContainerLowest,
+                fillColor: AppThemeColors.of(context).surfaceContainer,
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
+                  horizontal: AppSpacing.md,
                   vertical: 12,
                 ),
                 border: OutlineInputBorder(
@@ -206,7 +201,7 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: AppColors.primary.withValues(alpha: 0.4),
+                    color: AppThemeColors.of(context).primary.withValues(alpha: 0.4),
                   ),
                 ),
               ),
@@ -225,7 +220,7 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           // Status Filters
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 12),
             child: Row(
               children: [
                 _StatusFilterChip(
@@ -233,26 +228,26 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                   isSelected: _selectedStatus == 'all',
                   onSelected: () => setState(() => _selectedStatus = 'all'),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 _StatusFilterChip(
                   label: 'Aktif',
                   isSelected: _selectedStatus == 'active',
                   onSelected: () => setState(() => _selectedStatus = 'active'),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 _StatusFilterChip(
                   label: 'Arızalı',
                   isSelected: _selectedStatus == 'faulty',
                   onSelected: () => setState(() => _selectedStatus = 'faulty'),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 _StatusFilterChip(
                   label: 'Bakımda',
                   isSelected: _selectedStatus == 'under_maintenance',
                   onSelected: () =>
                       setState(() => _selectedStatus = 'under_maintenance'),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 _StatusFilterChip(
                   label: 'Pasif',
                   isSelected: _selectedStatus == 'inactive',
@@ -266,10 +261,10 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           Expanded(
             child: elevatorsAsync.when(
               loading: () => const Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(AppSpacing.md),
                 child: LoadingState(count: 6),
               ),
-              error: (e, _) => _ErrorBody(
+              error: (e, _) => ErrorState(
                 message: e.toString().replaceFirst('Exception: ', ''),
                 onRetry: () => ref.invalidate(elevatorsProvider),
               ),
@@ -277,44 +272,76 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                 final items = _applyFilter(all);
 
                 if (all.isEmpty) {
-                  return const _EmptyBody(
+                  return const EmptyState(
                     icon: Icons.elevator_outlined,
-                    title: 'Asansör Bulunamadı',
-                    subtitle:
-                        'Sisteme henüz asansör eklenmemiş.\nLütfen yöneticinizle iletişime geçin.',
+                    message:
+                        'Asansör Bulunamadı\n\nSisteme henüz asansör eklenmemiş.\nLütfen yöneticinizle iletişime geçin.',
                   );
                 }
 
                 if (items.isEmpty) {
-                  return _EmptyBody(
+                  return EmptyState(
                     icon: Icons.search_off_outlined,
-                    title: 'Sonuç Yok',
-                    subtitle: '"$_query" ile eşleşen asansör bulunamadı.',
+                    message: 'Sonuç Yok\n\n"$_query" ile eşleşen asansör bulunamadı.',
                   );
                 }
 
-                return RefreshIndicator(
-                  color: AppColors.primary,
-                  onRefresh: () async => ref.invalidate(elevatorsProvider),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    itemCount: items.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final elevator = items[index];
-                      return FadeInSlide(
-                        index: index,
-                        child: _ElevatorCard(
-                          elevator: elevator,
-                          onTap: () => context.push('/elevator/${elevator.id}'),
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: RefreshIndicator(
+                    key: ValueKey('list-$_selectedStatus-$_query'),
+                    color: AppThemeColors.of(context).primary,
+                    onRefresh: () async => ref.invalidate(elevatorsProvider),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (constraints.maxWidth >= 600) {
+                        return GridView.builder(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: 8,
+                          ),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisExtent: 104,
+                          ),
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            final elevator = items[index];
+                            return FadeInSlide(
+                              index: index,
+                              child: _ElevatorCard(
+                                elevator: elevator,
+                                onTap: () =>
+                                    context.push('/elevator/${elevator.id}'),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                      return ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: 8,
                         ),
+                        itemCount: items.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final elevator = items[index];
+                          return FadeInSlide(
+                            index: index,
+                            child: _ElevatorCard(
+                              elevator: elevator,
+                              onTap: () =>
+                                  context.push('/elevator/${elevator.id}'),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),
+                ),
                 );
               },
             ),
@@ -335,26 +362,28 @@ class _ElevatorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = _statusStyle(elevator.status);
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final style = _statusStyle(elevator.status, colors);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: AppColors.surfaceContainerLowest,
+        color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppColors.outlineVariant.withValues(alpha: 0.45),
+                color: colors.outlineVariant.withValues(alpha: 0.45),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: colors.outline.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -383,10 +412,9 @@ class _ElevatorCard extends StatelessWidget {
                         color: Colors.transparent,
                         child: Text(
                           elevator.buildingName,
-                          style: const TextStyle(
-                            fontSize: 15,
+                          style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppColors.onSurface,
+                            color: colors.onSurface,
                             letterSpacing: -0.2,
                           ),
                           maxLines: 1,
@@ -395,21 +423,20 @@ class _ElevatorCard extends StatelessWidget {
                       ),
                       if (elevator.address != null &&
                           elevator.address!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.xs),
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.location_on_outlined,
                               size: 13,
-                              color: AppColors.onSurfaceVariant,
+                              color: colors.onSurfaceVariant,
                             ),
                             const SizedBox(width: 3),
                             Expanded(
                               child: Text(
                                 elevator.address!,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.onSurfaceVariant,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
                                   height: 1.3,
                                 ),
                                 maxLines: 1,
@@ -439,18 +466,17 @@ class _ElevatorCard extends StatelessWidget {
                       ),
                       child: Text(
                         style.label,
-                        style: TextStyle(
-                          fontSize: 11,
+                        style: textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: style.fg,
                         ),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Icon(
+                    Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 13,
-                      color: AppColors.outline,
+                      color: colors.outline,
                     ),
                   ],
                 ),
@@ -463,98 +489,6 @@ class _ElevatorCard extends StatelessWidget {
   }
 }
 
-// ── Error body ────────────────────────────────────────────────────────────────
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 56, color: AppColors.error),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.onSurfaceVariant),
-            ),
-            const SizedBox(height: 20),
-            FilledButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Empty body ────────────────────────────────────────────────────────────────
-
-class _EmptyBody extends StatelessWidget {
-  const _EmptyBody({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 44, color: AppColors.outline),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.onSurfaceVariant,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _StatusFilterChip extends StatelessWidget {
   const _StatusFilterChip({
@@ -569,18 +503,20 @@ class _StatusFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
       onSelected: (_) => onSelected(),
-      selectedColor: AppColors.primary.withValues(alpha: 0.15),
-      labelStyle: TextStyle(
-        color: isSelected ? AppColors.primary : AppColors.outline,
+      selectedColor: colors.primary.withValues(alpha: 0.15),
+      labelStyle: textTheme.labelMedium?.copyWith(
+        color: isSelected ? colors.primary : colors.outline,
         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-        fontSize: 13,
       ),
       side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.outlineVariant,
+        color: isSelected ? colors.primary : colors.outlineVariant,
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       showCheckmark: false,

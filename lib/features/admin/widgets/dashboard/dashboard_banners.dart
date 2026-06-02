@@ -11,6 +11,10 @@ class ConflictBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -20,12 +24,12 @@ class ConflictBanner extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.errorContainer,
+            color: colors.errorContainer,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+            border: Border.all(color: colors.error.withValues(alpha: 0.3)),
             boxShadow: [
               BoxShadow(
-                color: AppColors.error.withValues(alpha: 0.1),
+                color: colors.error.withValues(alpha: 0.1),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -34,15 +38,15 @@ class ConflictBanner extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: iconSize,
+                height: iconSize,
                 decoration: BoxDecoration(
-                  color: AppColors.error.withValues(alpha: 0.1),
+                  color: colors.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.warning_rounded,
-                  color: AppColors.error,
+                  color: colors.error,
                   size: 28,
                 ),
               ),
@@ -53,19 +57,17 @@ class ConflictBanner extends StatelessWidget {
                   children: [
                     Text(
                       '$count Senkronizasyon Çakışması',
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: AppColors.onErrorContainer,
+                        color: colors.onErrorContainer,
                         letterSpacing: -0.2,
                       ),
                     ),
                     const SizedBox(height: 3),
-                    const Text(
+                    Text(
                       'Çözülmemiş çakışmalar var, incelemek için dokunun',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.onErrorContainer,
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colors.onErrorContainer,
                         height: 1.3,
                       ),
                     ),
@@ -73,9 +75,9 @@ class ConflictBanner extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
-                color: AppColors.error,
+                color: colors.error,
                 size: 14,
               ),
             ],
@@ -95,6 +97,10 @@ class AddElevatorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -104,15 +110,15 @@ class AddElevatorBanner extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFFB91C1C), Color(0xFF991B1B)],
+              colors: [colors.error, colors.errorContainer], // Just matching a general red gradient from theme
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.35),
+                color: colors.error.withValues(alpha: 0.35),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -121,8 +127,8 @@ class AddElevatorBanner extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: iconSize,
+                height: iconSize,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(14),
@@ -134,24 +140,22 @@ class AddElevatorBanner extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Yeni Asansör Ekle',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
                         letterSpacing: -0.2,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
                       'Kayıt oluştur ve QR kodu otomatik üret',
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: textTheme.labelMedium?.copyWith(
                         color: Colors.white70,
                         height: 1.3,
                       ),
@@ -168,15 +172,14 @@ class AddElevatorBanner extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.qr_code_rounded, size: 14, color: Colors.white),
-                    SizedBox(width: 5),
+                    const Icon(Icons.qr_code_rounded, size: 14, color: Colors.white),
+                    const SizedBox(width: 5),
                     Text(
                       'QR',
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
                       ),
@@ -201,20 +204,23 @@ class ErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.errorContainer,
+        color: colors.errorContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.onErrorContainer),
+          Icon(Icons.error_outline, color: colors.onErrorContainer),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: AppColors.onErrorContainer),
+              style: textTheme.bodyMedium?.copyWith(color: colors.onErrorContainer),
             ),
           ),
         ],

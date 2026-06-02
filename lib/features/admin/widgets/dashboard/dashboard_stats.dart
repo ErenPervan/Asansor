@@ -24,12 +24,11 @@ class DashboardStatsGrid extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text(
+              Text(
                 'Genel Bakış',
-                style: TextStyle(
-                  fontSize: 20,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: AppColors.onSurface,
+                  color: AppThemeColors.of(context).onSurface,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -38,18 +37,17 @@ class DashboardStatsGrid extends StatelessWidget {
               Container(
                 width: 7,
                 height: 7,
-                decoration: const BoxDecoration(
-                  color: AppColors.success,
+                decoration: BoxDecoration(
+                  color: AppThemeColors.of(context).success,
                   shape: BoxShape.circle,
                 ),
               ),
               const SizedBox(width: 5),
-              const Text(
+              Text(
                 'Canlı',
-                style: TextStyle(
-                  fontSize: 11,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.success,
+                  color: AppThemeColors.of(context).success,
                 ),
               ),
             ],
@@ -156,50 +154,53 @@ class DashboardStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     final (bg, iconBg, iconFg, valueFg, labelFg, gradient) = switch (variant) {
       StatVariant.brand => (
-        AppColors.primary,
+        colors.primary,
         Colors.white.withValues(alpha: 0.15),
         Colors.white,
         Colors.white,
         Colors.white70,
-        const LinearGradient(
+        LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFFB91C1C), Color(0xFF7F1D1D)],
+              colors: [colors.primaryDark, colors.primary],
             )
             as Gradient?,
       ),
       StatVariant.critical => (
-        const Color(0xFFFFF1F2), // red-50
-        const Color(0xFFFFE4E4),
-        AppColors.error,
-        AppColors.error,
-        const Color(0xFF9F1239), // rose-800
+        colors.errorContainer,
+        colors.error.withValues(alpha: 0.1),
+        colors.error,
+        colors.error,
+        colors.error,
         null,
       ),
       StatVariant.success => (
-        const Color(0xFFF0FDF4), // green-50
-        const Color(0xFFDCFCE7),
-        AppColors.success,
-        AppColors.success,
-        const Color(0xFF14532D),
+        colors.successContainer,
+        colors.success.withValues(alpha: 0.1),
+        colors.success,
+        colors.success,
+        colors.success,
         null,
       ),
       StatVariant.warning => (
-        const Color(0xFFFFFBEB), // amber-50
-        const Color(0xFFFEF3C7),
-        AppColors.warning,
-        AppColors.warning,
-        const Color(0xFF78350F),
+        colors.warningContainer,
+        colors.warning.withValues(alpha: 0.1),
+        colors.warning,
+        colors.warning,
+        colors.warning,
         null,
       ),
       StatVariant.neutral => (
-        AppColors.surfaceContainerLowest,
-        AppColors.surfaceContainer,
-        AppColors.outline,
-        AppColors.onSurface,
-        AppColors.onSurfaceVariant,
+        colors.surfaceContainerLowest,
+        colors.surfaceContainer,
+        colors.outline,
+        colors.onSurface,
+        colors.onSurfaceVariant,
         null,
       ),
     };
@@ -211,11 +212,11 @@ class DashboardStatCard extends StatelessWidget {
         gradient: gradient,
         borderRadius: BorderRadius.circular(20),
         border: gradient == null
-            ? Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.6))
+            ? Border.all(color: colors.outlineVariant.withValues(alpha: 0.6))
             : null,
         boxShadow: [
           BoxShadow(
-            color: (gradient != null ? AppColors.primary : Colors.black)
+            color: (gradient != null ? colors.primary : Colors.black)
                 .withValues(alpha: gradient != null ? 0.18 : 0.04),
             blurRadius: gradient != null ? 16 : 10,
             offset: const Offset(0, 4),
@@ -239,19 +240,17 @@ class DashboardStatCard extends StatelessWidget {
           AnimatedCounter(
             value: value,
             duration: const Duration(milliseconds: 900),
-            style: TextStyle(
-              fontSize: 34,
+            style: textTheme.headlineLarge?.copyWith(
               fontWeight: FontWeight.w800,
               color: valueFg,
               letterSpacing: -1.5,
               height: 1,
-            ),
+            ) ?? const TextStyle(),
           ),
           const SizedBox(height: 5),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
+            style: textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: labelFg,
               height: 1.3,

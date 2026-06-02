@@ -38,6 +38,8 @@ class HomeView extends ConsumerWidget {
     final userEmail = authState.valueOrNull?.email ?? '';
     final role = ref.watch(roleProvider) ?? 'technician';
     final isAdmin = role == 'admin';
+    final screenW = MediaQuery.of(context).size.width;
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -59,7 +61,7 @@ class HomeView extends ConsumerWidget {
             const OfflineBanner(),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: screenW > 600 ? 40 : 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -91,7 +93,7 @@ class HomeView extends ConsumerWidget {
                       onTap: () => context.push('/elevators'),
                     ),
                     // Bottom padding so content clears the FAB + nav bar.
-                    const SizedBox(height: 120),
+                    SizedBox(height: 100 + bottomInset),
                   ],
                 ),
               ),

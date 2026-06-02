@@ -23,9 +23,9 @@ import '../providers/admin_providers.dart';
 import '../../../core/theme/app_colors.dart';
 
 // Marker colours (match Google Maps palette for familiarity)
-const _colorFault = Color(0xFFDB4437);
-const _colorMaintenance = Color(0xFFF4B400);
-const _colorHealthy = Color(0xFF1B8B4B);
+const _colorFault = AppColors.error;
+const _colorMaintenance = AppColors.warningLight;
+const _colorHealthy = AppColors.successLight;
 
 // ── Marker status enum ────────────────────────────────────────────────────────
 
@@ -190,12 +190,12 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
     return Scaffold(
       backgroundColor: AppThemeColors.of(context).background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: AppThemeColors.of(context).primary,
+        foregroundColor: AppThemeColors.of(context).onPrimary,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Canlı Operasyon Haritası',
-          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.3),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppThemeColors.of(context).onPrimary),
         ),
         actions: [
           IconButton(
@@ -211,8 +211,8 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
         ],
       ),
       body: elevatorsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
+        loading: () => Center(
+          child: CircularProgressIndicator(color: AppThemeColors.of(context).primary),
         ),
         error: (e, _) => _ErrorBody(
           message: e.toString().replaceFirst('Exception: ', ''),
@@ -342,6 +342,7 @@ class _ElevatorSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     final (statusLabel, statusColor) = switch (status) {
       _MarkerStatus.fault => ('Aktif Arıza', _colorFault),
       _MarkerStatus.maintenance => ('Bugün Bakım', _colorMaintenance),
@@ -351,11 +352,11 @@ class _ElevatorSheet extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
+            color: colors.onSurface.withValues(alpha: 0.12),
             blurRadius: 24,
             offset: const Offset(0, -4),
           ),
@@ -373,7 +374,7 @@ class _ElevatorSheet extends StatelessWidget {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.outlineVariant,
+                  color: AppThemeColors.of(context).outlineVariant,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -387,10 +388,9 @@ class _ElevatorSheet extends StatelessWidget {
                 Expanded(
                   child: Text(
                     elevator.buildingName,
-                    style: const TextStyle(
-                      fontSize: 20,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: AppColors.onSurface,
+                      color: AppThemeColors.of(context).onSurface,
                       letterSpacing: -0.4,
                     ),
                   ),
@@ -410,8 +410,7 @@ class _ElevatorSheet extends StatelessWidget {
                   ),
                   child: Text(
                     statusLabel,
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: statusColor,
                     ),
@@ -425,18 +424,17 @@ class _ElevatorSheet extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.location_on_outlined,
                     size: 15,
-                    color: AppColors.outline,
+                    color: AppThemeColors.of(context).outline,
                   ),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       elevator.address!,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.outline,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppThemeColors.of(context).outline,
                         height: 1.4,
                       ),
                     ),
@@ -454,12 +452,13 @@ class _ElevatorSheet extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: onViewDetails,
                 icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                label: const Text(
+                label: Text(
                   'Detayları Gör',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppThemeColors.of(context).primary,
+                  foregroundColor: AppThemeColors.of(context).onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -495,8 +494,8 @@ class _StatsOverlay extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
-            blurRadius: 12,
+            color: AppThemeColors.of(context).onSurface.withValues(alpha: 0.10),
+            blurRadius: 20,
             offset: const Offset(0, 4),
           ),
         ],
@@ -507,10 +506,9 @@ class _StatsOverlay extends StatelessWidget {
         children: [
           Text(
             '$locatedCount / $totalCount asansör haritada',
-            style: const TextStyle(
-              fontSize: 12,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.onSurface,
+              color: AppThemeColors.of(context).onSurface,
             ),
           ),
           if (faultCount > 0) ...[
@@ -529,8 +527,7 @@ class _StatsOverlay extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   '$faultCount aktif arıza',
-                  style: const TextStyle(
-                    fontSize: 11,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: _colorFault,
                   ),
@@ -556,12 +553,12 @@ class _LegendSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: AppThemeColors.of(context).surfaceContainerLowest,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 20,
+            color: AppThemeColors.of(context).onSurface.withValues(alpha: 0.08),
+            blurRadius: 10,
             offset: const Offset(0, -4),
           ),
         ],
@@ -575,7 +572,7 @@ class _LegendSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 14),
             decoration: BoxDecoration(
-              color: AppColors.outlineVariant,
+              color: AppThemeColors.of(context).outlineVariant,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -611,26 +608,25 @@ class _LegendSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: AppThemeColors.of(context).background,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: AppColors.outlineVariant.withValues(alpha: 0.5),
+                  color: AppThemeColors.of(context).outlineVariant.withValues(alpha: 0.5),
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.location_off_outlined,
                     size: 14,
-                    color: AppColors.onSurfaceVariant,
+                    color: AppThemeColors.of(context).onSurfaceVariant,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       '$unmappedCount asansörün koordinatı eksik — haritada gösterilmiyor.',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.onSurfaceVariant,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppThemeColors.of(context).onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -685,15 +681,14 @@ class _LegendItem extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
+                color: AppThemeColors.of(context).onSurface,
               ),
             ),
             Text(
               sublabel,
-              style: const TextStyle(fontSize: 10, color: AppColors.outline),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppThemeColors.of(context).outline),
             ),
           ],
         ),
@@ -720,13 +715,13 @@ class _ErrorBody extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: AppColors.errorContainer,
+              decoration: BoxDecoration(
+                color: AppThemeColors.of(context).errorContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.location_off_outlined,
-                color: AppColors.onErrorContainer,
+                color: AppThemeColors.of(context).onErrorContainer,
                 size: 32,
               ),
             ),
@@ -734,14 +729,17 @@ class _ErrorBody extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppThemeColors.of(context).onSurfaceVariant),
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppThemeColors.of(context).primary,
+                foregroundColor: AppThemeColors.of(context).onPrimary,
+              ),
             ),
           ],
         ),

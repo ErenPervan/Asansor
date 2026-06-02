@@ -29,29 +29,27 @@ class ActiveFaultsSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            const Text(
+            Text(
               'Açık Arızalar',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: AppColors.onSurface,
-                letterSpacing: -0.5,
-              ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: AppThemeColors.of(context).onSurface,
+                    letterSpacing: -0.5,
+                  ),
             ),
             activeFaults.maybeWhen(
               data: (faults) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.06),
+                  color: AppThemeColors.of(context).primary.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${faults.length} Aktif',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppThemeColors.of(context).primary,
+                      ),
                 ),
               ),
               orElse: () => const SizedBox.shrink(),
@@ -72,15 +70,18 @@ class ActiveFaultsSection extends StatelessWidget {
                 message: 'Aktif arıza bulunmuyor.',
               );
             }
-            return SizedBox(
-              height: 190,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                clipBehavior: Clip.none,
-                padding: EdgeInsets.zero,
-                itemCount: faults.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 16),
-                itemBuilder: (context, i) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final cardWidth = (constraints.maxWidth * 0.85).clamp(260.0, 400.0);
+                return SizedBox(
+                  height: 190,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    clipBehavior: Clip.none,
+                    padding: EdgeInsets.zero,
+                    itemCount: faults.length,
+                    separatorBuilder: (context, index) => const SizedBox(width: 16),
+                    itemBuilder: (context, i) {
                   final elevator = findElevator(
                     faults[i].elevatorId,
                     elevators,
@@ -89,13 +90,16 @@ class ActiveFaultsSection extends StatelessWidget {
                     fault: faults[i],
                     buildingName: elevator?.buildingName ?? 'Asansör',
                     address: elevator?.address ?? faults[i].description,
+                    cardWidth: cardWidth,
                     onTap: () => context.push('/fault/${faults[i].id}'),
                   );
                 },
               ),
             );
           },
-        ),
+        );
+      },
+    ),
       ],
     );
   }
@@ -107,12 +111,14 @@ class FaultCard extends StatefulWidget {
     required this.fault,
     required this.buildingName,
     required this.address,
+    required this.cardWidth,
     this.onTap,
   });
 
   final FaultReportModel fault;
   final String buildingName;
   final String address;
+  final double cardWidth;
   final VoidCallback? onTap;
 
   @override
@@ -142,6 +148,9 @@ class FaultCardState extends State<FaultCard>
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     final description = widget.fault.description.isNotEmpty
         ? widget.fault.description
         : 'Arıza bildirimi alındı.';
@@ -155,18 +164,18 @@ class FaultCardState extends State<FaultCard>
         builder: (context, child) {
           final glowAlpha = isNew ? 0.08 + (_pulse.value * 0.14) : 0.06;
           return Container(
-            width: 264,
+            width: widget.cardWidth,
             decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLowest,
+              color: colors.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.error.withValues(alpha: glowAlpha),
+                  color: colors.error.withValues(alpha: glowAlpha),
                   blurRadius: 18,
                   offset: const Offset(0, 4),
                 ),
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: colors.onSurface.withValues(alpha: 0.04),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -182,18 +191,18 @@ class FaultCardState extends State<FaultCard>
             // Header band
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
-                  colors: [Color(0xFFB91C1C), Color(0xFFDC2626)],
+                  colors: [colors.primary, colors.error],
                 ),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(
+                  Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
@@ -201,15 +210,14 @@ class FaultCardState extends State<FaultCard>
                         color: Colors.white,
                         size: 14,
                       ),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       Text(
                         'ACİL ARIZA',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 1.2,
-                        ),
+                        style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 1.2,
+                            ),
                       ),
                     ],
                   ),
@@ -225,11 +233,10 @@ class FaultCardState extends State<FaultCard>
                     ),
                     child: Text(
                       _timeAgo(widget.fault.reportedAt),
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+                      style: textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                     ),
                   ),
                 ],
@@ -246,12 +253,11 @@ class FaultCardState extends State<FaultCard>
                   // Building name
                   Text(
                     widget.buildingName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.onSurface,
-                      letterSpacing: -0.3,
-                    ),
+                    style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: colors.onSurface,
+                          letterSpacing: -0.3,
+                        ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -260,19 +266,18 @@ class FaultCardState extends State<FaultCard>
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.location_on_outlined,
                           size: 13,
-                          color: AppColors.outline,
+                          color: colors.outline,
                         ),
                         const SizedBox(width: 3),
                         Expanded(
                           child: Text(
                             widget.address,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.outline,
-                            ),
+                            style: textTheme.bodySmall?.copyWith(
+                                  color: colors.outline,
+                                ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -286,16 +291,15 @@ class FaultCardState extends State<FaultCard>
                     width: double.infinity,
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceContainer,
+                      color: colors.surfaceContainer,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       description,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.onSurfaceVariant,
-                        height: 1.4,
-                      ),
+                      style: textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                            height: 1.4,
+                          ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),

@@ -16,9 +16,10 @@ class ShimmerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return Shimmer.fromColors(
-      baseColor: AppColors.surfaceContainer,
-      highlightColor: AppColors.surfaceContainerHigh,
+      baseColor: colors.surfaceContainer,
+      highlightColor: colors.surfaceContainerHigh,
       child: Container(
         width: width,
         height: height,

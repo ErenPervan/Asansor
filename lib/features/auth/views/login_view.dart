@@ -195,7 +195,7 @@ class _LoginViewState extends ConsumerState<LoginView>
         children: [
           // ── Crimson header (brand section) ──────────────────────────────
           SizedBox(
-            height: screenH * 0.42,
+            height: (screenH * 0.38).clamp(220.0, 360.0),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -249,14 +249,13 @@ class _LoginViewState extends ConsumerState<LoginView>
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
+                      Text(
                         'ASANSOR',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 4,
-                        ),
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 4,
+                            ),
                       ),
                       const SizedBox(height: 6),
                       Container(
@@ -271,14 +270,13 @@ class _LoginViewState extends ConsumerState<LoginView>
                             color: Colors.white.withValues(alpha: 0.25),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Bakım & Arıza Takip Sistemi',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            letterSpacing: 0.5,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                letterSpacing: 0.5,
+                              ),
                         ),
                       ),
                     ],
@@ -318,21 +316,19 @@ class _LoginViewState extends ConsumerState<LoginView>
                           // Card title
                           Text(
                             l10n.loginTitle,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w800,
-                              color: colors.onSurface,
-                              letterSpacing: -0.5,
-                            ),
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: colors.onSurface,
+                                  letterSpacing: -0.5,
+                                ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Hesabınıza erişmek için bilgilerinizi girin.',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: colors.onSurfaceVariant,
-                              height: 1.4,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  height: 1.4,
+                                ),
                           ),
                           const SizedBox(height: 32),
 
@@ -345,10 +341,9 @@ class _LoginViewState extends ConsumerState<LoginView>
                             textInputAction: TextInputAction.next,
                             autocorrect: false,
                             enabled: !isLoading,
-                            style: TextStyle(
-                              color: colors.onSurface,
-                              fontSize: 15,
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: colors.onSurface,
+                                ),
                             decoration: InputDecoration(
                               hintText: 'ornek@sirket.com',
                               filled: true,
@@ -356,31 +351,6 @@ class _LoginViewState extends ConsumerState<LoginView>
                               prefixIcon: const Icon(
                                 Icons.email_outlined,
                                 size: 18,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: colors.outlineVariant,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: colors.outlineVariant,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: AppColors.primary,
-                                  width: 1.5,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: AppColors.error,
-                                ),
                               ),
                             ),
                             validator: (v) {
@@ -404,10 +374,9 @@ class _LoginViewState extends ConsumerState<LoginView>
                             textInputAction: TextInputAction.done,
                             enabled: !isLoading,
                             onFieldSubmitted: (_) => _submit(),
-                            style: TextStyle(
-                              color: colors.onSurface,
-                              fontSize: 15,
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: colors.onSurface,
+                                ),
                             decoration: InputDecoration(
                               hintText: '••••••••',
                               filled: true,
@@ -415,31 +384,6 @@ class _LoginViewState extends ConsumerState<LoginView>
                               prefixIcon: const Icon(
                                 Icons.lock_outlined,
                                 size: 18,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: colors.outlineVariant,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: colors.outlineVariant,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: AppColors.primary,
-                                  width: 1.5,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: AppColors.error,
-                                ),
                               ),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -471,8 +415,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                             child: FilledButton(
                               onPressed: isLoading ? null : _submit,
                               style: FilledButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                disabledBackgroundColor: AppColors.primary
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                disabledBackgroundColor: Theme.of(context).colorScheme.primary
                                     .withValues(alpha: 0.5),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
@@ -489,11 +433,11 @@ class _LoginViewState extends ConsumerState<LoginView>
                                     )
                                   : Text(
                                       l10n.loginButton,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 0.3,
-                                      ),
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.3,
+                                            color: Theme.of(context).colorScheme.onPrimary,
+                                          ),
                                     ),
                             ),
                           ),
@@ -512,12 +456,11 @@ class _LoginViewState extends ConsumerState<LoginView>
                               const SizedBox(width: 10),
                               Text(
                                 'Güvenli Bağlantı',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: colors.onSurfaceVariant,
-                                  letterSpacing: 0.3,
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                      letterSpacing: 0.3,
+                                    ),
                                 ),
-                              ),
                               const SizedBox(width: 5),
                               Icon(
                                 Icons.lock_outlined,
@@ -557,12 +500,11 @@ class _FormLabel extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     return Text(
       label,
-      style: TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: colors.onSurface,
-        letterSpacing: 0.1,
-      ),
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: colors.onSurface,
+            letterSpacing: 0.1,
+          ),
     );
   }
 }

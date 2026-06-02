@@ -67,23 +67,21 @@ class TopAppBar extends StatelessWidget {
               children: [
                 Text(
                   statusText,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: colors.outline,
-                    letterSpacing: 1.1,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colors.outline,
+                        letterSpacing: 1.1,
+                      ),
                 ),
                 Text(
                   isAdmin
                       ? 'Merhaba Admin — $activeFaultCount açık arıza'
                       : 'Merhaba, $displayName',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: colors.primary,
-                    letterSpacing: -0.3,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colors.primary,
+                        letterSpacing: -0.3,
+                      ),
                 ),
               ],
             ),
@@ -94,7 +92,7 @@ class TopAppBar extends StatelessWidget {
               color: colors.surfaceContainerLowest,
               shape: const CircleBorder(),
               elevation: 1,
-              shadowColor: Colors.black12,
+              shadowColor: colors.outline.withValues(alpha: 0.12),
               child: InkWell(
                 customBorder: const CircleBorder(),
                 onTap: () => context.push('/admin/dashboard'),
@@ -117,7 +115,7 @@ class TopAppBar extends StatelessWidget {
             color: colors.surfaceContainerLowest,
             shape: const CircleBorder(),
             elevation: 1,
-            shadowColor: Colors.black12,
+            shadowColor: colors.outline.withValues(alpha: 0.12),
             child: InkWell(
               customBorder: const CircleBorder(),
               onTap: () async {
@@ -190,16 +188,16 @@ class SyncStatusButton extends ConsumerWidget {
 
     if (!isOnline) {
       icon = Icons.cloud_off_outlined;
-      color = const Color(0xFFD97706); // amber-600
-      tooltip = 'Ã‡evrimdÄ±ÅŸÄ±';
+      color = AppThemeColors.of(context).warning;
+      tooltip = 'Çevrimdışı';
     } else if (hasPending) {
       icon = Icons.cloud_upload_outlined;
-      color = const Color(0xFFD97706); // amber-600
-      tooltip = '$pendingCount Ã¶ÄŸe senkronize bekleniyor';
+      color = AppThemeColors.of(context).warning;
+      tooltip = '$pendingCount öğe senkronize bekleniyor';
     } else {
       icon = Icons.cloud_done_outlined;
-      color = const Color(0xFF16A34A); // green-600
-      tooltip = 'TÃ¼m veriler senkronize';
+      color = AppThemeColors.of(context).success;
+      tooltip = 'Tüm veriler senkronize';
     }
 
     return Tooltip(
@@ -208,7 +206,7 @@ class SyncStatusButton extends ConsumerWidget {
         color: AppThemeColors.of(context).surfaceContainerLowest,
         shape: const CircleBorder(),
         elevation: 1,
-        shadowColor: Colors.black12,
+        shadowColor: AppThemeColors.of(context).outline.withValues(alpha: 0.12),
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: () => _showSyncSheet(context, ref),
@@ -242,17 +240,17 @@ class SyncStatusButton extends ConsumerWidget {
                         minWidth: 14,
                         minHeight: 14,
                       ),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFD97706),
+                      decoration: BoxDecoration(
+                        color: AppThemeColors.of(context).warning,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
                         '$pendingCount',
-                        style: const TextStyle(
-                          fontSize: 8,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -290,12 +288,12 @@ class SyncStatusButton extends ConsumerWidget {
                   content: Text(
                     result.hasFailures
                         ? '${result.synced} senkronize edildi, '
-                              '${result.failed} baÅŸarÄ±sÄ±z'
-                        : '${result.synced} Ã¶ÄŸe baÅŸarÄ±yla senkronize edildi',
+                              '${result.failed} başarısız'
+                        : '${result.synced} öğe başarıyla senkronize edildi',
                   ),
                   backgroundColor: result.hasFailures
-                      ? AppColors.primary
-                      : const Color(0xFF16A34A),
+                      ? AppThemeColors.of(context).error
+                      : AppThemeColors.of(context).success,
                 ),
               );
             }
@@ -322,6 +320,7 @@ class SyncSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasPending = pendingCount > 0;
+    final colors = AppThemeColors.of(context);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
@@ -345,8 +344,8 @@ class SyncSheet extends StatelessWidget {
             height: 56,
             decoration: BoxDecoration(
               color: hasPending
-                  ? const Color(0xFFFFFBEB)
-                  : const Color(0xFFDCFCE7),
+                  ? colors.warningContainer
+                  : colors.successContainer,
               shape: BoxShape.circle,
             ),
             child: AnimatedSwitcher(
@@ -367,33 +366,31 @@ class SyncSheet extends StatelessWidget {
                 key: ValueKey(hasPending),
                 size: 28,
                 color: hasPending
-                    ? const Color(0xFFD97706)
-                    : const Color(0xFF16A34A),
+                    ? colors.warning
+                    : colors.success,
               ),
             ),
           ),
           const SizedBox(height: 14),
 
           Text(
-            hasPending ? 'Bekleyen Senkronizasyon' : 'TÃ¼m Veriler Senkronize',
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              color: AppColors.onSurface,
-            ),
+            hasPending ? 'Bekleyen Senkronizasyon' : 'Tüm Veriler Senkronize',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: colors.onSurface,
+                ),
           ),
           const SizedBox(height: 6),
           Text(
             hasPending
-                ? '$pendingCount kayÄ±t Ã§evrimdÄ±ÅŸÄ± olarak saklandÄ±.'
-                      '${isOnline ? ' Åimdi senkronize edebilirsiniz.' : ' Ä°nternet baÄŸlantÄ±sÄ± gerekli.'}'
-                : 'TÃ¼m bakÄ±m ve arÄ±za kayÄ±tlarÄ± Supabase ile senkronize.',
+                ? '$pendingCount kayıt çevrimdışı olarak saklandı.'
+                      '${isOnline ? ' Şimdi senkronize edebilirsiniz.' : ' İnternet bağlantısı gerekli.'}'
+                : 'Tüm bakım ve arıza kayıtları Supabase ile senkronize.',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.onSurfaceVariant,
-              height: 1.5,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  height: 1.5,
+                ),
           ),
 
           const SizedBox(height: 24),
@@ -401,9 +398,9 @@ class SyncSheet extends StatelessWidget {
           if (hasPending && isOnline)
             FilledButton.icon(
               icon: const Icon(Icons.sync_rounded),
-              label: const Text('Åimdi Senkronize Et'),
+              label: const Text('Şimdi Senkronize Et'),
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF16A34A),
+                backgroundColor: colors.success,
                 minimumSize: const Size(double.infinity, 50),
               ),
               onPressed: onSync,
@@ -413,25 +410,24 @@ class SyncSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF3C7), // amber-100
+                color: colors.warningContainer,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
-                children: const [
+                children: [
                   Icon(
                     Icons.wifi_off_rounded,
-                    color: Color(0xFFD97706),
+                    color: colors.warning,
                     size: 18,
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Ä°nternet baÄŸlantÄ±sÄ± yok. BaÄŸlantÄ± kurulduÄŸunda otomatik senkronize edilecek.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFFD97706),
-                        height: 1.4,
-                      ),
+                      'İnternet bağlantısı yok. Bağlantı kurulduğunda otomatik senkronize edilecek.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colors.warning,
+                            height: 1.4,
+                          ),
                     ),
                   ),
                 ],

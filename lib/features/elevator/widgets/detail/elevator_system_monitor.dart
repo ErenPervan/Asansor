@@ -30,6 +30,9 @@ class SystemMonitorSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     // ── Live data ──────────────────────────────────────────────────────────
     final latestFaultAsync = ref.watch(latestFaultDateProvider(elevatorId));
     final nextMaintenanceAsync = ref.watch(
@@ -42,18 +45,17 @@ class SystemMonitorSection extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainerLow,
+            color: colors.surfaceContainerLow,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Sistem İzleme',
-                style: TextStyle(
-                  fontSize: 16,
+                style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.onSurface,
+                  color: colors.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -70,7 +72,7 @@ class SystemMonitorSection extends ConsumerWidget {
                         error: (e, s) => '!',
                         data: (dt) => dt != null ? _fmtDateCompact(dt) : '—',
                       ),
-                      valueColor: AppColors.error,
+                      valueColor: colors.error,
                     ),
                   ),
                 ],
@@ -85,7 +87,7 @@ class SystemMonitorSection extends ConsumerWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppColors.primaryDark,
+            color: colors.primaryDark,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Stack(
@@ -151,31 +153,31 @@ class NextMaintenanceContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'SIRADAKİ BAKIM',
-          style: TextStyle(
-            fontSize: 11,
+          style: textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.primaryFixed.withValues(alpha: 0.8),
+            color: colors.primaryFixed.withValues(alpha: 0.8),
             letterSpacing: 1.2,
           ),
         ),
         const SizedBox(height: 20),
         Text(
           dayLabel,
-          style: const TextStyle(
-            fontSize: 36,
+          style: textTheme.displaySmall?.copyWith(
             fontWeight: FontWeight.w900,
             color: Colors.white,
           ),
         ),
         Text(
           dateLabel,
-          style: const TextStyle(
-            fontSize: 16,
+          style: textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
@@ -183,8 +185,7 @@ class NextMaintenanceContent extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           'Periyodik Genel Revizyon',
-          style: TextStyle(
-            fontSize: 12,
+          style: textTheme.bodySmall?.copyWith(
             color: Colors.white.withValues(alpha: 0.7),
           ),
         ),
@@ -197,15 +198,14 @@ class NextMaintenanceContent extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           alignment: Alignment.center,
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.check_circle, color: Colors.white, size: 16),
               SizedBox(width: 8),
               Text(
                 'Planlandı',
-                style: TextStyle(
-                  fontSize: 12,
+                style: textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
@@ -230,6 +230,9 @@ class SystemStatusIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Row(
       children: [
         Container(
@@ -240,10 +243,9 @@ class SystemStatusIndicator extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 13,
+          style: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w500,
-            color: AppColors.onSurface,
+            color: colors.onSurface,
           ),
         ),
       ],
@@ -265,10 +267,13 @@ class SystemStatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
+        color: colors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -276,17 +281,15 @@ class SystemStatChip extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 10,
+            style: textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w700,
-              color: AppColors.outline,
+              color: colors.outline,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 20,
+            style: textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w800,
               color: valueColor,
             ),

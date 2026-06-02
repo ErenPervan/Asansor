@@ -140,7 +140,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Görev başarıyla atandı.'),
-          backgroundColor: Color(0xFF2E7D32),
+          backgroundColor: AppColors.success,
         ),
       );
     }
@@ -178,12 +178,11 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 4),
               child: Row(
                 children: [
-                  const Text(
+                  Text(
                     'Yeni Görev Ata',
-                    style: TextStyle(
-                      fontSize: 20,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: AppColors.onSurface,
+                      color: AppThemeColors.of(context).onSurface,
                     ),
                   ),
                   const Spacer(),
@@ -206,14 +205,13 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // ── Elevator picker ─────────────────────────────────
-                      const SectionLabel(
+                      SectionLabel(
                         icon: Icons.elevator_outlined,
                         label: 'Asansör',
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: TextStyle(
-                          fontSize: 13,
+                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.2,
                         ),
@@ -233,14 +231,13 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Technician picker ────────────────────────────────
-                      const SectionLabel(
+                      SectionLabel(
                         icon: Icons.engineering_outlined,
                         label: 'Teknisyen',
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: TextStyle(
-                          fontSize: 13,
+                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.2,
                         ),
@@ -260,14 +257,13 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Date & Time pickers ──────────────────────────────
-                      const SectionLabel(
+                      SectionLabel(
                         icon: Icons.calendar_today_outlined,
                         label: 'Tarih ve Saat',
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: TextStyle(
-                          fontSize: 13,
+                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.2,
                         ),
@@ -298,14 +294,13 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Priority selector ────────────────────────────────
-                      const SectionLabel(
+                      SectionLabel(
                         icon: Icons.flag_outlined,
                         label: 'Öncelik',
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: TextStyle(
-                          fontSize: 13,
+                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.2,
                         ),
@@ -319,14 +314,13 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Notes ────────────────────────────────────────────
-                      const SectionLabel(
+                      SectionLabel(
                         icon: Icons.notes_outlined,
                         label: 'Notlar (İsteğe Bağlı)',
                         color: AppColors.primary,
                         iconSize: 15,
                         gap: 6,
-                        textStyle: TextStyle(
-                          fontSize: 13,
+                        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.2,
                         ),
@@ -338,9 +332,8 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                         decoration: InputDecoration(
                           hintText:
                               'Görev hakkında ek bilgi veya talimatlar...',
-                          hintStyle: const TextStyle(
+                          hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: AppColors.outline,
-                            fontSize: 14,
                           ),
                           filled: true,
                           fillColor: AppColors.surfaceContainer,
@@ -391,9 +384,8 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                               : const Icon(Icons.assignment_turned_in_outlined),
                           label: Text(
                             isSubmitting ? 'Atanıyor...' : 'Görevi Ata',
-                            style: const TextStyle(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w700,
-                              fontSize: 15,
                             ),
                           ),
                         ),
@@ -468,8 +460,7 @@ class PrioritySelector extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       label,
-                      style: TextStyle(
-                        fontSize: 11,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         fontWeight: isSelected
                             ? FontWeight.w700
                             : FontWeight.w500,
@@ -539,8 +530,7 @@ class PickerField extends StatelessWidget {
                   ? const SizedBox(height: 14, child: LinearProgressIndicator())
                   : Text(
                       hasValue ? value! : hint,
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: hasValue
                             ? FontWeight.w600
                             : FontWeight.w400,

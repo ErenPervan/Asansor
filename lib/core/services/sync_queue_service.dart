@@ -181,7 +181,8 @@ class SyncQueueService extends ChangeNotifier {
         try {
           final item = jsonDecode(raw) as Map<String, dynamic>;
 
-          if (item['status'] == _statusConflictDetected || item['status'] == _statusDeadLetter) {
+          if (item['status'] == _statusConflictDetected ||
+              item['status'] == _statusDeadLetter) {
             failed++;
             continue; // Skip conflicted/dead items, they require manual resolution
           }
@@ -290,7 +291,7 @@ class SyncQueueService extends ChangeNotifier {
         client,
         _pdfPendingRemoteState(queueItem),
       );
-      
+
       queueItem['status'] = _statusSchedulePending;
       await _box.put(key, jsonEncode(queueItem));
 
@@ -686,7 +687,9 @@ class SyncQueueService extends ChangeNotifier {
       if (error.code != null) {
         final code = error.code!;
         // 22xxx (Data Exception), 23xxx (Integrity Constraint Violation), 42xxx (Syntax Error/Access Rule)
-        if (code.startsWith('22') || code.startsWith('23') || code.startsWith('42')) {
+        if (code.startsWith('22') ||
+            code.startsWith('23') ||
+            code.startsWith('42')) {
           return true;
         }
       }

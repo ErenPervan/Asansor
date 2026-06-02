@@ -83,7 +83,7 @@ class NotificationService {
         _state == NotificationServiceState.ready) {
       return;
     }
-    
+
     _state = NotificationServiceState.initializing;
 
     try {
@@ -110,7 +110,8 @@ class NotificationService {
       // Initialise flutter_local_notifications.
       const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
       const iosInit = DarwinInitializationSettings(
-        requestAlertPermission: false, // already requested via FirebaseMessaging
+        requestAlertPermission:
+            false, // already requested via FirebaseMessaging
         requestBadgePermission: false,
         requestSoundPermission: false,
       );

@@ -101,12 +101,15 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
 
       final currentVersion = (report.remotePayload['version'] as int?) ?? 1;
 
-      await _client.rpc('resolve_elevator_conflict', params: {
-        'p_conflict_id': report.id,
-        'p_elevator_id': report.elevatorId,
-        'p_current_version': currentVersion,
-        'p_payload': sanitized,
-      });
+      await _client.rpc(
+        'resolve_elevator_conflict',
+        params: {
+          'p_conflict_id': report.id,
+          'p_elevator_id': report.elevatorId,
+          'p_current_version': currentVersion,
+          'p_payload': sanitized,
+        },
+      );
 
       state = AsyncData(await _fetchPending());
     } catch (e, st) {

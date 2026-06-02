@@ -67,13 +67,7 @@ final authControllerProvider = AsyncNotifierProvider<AuthController, User?>(
 
 // ── App Auth State Machine ───────────────────────────────────────────────────
 
-enum AuthStatus {
-  initial,
-  unauthenticated,
-  profileLoading,
-  authorized,
-  error,
-}
+enum AuthStatus { initial, unauthenticated, profileLoading, authorized, error }
 
 class AuthStateModel {
   final AuthStatus status;
@@ -92,5 +86,5 @@ class AuthStateModel {
 }
 
 // We cannot import profile_providers here to avoid circular dependency.
-// So we will define this in a new file, or we can just keep the model here and 
+// So we will define this in a new file, or we can just keep the model here and
 // define the provider in app_router.dart where it can import everything.

@@ -101,7 +101,9 @@ Future<void> main() async {
   try {
     await NotificationService.instance.initialize();
   } catch (e) {
-    debugPrint('NotificationService initialization failed during bootstrap: $e');
+    debugPrint(
+      'NotificationService initialization failed during bootstrap: $e',
+    );
   }
 
   await initializeDateFormatting('tr_TR', null);

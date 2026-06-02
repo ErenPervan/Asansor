@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -297,7 +298,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppSpacing.sm),
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
@@ -516,7 +517,9 @@ class _MaintenanceDayPicker extends StatelessWidget {
           value: null,
           child: Text(
             'Seçilmedi (sözleşme yok)',
-            style: TextStyle(color: colors.onSurfaceVariant),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
           ),
         ),
         // Days 1–28

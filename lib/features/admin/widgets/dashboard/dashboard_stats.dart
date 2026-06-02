@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/widgets/animated_counter.dart';
@@ -52,7 +53,7 @@ class DashboardStatsGrid extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           // ── Top row: brand card (crimson) + fault alert ──────────────
           Row(
             children: [
@@ -115,7 +116,7 @@ class _StatsGridShimmer extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const ShimmerCard(width: 140, height: 24, borderRadius: 6),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.md),
         Row(
           children: const [
             Expanded(child: ShimmerCard(height: 140, borderRadius: 20)),

@@ -1,3 +1,4 @@
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
@@ -103,14 +104,14 @@ class PdfService {
       pw.MultiPage(
         pageTheme: pw.PageTheme(
           pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.all(32),
+          margin: const pw.EdgeInsets.all(AppSpacing.xl),
           theme: theme,
         ),
         build: (context) {
           return [
             // 1. HEADER SECTION
             pw.Container(
-              padding: const pw.EdgeInsets.all(16),
+              padding: const pw.EdgeInsets.all(AppSpacing.md),
               decoration: pw.BoxDecoration(
                 color: surfaceColor,
                 borderRadius: const pw.BorderRadius.all(pw.Radius.circular(12)),
@@ -141,7 +142,7 @@ class PdfService {
                           ),
                         ),
                       ),
-                      pw.SizedBox(height: 16),
+                      pw.SizedBox(height: AppSpacing.md),
                       pw.Text(
                         'MAINTENANCE REPORT',
                         style: pw.TextStyle(
@@ -181,7 +182,7 @@ class PdfService {
                 ],
               ),
             ),
-            pw.SizedBox(height: 32),
+            pw.SizedBox(height: AppSpacing.xl),
 
             // 2. BODY SECTION 1: CHECKLIST
             pw.Text(
@@ -261,7 +262,7 @@ class PdfService {
                 ),
               ],
             ),
-            pw.SizedBox(height: 32),
+            pw.SizedBox(height: AppSpacing.xl),
 
             // 3. BODY SECTION 2: MEDIA
             if (mediaImageProviders.isNotEmpty) ...[
@@ -294,7 +295,7 @@ class PdfService {
                   );
                 }).toList(),
               ),
-              pw.SizedBox(height: 32),
+              pw.SizedBox(height: AppSpacing.xl),
             ],
 
             // NOTES SECTION
@@ -307,7 +308,7 @@ class PdfService {
                   color: primaryColor,
                 ),
               ),
-              pw.SizedBox(height: 8),
+              pw.SizedBox(height: AppSpacing.sm),
               pw.Container(
                 width: double.infinity,
                 padding: const pw.EdgeInsets.all(12),
@@ -322,13 +323,13 @@ class PdfService {
                   style: const pw.TextStyle(fontSize: 11),
                 ),
               ),
-              pw.SizedBox(height: 32),
+              pw.SizedBox(height: AppSpacing.xl),
             ],
 
             // 4. FOOTER: SIGNATURES
             pw.Spacer(),
             pw.Divider(color: outlineColor, thickness: 0.5),
-            pw.SizedBox(height: 16),
+            pw.SizedBox(height: AppSpacing.md),
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               crossAxisAlignment: pw.CrossAxisAlignment.end,
@@ -344,7 +345,7 @@ class PdfService {
                       'Technician Signature',
                       onSurface,
                     ),
-                    pw.SizedBox(width: 24),
+                    pw.SizedBox(width: AppSpacing.lg),
                     _buildSignatureBlock(
                       customerSignatureImageProvider,
                       'Customer Signature',
@@ -383,7 +384,7 @@ class PdfService {
             fontSize: 11,
           ),
         ),
-        pw.SizedBox(width: 8),
+        pw.SizedBox(width: AppSpacing.sm),
         pw.Text(
           value,
           style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
@@ -408,7 +409,7 @@ class PdfService {
           )
         else
           pw.SizedBox(height: 60),
-        pw.SizedBox(height: 8),
+        pw.SizedBox(height: AppSpacing.sm),
         pw.Container(width: 140, height: 1, color: lineColor),
         pw.SizedBox(height: 4),
         pw.Text(
@@ -438,12 +439,12 @@ class PdfService {
   static const _textMuted = PdfColor.fromInt(0xFF546E7A);
   static const _accentIndigo = PdfColor.fromInt(0xFF3949AB);
 
-  // ── Public API ────────────────────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Public API Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
   /// Builds a corporate-styled A4 PDF for [elevator] covering [logs].
   ///
   /// The document uses [PdfGoogleFonts.nunitoSans*] which supports the full
-  /// Latin-Extended-A block, including all Turkish characters (ç ş ğ ü ö ı İ).
+  /// Latin-Extended-A block, including all Turkish characters (ÃƒÂ§ Ã…Å¸ Ã„Å¸ ÃƒÂ¼ ÃƒÂ¶ Ã„Â± Ã„Â°).
   Future<pw.Document> generateElevatorReport(
     ElevatorModel elevator,
     List<MaintenanceLogModel> logs,
@@ -475,7 +476,7 @@ class PdfService {
     final doc = pw.Document(theme: baseTheme);
 
     // pageTheme owns ALL page-level settings; never pass pageFormat / margin /
-    // theme / orientation / clip / textDirection alongside it — the pdf library
+    // theme / orientation / clip / textDirection alongside it Ã¢â‚¬â€ the pdf library
     // asserts that the two styles are mutually exclusive.
     doc.addPage(
       pw.MultiPage(
@@ -510,7 +511,7 @@ class PdfService {
     return doc;
   }
 
-  // ── Section builders ──────────────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Section builders Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
   pw.Widget _buildHeader(
     ElevatorModel elevator,
@@ -529,7 +530,7 @@ class PdfService {
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           pw.Text(
-            'ASANSÖR BAKIM RAPORU',
+            'ASANSÃƒâ€“R BAKIM RAPORU',
             style: pw.TextStyle(
               font: bold,
               fontSize: 20,
@@ -579,7 +580,7 @@ class PdfService {
     String period,
   ) {
     return pw.Container(
-      padding: const pw.EdgeInsets.all(16),
+      padding: const pw.EdgeInsets.all(AppSpacing.md),
       decoration: pw.BoxDecoration(
         color: _rowAlt,
         borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
@@ -588,31 +589,31 @@ class PdfService {
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          _sectionLabel('ASANSÖR BİLGİLERİ', bold),
+          _sectionLabel('ASANSÃƒâ€“R BÃ„Â°LGÃ„Â°LERÃ„Â°', bold),
           pw.SizedBox(height: 10),
           pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Expanded(
                 child: _infoRow(
-                  'Bina Adı',
+                  'Bina AdÃ„Â±',
                   elevator.buildingName,
                   bold,
                   regular,
                 ),
               ),
-              pw.SizedBox(width: 24),
+              pw.SizedBox(width: AppSpacing.lg),
               pw.Expanded(
                 child: _infoRow(
                   'Adres',
-                  elevator.address ?? 'Belirtilmemiş',
+                  elevator.address ?? 'BelirtilmemiÃ…Å¸',
                   bold,
                   regular,
                 ),
               ),
             ],
           ),
-          pw.SizedBox(height: 8),
+          pw.SizedBox(height: AppSpacing.sm),
           pw.Row(
             children: [
               pw.Expanded(
@@ -623,9 +624,9 @@ class PdfService {
                   regular,
                 ),
               ),
-              pw.SizedBox(width: 24),
+              pw.SizedBox(width: AppSpacing.lg),
               pw.Expanded(
-                child: _infoRow('Rapor Dönemi', period, bold, regular),
+                child: _infoRow('Rapor DÃƒÂ¶nemi', period, bold, regular),
               ),
             ],
           ),
@@ -643,7 +644,7 @@ class PdfService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        _sectionLabel('BAKIM GEÇMİŞİ', bold),
+        _sectionLabel('BAKIM GEÃƒâ€¡MÃ„Â°Ã…ÂÃ„Â°', bold),
         pw.SizedBox(height: 10),
         pw.Table(
           border: pw.TableBorder.all(color: _borderColor, width: 0.6),
@@ -654,24 +655,24 @@ class PdfService {
             3: const pw.FixedColumnWidth(72),
           },
           children: [
-            // ── Header row ────────────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Header row Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             pw.TableRow(
               decoration: const pw.BoxDecoration(color: _accentIndigo),
               children: [
-                _tableHeader('TARİH', bold),
-                _tableHeader('TEKNİSYEN', bold),
-                _tableHeader('YAPILAN İŞLEMLER / NOTLAR', bold),
+                _tableHeader('TARÃ„Â°H', bold),
+                _tableHeader('TEKNÃ„Â°SYEN', bold),
+                _tableHeader('YAPILAN Ã„Â°Ã…ÂLEMLER / NOTLAR', bold),
                 _tableHeader('ONAY', bold),
               ],
             ),
-            // ── Data rows ─────────────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Data rows Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             if (logs.isEmpty)
               pw.TableRow(
                 children: [
                   pw.Padding(
                     padding: const pw.EdgeInsets.all(10),
                     child: pw.Text(
-                      'Bu dönemde kayıt bulunamadı.',
+                      'Bu dÃƒÂ¶nemde kayÃ„Â±t bulunamadÃ„Â±.',
                       style: pw.TextStyle(font: italic, color: _textMuted),
                       textAlign: pw.TextAlign.center,
                     ),
@@ -691,9 +692,9 @@ class PdfService {
                   children: [
                     _tableCell(_fmtDate(log.maintenanceDate), regular),
                     _tableCell(_shortId(log.technicianId), regular),
-                    _tableCell(log.notes ?? '—', regular),
+                    _tableCell(log.notes ?? 'Ã¢â‚¬â€', regular),
                     _tableCellCenter(
-                      log.isApproved ? '✓' : '⏳',
+                      log.isApproved ? 'Ã¢Å“â€œ' : 'Ã¢ÂÂ³',
                       log.isApproved ? bold : regular,
                       color: log.isApproved
                           ? PdfColor.fromInt(0xFF1B6B3A)
@@ -706,7 +707,7 @@ class PdfService {
         ),
         pw.SizedBox(height: 6),
         pw.Text(
-          'Toplam kayıt: ${logs.length}',
+          'Toplam kayÃ„Â±t: ${logs.length}',
           style: pw.TextStyle(font: regular, fontSize: 9, color: _textMuted),
         ),
       ],
@@ -729,7 +730,7 @@ class PdfService {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
-                  'Onaylayan / İmza',
+                  'Onaylayan / Ã„Â°mza',
                   style: pw.TextStyle(
                     font: bold,
                     fontSize: 9,
@@ -737,7 +738,7 @@ class PdfService {
                     letterSpacing: 0.6,
                   ),
                 ),
-                pw.SizedBox(height: 24),
+                pw.SizedBox(height: AppSpacing.lg),
                 pw.Container(height: 0.8, width: 160, color: _textDark),
                 pw.SizedBox(height: 4),
                 pw.Text(
@@ -756,7 +757,7 @@ class PdfService {
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
               pw.Text(
-                'Oluşturulma Tarihi',
+                'OluÃ…Å¸turulma Tarihi',
                 style: pw.TextStyle(
                   font: bold,
                   fontSize: 9,
@@ -773,9 +774,9 @@ class PdfService {
                   color: _textDark,
                 ),
               ),
-              pw.SizedBox(height: 8),
+              pw.SizedBox(height: AppSpacing.sm),
               pw.Text(
-                'Bu rapor otomatik olarak oluşturulmuştur.',
+                'Bu rapor otomatik olarak oluÃ…Å¸turulmuÃ…Å¸tur.',
                 style: pw.TextStyle(
                   font: regular,
                   fontSize: 8,
@@ -790,7 +791,7 @@ class PdfService {
     );
   }
 
-  // ── Small helpers ─────────────────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Small helpers Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
   pw.Widget _sectionLabel(String text, pw.Font bold) {
     return pw.Row(
@@ -882,7 +883,7 @@ class PdfService {
     );
   }
 
-  // ── Date/string utilities ─────────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Date/string utilities Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
   String _fmtDate(DateTime dt) {
     final d = dt.toLocal();
@@ -898,17 +899,17 @@ class PdfService {
         '${d.minute.toString().padLeft(2, '0')}';
   }
 
-  /// Returns a human-readable "last 6 months" period label, e.g. "Eki 2025 – Nis 2026".
+  /// Returns a human-readable "last 6 months" period label, e.g. "Eki 2025 Ã¢â‚¬â€œ Nis 2026".
   String _periodLabel(DateTime now) {
     const months = [
       'Oca',
-      'Şub',
+      'Ã…Âub',
       'Mar',
       'Nis',
       'May',
       'Haz',
       'Tem',
-      'Ağu',
+      'AÃ„Å¸u',
       'Eyl',
       'Eki',
       'Kas',
@@ -920,22 +921,22 @@ class PdfService {
       from.month <= 0 ? 12 + from.month : from.month,
       1,
     );
-    return '${months[fromNorm.month - 1]} ${fromNorm.year} – '
+    return '${months[fromNorm.month - 1]} ${fromNorm.year} Ã¢â‚¬â€œ '
         '${months[now.month - 1]} ${now.year}';
   }
 
   /// Shortens a UUID to a readable 8-character fragment.
   String _shortId(String id) =>
-      id.length > 8 ? '…${id.substring(id.length - 8)}' : id;
+      id.length > 8 ? 'Ã¢â‚¬Â¦${id.substring(id.length - 8)}' : id;
 
   String _statusTr(String status) {
     switch (status.toLowerCase()) {
       case 'active':
         return 'Aktif';
       case 'faulty':
-        return 'Arızalı';
+        return 'ArÃ„Â±zalÃ„Â±';
       case 'under_maintenance':
-        return 'Bakımda';
+        return 'BakÃ„Â±mda';
       case 'inactive':
         return 'Pasif';
       default:

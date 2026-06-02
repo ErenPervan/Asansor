@@ -1,4 +1,6 @@
+import 'package:asansor/core/widgets/loading_state.dart';
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 
 import 'package:flutter/services.dart';
 
@@ -13,7 +15,7 @@ import '../models/technician_stats.dart';
 import '../providers/admin_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
-// ── Main view ─────────────────────────────────────────────────────────────────
+// â”€â”€ Main view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class TechnicianManagementView extends ConsumerWidget {
   const TechnicianManagementView({super.key});
@@ -40,8 +42,7 @@ class TechnicianManagementView extends ConsumerWidget {
         ],
       ),
       body: dataAsync.when(
-        loading: () =>
-            Center(child: CircularProgressIndicator(color: colors.primary)),
+        loading: () => const LoadingState(),
         error: (e, st) => _ErrorBody(
           error: e,
           onRetry: () => ref.invalidate(technicianManagementProvider),
@@ -52,7 +53,7 @@ class TechnicianManagementView extends ConsumerWidget {
   }
 }
 
-// ── List ──────────────────────────────────────────────────────────────────────
+// â”€â”€ List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _TechnicianList extends StatelessWidget {
   const _TechnicianList({required this.stats});
@@ -101,7 +102,7 @@ class _TechnicianList extends StatelessWidget {
                         onTap: () => _showDetailSheet(context, stats[idx1]),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: idx2 < stats.length
                           ? _TechnicianCard(
@@ -121,8 +122,9 @@ class _TechnicianList extends StatelessWidget {
         return ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
           itemCount: stats.length + 1, // +1 for header
-          separatorBuilder: (_, i) =>
-              i == 0 ? const SizedBox(height: 16) : const SizedBox(height: 12),
+          separatorBuilder: (_, i) => i == 0
+              ? const SizedBox(height: AppSpacing.md)
+              : const SizedBox(height: 12),
           itemBuilder: (_, i) {
             if (i == 0) {
               return _SummaryHeader(
@@ -152,7 +154,7 @@ class _TechnicianList extends StatelessWidget {
   }
 }
 
-// ── Summary header ────────────────────────────────────────────────────────────
+// â”€â”€ Summary header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _SummaryHeader extends StatelessWidget {
   const _SummaryHeader({
@@ -170,7 +172,7 @@ class _SummaryHeader extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -191,7 +193,7 @@ class _SummaryHeader extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           _StatPill(
-            label: 'Müsait',
+            label: 'MÃ¼sait',
             value: free,
             light: true,
             accent: colors.warningLight,
@@ -208,7 +210,7 @@ class _SummaryHeader extends StatelessWidget {
                 ),
               ),
               Text(
-                'Bugün',
+                'BugÃ¼n',
                 style: textTheme.labelSmall?.copyWith(
                   color: Colors.white.withValues(alpha: 0.7),
                 ),
@@ -258,7 +260,7 @@ class _StatPill extends StatelessWidget {
   }
 }
 
-// ── Technician card ───────────────────────────────────────────────────────────
+// â”€â”€ Technician card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _TechnicianCard extends StatelessWidget {
   const _TechnicianCard({required this.stats, required this.onTap});
@@ -293,11 +295,11 @@ class _TechnicianCard extends StatelessWidget {
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Top row: avatar + info ──────────────────────────
+                // â”€â”€ Top row: avatar + info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -360,7 +362,7 @@ class _TechnicianCard extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: AppSpacing.sm),
                               _MonthlyBadge(
                                 count: stats.monthlyCompleted,
                                 colors: colors,
@@ -420,12 +422,12 @@ class _TechnicianCard extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                // ── Workload bar ────────────────────────────────────
+                // â”€â”€ Workload bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 if (stats.todayTotal > 0) ...[
                   Row(
                     children: [
                       Text(
-                        'Bugünkü İlerleme',
+                        'BugÃ¼nkÃ¼ Ä°lerleme',
                         style: textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colors.onSurfaceVariant,
@@ -433,7 +435,7 @@ class _TechnicianCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        '${stats.todayCompleted}/${stats.todayTotal} görev',
+                        '${stats.todayCompleted}/${stats.todayTotal} gÃ¶rev',
                         style: textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: colors.onSurfaceVariant,
@@ -454,8 +456,8 @@ class _TechnicianCard extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     allDone
-                        ? '✓ Tüm görevler tamamlandı'
-                        : '${stats.todayPending} görev bekliyor',
+                        ? 'âœ“ TÃ¼m gÃ¶revler tamamlandÄ±'
+                        : '${stats.todayPending} gÃ¶rev bekliyor',
                     style: textTheme.labelSmall?.copyWith(
                       color: allDone ? colors.success : colors.outline,
                       fontWeight: allDone ? FontWeight.w700 : FontWeight.normal,
@@ -463,7 +465,7 @@ class _TechnicianCard extends StatelessWidget {
                   ),
                 ] else
                   Text(
-                    'Bugün için planlanmış görev yok',
+                    'BugÃ¼n iÃ§in planlanmÄ±ÅŸ gÃ¶rev yok',
                     style: textTheme.labelSmall?.copyWith(
                       color: colors.outline,
                       fontStyle: FontStyle.italic,
@@ -472,7 +474,7 @@ class _TechnicianCard extends StatelessWidget {
 
                 Divider(height: 20, color: colors.outlineVariant),
 
-                // ── Action buttons ──────────────────────────────────
+                // â”€â”€ Action buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 Row(
                   children: [
                     _ActionButton(
@@ -503,8 +505,8 @@ class _TechnicianCard extends StatelessWidget {
                       icon: const Icon(Icons.list_alt_rounded, size: 16),
                       label: Text(
                         stats.todayTotal > 0
-                            ? '${stats.todayTotal} Görev'
-                            : 'Görevler',
+                            ? '${stats.todayTotal} GÃ¶rev'
+                            : 'GÃ¶revler',
                         style: textTheme.labelSmall,
                       ),
                       style: TextButton.styleFrom(
@@ -530,7 +532,7 @@ class _TechnicianCard extends StatelessWidget {
     if (phone == null || phone.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$name için telefon numarası kayıtlı değil.'),
+          content: Text('$name iÃ§in telefon numarasÄ± kayÄ±tlÄ± deÄŸil.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -539,7 +541,7 @@ class _TechnicianCard extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: phone));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$name: $phone — Kopyalandı'),
+        content: Text('$name: $phone â€” KopyalandÄ±'),
         behavior: SnackBarBehavior.floating,
         action: SnackBarAction(label: 'Tamam', onPressed: () {}),
       ),
@@ -550,7 +552,7 @@ class _TechnicianCard extends StatelessWidget {
     if (phone == null || phone.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$name için telefon numarası kayıtlı değil.'),
+          content: Text('$name iÃ§in telefon numarasÄ± kayÄ±tlÄ± deÄŸil.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -559,7 +561,7 @@ class _TechnicianCard extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: phone));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Numara kopyalandı: $phone'),
+        content: Text('Numara kopyalandÄ±: $phone'),
         behavior: SnackBarBehavior.floating,
         action: SnackBarAction(label: 'Tamam', onPressed: () {}),
       ),
@@ -567,7 +569,7 @@ class _TechnicianCard extends StatelessWidget {
   }
 }
 
-// ── Monthly badge ─────────────────────────────────────────────────────────────
+// â”€â”€ Monthly badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _MonthlyBadge extends StatelessWidget {
   const _MonthlyBadge({
@@ -589,7 +591,7 @@ class _MonthlyBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        'Bu Ay: $count İş',
+        'Bu Ay: $count Ä°ÅŸ',
         style: textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w700,
           color: count > 0 ? colors.success : colors.outline,
@@ -599,7 +601,7 @@ class _MonthlyBadge extends StatelessWidget {
   }
 }
 
-// ── Action button ─────────────────────────────────────────────────────────────
+// â”€â”€ Action button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
@@ -646,7 +648,7 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-// ── Technician detail sheet (DraggableScrollableSheet) ────────────────────────
+// â”€â”€ Technician detail sheet (DraggableScrollableSheet) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _TechnicianDetailSheet extends StatelessWidget {
   const _TechnicianDetailSheet({required this.stats});
@@ -671,7 +673,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // ── Handle ─────────────────────────────────────────────
+              // â”€â”€ Handle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               const SizedBox(height: 12),
               Center(
                 child: Container(
@@ -683,9 +685,9 @@ class _TechnicianDetailSheet extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
 
-              // ── Sheet header ────────────────────────────────────────
+              // â”€â”€ Sheet header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -715,9 +717,9 @@ class _TechnicianDetailSheet extends StatelessWidget {
                           ),
                           Text(
                             stats.todayTotal == 0
-                                ? 'Bugün görev yok'
-                                : '${stats.todayTotal} görev — '
-                                      '${stats.todayCompleted} tamamlandı',
+                                ? 'BugÃ¼n gÃ¶rev yok'
+                                : '${stats.todayTotal} gÃ¶rev â€” '
+                                      '${stats.todayCompleted} tamamlandÄ±',
                             style: textTheme.labelSmall?.copyWith(
                               color: colors.onSurfaceVariant,
                             ),
@@ -735,7 +737,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
 
               Divider(height: 20, color: colors.outlineVariant),
 
-              // ── Task list ───────────────────────────────────────────
+              // â”€â”€ Task list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               Expanded(
                 child: stats.todayTasks.isEmpty
                     ? _SheetEmptyView(name: stats.profile.displayName)
@@ -763,7 +765,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
   }
 }
 
-// ── Timeline task item ────────────────────────────────────────────────────────
+// â”€â”€ Timeline task item â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _TimelineTaskItem extends StatelessWidget {
   const _TimelineTaskItem({
@@ -913,7 +915,7 @@ class _TimelineTaskItem extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: AppSpacing.sm),
                                   // Badges row
                                   Wrap(
                                     spacing: 6,
@@ -972,7 +974,7 @@ class _TimelineTaskItem extends StatelessWidget {
   }
 }
 
-// ── Small badge ───────────────────────────────────────────────────────────────
+// â”€â”€ Small badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _SmallBadge extends StatelessWidget {
   const _SmallBadge({
@@ -997,11 +999,11 @@ class _SmallBadge extends StatelessWidget {
       'completed' => ('TAMAMLANDI', colors.successContainer, colors.success),
       'in_progress' => ('DEVAM', colors.warningContainer, colors.warning),
       'cancelled' => (
-        'İPTAL',
+        'Ä°PTAL',
         colors.surfaceContainerHigh,
         colors.onSurfaceVariant,
       ),
-      _ => ('BEKLİYOR', colors.surfaceContainer, colors.onSurface),
+      _ => ('BEKLÄ°YOR', colors.surfaceContainer, colors.onSurface),
     };
     return _SmallBadge(label: lbl, bg: bg, fg: fg, textTheme: textTheme);
   }
@@ -1013,9 +1015,13 @@ class _SmallBadge extends StatelessWidget {
   ) {
     final colors = AppThemeColors.of(context);
     final (lbl, bg, fg) = switch (p) {
-      'emergency' => ('ACİL', colors.errorContainer, colors.error),
-      'high' => ('YÜKSEK', colors.warningContainer, colors.warning),
-      'low' => ('DÜŞÜK', colors.surfaceContainerHigh, colors.onSurfaceVariant),
+      'emergency' => ('ACÄ°L', colors.errorContainer, colors.error),
+      'high' => ('YÃœKSEK', colors.warningContainer, colors.warning),
+      'low' => (
+        'DÃœÅÃœK',
+        colors.surfaceContainerHigh,
+        colors.onSurfaceVariant,
+      ),
       _ => ('NORMAL', colors.surfaceContainer, colors.onSurface),
     };
     return _SmallBadge(label: lbl, bg: bg, fg: fg, textTheme: textTheme);
@@ -1042,7 +1048,7 @@ class _SmallBadge extends StatelessWidget {
   }
 }
 
-// ── Empty / error states ──────────────────────────────────────────────────────
+// â”€â”€ Empty / error states â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _EmptyBody extends StatelessWidget {
   const _EmptyBody();
@@ -1068,9 +1074,9 @@ class _EmptyBody extends StatelessWidget {
               color: colors.outline,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           Text(
-            'Henüz teknisyen kaydı yok',
+            'HenÃ¼z teknisyen kaydÄ± yok',
             style: textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
               color: colors.onSurface,
@@ -1078,7 +1084,7 @@ class _EmptyBody extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Kullanıcı yönetiminden teknisyen rolü atayın.',
+            'KullanÄ±cÄ± yÃ¶netiminden teknisyen rolÃ¼ atayÄ±n.',
             style: textTheme.labelMedium?.copyWith(
               color: colors.onSurfaceVariant,
             ),
@@ -1103,14 +1109,14 @@ class _ErrorBody extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.cloud_off_outlined, size: 48, color: colors.outline),
             const SizedBox(height: 12),
             Text(
-              'Veriler yüklenemedi',
+              'Veriler yÃ¼klenemedi',
               style: textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: colors.onSurface,
@@ -1151,7 +1157,7 @@ class _SheetEmptyView extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1162,7 +1168,7 @@ class _SheetEmptyView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '$name için bugün\nplanlanmış görev yok',
+              '$name iÃ§in bugÃ¼n\nplanlanmÄ±ÅŸ gÃ¶rev yok',
               textAlign: TextAlign.center,
               style: textTheme.labelLarge?.copyWith(
                 color: colors.onSurfaceVariant,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/widgets/loading_state.dart';
 import '../models/checklist_item_model.dart';
 import '../providers/checklist_provider.dart';
 
@@ -155,10 +156,8 @@ class ChecklistManagementView extends ConsumerWidget {
                 ),
               );
             },
-            loading: () => SliverFillRemaining(
-              child: Center(
-                child: CircularProgressIndicator(color: colors.primary),
-              ),
+            loading: () => const SliverFillRemaining(
+              child: LoadingState(count: 5, height: 80),
             ),
             error: (err, _) => SliverFillRemaining(
               child: _ErrorState(
@@ -260,7 +259,7 @@ class ChecklistManagementView extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.lg),
 
                       // Label field
                       TextFormField(
@@ -490,7 +489,7 @@ class _SectionHeader extends StatelessWidget {
             letterSpacing: 0.3,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.sm),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
@@ -641,7 +640,7 @@ class _EmptyState extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -657,7 +656,7 @@ class _EmptyState extends StatelessWidget {
                 color: colors.primary,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
             Text(
               'Henüz kontrol kalemi yok',
               style: textTheme.titleMedium?.copyWith(
@@ -665,7 +664,7 @@ class _EmptyState extends StatelessWidget {
                 color: colors.onSurface,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'Bakım kontrol listesine kalem ekleyerek\nteknisyenlerin iş kalitesini artırın.',
               textAlign: TextAlign.center,
@@ -717,7 +716,7 @@ class _ErrorState extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -741,7 +740,7 @@ class _ErrorState extends StatelessWidget {
                 color: colors.onSurface,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -749,7 +748,7 @@ class _ErrorState extends StatelessWidget {
                 color: colors.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),

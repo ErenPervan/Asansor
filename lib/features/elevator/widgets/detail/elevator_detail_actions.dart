@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/animations/animated_press_button.dart';
 
@@ -30,7 +31,7 @@ class ElevatorDetailActions extends StatelessWidget {
             labelColor: colors.onErrorContainer,
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppSpacing.md),
         // "Bakım Ekle" — primary background
         Expanded(
           child: ElevatorActionCard(

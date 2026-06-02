@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -51,13 +52,13 @@ class _FaultListViewState extends ConsumerState<FaultListView> {
                   isSelected: _filterIndex == 0,
                   onSelected: () => setState(() => _filterIndex = 0),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 _FilterChip(
                   label: 'Açık',
                   isSelected: _filterIndex == 1,
                   onSelected: () => setState(() => _filterIndex = 1),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 _FilterChip(
                   label: 'Çözüldü',
                   isSelected: _filterIndex == 2,
@@ -91,7 +92,7 @@ class _FaultListViewState extends ConsumerState<FaultListView> {
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(allFaultsProvider),
             child: ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.md),
               itemCount: filtered.length,
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
@@ -179,7 +180,7 @@ class _FaultCard extends StatelessWidget {
       child: InkWell(
         onTap: () => context.push('/fault/${fault.id}'),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

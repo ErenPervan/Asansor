@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 
 // ── Checklist Management Card ──────────────────────────────────────────────────
@@ -53,7 +54,7 @@ class ChecklistCard extends StatelessWidget {
                   size: 28,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +78,7 @@ class ChecklistCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: colors.outline,
@@ -144,7 +145,7 @@ class StatisticsCard extends StatelessWidget {
                   size: 28,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,7 +169,7 @@ class StatisticsCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               const Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: Colors.white70,

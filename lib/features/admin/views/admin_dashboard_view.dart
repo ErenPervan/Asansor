@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -51,7 +52,7 @@ class AdminDashboardView extends ConsumerWidget {
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -60,10 +61,10 @@ class AdminDashboardView extends ConsumerWidget {
                   count: syncQueue.conflictCount,
                   onTap: () => context.push('/admin/conflicts'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.md),
               ],
               DashboardStatsGrid(stats: stats),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               AddElevatorBanner(
                 onTap: () => context.push('/admin/add-elevator'),
               ),
@@ -116,7 +117,7 @@ class AdminDashboardView extends ConsumerWidget {
                   }
                 },
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xl),
               DashboardScheduleList(
                 schedules: schedules,
                 elevators: elevators.valueOrNull,

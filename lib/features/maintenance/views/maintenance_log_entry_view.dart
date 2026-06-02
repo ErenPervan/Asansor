@@ -292,12 +292,12 @@ class _MaintenanceLogEntryViewState
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  contentPadding: const EdgeInsets.all(32),
+                  contentPadding: const EdgeInsets.all(AppSpacing.xl),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
                           color: colors.success.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
@@ -308,7 +308,7 @@ class _MaintenanceLogEntryViewState
                           size: 64,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.lg),
                       Text(
                         'Bakım Kaydedildi',
                         style: Theme.of(context).textTheme.headlineSmall
@@ -411,7 +411,7 @@ class _MaintenanceLogEntryViewState
                         ),
                         if (elevator.address != null &&
                             elevator.address!.isNotEmpty) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppSpacing.sm),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -682,7 +682,7 @@ class _MaintenanceLogEntryViewState
                     }),
                   ),
                 ] else ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   const Text('Henüz fotoğraf eklenmedi.'),
                 ],
 
@@ -733,7 +733,7 @@ class _MaintenanceLogEntryViewState
                   },
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacing.xl),
 
                 // Submit Button
                 AnimatedPressButton(

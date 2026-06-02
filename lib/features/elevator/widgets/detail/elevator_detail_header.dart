@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/status_tokens.dart';
 import '../../models/elevator_model.dart';
@@ -15,7 +16,7 @@ class ElevatorDetailHeader extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return InfoCard(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       radius: 16,
       backgroundColor: colors.surfaceContainerLowest,
       borderColor: Colors.transparent,
@@ -51,7 +52,7 @@ class ElevatorDetailHeader extends StatelessWidget {
                         size: 28,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,7 +97,7 @@ class ElevatorDetailHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               // Dynamic status badge
               DetailStatusBadge(status: elevator.status),
             ],

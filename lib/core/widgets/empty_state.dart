@@ -18,6 +18,7 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -27,17 +28,16 @@ class EmptyState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: AppColors.surfaceContainer,
+                color: colors.surfaceContainer,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 48, color: AppColors.outline),
+              child: Icon(icon, size: 48, color: colors.outline),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
               message,
-              style: const TextStyle(
-                fontSize: 16,
-                color: AppColors.onSurfaceVariant,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: colors.onSurfaceVariant,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -49,7 +49,7 @@ class EmptyState extends StatelessWidget {
                 icon: const Icon(Icons.add_rounded),
                 label: Text(actionLabel!),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: colors.primary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.xl,
                     vertical: AppSpacing.md,

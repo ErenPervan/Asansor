@@ -53,6 +53,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
   // â”€â”€ Date / time pickers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   Future<void> _pickDate() async {
+    final colors = AppThemeColors.of(context);
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
@@ -62,9 +63,9 @@ class _AssignViewState extends ConsumerState<AssignView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
+            colorScheme: ColorScheme.light(
+              primary: colors.primary,
+              onPrimary: colors.surface,
             ),
           ),
           child: child!,
@@ -75,15 +76,16 @@ class _AssignViewState extends ConsumerState<AssignView> {
   }
 
   Future<void> _pickTime() async {
+    final colors = AppThemeColors.of(context);
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime ?? TimeOfDay.now(),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
+            colorScheme: ColorScheme.light(
+              primary: colors.primary,
+              onPrimary: colors.surface,
             ),
           ),
           child: child!,
@@ -158,10 +160,11 @@ class _AssignViewState extends ConsumerState<AssignView> {
     if (isError) {
       unawaited(HapticFeedback.heavyImpact());
     }
+    final colors = AppThemeColors.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.primary,
+        backgroundColor: isError ? colors.error : colors.primary,
         behavior: SnackBarBehavior.floating,
         duration: isError
             ? AppDurations.snackBarError
@@ -174,6 +177,9 @@ class _AssignViewState extends ConsumerState<AssignView> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     final elevatorsAsync = ref.watch(elevatorsProvider);
     final techniciansAsync = ref.watch(profilesByRoleProvider('technician'));
     final controllerState = ref.watch(scheduleControllerProvider);
@@ -184,20 +190,24 @@ class _AssignViewState extends ConsumerState<AssignView> {
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && isLoading) {
           _showSnack(
-            'LÃ¼tfen iÅŸlem tamamlanana kadar bekleyin.',
+            'Lütfen işlem tamamlanana kadar bekleyin.',
             isError: true,
           );
         }
       },
       child: Scaffold(
-        backgroundColor: AppThemeColors.of(context).background,
+        backgroundColor: colors.background,
         appBar: AppBar(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: colors.primary,
+          foregroundColor: colors.surface,
           elevation: 0,
-          title: const Text(
-            'GÃ¶rev Ata',
-            style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.3),
+          title: Text(
+            'Görev Ata',
+            style: textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+              color: colors.surface,
+            ),
           ),
         ),
         body: SingleChildScrollView(
@@ -207,15 +217,15 @@ class _AssignViewState extends ConsumerState<AssignView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // â”€â”€ Elevator Selector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Elevator Selector ───────────────────────────────────────
                 const SectionLabel(
                   icon: Icons.elevator_outlined,
-                  label: 'AsansÃ¶r SeÃ§',
+                  label: 'Asansör Seç',
                 ),
                 const SizedBox(height: 12),
                 elevatorsAsync.when(
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
+                  loading: () => Center(
+                    child: CircularProgressIndicator(color: colors.primary),
                   ),
                   error: (e, _) => _InlineError(
                     message: e.toString().replaceFirst('Exception: ', ''),
@@ -223,7 +233,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                   data: (elevators) {
                     if (elevators.isEmpty) {
                       return const _InlineError(
-                        message: 'KayÄ±tlÄ± asansÃ¶r bulunamadÄ±.',
+                        message: 'Kayıtlı asansör bulunamadı.',
                       );
                     }
                     return _ElevatorSelector(
@@ -236,18 +246,18 @@ class _AssignViewState extends ConsumerState<AssignView> {
 
                 const SizedBox(height: 28),
 
-                // â”€â”€ Technician UUID â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Technician UUID ─────────────────────────────────────────
                 const SectionLabel(
                   icon: Icons.person_search_outlined,
-                  label: 'Teknisyen SeÃ§',
+                  label: 'Teknisyen Seç',
                 ),
                 const SizedBox(height: 12),
                 techniciansAsync.when(
-                  loading: () => const Center(
+                  loading: () => Center(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       child: CircularProgressIndicator(
-                        color: AppColors.primary,
+                        color: colors.primary,
                       ),
                     ),
                   ),
@@ -264,9 +274,9 @@ class _AssignViewState extends ConsumerState<AssignView> {
                     return DropdownButtonFormField<ProfileModel>(
                       initialValue: _selectedTechnician,
                       decoration: appInputDecoration(
-                        hint: 'Teknisyen seÃ§in...',
+                        hint: 'Teknisyen seçin...',
                         helper:
-                            'Teknisyen seÃ§ildiÄŸinde UUID otomatik yazÄ±lÄ±r.',
+                            'Teknisyen seçildiğinde UUID otomatik yazılır.',
                       ),
                       icon: const Icon(Icons.expand_more),
                       isExpanded: true,
@@ -280,17 +290,16 @@ class _AssignViewState extends ConsumerState<AssignView> {
                                 children: [
                                   Text(
                                     t.displayName,
-                                    style: const TextStyle(
+                                    style: textTheme.labelLarge?.copyWith(
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.onSurface,
+                                      color: colors.onSurface,
                                     ),
                                   ),
                                   if (t.email != null && t.email!.isNotEmpty)
                                     Text(
                                       t.email!,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: AppColors.onSurfaceVariant,
+                                      style: textTheme.labelSmall?.copyWith(
+                                        color: colors.onSurfaceVariant,
                                       ),
                                     ),
                                 ],
@@ -355,7 +364,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                   controller: _notesController,
                   maxLines: 4,
                   decoration: appInputDecoration(
-                    hint: 'BakÄ±m ile ilgili ek notlar...',
+                    hint: 'Bakım ile ilgili ek notlar...',
                   ),
                 ),
 
@@ -368,7 +377,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                   child: FilledButton(
                     onPressed: isLoading ? null : _submit,
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: colors.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -382,11 +391,11 @@ class _AssignViewState extends ConsumerState<AssignView> {
                               strokeWidth: 2.5,
                             ),
                           )
-                        : const Text(
-                            'GÃ¶revi Ata',
-                            style: TextStyle(
-                              fontSize: 16,
+                        : Text(
+                            'Görevi Ata',
+                            style: textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w700,
+                              color: colors.surface,
                             ),
                           ),
                   ),
@@ -416,22 +425,25 @@ class _ElevatorSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.5),
+          color: colors.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<ElevatorModel>(
           value: selected,
-          hint: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+          hint: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              'AsansÃ¶r seÃ§in...',
-              style: TextStyle(color: AppColors.outline),
+              'Asansör seçin...',
+              style: textTheme.labelLarge?.copyWith(color: colors.outline),
             ),
           ),
           isExpanded: true,
@@ -449,17 +461,16 @@ class _ElevatorSelector extends StatelessWidget {
                       children: [
                         Text(
                           e.buildingName,
-                          style: const TextStyle(
+                          style: textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.onSurface,
+                            color: colors.onSurface,
                           ),
                         ),
                         if (e.address != null)
                           Text(
                             e.address!,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.outline,
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colors.outline,
                             ),
                           ),
                       ],
@@ -494,10 +505,13 @@ class _PickerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Material(
       color: hasValue
-          ? AppColors.primary.withValues(alpha: 0.07)
-          : AppColors.surfaceContainerLowest,
+          ? colors.primary.withValues(alpha: 0.07)
+          : colors.surfaceContainerLowest,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -508,8 +522,8 @@ class _PickerButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: hasValue
-                  ? AppColors.primary
-                  : AppColors.outlineVariant.withValues(alpha: 0.5),
+                  ? colors.primary
+                  : colors.outlineVariant.withValues(alpha: 0.5),
               width: hasValue ? 1.5 : 1,
             ),
           ),
@@ -519,19 +533,18 @@ class _PickerButton extends StatelessWidget {
                 icon,
                 size: 18,
                 color: hasValue
-                    ? AppColors.primary
-                    : AppColors.onSurfaceVariant,
+                    ? colors.primary
+                    : colors.onSurfaceVariant,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 13,
+                  style: textTheme.labelLarge?.copyWith(
                     fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
                     color: hasValue
-                        ? AppColors.primary
-                        : AppColors.onSurfaceVariant,
+                        ? colors.primary
+                        : colors.onSurfaceVariant,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -551,26 +564,28 @@ class _InlineError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.errorContainer,
+        color: colors.errorContainer,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.error_outline,
-            color: AppColors.onErrorContainer,
+            color: colors.onErrorContainer,
             size: 18,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
-                color: AppColors.onErrorContainer,
-                fontSize: 13,
+              style: textTheme.labelLarge?.copyWith(
+                color: colors.onErrorContainer,
               ),
             ),
           ),

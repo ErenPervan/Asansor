@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/status_tokens.dart';
 import '../../models/elevator_model.dart';
 import '../../../../core/widgets/info_card.dart';
 
@@ -10,14 +11,17 @@ class ElevatorDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return InfoCard(
       padding: const EdgeInsets.all(24),
       radius: 16,
-      backgroundColor: AppColors.surfaceContainerLowest,
+      backgroundColor: colors.surfaceContainerLowest,
       borderColor: Colors.transparent,
       boxShadow: [
         BoxShadow(
-          color: const Color(0xFF191C1D).withValues(alpha: 0.04),
+          color: colors.onSurface.withValues(alpha: 0.04),
           blurRadius: 32,
           offset: const Offset(0, 12),
         ),
@@ -38,12 +42,12 @@ class ElevatorDetailHeader extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryFixed, // primary-fixed: #D6E3FF
+                        color: colors.primaryFixed,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.elevator_outlined,
-                        color: AppColors.primary,
+                        color: colors.primary,
                         size: 28,
                       ),
                     ),
@@ -57,10 +61,9 @@ class ElevatorDetailHeader extends StatelessWidget {
                             color: Colors.transparent,
                             child: Text(
                               elevator.buildingName,
-                              style: const TextStyle(
-                                fontSize: 18,
+                              style: textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.onSurface,
+                                color: colors.onSurface,
                                 letterSpacing: -0.3,
                               ),
                             ),
@@ -68,19 +71,18 @@ class ElevatorDetailHeader extends StatelessWidget {
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on_outlined,
                                 size: 14,
-                                color: AppColors.onSurfaceVariant,
+                                color: colors.onSurfaceVariant,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   elevator.address ?? 'Adres belirtilmemiş',
-                                  style: const TextStyle(
-                                    fontSize: 13,
+                                  style: textTheme.bodySmall?.copyWith(
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.onSurfaceVariant,
+                                    color: colors.onSurfaceVariant,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -104,7 +106,7 @@ class ElevatorDetailHeader extends StatelessWidget {
           const SizedBox(height: 20),
           Divider(
             height: 1,
-            color: AppColors.outlineVariant.withValues(alpha: 0.15),
+            color: colors.outlineVariant.withValues(alpha: 0.15),
           ),
           const SizedBox(height: 20),
 
@@ -141,25 +143,26 @@ class DetailMetaCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 10,
+          style: textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.outline,
+            color: colors.outline,
             letterSpacing: 1.2,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 13,
+          style: textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.onSurface,
+            color: colors.onSurface,
           ),
         ),
       ],
@@ -177,29 +180,16 @@ class DetailStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (label, bg, fg) = switch (status.toLowerCase()) {
-      'active' => (
-        'DURUM: AKTİF',
-        const Color(0xFF059669), // emerald-600
-        Colors.white,
-      ),
-      'faulty' => (
-        'DURUM: ARIZALI',
-        AppColors.errorContainer,
-        AppColors.onErrorContainer,
-      ),
-      'under_maintenance' => (
-        'DURUM: BAKIMDA',
-        const Color(0xFFFFF3CD),
-        const Color(0xFF856404),
-      ),
-      'inactive' => (
-        'DURUM: PASİF',
-        AppColors.surfaceContainer,
-        AppColors.outline,
-      ),
-      _ => ('DURUM: BİLİNMİYOR', AppColors.surfaceContainer, AppColors.outline),
+    final label = switch (status.toLowerCase()) {
+      'active' => 'DURUM: AKTİF',
+      'faulty' => 'DURUM: ARIZALI',
+      'under_maintenance' => 'DURUM: BAKIMDA',
+      'inactive' => 'DURUM: PASİF',
+      _ => 'DURUM: BİLİNMİYOR',
     };
+
+    final bg = StatusTokens.elevatorBadgeBackgroundDynamic(context, status);
+    final fg = StatusTokens.elevatorBadgeForegroundDynamic(context, status);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -209,8 +199,7 @@ class DetailStatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 10,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w700,
           color: fg,
           letterSpacing: 0.8,

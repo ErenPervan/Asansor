@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import '../../../core/theme/app_colors.dart';
 
 // ── Models ────────────────────────────────────────────────────────────────────
 
@@ -150,12 +151,12 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
 
   // Define colors for top categories
   final colors = [
-    const Color(0xFF2563EB),
-    const Color(0xFF7C3AED),
-    const Color(0xFF059669),
-    const Color(0xFFD97706),
-    const Color(0xFFDC2626),
-    const Color(0xFF94A3B8),
+    AppColors.blue,
+    AppColors.violet,
+    AppColors.successLight,
+    AppColors.warningLight,
+    AppColors.error,
+    AppColors.outline,
   ];
 
   final sortedCategories = categoryCounts.entries.toList()
@@ -187,7 +188,7 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
             const FaultCategoryData(
               label: 'Veri Yok',
               percent: 100,
-              color: Color(0xFF94A3B8),
+              color: AppColors.outline,
             ),
           ]
         : faultCategories,

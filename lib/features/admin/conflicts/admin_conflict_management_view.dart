@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
+
+import '../../../core/widgets/loading_state.dart';
+import '../../../core/widgets/error_state.dart';
 
 import 'admin_conflict_provider.dart';
 import 'admin_conflict_detail_dialog.dart';
@@ -13,12 +17,19 @@ class AdminConflictManagementView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncConflicts = ref.watch(adminConflictProvider);
+    final colors = AppThemeColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: colors.background,
       body: asyncConflicts.when(
-        loading: () => const _LoadingState(),
-        error: (e, _) => _ErrorState(message: e.toString()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(AppSpacing.md),
+          child: LoadingState(count: 3),
+        ),
+        error: (e, _) => ErrorState(
+          message: e.toString().replaceFirst('Exception: ', ''),
+          onRetry: () => ref.invalidate(adminConflictProvider),
+        ),
         data: (conflicts) => _ConflictBody(conflicts: conflicts),
       ),
     );
@@ -40,10 +51,10 @@ class _ConflictBody extends StatelessWidget {
           const SliverFillRemaining(child: _EmptyState())
         else
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.md, 20, AppSpacing.md, 100),
             sliver: SliverList.separated(
               itemCount: conflicts.length,
-              separatorBuilder: (context, i) => const SizedBox(height: 16),
+              separatorBuilder: (context, i) => const SizedBox(height: AppSpacing.md),
               itemBuilder: (context, index) =>
                   _ConflictCard(report: conflicts[index]),
             ),
@@ -61,37 +72,38 @@ class _ConflictAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     return SliverAppBar(
       expandedHeight: 110,
       pinned: true,
       elevation: 0,
-      backgroundColor: AppColors.primary,
-      foregroundColor: Colors.white,
+      backgroundColor: colors.primary,
+      foregroundColor: colors.onPrimary,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [AppColors.primary, Color(0xFF002D59)],
+              colors: [colors.primary, colors.navy],
             ),
           ),
-          padding: const EdgeInsets.fromLTRB(20, 60, 20, 16),
+          padding: const EdgeInsets.fromLTRB(20, 60, 20, AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              const Text(
+              Text(
                 'Veri Çakışmaları',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+                style: textTheme.headlineSmall?.copyWith(
+                  color: colors.onPrimary,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.5,
                   height: 1.1,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Row(
                 children: [
                   Container(
@@ -99,8 +111,8 @@ class _ConflictAppBar extends StatelessWidget {
                     height: 7,
                     decoration: BoxDecoration(
                       color: conflictCount > 0
-                          ? const Color(0xFFFBBF24)
-                          : const Color(0xFF4ADE80),
+                          ? colors.warningLight
+                          : colors.successLight,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -109,9 +121,8 @@ class _ConflictAppBar extends StatelessWidget {
                     conflictCount > 0
                         ? '$conflictCount Bekleyen Çakışma'
                         : 'Tüm veriler senkronize',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.75),
-                      fontSize: 13,
+                    style: textTheme.labelLarge?.copyWith(
+                      color: colors.onPrimary.withValues(alpha: 0.75),
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.1,
                     ),
@@ -121,15 +132,14 @@ class _ConflictAppBar extends StatelessWidget {
             ],
           ),
         ),
-        title: const Text(
+        title: Text(
           'Veri Çakışmaları',
-          style: TextStyle(
-            color: Colors.white,
+          style: textTheme.titleLarge?.copyWith(
+            color: colors.onPrimary,
             fontWeight: FontWeight.w800,
-            fontSize: 18,
           ),
         ),
-        titlePadding: const EdgeInsets.only(left: 56, bottom: 16),
+        titlePadding: const EdgeInsets.only(left: 56, bottom: AppSpacing.md),
       ),
     );
   }
@@ -145,6 +155,8 @@ class _ConflictCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final elevatorName = report.buildingName ?? report.elevatorId;
     final techName = report.technicianName ?? 'Bilinmiyor';
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
 
     return InkWell(
       onTap: () {
@@ -156,74 +168,71 @@ class _ConflictCard extends ConsumerWidget {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLowest,
+          color: colors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.onSurface.withValues(alpha: 0.1)),
+          border: Border.all(color: colors.onSurface.withValues(alpha: 0.1)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.onSurface.withValues(alpha: 0.04),
+              color: colors.onSurface.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.08),
+                color: colors.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.warning_amber_rounded,
-                color: AppColors.primary,
+                color: colors.primary,
                 size: 24,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     elevatorName,
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: AppColors.onSurface,
+                      color: colors.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.person_outline,
                         size: 14,
-                        color: AppColors.onSurfaceVariant,
+                        color: colors.onSurfaceVariant,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Text(
                         techName,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.onSurfaceVariant,
+                        style: textTheme.labelLarge?.copyWith(
+                          color: colors.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Icon(
+                      Icon(
                         Icons.access_time,
                         size: 14,
-                        color: AppColors.onSurfaceVariant,
+                        color: colors.onSurfaceVariant,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Text(
                         _formatDate(report.createdAt.toIso8601String()),
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.onSurfaceVariant,
+                        style: textTheme.labelLarge?.copyWith(
+                          color: colors.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -232,7 +241,7 @@ class _ConflictCard extends ConsumerWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.onSurfaceVariant),
+            Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
           ],
         ),
       ),
@@ -258,6 +267,8 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -268,39 +279,37 @@ class _EmptyState extends StatelessWidget {
               width: 88,
               height: 88,
               decoration: BoxDecoration(
-                color: const Color(0xFFDCFCE7),
+                color: colors.successContainer,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF166534).withValues(alpha: 0.12),
+                    color: colors.success.withValues(alpha: 0.12),
                     blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.check_circle_outline_rounded,
-                color: Color(0xFF166534),
+                color: colors.success,
                 size: 44,
               ),
             ),
-            const SizedBox(height: 24),
-            const Text(
+            const SizedBox(height: AppSpacing.lg),
+            Text(
               'Çakışma yok',
-              style: TextStyle(
-                fontSize: 22,
+              style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: AppColors.onSurface,
+                color: colors.onSurface,
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            const SizedBox(height: AppSpacing.sm),
+            Text(
               'Tüm veriler senkronize —\nsistem tamamen uyumlu.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.onSurfaceVariant,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
                 height: 1.5,
               ),
             ),
@@ -311,50 +320,3 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-// ── Loading & Error States ────────────────────────────────────────────────────
-
-class _LoadingState extends StatelessWidget {
-  const _LoadingState();
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(color: AppColors.primary),
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.message});
-  final String message;
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, color: AppColors.error, size: 48),
-            const SizedBox(height: 16),
-            Text(
-              'Bir hata oluştu',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.onSurfaceVariant,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

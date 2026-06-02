@@ -7,6 +7,7 @@ import '../../fault/providers/fault_providers.dart';
 import '../../maintenance/providers/maintenance_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/loading_state.dart';
+import '../../../core/widgets/error_state.dart';
 import '../widgets/detail/elevator_detail_header.dart';
 import '../widgets/detail/elevator_detail_actions.dart';
 import '../widgets/detail/elevator_system_monitor.dart';
@@ -34,16 +35,14 @@ class ElevatorDetailView extends ConsumerWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: AppThemeColors.of(context).primary),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
+        title: Text(
           'Asansör Detayları',
-          style: TextStyle(
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
-            fontSize: 17,
-            color: AppColors.onSurface,
-            letterSpacing: -0.2,
+            color: AppThemeColors.of(context).onSurface,
           ),
         ),
         centerTitle: false,
@@ -55,7 +54,7 @@ class ElevatorDetailView extends ConsumerWidget {
           padding: EdgeInsets.all(16.0),
           child: LoadingState(isList: false),
         ),
-        error: (err, _) => _ErrorBody(
+        error: (err, _) => ErrorState(
           message: err.toString().replaceFirst('Exception: ', ''),
           onRetry: () => ref.invalidate(elevatorByIdProvider(elevatorId)),
         ),
@@ -67,7 +66,7 @@ class ElevatorDetailView extends ConsumerWidget {
             showModalBottomSheet<void>(
               context: context,
               isScrollControlled: true,
-              backgroundColor: Theme.of(context).colorScheme.surface,
+              backgroundColor: AppThemeColors.of(context).surface,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
@@ -79,7 +78,7 @@ class ElevatorDetailView extends ConsumerWidget {
             showModalBottomSheet<void>(
               context: context,
               isScrollControlled: true,
-              backgroundColor: Theme.of(context).colorScheme.surface,
+              backgroundColor: AppThemeColors.of(context).surface,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
@@ -145,38 +144,3 @@ class _DetailScrollBody extends StatelessWidget {
 // Stitch: <section class="bg-surface-container-lowest rounded-xl p-6 shadow-...">
 
 // ── Report Fault Bottom Sheet ─────────────────────────────────────────────────
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: AppColors.error),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.onSurfaceVariant),
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

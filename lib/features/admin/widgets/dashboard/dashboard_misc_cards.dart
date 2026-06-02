@@ -10,6 +10,10 @@ class ChecklistCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -19,14 +23,14 @@ class ChecklistCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainerLowest,
+            color: colors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: AppColors.outlineVariant.withValues(alpha: 0.4),
+              color: colors.outlineVariant.withValues(alpha: 0.4),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
+                color: colors.onSurface.withValues(alpha: 0.03),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -35,38 +39,36 @@ class ChecklistCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: iconSize,
+                height: iconSize,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
+                  color: colors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.checklist_rounded,
-                  color: AppColors.primary,
+                  color: colors.primary,
                   size: 28,
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Kontrol Listesi Yönetimi',
-                      style: TextStyle(
-                        fontSize: 15,
+                      style: textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
+                        color: colors.onSurface,
                         letterSpacing: -0.2,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
                       'Bakım kontrol maddelerini ekle, düzenle ve yönet',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.onSurfaceVariant,
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
                         height: 1.3,
                       ),
                     ),
@@ -74,9 +76,9 @@ class ChecklistCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
-                color: AppColors.outline,
+                color: colors.outline,
                 size: 14,
               ),
             ],
@@ -96,6 +98,10 @@ class StatisticsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -105,15 +111,15 @@ class StatisticsCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF0F2040), Color(0xFF1B3A6B)],
+              colors: [colors.navy, colors.navyMid],
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF0F2040).withValues(alpha: 0.30),
+                color: colors.navy.withValues(alpha: 0.30),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -122,8 +128,8 @@ class StatisticsCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: iconSize,
+                height: iconSize,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
@@ -135,24 +141,22 @@ class StatisticsCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'İstatistikler & Analizler',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                         letterSpacing: -0.3,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       'Arıza trendleri, dağılım grafikleri ve KPI özeti',
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: textTheme.labelMedium?.copyWith(
                         color: Colors.white70,
                         height: 1.3,
                       ),

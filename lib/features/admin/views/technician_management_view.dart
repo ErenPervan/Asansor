@@ -20,14 +20,16 @@ class TechnicianManagementView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final dataAsync = ref.watch(technicianManagementProvider);
 
     return Scaffold(
-      backgroundColor: AppThemeColors.of(context).background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Teknisyen Ekibi',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
         actions: [
           IconButton(
@@ -38,7 +40,7 @@ class TechnicianManagementView extends ConsumerWidget {
         ],
       ),
       body: dataAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator(color: colors.primary)),
         error: (e, st) => _ErrorBody(
           error: e,
           onRetry: () => ref.invalidate(technicianManagementProvider),
@@ -65,23 +67,74 @@ class _TechnicianList extends StatelessWidget {
     final activeCount = stats.where((s) => s.hasActiveTasks).length;
     final freeCount = stats.length - activeCount;
 
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-      itemCount: stats.length + 1, // +1 for header
-      separatorBuilder: (_, i) =>
-          i == 0 ? const SizedBox(height: 16) : const SizedBox(height: 12),
-      itemBuilder: (_, i) {
-        if (i == 0) {
-          return _SummaryHeader(
-            total: stats.length,
-            active: activeCount,
-            free: freeCount,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 600) {
+          final rowCount = (stats.length / 2).ceil();
+          return ListView.builder(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+            itemCount: rowCount + 1,
+            itemBuilder: (_, i) {
+              if (i == 0) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _SummaryHeader(
+                    total: stats.length,
+                    active: activeCount,
+                    free: freeCount,
+                  ),
+                );
+              }
+              final rowIndex = i - 1;
+              final idx1 = rowIndex * 2;
+              final idx2 = rowIndex * 2 + 1;
+              
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _TechnicianCard(
+                        stats: stats[idx1],
+                        onTap: () => _showDetailSheet(context, stats[idx1]),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: idx2 < stats.length
+                          ? _TechnicianCard(
+                              stats: stats[idx2],
+                              onTap: () => _showDetailSheet(context, stats[idx2]),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ),
+              );
+            },
           );
         }
-        final techStats = stats[i - 1];
-        return _TechnicianCard(
-          stats: techStats,
-          onTap: () => _showDetailSheet(context, techStats),
+
+        return ListView.separated(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+          itemCount: stats.length + 1, // +1 for header
+          separatorBuilder: (_, i) =>
+              i == 0 ? const SizedBox(height: 16) : const SizedBox(height: 12),
+          itemBuilder: (_, i) {
+            if (i == 0) {
+              return _SummaryHeader(
+                total: stats.length,
+                active: activeCount,
+                free: freeCount,
+              );
+            }
+            final techStats = stats[i - 1];
+            return _TechnicianCard(
+              stats: techStats,
+              onTap: () => _showDetailSheet(context, techStats),
+            );
+          },
         );
       },
     );
@@ -112,13 +165,15 @@ class _SummaryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primary, AppColors.primaryDark],
+          colors: [colors.primary, colors.primaryDark],
         ),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -130,14 +185,14 @@ class _SummaryHeader extends StatelessWidget {
             label: 'Aktif',
             value: active,
             light: true,
-            accent: const Color(0xFF4ADE80),
+            accent: colors.successLight,
           ),
           const SizedBox(width: 12),
           _StatPill(
             label: 'Müsait',
             value: free,
             light: true,
-            accent: const Color(0xFFFBBF24),
+            accent: colors.warningLight,
           ),
           const Spacer(),
           Column(
@@ -145,16 +200,14 @@ class _SummaryHeader extends StatelessWidget {
             children: [
               Text(
                 DateFormat('d MMMM', 'tr_TR').format(DateTime.now()),
-                style: const TextStyle(
-                  fontSize: 13,
+                style: textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
               ),
               Text(
                 'Bugün',
-                style: TextStyle(
-                  fontSize: 11,
+                style: textTheme.labelSmall?.copyWith(
                   color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
@@ -181,21 +234,20 @@ class _StatPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '$value',
-          style: TextStyle(
-            fontSize: 22,
+          style: textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w900,
             color: accent ?? Colors.white,
           ),
         ),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 11,
+          style: textTheme.labelSmall?.copyWith(
             color: Colors.white.withValues(alpha: 0.8),
           ),
         ),
@@ -214,12 +266,14 @@ class _TechnicianCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final profile = stats.profile;
     final allDone = stats.todayTotal > 0 && stats.progressValue >= 1.0;
-    final barColor = allDone ? AppColors.success : AppColors.primary;
+    final barColor = allDone ? colors.success : colors.primary;
 
     return Material(
-      color: AppColors.surface,
+      color: colors.surface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -227,10 +281,10 @@ class _TechnicianCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.outlineVariant),
+            border: Border.all(color: colors.outlineVariant),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: colors.onSurface.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -251,15 +305,14 @@ class _TechnicianCard extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 28,
-                          backgroundColor: AppColors.primary.withValues(
+                          backgroundColor: colors.primary.withValues(
                             alpha: 0.12,
                           ),
                           child: Text(
                             profile.initials,
-                            style: const TextStyle(
-                              fontSize: 18,
+                            style: textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w800,
-                              color: AppColors.primary,
+                              color: colors.primary,
                             ),
                           ),
                         ),
@@ -271,11 +324,11 @@ class _TechnicianCard extends StatelessWidget {
                             height: 14,
                             decoration: BoxDecoration(
                               color: stats.hasActiveTasks
-                                  ? AppColors.success
-                                  : AppColors.outline,
+                                  ? colors.success
+                                  : colors.outline,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: AppColors.surface,
+                                color: colors.surface,
                                 width: 2,
                               ),
                             ),
@@ -296,10 +349,9 @@ class _TechnicianCard extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   profile.displayName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
+                                  style: textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.w800,
-                                    color: AppColors.onSurface,
+                                    color: colors.onSurface,
                                     letterSpacing: -0.3,
                                   ),
                                   maxLines: 1,
@@ -307,7 +359,7 @@ class _TechnicianCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              _MonthlyBadge(count: stats.monthlyCompleted),
+                              _MonthlyBadge(count: stats.monthlyCompleted, colors: colors, textTheme: textTheme),
                             ],
                           ),
                           if (profile.email != null &&
@@ -315,18 +367,17 @@ class _TechnicianCard extends StatelessWidget {
                             const SizedBox(height: 3),
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.email_outlined,
                                   size: 12,
-                                  color: AppColors.outline,
+                                  color: colors.outline,
                                 ),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     profile.email!,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.outline,
+                                    style: textTheme.labelSmall?.copyWith(
+                                      color: colors.outline,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -340,17 +391,16 @@ class _TechnicianCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.phone_outlined,
                                   size: 12,
-                                  color: AppColors.outline,
+                                  color: colors.outline,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   profile.phone!,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.outline,
+                                  style: textTheme.labelSmall?.copyWith(
+                                    color: colors.outline,
                                   ),
                                 ),
                               ],
@@ -368,21 +418,19 @@ class _TechnicianCard extends StatelessWidget {
                 if (stats.todayTotal > 0) ...[
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Bugünkü İlerleme',
-                        style: TextStyle(
-                          fontSize: 12,
+                        style: textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.onSurfaceVariant,
+                          color: colors.onSurfaceVariant,
                         ),
                       ),
                       const Spacer(),
                       Text(
                         '${stats.todayCompleted}/${stats.todayTotal} görev',
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppColors.onSurfaceVariant,
+                          color: colors.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -393,7 +441,7 @@ class _TechnicianCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: stats.progressValue,
                       minHeight: 7,
-                      backgroundColor: AppColors.outlineVariant,
+                      backgroundColor: colors.outlineVariant,
                       valueColor: AlwaysStoppedAnimation<Color>(barColor),
                     ),
                   ),
@@ -402,23 +450,21 @@ class _TechnicianCard extends StatelessWidget {
                     allDone
                         ? '✓ Tüm görevler tamamlandı'
                         : '${stats.todayPending} görev bekliyor',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: allDone ? AppColors.success : AppColors.outline,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: allDone ? colors.success : colors.outline,
                       fontWeight: allDone ? FontWeight.w700 : FontWeight.normal,
                     ),
                   ),
                 ] else
-                  const Text(
+                  Text(
                     'Bugün için planlanmış görev yok',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.outline,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colors.outline,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
 
-                const Divider(height: 20, color: AppColors.outlineVariant),
+                Divider(height: 20, color: colors.outlineVariant),
 
                 // ── Action buttons ──────────────────────────────────
                 Row(
@@ -426,6 +472,8 @@ class _TechnicianCard extends StatelessWidget {
                     _ActionButton(
                       icon: Icons.phone_outlined,
                       label: 'Ara',
+                      colors: colors,
+                      textTheme: textTheme,
                       onTap: () => _handleCall(
                         context,
                         profile.phone,
@@ -436,6 +484,8 @@ class _TechnicianCard extends StatelessWidget {
                     _ActionButton(
                       icon: Icons.chat_bubble_outline_rounded,
                       label: 'Mesaj',
+                      colors: colors,
+                      textTheme: textTheme,
                       onTap: () => _handleMessage(
                         context,
                         profile.phone,
@@ -449,10 +499,10 @@ class _TechnicianCard extends StatelessWidget {
                         stats.todayTotal > 0
                             ? '${stats.todayTotal} Görev'
                             : 'Görevler',
-                        style: const TextStyle(fontSize: 12),
+                        style: textTheme.labelSmall,
                       ),
                       style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primary,
+                        foregroundColor: colors.primary,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
                           vertical: 6,
@@ -514,9 +564,11 @@ class _TechnicianCard extends StatelessWidget {
 // ── Monthly badge ─────────────────────────────────────────────────────────────
 
 class _MonthlyBadge extends StatelessWidget {
-  const _MonthlyBadge({required this.count});
+  const _MonthlyBadge({required this.count, required this.colors, required this.textTheme});
 
   final int count;
+  final AppThemeColors colors;
+  final TextTheme textTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -524,16 +576,15 @@ class _MonthlyBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: count > 0
-            ? AppColors.successContainer
-            : AppColors.surfaceContainer,
+            ? colors.successContainer
+            : colors.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         'Bu Ay: $count İş',
-        style: TextStyle(
-          fontSize: 11,
+        style: textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w700,
-          color: count > 0 ? AppColors.success : AppColors.outline,
+          color: count > 0 ? colors.success : colors.outline,
         ),
       ),
     );
@@ -546,11 +597,15 @@ class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.icon,
     required this.label,
+    required this.colors,
+    required this.textTheme,
     required this.onTap,
   });
 
   final IconData icon;
   final String label;
+  final AppThemeColors colors;
+  final TextTheme textTheme;
   final VoidCallback onTap;
 
   @override
@@ -561,20 +616,19 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainer,
+          color: colors.surfaceContainer,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 15, color: AppColors.onSurfaceVariant),
+            Icon(icon, size: 15, color: colors.onSurfaceVariant),
             const SizedBox(width: 5),
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 12,
+              style: textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.onSurfaceVariant,
+                color: colors.onSurfaceVariant,
               ),
             ),
           ],
@@ -593,6 +647,9 @@ class _TechnicianDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return DraggableScrollableSheet(
       initialChildSize: 0.55,
       minChildSize: 0.35,
@@ -600,9 +657,9 @@ class _TechnicianDetailSheet extends StatelessWidget {
       expand: false,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
@@ -613,7 +670,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.outlineVariant,
+                    color: colors.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -627,15 +684,14 @@ class _TechnicianDetailSheet extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 22,
-                      backgroundColor: AppColors.primary.withValues(
+                      backgroundColor: colors.primary.withValues(
                         alpha: 0.12,
                       ),
                       child: Text(
                         stats.profile.initials,
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style: textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: AppColors.primary,
+                          color: colors.primary,
                         ),
                       ),
                     ),
@@ -646,10 +702,9 @@ class _TechnicianDetailSheet extends StatelessWidget {
                         children: [
                           Text(
                             stats.profile.displayName,
-                            style: const TextStyle(
-                              fontSize: 16,
+                            style: textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w800,
-                              color: AppColors.onSurface,
+                              color: colors.onSurface,
                             ),
                           ),
                           Text(
@@ -657,23 +712,22 @@ class _TechnicianDetailSheet extends StatelessWidget {
                                 ? 'Bugün görev yok'
                                 : '${stats.todayTotal} görev — '
                                       '${stats.todayCompleted} tamamlandı',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.onSurfaceVariant,
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colors.onSurfaceVariant,
                             ),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: AppColors.outline),
+                      icon: Icon(Icons.close, color: colors.outline),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
                 ),
               ),
 
-              const Divider(height: 20, color: AppColors.outlineVariant),
+              Divider(height: 20, color: colors.outlineVariant),
 
               // ── Task list ───────────────────────────────────────────
               Expanded(
@@ -718,6 +772,8 @@ class _TimelineTaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final time = DateFormat(
       'HH:mm',
       'tr_TR',
@@ -739,18 +795,17 @@ class _TimelineTaskItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: task.isCompleted
-                        ? AppColors.successContainer
-                        : AppColors.primary.withValues(alpha: 0.08),
+                        ? colors.successContainer
+                        : colors.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     time,
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: task.isCompleted
-                          ? AppColors.success
-                          : AppColors.primary,
+                          ? colors.success
+                          : colors.primary,
                     ),
                   ),
                 ),
@@ -760,7 +815,7 @@ class _TimelineTaskItem extends StatelessWidget {
                       child: Container(
                         width: 2,
                         margin: const EdgeInsets.symmetric(vertical: 4),
-                        color: AppColors.outlineVariant,
+                        color: colors.outlineVariant,
                       ),
                     ),
                   ),
@@ -774,7 +829,7 @@ class _TimelineTaskItem extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
               child: Material(
-                color: AppColors.surface,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(12),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
@@ -782,7 +837,7 @@ class _TimelineTaskItem extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.outlineVariant),
+                      border: Border.all(color: colors.outlineVariant),
                     ),
                     child: IntrinsicHeight(
                       child: Row(
@@ -792,7 +847,7 @@ class _TimelineTaskItem extends StatelessWidget {
                           Container(
                             width: 4,
                             decoration: BoxDecoration(
-                              color: _priorityColor(task.priority),
+                              color: _priorityColor(context, task.priority),
                               borderRadius: const BorderRadius.horizontal(
                                 left: Radius.circular(12),
                               ),
@@ -807,10 +862,9 @@ class _TimelineTaskItem extends StatelessWidget {
                                   // Building name
                                   Text(
                                     task.buildingName,
-                                    style: const TextStyle(
-                                      fontSize: 14,
+                                    style: textTheme.labelLarge?.copyWith(
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.onSurface,
+                                      color: colors.onSurface,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -821,18 +875,17 @@ class _TimelineTaskItem extends StatelessWidget {
                                     const SizedBox(height: 3),
                                     Row(
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.location_on_outlined,
                                           size: 12,
-                                          color: AppColors.outline,
+                                          color: colors.outline,
                                         ),
                                         const SizedBox(width: 3),
                                         Expanded(
                                           child: Text(
                                             task.address!,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: AppColors.outline,
+                                            style: textTheme.labelSmall?.copyWith(
+                                              color: colors.outline,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -847,9 +900,8 @@ class _TimelineTaskItem extends StatelessWidget {
                                     const SizedBox(height: 5),
                                     Text(
                                       task.notes!,
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.onSurfaceVariant,
+                                      style: textTheme.labelSmall?.copyWith(
+                                        color: colors.onSurfaceVariant,
                                         fontStyle: FontStyle.italic,
                                       ),
                                       maxLines: 1,
@@ -862,8 +914,8 @@ class _TimelineTaskItem extends StatelessWidget {
                                     spacing: 6,
                                     runSpacing: 4,
                                     children: [
-                                      _SmallBadge.status(task.status),
-                                      _SmallBadge.priority(task.priority),
+                                      _SmallBadge.status(context, task.status, textTheme),
+                                      _SmallBadge.priority(context, task.priority, textTheme),
                                     ],
                                   ),
                                 ],
@@ -876,7 +928,7 @@ class _TimelineTaskItem extends StatelessWidget {
                             child: Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 12,
-                              color: AppColors.outline.withValues(alpha: 0.6),
+                              color: colors.outline.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
@@ -892,16 +944,17 @@ class _TimelineTaskItem extends StatelessWidget {
     );
   }
 
-  static Color _priorityColor(String p) {
+  static Color _priorityColor(BuildContext context, String p) {
+    final colors = AppThemeColors.of(context);
     switch (p) {
       case 'emergency':
-        return const Color(0xFFDC2626);
+        return colors.error;
       case 'high':
-        return const Color(0xFFEA580C);
+        return colors.warning;
       case 'normal':
-        return const Color(0xFF2563EB);
+        return colors.primary;
       default:
-        return const Color(0xFF94A3B8);
+        return colors.outline;
     }
   }
 }
@@ -909,42 +962,45 @@ class _TimelineTaskItem extends StatelessWidget {
 // ── Small badge ───────────────────────────────────────────────────────────────
 
 class _SmallBadge extends StatelessWidget {
-  const _SmallBadge({required this.label, required this.bg, required this.fg});
+  const _SmallBadge({required this.label, required this.bg, required this.fg, required this.textTheme});
 
   final String label;
   final Color bg;
   final Color fg;
+  final TextTheme textTheme;
 
-  factory _SmallBadge.status(String s) {
+  factory _SmallBadge.status(BuildContext context, String s, TextTheme textTheme) {
+    final colors = AppThemeColors.of(context);
     final (lbl, bg, fg) = switch (s) {
       'completed' => (
         'TAMAMLANDI',
-        const Color(0xFFDCFCE7),
-        const Color(0xFF166534),
+        colors.successContainer,
+        colors.success,
       ),
       'in_progress' => (
         'DEVAM',
-        const Color(0xFFFFF7ED),
-        const Color(0xFF92400E),
+        colors.warningContainer,
+        colors.warning,
       ),
       'cancelled' => (
         'İPTAL',
-        const Color(0xFFF1F5F9),
-        const Color(0xFF64748B),
+        colors.surfaceContainerHigh,
+        colors.onSurfaceVariant,
       ),
-      _ => ('BEKLİYOR', const Color(0xFFF1F5F9), const Color(0xFF475569)),
+      _ => ('BEKLİYOR', colors.surfaceContainer, colors.onSurface),
     };
-    return _SmallBadge(label: lbl, bg: bg, fg: fg);
+    return _SmallBadge(label: lbl, bg: bg, fg: fg, textTheme: textTheme);
   }
 
-  factory _SmallBadge.priority(String p) {
+  factory _SmallBadge.priority(BuildContext context, String p, TextTheme textTheme) {
+    final colors = AppThemeColors.of(context);
     final (lbl, bg, fg) = switch (p) {
-      'emergency' => ('ACİL', const Color(0xFFFEE2E2), const Color(0xFFB91C1C)),
-      'high' => ('YÜKSEK', const Color(0xFFFFF7ED), const Color(0xFFC2410C)),
-      'low' => ('DÜŞÜK', const Color(0xFFF1F5F9), const Color(0xFF94A3B8)),
-      _ => ('NORMAL', const Color(0xFFF1F5F9), const Color(0xFF475569)),
+      'emergency' => ('ACİL', colors.errorContainer, colors.error),
+      'high' => ('YÜKSEK', colors.warningContainer, colors.warning),
+      'low' => ('DÜŞÜK', colors.surfaceContainerHigh, colors.onSurfaceVariant),
+      _ => ('NORMAL', colors.surfaceContainer, colors.onSurface),
     };
-    return _SmallBadge(label: lbl, bg: bg, fg: fg);
+    return _SmallBadge(label: lbl, bg: bg, fg: fg, textTheme: textTheme);
   }
 
   @override
@@ -957,7 +1013,7 @@ class _SmallBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
+        style: textTheme.labelSmall?.copyWith(
           fontSize: 9,
           fontWeight: FontWeight.w800,
           color: fg,
@@ -975,35 +1031,37 @@ class _EmptyBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.all(22),
-            decoration: const BoxDecoration(
-              color: AppColors.surfaceContainer,
+            decoration: BoxDecoration(
+              color: colors.surfaceContainer,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.engineering_outlined,
               size: 40,
-              color: AppColors.outline,
+              color: colors.outline,
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Henüz teknisyen kaydı yok',
-            style: TextStyle(
-              fontSize: 15,
+            style: textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
-              color: AppColors.onSurface,
+              color: colors.onSurface,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Kullanıcı yönetiminden teknisyen rolü atayın.',
-            style: TextStyle(fontSize: 13, color: AppColors.onSurfaceVariant),
+            style: textTheme.labelMedium?.copyWith(color: colors.onSurfaceVariant),
             textAlign: TextAlign.center,
           ),
         ],
@@ -1020,32 +1078,33 @@ class _ErrorBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.cloud_off_outlined,
               size: 48,
-              color: AppColors.outline,
+              color: colors.outline,
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'Veriler yüklenemedi',
-              style: TextStyle(
-                fontSize: 15,
+              style: textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
+                color: colors.onSurface,
               ),
             ),
             const SizedBox(height: 6),
             Text(
               error.toString(),
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.onSurfaceVariant,
+              style: textTheme.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
               maxLines: 3,
@@ -1071,24 +1130,26 @@ class _SheetEmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.event_available_outlined,
               size: 36,
-              color: AppColors.outline,
+              color: colors.outline,
             ),
             const SizedBox(height: 12),
             Text(
               '$name için bugün\nplanlanmış görev yok',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.onSurfaceVariant,
+              style: textTheme.labelLarge?.copyWith(
+                color: colors.onSurfaceVariant,
                 height: 1.5,
               ),
             ),

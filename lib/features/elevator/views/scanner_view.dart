@@ -81,6 +81,7 @@ class _ScannerViewState extends ConsumerState<ScannerView>
     } else {
       await HapticFeedback.heavyImpact();
       if (!mounted) return;
+      final colors = AppThemeColors.of(context);
       // Invalid payload — show feedback and resume scanning.
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -90,7 +91,7 @@ class _ScannerViewState extends ConsumerState<ScannerView>
               'Geçersiz QR kod. Lütfen bir asansör QR kodu tarayın.',
             ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: colors.error,
             duration: AppDurations.snackBarError,
           ),
         );
@@ -113,13 +114,14 @@ class _ScannerViewState extends ConsumerState<ScannerView>
 
     if (rawValue == null || rawValue.isEmpty) {
       if (!mounted) return;
+      final colors = AppThemeColors.of(context);
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
             content: const Text('Bu görselde QR kod bulunamadı.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: colors.error,
             duration: AppDurations.snackBarError,
           ),
         );
@@ -141,6 +143,7 @@ class _ScannerViewState extends ConsumerState<ScannerView>
     } else {
       await HapticFeedback.heavyImpact();
       if (!mounted) return;
+      final colors = AppThemeColors.of(context);
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -149,7 +152,7 @@ class _ScannerViewState extends ConsumerState<ScannerView>
               'Geçersiz QR kod. Lütfen bir asansör QR kodu seçin.',
             ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: colors.error,
             duration: AppDurations.snackBarError,
           ),
         );
@@ -189,6 +192,8 @@ class _ScannerViewState extends ConsumerState<ScannerView>
                 painter: _ScanOverlayPainter(
                   scanLineProgress: _lineAnim.value,
                   isProcessing: _isProcessing,
+                  primaryColor: AppThemeColors.of(context).primary,
+                  successColor: AppThemeColors.of(context).success,
                 ),
               ),
             ),
@@ -270,16 +275,19 @@ class _ScanOverlayPainter extends CustomPainter {
   const _ScanOverlayPainter({
     required this.scanLineProgress,
     required this.isProcessing,
+    required this.primaryColor,
+    required this.successColor,
   });
 
   final double scanLineProgress;
   final bool isProcessing;
+  final Color primaryColor;
+  final Color successColor;
 
   static const double _cutout = 280;
   static const double _radius = 16;
   static const double _bracketLen = 36;
   static const double _bracketStroke = 4;
-  static const Color _primary = AppColors.primary;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -308,8 +316,8 @@ class _ScanOverlayPainter extends CustomPainter {
     // ── Animated scan line (hidden while processing) ──────────────────────
     if (!isProcessing) {
       final lineY = rect.top + scanLineProgress * rect.height;
-      final shader = const LinearGradient(
-        colors: [Colors.transparent, _primary, Colors.transparent],
+      final shader = LinearGradient(
+        colors: [Colors.transparent, primaryColor, Colors.transparent],
       ).createShader(Rect.fromLTWH(rect.left, lineY - 1, rect.width, 2));
 
       canvas.drawLine(
@@ -323,7 +331,7 @@ class _ScanOverlayPainter extends CustomPainter {
     }
 
     // ── Corner brackets ───────────────────────────────────────────────────
-    final bracketColor = isProcessing ? Colors.greenAccent.shade400 : _primary;
+    final bracketColor = isProcessing ? successColor : primaryColor;
 
     final paint = Paint()
       ..color = bracketColor

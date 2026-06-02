@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 
 // ── Map Preview Card ──────────────────────────────────────────────────────────
 
@@ -9,6 +10,10 @@ class DashboardMapCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final iconSize = (MediaQuery.textScalerOf(context).scale(52)).clamp(40.0, 72.0);
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -18,15 +23,15 @@ class DashboardMapCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF004180), Color(0xFF295999)],
+              colors: [colors.mapBlue, colors.mapBlueMid],
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF004180).withValues(alpha: 0.30),
+                color: colors.mapBlue.withValues(alpha: 0.30),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -35,8 +40,8 @@ class DashboardMapCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: iconSize,
+                height: iconSize,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
@@ -48,24 +53,22 @@ class DashboardMapCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Canlı Operasyon Haritası',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                         letterSpacing: -0.3,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       'Tüm asansörleri gerçek zamanlı haritada görüntüle',
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: textTheme.labelMedium?.copyWith(
                         color: Colors.white70,
                         height: 1.3,
                       ),

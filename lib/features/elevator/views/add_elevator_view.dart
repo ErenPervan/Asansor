@@ -87,10 +87,11 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
       canPop: !isLoading,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && isLoading) {
+          final colors = AppThemeColors.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Lütfen kayıt tamamlanana kadar bekleyin.'),
-              backgroundColor: AppColors.error,
+            SnackBar(
+              content: const Text('Lütfen kayıt tamamlanana kadar bekleyin.'),
+              backgroundColor: colors.error,
               duration: AppDurations.snackBarInfo,
             ),
           );
@@ -99,9 +100,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
       child: Scaffold(
         backgroundColor: AppThemeColors.of(context).background,
         appBar: AppBar(
-          title: const Text(
+          title: Text(
             'Asansör Ekle',
-            style: TextStyle(fontWeight: FontWeight.w800),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
           ),
         ),
         body: Form(
@@ -113,7 +114,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
               SectionLabel(
                 icon: Icons.domain_outlined,
                 label: 'Bina Bilgileri',
-                color: AppColors.onSurfaceVariant,
+                color: AppThemeColors.of(context).onSurfaceVariant,
                 uppercase: true,
               ),
               const SizedBox(height: 12),
@@ -158,7 +159,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
               SectionLabel(
                 icon: Icons.info_outline_rounded,
                 label: 'Durum',
-                color: AppColors.onSurfaceVariant,
+                color: AppThemeColors.of(context).onSurfaceVariant,
                 uppercase: true,
               ),
               const SizedBox(height: 12),
@@ -173,7 +174,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
               SectionLabel(
                 icon: Icons.event_repeat_outlined,
                 label: 'Periyodik Bakım Sözleşmesi',
-                color: AppColors.onSurfaceVariant,
+                color: AppThemeColors.of(context).onSurfaceVariant,
                 uppercase: true,
               ),
               const SizedBox(height: 12),
@@ -194,9 +195,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: AppThemeColors.of(context).surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.outlineVariant),
+                    border: Border.all(color: AppThemeColors.of(context).outlineVariant),
                   ),
                   child: Row(
                     children: [
@@ -204,8 +205,8 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                         Icons.my_location_rounded,
                         size: 18,
                         color: _showLocation
-                            ? AppColors.primary
-                            : AppColors.outline,
+                            ? AppThemeColors.of(context).primary
+                            : AppThemeColors.of(context).outline,
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -214,12 +215,11 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                               ? 'GPS Konumu (İsteğe Bağlı)'
                               : 'GPS Konumu • ${_selectedLatLng!.latitude.toStringAsFixed(5)}, '
                                     '${_selectedLatLng!.longitude.toStringAsFixed(5)}',
-                          style: TextStyle(
-                            fontSize: 14,
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: _showLocation
-                                ? AppColors.primary
-                                : AppColors.onSurfaceVariant,
+                                ? AppThemeColors.of(context).primary
+                                : AppThemeColors.of(context).onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -227,7 +227,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                         _showLocation
                             ? Icons.expand_less_rounded
                             : Icons.expand_more_rounded,
-                        color: AppColors.outline,
+                        color: AppThemeColors.of(context).outline,
                       ),
                     ],
                   ),
@@ -269,33 +269,32 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                       userAgentPackageName: 'com.asansor.app',
                                     ),
-                                    if (_selectedLatLng != null)
-                                      MarkerLayer(
-                                        markers: [
-                                          Marker(
-                                            point: _selectedLatLng!,
-                                            width: 44,
-                                            height: 44,
-                                            child: const Icon(
-                                              Icons.location_pin,
-                                              color: AppColors.primary,
-                                              size: 36,
+                                      if (_selectedLatLng != null)
+                                        MarkerLayer(
+                                          markers: [
+                                            Marker(
+                                              point: _selectedLatLng!,
+                                              width: 44,
+                                              height: 44,
+                                              child: Icon(
+                                                Icons.location_pin,
+                                                color: AppThemeColors.of(context).primary,
+                                                size: 36,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
+                                          ],
+                                        ),
                                   ],
                                 ),
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Align(
+                            Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 'Haritaya dokunarak konum pinini belirleyin.',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.onSurfaceVariant,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppThemeColors.of(context).onSurfaceVariant,
                                 ),
                               ),
                             ),
@@ -352,14 +351,14 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                     : const Icon(Icons.add_rounded),
                 label: Text(
                   isLoading ? 'Oluşturuluyor…' : 'Asansör Oluştur',
-                  style: const TextStyle(
-                    fontSize: 15,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 54),
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppThemeColors.of(context).primary,
+                  foregroundColor: AppThemeColors.of(context).surface,
                 ),
                 onPressed: isLoading ? null : _submit,
               ),
@@ -444,16 +443,19 @@ class _Field extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 15, color: AppColors.onSurface),
+      style: textTheme.bodyLarge?.copyWith(color: colors.onSurface),
       decoration: appInputDecoration(
         label: required ? '$label *' : label,
         hint: hint,
-        prefixIcon: Icon(icon, size: 18, color: AppColors.outline),
-        fillColor: AppColors.surface,
+        prefixIcon: Icon(icon, size: 18, color: colors.outline),
+        fillColor: colors.surface,
         radius: 12,
       ),
       validator: validator,
@@ -478,28 +480,31 @@ class _MaintenanceDayPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return DropdownButtonFormField<int?>(
       initialValue: selected,
       isExpanded: true,
       decoration: appInputDecoration(
         label: 'Sözleşme Bakım Günü',
         hint: 'Ayın kaçında bakım yapılacak?',
-        prefixIcon: const Icon(
+        prefixIcon: Icon(
           Icons.calendar_month_outlined,
           size: 18,
-          color: AppColors.outline,
+          color: colors.outline,
         ),
-        fillColor: AppColors.surface,
+        fillColor: colors.surface,
         radius: 12,
       ),
-      style: const TextStyle(fontSize: 15, color: AppColors.onSurface),
+      style: textTheme.bodyLarge?.copyWith(color: colors.onSurface),
       items: [
         // Unset option
-        const DropdownMenuItem<int?>(
+        DropdownMenuItem<int?>(
           value: null,
           child: Text(
             'Seçilmedi (sözleşme yok)',
-            style: TextStyle(color: AppColors.onSurfaceVariant),
+            style: TextStyle(color: colors.onSurfaceVariant),
           ),
         ),
         // Days 1–28
@@ -558,7 +563,9 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (bg, fg) = _colors(value, isSelected);
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final (bg, fg) = _colors(value, isSelected, colors);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -570,7 +577,7 @@ class _StatusChip extends StatelessWidget {
           border: Border.all(
             color: isSelected
                 ? fg.withValues(alpha: 0.5)
-                : AppColors.outlineVariant,
+                : colors.outlineVariant,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -581,8 +588,7 @@ class _StatusChip extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 13,
+              style: textTheme.labelMedium?.copyWith(
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: fg,
               ),
@@ -593,17 +599,17 @@ class _StatusChip extends StatelessWidget {
     );
   }
 
-  static (Color, Color) _colors(String val, bool selected) {
-    if (!selected) return (AppColors.surface, AppColors.outline);
+  static (Color, Color) _colors(String val, bool selected, AppThemeColors colors) {
+    if (!selected) return (colors.surface, colors.outline);
     switch (val) {
       case 'active':
-        return (const Color(0xFFDCFCE7), const Color(0xFF166534));
+        return (colors.successContainer, colors.success);
       case 'faulty':
-        return (const Color(0xFFFEE2E2), const Color(0xFFB91C1C));
+        return (AppColors.errorContainer, colors.primary);
       case 'under_maintenance':
-        return (const Color(0xFFFFF7ED), const Color(0xFF92400E));
+        return (AppColors.warningContainer, AppColors.warning);
       default: // inactive
-        return (AppColors.surfaceContainer, AppColors.onSurfaceVariant);
+        return (colors.surfaceContainer, colors.onSurfaceVariant);
     }
   }
 }

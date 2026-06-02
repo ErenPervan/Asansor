@@ -15,9 +15,9 @@ import '../providers/admin_providers.dart';
 import '../../../core/theme/app_colors.dart';
 
 // Dot colours for calendar markers.
-const _dotRed = Color(0xFFDC2626);
-const _dotGreen = Color(0xFF16A34A);
-const _dotAmber = Color(0xFFD97706);
+const _dotRed = AppColors.error;
+const _dotGreen = AppColors.successLight;
+const _dotAmber = AppColors.warningLight;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -36,6 +36,9 @@ class _AdminMasterCalendarViewState
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     final allAsync = ref.watch(allSchedulesWithDetailsProvider);
     final filter = ref.watch(masterCalendarFilterProvider);
 
@@ -52,8 +55,8 @@ class _AdminMasterCalendarViewState
               content: Text(msg),
               behavior: SnackBarBehavior.floating,
               backgroundColor: result.inserted > 0
-                  ? const Color(0xFF166534)
-                  : const Color(0xFF475569),
+                  ? AppColors.success
+                  : AppColors.onSurfaceVariant,
               duration: const Duration(seconds: 4),
             ),
           );
@@ -62,7 +65,7 @@ class _AdminMasterCalendarViewState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Hata: $e'),
-              backgroundColor: AppColors.primary,
+              backgroundColor: colors.primary,
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -74,11 +77,11 @@ class _AdminMasterCalendarViewState
     final isGenerating = autoScheduleState.isLoading;
 
     return Scaffold(
-      backgroundColor: AppThemeColors.of(context).background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Ana Takvim',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
         actions: [
           // Refresh
@@ -103,7 +106,7 @@ class _AdminMasterCalendarViewState
                         width: 9,
                         height: 9,
                         decoration: const BoxDecoration(
-                          color: Color(0xFFEF4444),
+                          color: AppColors.secondary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -135,9 +138,9 @@ class _AdminMasterCalendarViewState
             : const Icon(Icons.auto_fix_high_rounded),
         label: Text(
           isGenerating ? 'Oluşturuluyor…' : 'Bu Ayı Planla',
-          style: const TextStyle(fontWeight: FontWeight.w700),
+          style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
-        backgroundColor: isGenerating ? AppColors.outline : AppColors.primary,
+        backgroundColor: isGenerating ? colors.outline : colors.primary,
       ),
       body: allAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -166,7 +169,7 @@ class _AdminMasterCalendarViewState
                 onPageChanged: (foc) => setState(() => _focusedDay = foc),
               ),
 
-              const Divider(height: 1, color: AppColors.outlineVariant),
+              Divider(height: 1, color: colors.outlineVariant),
 
               // ── Day header ──────────────────────────────────────────
               _DayHeader(day: _selectedDay, taskCount: dayTasks.length),
@@ -204,6 +207,8 @@ class _AdminMasterCalendarViewState
     BuildContext context,
     DateTime month,
   ) async {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final monthLabel = DateFormat('MMMM y', 'tr_TR').format(month);
 
     final confirmed = await showDialog<bool>(
@@ -215,20 +220,20 @@ class _AdminMasterCalendarViewState
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: colors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.auto_fix_high_rounded,
-                color: AppColors.primary,
+                color: colors.primary,
                 size: 20,
               ),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Text(
                 'Otomatik Planlama',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
               ),
             ),
           ],
@@ -237,23 +242,22 @@ class _AdminMasterCalendarViewState
           '$monthLabel ayı için eksik olan tüm periyodik bakımlar '
           'otomatik oluşturulacak.\n\n'
           'Onaylıyor musunuz?',
-          style: const TextStyle(
-            fontSize: 14,
+          style: textTheme.bodyMedium?.copyWith(
             height: 1.5,
-            color: AppColors.onSurfaceVariant,
+            color: colors.onSurfaceVariant,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
+            child: Text(
               'İptal',
-              style: TextStyle(color: AppColors.onSurfaceVariant),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: colors.primary,
               minimumSize: const Size(90, 40),
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -321,8 +325,11 @@ class _CalendarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
-      color: AppColors.surface,
+      color: colors.surface,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: TableCalendar<ScheduleWithDetails>(
         locale: 'tr_TR',
@@ -343,61 +350,58 @@ class _CalendarSection extends StatelessWidget {
         // ── Style ──────────────────────────────────────────────────────
         calendarStyle: CalendarStyle(
           // Selected day: solid crimson circle with white text.
-          selectedDecoration: const BoxDecoration(
-            color: AppColors.primary,
+          selectedDecoration: BoxDecoration(
+            color: colors.primary,
             shape: BoxShape.circle,
           ),
-          selectedTextStyle: const TextStyle(
+          selectedTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w800,
-          ),
+          ) ?? const TextStyle(),
           // Today: crimson border, no fill.
           todayDecoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: AppColors.primary, width: 1.5),
+            border: Border.all(color: colors.primary, width: 1.5),
           ),
-          todayTextStyle: const TextStyle(
-            color: AppColors.primary,
+          todayTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: colors.primary,
             fontWeight: FontWeight.w700,
-          ),
+          ) ?? const TextStyle(),
           defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
           weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
-          weekendTextStyle: const TextStyle(color: AppColors.onSurfaceVariant),
+          weekendTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant) ?? const TextStyle(),
           outsideDaysVisible: false,
           cellMargin: const EdgeInsets.all(5),
           // Marker decoration is overridden by calendarBuilders below.
           markerDecoration: const BoxDecoration(shape: BoxShape.circle),
           markersMaxCount: 1,
         ),
-        headerStyle: const HeaderStyle(
+        headerStyle: HeaderStyle(
           formatButtonVisible: false,
           titleCentered: true,
-          titleTextStyle: TextStyle(
-            fontSize: 16,
+          titleTextStyle: textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.onSurface,
-          ),
+            color: colors.onSurface,
+          ) ?? const TextStyle(),
           leftChevronIcon: Icon(
             Icons.chevron_left_rounded,
-            color: AppColors.primary,
+            color: colors.primary,
           ),
           rightChevronIcon: Icon(
             Icons.chevron_right_rounded,
-            color: AppColors.primary,
+            color: colors.primary,
           ),
-          headerPadding: EdgeInsets.symmetric(vertical: 8),
+          headerPadding: const EdgeInsets.symmetric(vertical: 8),
         ),
-        daysOfWeekStyle: const DaysOfWeekStyle(
-          weekdayStyle: TextStyle(
-            fontSize: 12,
+        daysOfWeekStyle: DaysOfWeekStyle(
+          weekdayStyle: textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.onSurfaceVariant,
-          ),
-          weekendStyle: TextStyle(
-            fontSize: 12,
+            color: colors.onSurfaceVariant,
+          ) ?? const TextStyle(),
+          weekendStyle: textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.outline,
-          ),
+            color: colors.outline,
+          ) ?? const TextStyle(),
         ),
         // ── Marker builder ─────────────────────────────────────────────
         calendarBuilders: CalendarBuilders<ScheduleWithDetails>(
@@ -449,26 +453,27 @@ class _DayHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final label = DateFormat('d MMMM y, EEEE', 'tr_TR').format(day);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      color: AppColors.surfaceContainer,
+      color: colors.surfaceContainer,
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.calendar_today_outlined,
             size: 15,
-            color: AppColors.primary,
+            color: colors.primary,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
+              style: textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
+                color: colors.onSurface,
               ),
             ),
           ),
@@ -476,18 +481,17 @@ class _DayHeader extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
             decoration: BoxDecoration(
               color: taskCount > 0
-                  ? AppColors.primary.withValues(alpha: 0.1)
-                  : AppColors.outlineVariant,
+                  ? colors.primary.withValues(alpha: 0.1)
+                  : colors.outlineVariant,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               '$taskCount görev',
-              style: TextStyle(
-                fontSize: 11,
+              style: textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: taskCount > 0
-                    ? AppColors.primary
-                    : AppColors.onSurfaceVariant,
+                    ? colors.primary
+                    : colors.onSurfaceVariant,
               ),
             ),
           ),
@@ -506,13 +510,15 @@ class _MasterTaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final time = DateFormat(
       'HH:mm',
       'tr_TR',
     ).format(task.scheduledDate.toLocal());
 
     return Material(
-      color: AppColors.surface,
+      color: colors.surface,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -520,10 +526,10 @@ class _MasterTaskCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.outlineVariant),
+            border: Border.all(color: colors.outlineVariant),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: colors.onSurface.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -533,13 +539,13 @@ class _MasterTaskCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Priority colour stripe
+                // Priority colour
                 Container(
                   width: 4,
                   decoration: BoxDecoration(
-                    color: _priorityStripeColor(task.priority),
+                    color: _priorityStripeColor(context, task.priority),
                     borderRadius: const BorderRadius.horizontal(
-                      left: Radius.circular(14),
+                      left: Radius.circular(16),
                     ),
                   ),
                 ),
@@ -557,10 +563,9 @@ class _MasterTaskCard extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 task.buildingName,
-                                style: const TextStyle(
-                                  fontSize: 15,
+                                style: textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.w800,
-                                  color: AppColors.onSurface,
+                                  color: colors.onSurface,
                                   letterSpacing: -0.2,
                                 ),
                                 maxLines: 1,
@@ -578,18 +583,17 @@ class _MasterTaskCard extends StatelessWidget {
                           const SizedBox(height: 3),
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on_outlined,
                                 size: 12,
-                                color: AppColors.outline,
+                                color: colors.outline,
                               ),
                               const SizedBox(width: 3),
                               Expanded(
                                 child: Text(
                                   task.address!,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.outline,
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: colors.outline,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -606,17 +610,16 @@ class _MasterTaskCard extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 11,
-                              backgroundColor: AppColors.primary.withValues(
+                              backgroundColor: colors.primary.withValues(
                                 alpha: 0.12,
                               ),
                               child: Text(
                                 task.technicianName.isNotEmpty
                                     ? task.technicianName[0].toUpperCase()
                                     : '?',
-                                style: const TextStyle(
-                                  fontSize: 10,
+                                style: textTheme.labelSmall?.copyWith(
                                   fontWeight: FontWeight.w800,
-                                  color: AppColors.primary,
+                                  color: colors.primary,
                                 ),
                               ),
                             ),
@@ -624,9 +627,8 @@ class _MasterTaskCard extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 task.technicianName,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.onSurfaceVariant,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -646,17 +648,16 @@ class _MasterTaskCard extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.schedule_rounded,
                                   size: 13,
-                                  color: AppColors.outline,
+                                  color: colors.outline,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   time,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.onSurfaceVariant,
+                                  style: textTheme.labelSmall?.copyWith(
+                                    color: colors.onSurfaceVariant,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -665,10 +666,10 @@ class _MasterTaskCard extends StatelessWidget {
                             _PriorityBadge(priority: task.priority),
                             _TaskStatusBadge(status: task.status),
                             if (task.isPeriodicMaintenance)
-                              const _Badge(
+                              _Badge(
                                 label: 'PERİYODİK',
-                                bg: Color(0xFFEDE9FE),
-                                fg: Color(0xFF5B21B6),
+                                bg: colors.primaryContainer,
+                                fg: colors.primary,
                               ),
                           ],
                         ),
@@ -680,14 +681,13 @@ class _MasterTaskCard extends StatelessWidget {
                             width: double.infinity,
                             padding: const EdgeInsets.all(9),
                             decoration: BoxDecoration(
-                              color: AppColors.surfaceContainer,
+                              color: colors.surfaceContainer,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               task.notes!,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.onSurfaceVariant,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colors.onSurfaceVariant,
                                 height: 1.4,
                               ),
                               maxLines: 2,
@@ -707,16 +707,17 @@ class _MasterTaskCard extends StatelessWidget {
     );
   }
 
-  static Color _priorityStripeColor(String priority) {
+  static Color _priorityStripeColor(BuildContext context, String priority) {
+    final colors = AppThemeColors.of(context);
     switch (priority) {
       case 'emergency':
-        return const Color(0xFFDC2626);
+        return colors.error;
       case 'high':
-        return const Color(0xFFEA580C);
+        return colors.warning;
       case 'normal':
-        return const Color(0xFF2563EB);
+        return colors.primary;
       default: // low
-        return const Color(0xFF94A3B8);
+        return colors.outline;
     }
   }
 }
@@ -730,20 +731,21 @@ class _StatusIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (icon, color) = _data(status);
+    final (icon, color) = _data(context, status);
     return Icon(icon, size: 18, color: color);
   }
 
-  static (IconData, Color) _data(String s) {
+  static (IconData, Color) _data(BuildContext context, String s) {
+    final colors = AppThemeColors.of(context);
     switch (s) {
       case 'completed':
-        return (Icons.check_circle_rounded, Color(0xFF16A34A));
+        return (Icons.check_circle_rounded, colors.success);
       case 'in_progress':
-        return (Icons.autorenew_rounded, Color(0xFFD97706));
+        return (Icons.autorenew_rounded, colors.warning);
       case 'cancelled':
-        return (Icons.cancel_rounded, Color(0xFF94A3B8));
+        return (Icons.cancel_rounded, colors.onSurfaceVariant);
       default: // pending
-        return (Icons.schedule_rounded, Color(0xFF94A3B8));
+        return (Icons.schedule_rounded, colors.outline);
     }
   }
 }
@@ -757,20 +759,21 @@ class _PriorityBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (label, bg, fg) = _styles(priority);
+    final (label, bg, fg) = _styles(context, priority);
     return _Badge(label: label, bg: bg, fg: fg);
   }
 
-  static (String, Color, Color) _styles(String p) {
+  static (String, Color, Color) _styles(BuildContext context, String p) {
+    final colors = AppThemeColors.of(context);
     switch (p) {
       case 'emergency':
-        return ('ACİL', Color(0xFFFEE2E2), Color(0xFFB91C1C));
+        return ('ACİL', colors.errorContainer, colors.error);
       case 'high':
-        return ('YÜKSEK', Color(0xFFFFF7ED), Color(0xFFC2410C));
+        return ('YÜKSEK', colors.warningContainer, colors.warning);
       case 'low':
-        return ('DÜŞÜK', Color(0xFFF1F5F9), Color(0xFF94A3B8));
+        return ('DÜŞÜK', colors.surfaceContainerHigh, colors.onSurfaceVariant);
       default: // normal
-        return ('NORMAL', Color(0xFFF1F5F9), Color(0xFF475569));
+        return ('NORMAL', colors.surfaceContainer, colors.onSurface);
     }
   }
 }
@@ -784,20 +787,21 @@ class _TaskStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (label, bg, fg) = _styles(status);
+    final (label, bg, fg) = _styles(context, status);
     return _Badge(label: label, bg: bg, fg: fg);
   }
 
-  static (String, Color, Color) _styles(String s) {
+  static (String, Color, Color) _styles(BuildContext context, String s) {
+    final colors = AppThemeColors.of(context);
     switch (s) {
       case 'completed':
-        return ('TAMAMLANDI', Color(0xFFDCFCE7), Color(0xFF166534));
+        return ('TAMAMLANDI', colors.successContainer, colors.success);
       case 'in_progress':
-        return ('DEVAM', Color(0xFFFFF7ED), Color(0xFF92400E));
+        return ('DEVAM', colors.warningContainer, colors.warning);
       case 'cancelled':
-        return ('İPTAL', Color(0xFFF1F5F9), Color(0xFF64748B));
+        return ('İPTAL', colors.surfaceContainerHigh, colors.onSurfaceVariant);
       default: // pending
-        return ('BEKLİYOR', Color(0xFFF1F5F9), Color(0xFF475569));
+        return ('BEKLİYOR', colors.surfaceContainer, colors.onSurface);
     }
   }
 }
@@ -821,8 +825,7 @@ class _Badge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 10,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w800,
           color: fg,
           letterSpacing: 0.5,
@@ -850,23 +853,22 @@ class _EmptyDayPlaceholder extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(22),
-              decoration: const BoxDecoration(
-                color: AppColors.surfaceContainer,
+              decoration: BoxDecoration(
+                color: AppThemeColors.of(context).surfaceContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.event_available_outlined,
                 size: 36,
-                color: AppColors.outline,
+                color: AppThemeColors.of(context).outline,
               ),
             ),
             const SizedBox(height: 16),
             Text(
               '$label için\nplanlanmış görev yok',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 15,
-                color: AppColors.onSurfaceVariant,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppThemeColors.of(context).onSurfaceVariant,
                 height: 1.5,
               ),
             ),
@@ -893,26 +895,24 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.cloud_off_outlined,
               size: 48,
-              color: AppColors.outline,
+              color: AppThemeColors.of(context).outline,
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'Veriler yüklenemedi',
-              style: TextStyle(
-                fontSize: 16,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
+                color: AppThemeColors.of(context).onSurface,
               ),
             ),
             const SizedBox(height: 6),
             Text(
               error.toString(),
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.onSurfaceVariant,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppThemeColors.of(context).onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
               maxLines: 3,
@@ -963,10 +963,11 @@ class _FilterSheet extends ConsumerWidget {
     }
     technicians.sort((a, b) => a.value.compareTo(b.value));
 
+    final colors = AppThemeColors.of(context);
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
         child: Padding(
@@ -981,7 +982,7 @@ class _FilterSheet extends ConsumerWidget {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.outlineVariant,
+                    color: colors.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -991,25 +992,24 @@ class _FilterSheet extends ConsumerWidget {
               // Header row
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Filtrele',
-                    style: TextStyle(
-                      fontSize: 18,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: AppColors.onSurface,
+                      color: colors.onSurface,
                     ),
                   ),
                   const Spacer(),
                   if (filter.isActive)
                     TextButton(
                       onPressed: notifier.clear,
-                      child: const Text(
+                      child: Text(
                         'Temizle',
-                        style: TextStyle(color: AppColors.primary),
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colors.primary),
                       ),
                     ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.outline),
+                    icon: Icon(Icons.close, color: colors.outline),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
@@ -1041,7 +1041,7 @@ class _FilterSheet extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Divider(color: AppColors.outlineVariant, height: 1),
+                Divider(color: colors.outlineVariant, height: 1),
                 const SizedBox(height: 16),
               ],
 
@@ -1078,10 +1078,9 @@ class _SheetSectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 11,
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(
         fontWeight: FontWeight.w700,
-        color: AppColors.onSurfaceVariant,
+        color: AppThemeColors.of(context).onSurfaceVariant,
         letterSpacing: 1.2,
       ),
     );
@@ -1101,25 +1100,25 @@ class _FilterChipItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return FilterChip(
       label: Text(
         label,
-        style: TextStyle(
-          fontSize: 13,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
           fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-          color: selected ? AppColors.primary : AppColors.onSurfaceVariant,
+          color: selected ? colors.primary : colors.onSurfaceVariant,
         ),
       ),
       selected: selected,
       onSelected: (_) => onSelected(),
-      selectedColor: AppColors.primary.withValues(alpha: 0.1),
-      checkmarkColor: AppColors.primary,
+      selectedColor: colors.primary.withValues(alpha: 0.1),
+      checkmarkColor: colors.primary,
       side: BorderSide(
         color: selected
-            ? AppColors.primary.withValues(alpha: 0.4)
-            : AppColors.outlineVariant,
+            ? colors.primary.withValues(alpha: 0.4)
+            : colors.outlineVariant,
       ),
-      backgroundColor: AppColors.surface,
+      backgroundColor: colors.surface,
       padding: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
@@ -1166,9 +1165,8 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 5),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: AppColors.onSurfaceVariant,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: AppThemeColors.of(context).onSurfaceVariant,
           ),
         ),
       ],

@@ -43,17 +43,28 @@ class _MaintenanceLogEntryViewState
   final Map<String, bool> _checkedItems = {};
   final List<String> _photoPaths = [];
 
-  final _techSignatureController = SignatureController(
-    penStrokeWidth: 2,
-    penColor: AppColors.onSurface,
-    exportBackgroundColor: Colors.transparent,
-  );
+  late final SignatureController _techSignatureController;
+  late final SignatureController _custSignatureController;
+  bool _controllersInitialized = false;
 
-  final _custSignatureController = SignatureController(
-    penStrokeWidth: 2,
-    penColor: AppColors.onSurface,
-    exportBackgroundColor: Colors.transparent,
-  );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_controllersInitialized) {
+      final colors = AppThemeColors.of(context);
+      _techSignatureController = SignatureController(
+        penStrokeWidth: 2,
+        penColor: colors.onSurface,
+        exportBackgroundColor: Colors.transparent,
+      );
+      _custSignatureController = SignatureController(
+        penStrokeWidth: 2,
+        penColor: colors.onSurface,
+        exportBackgroundColor: Colors.transparent,
+      );
+      _controllersInitialized = true;
+    }
+  }
 
   late final AnimationController _signatureShakeController;
   bool _techSignatureError = false;
@@ -217,16 +228,17 @@ class _MaintenanceLogEntryViewState
       if (techMissing || custMissing) {
         await HapticFeedback.heavyImpact();
         if (!mounted) return;
+        final colors = AppThemeColors.of(context);
         _triggerSignatureError(
           techMissing: techMissing,
           custMissing: custMissing,
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
+          SnackBar(
+            content: const Text(
               'Lütfen hem teknisyen hem de müşteri imzasını tamamlayın.',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: colors.error,
             duration: AppDurations.snackBarError,
           ),
         );
@@ -267,6 +279,7 @@ class _MaintenanceLogEntryViewState
         context: context,
         barrierDismissible: false,
         builder: (context) {
+          final colors = AppThemeColors.of(context);
           return TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeOutBack,
@@ -275,6 +288,7 @@ class _MaintenanceLogEntryViewState
               return Transform.scale(
                 scale: value,
                 child: AlertDialog(
+                  backgroundColor: colors.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
@@ -285,21 +299,21 @@ class _MaintenanceLogEntryViewState
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.success.withValues(alpha: 0.1),
+                          color: colors.success.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.check_circle_rounded,
-                          color: AppColors.success,
+                          color: colors.success,
                           size: 64,
                         ),
                       ),
                       const SizedBox(height: 24),
-                      const Text(
+                      Text(
                         'Bakım Kaydedildi',
-                        style: TextStyle(
-                          fontSize: 20,
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: colors.onSurface,
                         ),
                       ),
                     ],
@@ -308,7 +322,8 @@ class _MaintenanceLogEntryViewState
                     FilledButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: colors.primary,
+                        foregroundColor: colors.surface,
                       ),
                       child: const Text('Tamam'),
                     ),
@@ -328,10 +343,11 @@ class _MaintenanceLogEntryViewState
     } catch (e) {
       await HapticFeedback.heavyImpact();
       if (!mounted) return;
+      final colors = AppThemeColors.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Kayıt sırasında hata oluştu: $e'),
-          backgroundColor: AppColors.error,
+          backgroundColor: colors.error,
           duration: AppDurations.snackBarError,
         ),
       );
@@ -340,23 +356,24 @@ class _MaintenanceLogEntryViewState
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final sectionLabelStyle = textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
+
+    final maintenanceState = ref.watch(maintenanceControllerProvider);
     final elevatorAsync = ref.watch(elevatorByIdProvider(widget.elevatorId));
     final checklistAsync = ref.watch(checklistProvider);
-    final maintenanceState = ref.watch(maintenanceControllerProvider);
-    final sectionLabelStyle = Theme.of(
-      context,
-    ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
 
     return PopScope(
       canPop: !maintenanceState.isLoading,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && maintenanceState.isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
+            SnackBar(
+              content: const Text(
                 'Lütfen kaydetme işlemi tamamlanana kadar bekleyin.',
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: colors.error,
               duration: AppDurations.snackBarInfo,
             ),
           );
@@ -373,6 +390,7 @@ class _MaintenanceLogEntryViewState
                 // Elevator Info Card
                 Card(
                   elevation: 2,
+                  color: colors.surfaceContainerLowest,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -383,8 +401,8 @@ class _MaintenanceLogEntryViewState
                       children: [
                         Text(
                           elevator.buildingName,
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                          style: textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold, color: colors.onSurface),
                         ),
                         if (elevator.address != null &&
                             elevator.address!.isNotEmpty) ...[
@@ -392,17 +410,17 @@ class _MaintenanceLogEntryViewState
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on_outlined,
                                 size: 18,
-                                color: AppColors.outline,
+                                color: colors.outline,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   elevator.address!,
-                                  style: const TextStyle(
-                                    color: AppColors.outline,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: colors.outline,
                                   ),
                                 ),
                               ),
@@ -456,20 +474,18 @@ class _MaintenanceLogEntryViewState
                             children: [
                               Text(
                                 '$checkedCount / $totalCount tamamlandı',
-                                style: const TextStyle(
-                                  fontSize: 13,
+                                style: textTheme.labelMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.outline,
+                                  color: colors.outline,
                                 ),
                               ),
                               Text(
                                 '${(progress * 100).toInt()}%',
-                                style: TextStyle(
-                                  fontSize: 13,
+                                style: textTheme.labelMedium?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: progress == 1.0
-                                      ? AppColors.success
-                                      : AppColors.primary,
+                                      ? colors.success
+                                      : colors.primary,
                                 ),
                               ),
                             ],
@@ -480,10 +496,10 @@ class _MaintenanceLogEntryViewState
                           child: LinearProgressIndicator(
                             value: progress,
                             minHeight: 6,
-                            backgroundColor: AppColors.surfaceContainerHigh,
+                            backgroundColor: colors.surfaceContainerHigh,
                             color: progress == 1.0
-                                ? AppColors.success
-                                : AppColors.primary,
+                                ? colors.success
+                                : colors.primary,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -533,9 +549,9 @@ class _MaintenanceLogEntryViewState
                                             ), // align with scaled checkbox center
                                             Text(
                                               item.label,
-                                              style: const TextStyle(
-                                                fontSize: 16,
+                                              style: textTheme.bodyLarge?.copyWith(
                                                 fontWeight: FontWeight.w500,
+                                                color: colors.onSurface,
                                               ),
                                             ),
                                             if (item
@@ -544,9 +560,8 @@ class _MaintenanceLogEntryViewState
                                               const SizedBox(height: 4),
                                               Text(
                                                 item.description,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: AppColors.outline,
+                                                style: textTheme.bodyMedium?.copyWith(
+                                                  color: colors.outline,
                                                 ),
                                               ),
                                             ],
@@ -624,10 +639,11 @@ class _MaintenanceLogEntryViewState
                                 return Container(
                                   width: 80,
                                   height: 80,
-                                  color: AppColors.outlineVariant,
+                                  color: colors.outlineVariant,
                                   alignment: Alignment.center,
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.broken_image_outlined,
+                                    color: colors.onSurfaceVariant,
                                   ),
                                 );
                               },
@@ -644,9 +660,10 @@ class _MaintenanceLogEntryViewState
                               },
                               icon: const Icon(Icons.close, size: 16),
                               style: IconButton.styleFrom(
-                                backgroundColor: AppColors.surface.withValues(
+                                backgroundColor: colors.surface.withValues(
                                   alpha: 0.7,
                                 ),
+                                foregroundColor: colors.onSurface,
                                 padding: const EdgeInsets.all(2),
                                 minimumSize: const Size(24, 24),
                               ),
@@ -718,15 +735,14 @@ class _MaintenanceLogEntryViewState
                     width: double.infinity,
                     height: 50,
                     child: FilledButton.icon(
-                      // We pass null to onPressed here because AnimatedPressButton handles the tap
                       onPressed: maintenanceState.isLoading ? null : () {},
                       icon: maintenanceState.isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 24,
                               height: 24,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
-                                color: AppColors.onError,
+                                color: colors.onError,
                               ),
                             )
                           : const Icon(Icons.check_circle_outline),
@@ -734,7 +750,13 @@ class _MaintenanceLogEntryViewState
                         maintenanceState.isLoading
                             ? 'Kaydediliyor...'
                             : 'Bakımı Kaydet',
-                        style: const TextStyle(fontSize: 16),
+                        style: textTheme.titleMedium?.copyWith(
+                          color: colors.surface,
+                        ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colors.primary,
+                        foregroundColor: colors.surface,
                       ),
                     ),
                   ),
@@ -760,7 +782,9 @@ class _MaintenanceLogEntryViewState
     required VoidCallback onClear,
     required VoidCallback onInteract,
   }) {
-    final borderColor = showError ? AppColors.error : AppColors.outline;
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final borderColor = showError ? colors.error : colors.outline;
 
     return AnimatedBuilder(
       animation: _signatureShakeController,
@@ -773,7 +797,7 @@ class _MaintenanceLogEntryViewState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+          Text(label, style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           Container(
             decoration: BoxDecoration(
@@ -791,7 +815,7 @@ class _MaintenanceLogEntryViewState
                     child: Signature(
                       controller: controller,
                       height: 150,
-                      backgroundColor: AppColors.surfaceContainer,
+                      backgroundColor: colors.surfaceContainer,
                     ),
                   ),
                 ),

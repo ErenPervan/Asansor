@@ -15,9 +15,12 @@ class ChecklistManagementView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final checklistAsync = ref.watch(checklistProvider);
 
     return Scaffold(
+      backgroundColor: colors.background,
       body: CustomScrollView(
         slivers: [
           // ── Gradient AppBar ────────────────────────────────────────────
@@ -31,20 +34,19 @@ class ChecklistManagementView extends ConsumerWidget {
                 bottom: 16,
                 right: 16,
               ),
-              title: const Text(
+              title: Text(
                 'Kontrol Listesi',
-                style: TextStyle(
+                style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w700,
-                  fontSize: 20,
-                  color: Colors.white,
+                  color: colors.surface,
                 ),
               ),
               background: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [AppColors.primary, AppColors.primaryDark],
+                    colors: [colors.primary, colors.primaryDark],
                   ),
                 ),
                 child: Stack(
@@ -55,7 +57,7 @@ class ChecklistManagementView extends ConsumerWidget {
                       child: Icon(
                         Icons.checklist_rtl_rounded,
                         size: 160,
-                        color: Colors.white.withValues(alpha: 0.08),
+                        color: colors.surface.withValues(alpha: 0.08),
                       ),
                     ),
                     Positioned(
@@ -67,16 +69,15 @@ class ChecklistManagementView extends ConsumerWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.18),
+                          color: colors.surface.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child:
                             checklistAsync.whenOrNull(
                               data: (items) => Text(
                                 '${items.length} kalem',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
+                                style: textTheme.labelSmall?.copyWith(
+                                  color: colors.surface,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -89,7 +90,7 @@ class ChecklistManagementView extends ConsumerWidget {
               ),
             ),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+              icon: Icon(Icons.arrow_back_rounded, color: colors.surface),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ),
@@ -115,7 +116,7 @@ class ChecklistManagementView extends ConsumerWidget {
                       _SectionHeader(
                         title: 'Aktif Kalemler',
                         count: active.length,
-                        color: AppColors.success,
+                        color: colors.success,
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       ...active.map(
@@ -136,7 +137,7 @@ class ChecklistManagementView extends ConsumerWidget {
                       _SectionHeader(
                         title: 'Pasif Kalemler',
                         count: inactive.length,
-                        color: AppColors.outline,
+                        color: colors.outline,
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       ...inactive.map(
@@ -154,9 +155,9 @@ class ChecklistManagementView extends ConsumerWidget {
                 ),
               );
             },
-            loading: () => const SliverFillRemaining(
+            loading: () => SliverFillRemaining(
               child: Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
+                child: CircularProgressIndicator(color: colors.primary),
               ),
             ),
             error: (err, _) => SliverFillRemaining(
@@ -170,12 +171,12 @@ class ChecklistManagementView extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showItemSheet(context, ref),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: colors.primary,
+        foregroundColor: colors.surface,
         icon: const Icon(Icons.add_rounded),
-        label: const Text(
+        label: Text(
           'Yeni Kalem',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -188,6 +189,9 @@ class ChecklistManagementView extends ConsumerWidget {
     WidgetRef ref, {
     ChecklistItemModel? item,
   }) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     final isEdit = item != null;
     final labelCtrl = TextEditingController(text: item?.label ?? '');
     final descCtrl = TextEditingController(text: item?.description ?? '');
@@ -200,9 +204,9 @@ class ChecklistManagementView extends ConsumerWidget {
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: Container(
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.vertical(
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: const BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusXxl),
             ),
           ),
@@ -215,7 +219,7 @@ class ChecklistManagementView extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.outlineVariant,
+                  color: colors.outlineVariant,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -233,7 +237,7 @@ class ChecklistManagementView extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryFixed,
+                              color: colors.primaryFixed,
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusSm,
                               ),
@@ -242,17 +246,16 @@ class ChecklistManagementView extends ConsumerWidget {
                               isEdit
                                   ? Icons.edit_note_rounded
                                   : Icons.add_task_rounded,
-                              color: AppColors.primary,
+                              color: colors.primary,
                               size: 22,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Text(
                             isEdit ? 'Kalemi Düzenle' : 'Yeni Kalem Ekle',
-                            style: const TextStyle(
-                              fontSize: 18,
+                            style: textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
-                              color: AppColors.onSurface,
+                              color: colors.onSurface,
                             ),
                           ),
                         ],
@@ -301,8 +304,8 @@ class ChecklistManagementView extends ConsumerWidget {
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 14,
                                 ),
-                                side: const BorderSide(
-                                  color: AppColors.outlineVariant,
+                                side: BorderSide(
+                                  color: colors.outlineVariant,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
@@ -310,10 +313,10 @@ class ChecklistManagementView extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'İptal',
-                                style: TextStyle(
-                                  color: AppColors.onSurfaceVariant,
+                                style: textTheme.labelLarge?.copyWith(
+                                  color: colors.onSurfaceVariant,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -358,7 +361,7 @@ class ChecklistManagementView extends ConsumerWidget {
                               ),
                               label: Text(
                                 isEdit ? 'Kaydet' : 'Ekle',
-                                style: const TextStyle(
+                                style: textTheme.labelLarge?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -366,7 +369,8 @@ class ChecklistManagementView extends ConsumerWidget {
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 14,
                                 ),
-                                backgroundColor: AppColors.primary,
+                                backgroundColor: colors.primary,
+                                foregroundColor: colors.surface,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusMd,
@@ -395,20 +399,22 @@ class ChecklistManagementView extends ConsumerWidget {
     WidgetRef ref,
     ChecklistItemModel item,
   ) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: const Icon(
+        icon: Icon(
           Icons.delete_outline_rounded,
-          color: AppColors.error,
+          color: colors.error,
           size: 36,
         ),
         title: const Text('Kalemi Sil'),
         content: RichText(
           text: TextSpan(
-            style: const TextStyle(
-              color: AppColors.onSurfaceVariant,
-              fontSize: 14,
+            style: textTheme.bodyMedium?.copyWith(
+              color: colors.onSurfaceVariant,
               height: 1.5,
             ),
             children: [
@@ -417,9 +423,9 @@ class ChecklistManagementView extends ConsumerWidget {
               ),
               TextSpan(
                 text: '"${item.label}"',
-                style: const TextStyle(
+                style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.onSurface,
+                  color: colors.onSurface,
                 ),
               ),
             ],
@@ -441,7 +447,10 @@ class ChecklistManagementView extends ConsumerWidget {
                 ),
               );
             },
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            style: FilledButton.styleFrom(
+              backgroundColor: colors.error,
+              foregroundColor: colors.surface,
+            ),
             child: const Text('Sil'),
           ),
         ],
@@ -481,8 +490,7 @@ class _SectionHeader extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           title,
-          style: TextStyle(
-            fontSize: 14,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
             color: color,
             letterSpacing: 0.3,
@@ -497,8 +505,7 @@ class _SectionHeader extends StatelessWidget {
           ),
           child: Text(
             '$count',
-            style: TextStyle(
-              fontSize: 11,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w700,
               color: color,
             ),
@@ -525,7 +532,9 @@ class _ChecklistCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stripeColor = item.isActive ? AppColors.success : AppColors.outline;
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final stripeColor = item.isActive ? colors.success : colors.outline;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -540,19 +549,19 @@ class _ChecklistCard extends StatelessWidget {
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.only(right: 24),
           decoration: BoxDecoration(
-            color: AppColors.errorContainer,
+            color: colors.errorContainer,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.delete_outline_rounded,
-            color: AppColors.error,
+            color: colors.error,
           ),
         ),
         child: Material(
-          color: AppColors.surface,
+          color: colors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            side: const BorderSide(color: AppColors.outlineVariant, width: 0.8),
+            side: BorderSide(color: colors.outlineVariant, width: 0.8),
           ),
           child: InkWell(
             onTap: onTap,
@@ -581,12 +590,11 @@ class _ChecklistCard extends StatelessWidget {
                         children: [
                           Text(
                             item.label,
-                            style: TextStyle(
-                              fontSize: 15,
+                            style: textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: item.isActive
-                                  ? AppColors.onSurface
-                                  : AppColors.outline,
+                                  ? colors.onSurface
+                                  : colors.outline,
                               decoration: item.isActive
                                   ? null
                                   : TextDecoration.lineThrough,
@@ -598,11 +606,10 @@ class _ChecklistCard extends StatelessWidget {
                               item.description,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 13,
+                              style: textTheme.bodySmall?.copyWith(
                                 color: item.isActive
-                                    ? AppColors.onSurfaceVariant
-                                    : AppColors.outline,
+                                    ? colors.onSurfaceVariant
+                                    : colors.outline,
                                 height: 1.4,
                               ),
                             ),
@@ -616,8 +623,8 @@ class _ChecklistCard extends StatelessWidget {
                   Switch.adaptive(
                     value: item.isActive,
                     onChanged: onToggle,
-                    activeTrackColor: AppColors.primary,
-                    inactiveTrackColor: AppColors.surfaceContainer,
+                    activeTrackColor: colors.primary,
+                    inactiveTrackColor: colors.surfaceContainer,
                   ),
                   const SizedBox(width: 4),
                 ],
@@ -638,6 +645,9 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -647,31 +657,29 @@ class _EmptyState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: AppColors.primaryFixed,
+                color: colors.primaryFixed,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.playlist_add_rounded,
                 size: 48,
-                color: AppColors.primary,
+                color: colors.primary,
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Henüz kontrol kalemi yok',
-              style: TextStyle(
-                fontSize: 18,
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
+                color: colors.onSurface,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Bakım kontrol listesine kalem ekleyerek\nteknisyenlerin iş kalitesini artırın.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.onSurfaceVariant,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
                 height: 1.5,
               ),
             ),
@@ -679,12 +687,13 @@ class _EmptyState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add_rounded),
-              label: const Text(
+              label: Text(
                 'İlk Kalemi Ekle',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: colors.primary,
+                foregroundColor: colors.surface,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 28,
                   vertical: 14,
@@ -710,6 +719,9 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -718,32 +730,30 @@ class _ErrorState extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: AppColors.errorContainer,
+              decoration: BoxDecoration(
+                color: colors.errorContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.error_outline_rounded,
                 size: 40,
-                color: AppColors.error,
+                color: colors.error,
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Bir hata oluştu',
-              style: TextStyle(
-                fontSize: 16,
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
+                color: colors.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.onSurfaceVariant,
+              style: textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 24),

@@ -24,15 +24,23 @@ class SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final effectiveColor =
-        color ?? textStyle?.color ?? AppColors.onSurfaceVariant;
+        color ?? textStyle?.color ?? colors.onSurfaceVariant;
     final effectiveLabel = uppercase ? label.toUpperCase() : label;
-    final baseStyle = TextStyle(
-      fontSize: uppercase ? 11 : 14,
-      fontWeight: uppercase ? FontWeight.w700 : FontWeight.w800,
-      color: effectiveColor,
-      letterSpacing: uppercase ? 1.2 : 0.1,
-    );
+    
+    final baseStyle = uppercase
+        ? (textTheme.labelSmall ?? const TextStyle()).copyWith(
+            fontWeight: FontWeight.w700,
+            color: effectiveColor,
+            letterSpacing: 1.2,
+          )
+        : (textTheme.titleSmall ?? const TextStyle()).copyWith(
+            fontWeight: FontWeight.w800,
+            color: effectiveColor,
+            letterSpacing: 0.1,
+          );
     final resolvedStyle = textStyle == null
         ? baseStyle
         : baseStyle.merge(textStyle).copyWith(color: effectiveColor);

@@ -10,6 +10,7 @@ class ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -19,21 +20,20 @@ class ErrorState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: AppColors.errorContainer,
+                color: colors.errorContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.error_outline_rounded,
                 size: 48,
-                color: AppColors.error,
+                color: colors.error,
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
               message,
-              style: const TextStyle(
-                fontSize: 16,
-                color: AppColors.onSurfaceVariant,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: colors.onSurfaceVariant,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -45,7 +45,7 @@ class ErrorState extends StatelessWidget {
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('Tekrar Dene'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: colors.primary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.xl,
                     vertical: AppSpacing.md,

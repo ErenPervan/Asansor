@@ -74,7 +74,8 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDisabled = onPressed == null;
-    final color = isActive ? AppColors.primary : const Color(0xFF94A3B8);
+    final colors = AppThemeColors.of(context);
+    final color = isActive ? colors.primary : colors.outline;
 
     final child = Column(
       mainAxisSize: MainAxisSize.min,
@@ -83,8 +84,7 @@ class _NavItem extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
             fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
             color: color,
             letterSpacing: 0.6,

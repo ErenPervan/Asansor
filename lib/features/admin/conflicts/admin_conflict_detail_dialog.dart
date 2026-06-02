@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'admin_conflict_provider.dart';
-
-const _error = Color(0xFFBA1A1A);
-const _localBg = Color(0xFFFFF1F2);
-const _localLabel = Color(0xFF93000A);
-const _remoteBg = Color(0xFFF0F4FF);
-const _remoteLabel = Color(0xFF0D4686);
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 
 class AdminConflictDetailDialog extends ConsumerWidget {
   const AdminConflictDetailDialog({super.key, required this.report});
@@ -16,6 +12,7 @@ class AdminConflictDetailDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isLoading = ref.watch(adminConflictProvider).isLoading;
     final notifier = ref.read(adminConflictProvider.notifier);
+    final colors = AppThemeColors.of(context);
 
     // Get unique keys from both payloads
     final allKeys = <String>{
@@ -30,7 +27,7 @@ class AdminConflictDetailDialog extends ConsumerWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 800, maxHeight: 600),
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -39,10 +36,9 @@ class AdminConflictDetailDialog extends ConsumerWidget {
               children: [
                 Text(
                   'Çakışma Detayı: ${report.buildingName ?? report.elevatorId}',
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF191C1D),
+                    color: colors.onSurface,
                   ),
                 ),
                 IconButton(
@@ -51,16 +47,15 @@ class AdminConflictDetailDialog extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'Teknisyen: ${report.technicianName ?? "Bilinmeyen Teknisyen"}',
-              style: const TextStyle(
-                color: Color(0xFF424752),
-                fontSize: 14,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: colors.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,24 +65,24 @@ class AdminConflictDetailDialog extends ConsumerWidget {
                       title: 'Yerel Değişiklik (Teknisyen)',
                       payload: report.localPayload,
                       keys: displayKeys,
-                      bgColor: _localBg,
-                      labelColor: _localLabel,
+                      bgColor: colors.errorContainer,
+                      labelColor: colors.onErrorContainer,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: _PayloadColumn(
                       title: 'Uzak Durum (Sunucu)',
                       payload: report.remotePayload,
                       keys: displayKeys,
-                      bgColor: _remoteBg,
-                      labelColor: _remoteLabel,
+                      bgColor: colors.blueSoft,
+                      labelColor: colors.navyMid,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -95,8 +90,8 @@ class AdminConflictDetailDialog extends ConsumerWidget {
                   icon: const Icon(Icons.cloud_done_outlined),
                   label: const Text('Uzakı Koru (Yereli Yoksay)'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: _remoteLabel,
-                    side: const BorderSide(color: _remoteLabel),
+                    foregroundColor: colors.navyMid,
+                    side: BorderSide(color: colors.navyMid),
                   ),
                   onPressed: isLoading
                       ? null
@@ -105,20 +100,20 @@ class AdminConflictDetailDialog extends ConsumerWidget {
                           if (context.mounted) Navigator.of(context).pop();
                         },
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppSpacing.md),
                 FilledButton.icon(
                   icon: isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: colors.onError,
                           ),
                         )
                       : const Icon(Icons.warning_amber_rounded),
                   label: const Text('Yereli Kabul Et (Zorla Güncelle)'),
-                  style: FilledButton.styleFrom(backgroundColor: _error),
+                  style: FilledButton.styleFrom(backgroundColor: colors.error),
                   onPressed: isLoading
                       ? null
                       : () async {
@@ -152,26 +147,26 @@ class _PayloadColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: labelColor.withValues(alpha: 0.2)),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
               Icon(Icons.code, color: labelColor, size: 18),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 title,
-                style: TextStyle(
+                style: textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: labelColor,
-                  fontSize: 14,
                 ),
               ),
             ],
@@ -191,8 +186,7 @@ class _PayloadColumn extends StatelessWidget {
                   children: [
                     Text(
                       key.toUpperCase().replaceAll('_', ' '),
-                      style: TextStyle(
-                        fontSize: 10,
+                      style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: labelColor.withValues(alpha: 0.7),
                         letterSpacing: 0.5,
@@ -201,10 +195,11 @@ class _PayloadColumn extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       value,
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF191C1D),
+                        color: Theme.of(context).brightness == Brightness.dark 
+                            ? AppThemeColors.dark.onSurface 
+                            : AppThemeColors.light.onSurface,
                       ),
                     ),
                   ],

@@ -144,7 +144,7 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(Brightness.light),
       darkTheme: _buildTheme(Brightness.dark),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

@@ -44,6 +44,7 @@ abstract final class AppColors {
   // ── Semantic — Error ──────────────────────────────────────────────────────
   static const error = Color(0xFFDC2626); // Red-600
   static const errorContainer = Color(0xFFFEE2E2); // Red-100
+  static const errorContainerDark = Color(0xFF450A0A); // Red-950
   static const onErrorContainer = Color(0xFF991B1B);
   static const onError = Colors.white;
 
@@ -51,14 +52,17 @@ abstract final class AppColors {
   static const success = Color(0xFF166534); // Green-800
   static const successLight = Color(0xFF16A34A); // Green-600
   static const successContainer = Color(0xFFDCFCE7); // Green-100
+  static const successContainerDark = Color(0xFF052E16); // Green-950
 
   // ── Semantic — Warning ────────────────────────────────────────────────────
   static const warning = Color(0xFF92400E); // Amber-800
   static const warningLight = Color(0xFFD97706); // Amber-600
   static const warningContainer = Color(0xFFFEF3C7); // Amber-100
+  static const warningContainerDark = Color(0xFF451A03); // Amber-950
 
   // ── Admin Dashboard — Chart Accents ────────────────────────────────────────
   static const navy = Color(0xFF0F2040);
+  static const navyDark = Color(0xFF1E293B);
   static const navyMid = Color(0xFF1B3A6B);
   static const blue = Color(0xFF2563EB);
   static const blueSoft = Color(0xFFEFF6FF);
@@ -69,6 +73,12 @@ abstract final class AppColors {
   static const tealSurface = Color(0xFFECFDF5);
   static const violet = Color(0xFF7C3AED);
   static const violetSurface = Color(0xFFF5F3FF);
+
+  // ── Added Tokens ────────────────────────────────────────────────────────────
+  static const mapBlue = Color(0xFF004180);
+  static const mapBlueMid = Color(0xFF295999);
+  static const calendarGreen = Color(0xFF1B6B3A);
+  static const skyBlue = Color(0xFF0369A1);
 }
 
 class AppThemeColors {
@@ -106,6 +116,10 @@ class AppThemeColors {
     required this.tealSurface,
     required this.violet,
     required this.violetSurface,
+    required this.mapBlue,
+    required this.mapBlueMid,
+    required this.calendarGreen,
+    required this.skyBlue,
   });
 
   final Color primary;
@@ -141,6 +155,15 @@ class AppThemeColors {
   final Color tealSurface;
   final Color violet;
   final Color violetSurface;
+  final Color mapBlue;
+  final Color mapBlueMid;
+  final Color calendarGreen;
+  final Color skyBlue;
+
+  Color get onPrimary => Colors.white;
+  Color get primaryContainer => primaryFixed;
+  Color get tealContainer => tealSurface;
+  Color get violetContainer => violetSurface;
 
   static const light = AppThemeColors(
     primary: AppColors.primary,
@@ -176,6 +199,10 @@ class AppThemeColors {
     tealSurface: AppColors.tealSurface,
     violet: AppColors.violet,
     violetSurface: AppColors.violetSurface,
+    mapBlue: AppColors.mapBlue,
+    mapBlueMid: AppColors.mapBlueMid,
+    calendarGreen: AppColors.calendarGreen,
+    skyBlue: AppColors.skyBlue,
   );
 
   static const dark = AppThemeColors(
@@ -194,16 +221,16 @@ class AppThemeColors {
     outline: AppColors.outlineDark,
     outlineVariant: AppColors.outlineVariantDark,
     error: AppColors.error,
-    errorContainer: AppColors.errorContainer,
+    errorContainer: AppColors.errorContainerDark,
     onErrorContainer: AppColors.onErrorContainer,
     onError: AppColors.onError,
     success: AppColors.success,
     successLight: AppColors.successLight,
-    successContainer: AppColors.successContainer,
+    successContainer: AppColors.successContainerDark,
     warning: AppColors.warning,
     warningLight: AppColors.warningLight,
-    warningContainer: AppColors.warningContainer,
-    navy: AppColors.navy,
+    warningContainer: AppColors.warningContainerDark,
+    navy: AppColors.navyDark,
     navyMid: AppColors.navyMid,
     blue: AppColors.blue,
     blueSoft: AppColors.blueSoft,
@@ -212,6 +239,10 @@ class AppThemeColors {
     tealSurface: AppColors.tealSurface,
     violet: AppColors.violet,
     violetSurface: AppColors.violetSurface,
+    mapBlue: AppColors.mapBlue,
+    mapBlueMid: AppColors.mapBlueMid,
+    calendarGreen: AppColors.calendarGreen,
+    skyBlue: AppColors.skyBlue,
   );
 
   static AppThemeColors of(BuildContext context) {

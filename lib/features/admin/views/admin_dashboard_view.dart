@@ -30,13 +30,7 @@ class AdminDashboardView extends ConsumerWidget {
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Admin Paneli',
-          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.3),
-        ),
+        title: const Text('Admin Paneli'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_outlined),
@@ -49,7 +43,7 @@ class AdminDashboardView extends ConsumerWidget {
         ],
       ),
       body: RefreshIndicator(
-        color: AppColors.primary,
+        color: colors.primary,
         onRefresh: () async {
           ref.invalidate(adminStatsProvider);
           ref.invalidate(allSchedulesProvider);
@@ -73,26 +67,43 @@ class AdminDashboardView extends ConsumerWidget {
               AddElevatorBanner(
                 onTap: () => context.push('/admin/add-elevator'),
               ),
-              const SizedBox(height: 16),
-              DashboardMapCard(onTap: () => context.push('/admin/map')),
-              const SizedBox(height: 12),
-              UserManagementCard(onTap: () => context.push('/admin/users')),
-              const SizedBox(height: 12),
-              DashboardCalendarCard(
-                onTap: () => context.push('/admin/calendar'),
-              ),
-              const SizedBox(height: 12),
-              MasterCalendarCard(
-                onTap: () => context.push('/admin/master-calendar'),
-              ),
-              const SizedBox(height: 12),
-              TechnicianDirCard(
-                onTap: () => context.push('/admin/technicians'),
-              ),
-              const SizedBox(height: 12),
-              ChecklistCard(onTap: () => context.push('/admin/checklists')),
-              const SizedBox(height: 12),
-              StatisticsCard(onTap: () => context.push('/admin/statistics')),
+              LayoutBuilder(builder: (context, constraints) {
+                final cards = [
+                  DashboardMapCard(onTap: () => context.push('/admin/map')),
+                  UserManagementCard(onTap: () => context.push('/admin/users')),
+                  DashboardCalendarCard(
+                    onTap: () => context.push('/admin/calendar'),
+                  ),
+                  MasterCalendarCard(
+                    onTap: () => context.push('/admin/master-calendar'),
+                  ),
+                  TechnicianDirCard(
+                    onTap: () => context.push('/admin/technicians'),
+                  ),
+                  ChecklistCard(onTap: () => context.push('/admin/checklists')),
+                  StatisticsCard(onTap: () => context.push('/admin/statistics')),
+                ];
+
+                if (constraints.maxWidth >= 600) {
+                  return Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: cards.map((c) => SizedBox(
+                      width: (constraints.maxWidth - 12) / 2,
+                      child: c,
+                    )).toList(),
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      for (int i = 0; i < cards.length; i++) ...[
+                        cards[i],
+                        if (i < cards.length - 1) const SizedBox(height: 12),
+                      ],
+                    ],
+                  );
+                }
+              }),
               const SizedBox(height: 32),
               DashboardScheduleList(
                 schedules: schedules,
@@ -105,12 +116,14 @@ class AdminDashboardView extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/admin/assign'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: colors.primary,
+        foregroundColor: colors.onPrimary,
         icon: const Icon(Icons.assignment_ind_outlined),
-        label: const Text(
+        label: Text(
           'Görev Ata',
-          style: TextStyle(fontWeight: FontWeight.w700),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
     );

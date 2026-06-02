@@ -79,8 +79,8 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
               ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: log.isOfflineQueued
-                  ? const Color(0xFFD97706)
-                  : const Color(0xFF155724),
+                  ? AppColors.warningLight
+                  : AppColors.success,
               duration: log.isOfflineQueued
                   ? const Duration(seconds: 5)
                   : const Duration(seconds: 3),

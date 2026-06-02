@@ -4,7 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 Color getPriorityColor(String p) {
   switch (p) {
     case 'low':
-      return const Color(0xFF78909C);
+      return AppColors.outline;
     case 'high':
       return AppColors.warning;
     case 'emergency':
@@ -45,7 +45,7 @@ Color getStatusColor(String s) {
     case 'in_progress':
       return AppColors.primary;
     case 'completed':
-      return const Color(0xFF2E7D32);
+      return AppColors.success;
     case 'cancelled':
       return AppColors.outline;
     default:

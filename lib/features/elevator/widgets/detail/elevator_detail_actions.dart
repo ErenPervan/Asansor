@@ -14,18 +14,20 @@ class ElevatorDetailActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
     return Row(
       children: [
         // "Arıza Bildir" — error-container background
         Expanded(
           child: ElevatorActionCard(
             onTap: onReportFault,
-            backgroundColor: AppColors.errorContainer,
-            iconContainerColor: AppColors.error.withValues(alpha: 0.12),
+            backgroundColor: colors.errorContainer,
+            iconContainerColor: colors.error.withValues(alpha: 0.12),
             icon: Icons.warning_rounded,
-            iconColor: AppColors.error,
+            iconColor: colors.error,
             label: 'Arıza Bildir',
-            labelColor: AppColors.onErrorContainer,
+            labelColor: colors.onErrorContainer,
           ),
         ),
         const SizedBox(width: 16),
@@ -33,7 +35,7 @@ class ElevatorDetailActions extends StatelessWidget {
         Expanded(
           child: ElevatorActionCard(
             onTap: onLogMaintenance,
-            backgroundColor: AppColors.primary,
+            backgroundColor: colors.primary,
             iconContainerColor: Colors.white.withValues(alpha: 0.12),
             icon: Icons.assignment_outlined,
             iconColor: Colors.white,
@@ -94,8 +96,7 @@ class ElevatorActionCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 13,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: labelColor,
                   ),

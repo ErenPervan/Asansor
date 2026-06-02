@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/widgets/loading_state.dart';
+
 import '../../elevator/models/elevator_model.dart';
 
 import '../../elevator/providers/elevator_providers.dart';
@@ -11,32 +13,34 @@ import '../models/profile_model.dart';
 import '../providers/profile_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 // ── Role helpers ──────────────────────────────────────────────────────────────
 
-_RoleStyle _roleStyle(String role) {
+_RoleStyle _roleStyle(BuildContext context, String role) {
+  final colors = AppThemeColors.of(context);
   switch (role) {
     case 'admin':
-      return const _RoleStyle(
-        bg: AppColors.primary,
-        fg: Colors.white,
-        avatarBg: AppColors.primaryDark,
-        avatarFg: Colors.white,
+      return _RoleStyle(
+        bg: colors.primary,
+        fg: colors.surface,
+        avatarBg: colors.primaryDark,
+        avatarFg: colors.surface,
         icon: Icons.admin_panel_settings_outlined,
       );
     case 'customer':
-      return const _RoleStyle(
-        bg: AppColors.successContainer,
-        fg: AppColors.success,
-        avatarBg: Color(0xFF4CAF50),
-        avatarFg: Colors.white,
+      return _RoleStyle(
+        bg: colors.successContainer,
+        fg: colors.success,
+        avatarBg: colors.success, // keep original brand color or colors.success
+        avatarFg: colors.surface,
         icon: Icons.person_outline,
       );
     default: // technician
       return _RoleStyle(
-        bg: const Color(0xFFD6E3FF),
-        fg: AppColors.primary,
-        avatarBg: AppColors.primary.withValues(alpha: 0.80),
-        avatarFg: Colors.white,
+        bg: colors.primary.withValues(alpha: 0.15), // or another semantic color
+        fg: colors.primary,
+        avatarBg: colors.primary.withValues(alpha: 0.80),
+        avatarFg: colors.surface,
         icon: Icons.engineering_outlined,
       );
   }
@@ -91,15 +95,22 @@ class _UserManagementViewState extends ConsumerState<UserManagementView>
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: AppThemeColors.of(context).background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: colors.primary,
+        foregroundColor: colors.surface,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Kullanıcı Yönetimi',
-          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.3),
+          style: textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.3,
+            color: colors.surface,
+          ),
         ),
         actions: [
           IconButton(
@@ -110,12 +121,11 @@ class _UserManagementViewState extends ConsumerState<UserManagementView>
         ],
         bottom: TabBar(
           controller: _tabs,
-          indicatorColor: Colors.white,
+          indicatorColor: colors.surface,
           indicatorWeight: 3,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white60,
-          labelStyle: const TextStyle(
-            fontSize: 13,
+          labelColor: colors.surface,
+          unselectedLabelColor: colors.surface.withValues(alpha: 0.6),
+          labelStyle: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w700,
             letterSpacing: 0.2,
           ),
@@ -154,15 +164,19 @@ class _UserListTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppThemeColors.of(context);
     final currentRole = ref.watch(roleProvider);
     final profilesAsync = role == null
         ? ref.watch(allProfilesProvider)
         : ref.watch(profilesByRoleProvider(role!));
 
-    return profilesAsync.when(
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      ),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: profilesAsync.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(AppSpacing.md),
+          child: LoadingState(count: 4),
+        ),
       error: (e, _) => _ErrorPane(
         message: e.toString().replaceFirst('Exception: ', ''),
         onRetry: () => role == null
@@ -181,22 +195,64 @@ class _UserListTab extends ConsumerWidget {
           );
         }
         return RefreshIndicator(
-          color: AppColors.primary,
+          color: colors.primary,
           onRefresh: () async => role == null
               ? ref.invalidate(allProfilesProvider)
               : ref.invalidate(profilesByRoleProvider(role!)),
-          child: ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: profiles.length,
-            separatorBuilder: (context, i) => const SizedBox(height: 10),
-            itemBuilder: (context, i) => _ProfileCard(
-              profile: profiles[i],
-              isAdminViewer: currentRole == 'admin',
-              onEditRole: () => _showEditRoleSheet(context, profiles[i]),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth >= 600) {
+                return ListView.builder(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  itemCount: (profiles.length / 2).ceil(),
+                  itemBuilder: (context, i) {
+                    final idx1 = i * 2;
+                    final idx2 = i * 2 + 1;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _ProfileCard(
+                              profile: profiles[idx1],
+                              isAdminViewer: currentRole == 'admin',
+                              onEditRole: () =>
+                                  _showEditRoleSheet(context, profiles[idx1]),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: idx2 < profiles.length
+                                ? _ProfileCard(
+                                    profile: profiles[idx2],
+                                    isAdminViewer: currentRole == 'admin',
+                                    onEditRole: () =>
+                                        _showEditRoleSheet(context, profiles[idx2]),
+                                  )
+                                : const SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }
+              return ListView.separated(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                itemCount: profiles.length,
+                separatorBuilder: (context, i) => const SizedBox(height: 10),
+                itemBuilder: (context, i) => _ProfileCard(
+                  profile: profiles[i],
+                  isAdminViewer: currentRole == 'admin',
+                  onEditRole: () => _showEditRoleSheet(context, profiles[i]),
+                ),
+              );
+            },
           ),
         );
       },
+      ),
     );
   }
 }
@@ -208,14 +264,18 @@ class _CustomerTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppThemeColors.of(context);
     final currentRole = ref.watch(roleProvider);
     final profilesAsync = ref.watch(profilesByRoleProvider('customer'));
     final elevatorsAsync = ref.watch(elevatorsProvider);
 
-    return profilesAsync.when(
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      ),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: profilesAsync.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(AppSpacing.md),
+          child: LoadingState(count: 4),
+        ),
       error: (e, _) => _ErrorPane(
         message: e.toString().replaceFirst('Exception: ', ''),
         onRetry: () => ref.invalidate(profilesByRoleProvider('customer')),
@@ -229,31 +289,89 @@ class _CustomerTab extends ConsumerWidget {
         }
         final elevators = elevatorsAsync.valueOrNull ?? [];
         return RefreshIndicator(
-          color: AppColors.primary,
+          color: colors.primary,
           onRefresh: () async {
             ref.invalidate(profilesByRoleProvider('customer'));
             ref.invalidate(elevatorsProvider);
           },
-          child: ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: customers.length,
-            separatorBuilder: (context, i) => const SizedBox(height: 10),
-            itemBuilder: (context, i) => _ProfileCard(
-              profile: customers[i],
-              isAdminViewer: currentRole == 'admin',
-              elevators: elevators,
-              onEditRole: () => _showEditRoleSheet(context, customers[i]),
-              onAssignElevator: currentRole == 'admin'
-                  ? () => _showAssignElevatorSheet(
-                      context,
-                      customers[i],
-                      elevators,
-                    )
-                  : null,
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth >= 600) {
+                return ListView.builder(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  itemCount: (customers.length / 2).ceil(),
+                  itemBuilder: (context, i) {
+                    final idx1 = i * 2;
+                    final idx2 = i * 2 + 1;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _ProfileCard(
+                              profile: customers[idx1],
+                              isAdminViewer: currentRole == 'admin',
+                              elevators: elevators,
+                              onEditRole: () =>
+                                  _showEditRoleSheet(context, customers[idx1]),
+                              onAssignElevator: currentRole == 'admin'
+                                  ? () => _showAssignElevatorSheet(
+                                      context,
+                                      customers[idx1],
+                                      elevators,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: idx2 < customers.length
+                                ? _ProfileCard(
+                                    profile: customers[idx2],
+                                    isAdminViewer: currentRole == 'admin',
+                                    elevators: elevators,
+                                    onEditRole: () => _showEditRoleSheet(
+                                        context, customers[idx2]),
+                                    onAssignElevator: currentRole == 'admin'
+                                        ? () => _showAssignElevatorSheet(
+                                            context,
+                                            customers[idx2],
+                                            elevators,
+                                          )
+                                        : null,
+                                  )
+                                : const SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }
+              return ListView.separated(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                itemCount: customers.length,
+                separatorBuilder: (context, i) => const SizedBox(height: 10),
+                itemBuilder: (context, i) => _ProfileCard(
+                  profile: customers[i],
+                  isAdminViewer: currentRole == 'admin',
+                  elevators: elevators,
+                  onEditRole: () => _showEditRoleSheet(context, customers[i]),
+                  onAssignElevator: currentRole == 'admin'
+                      ? () => _showAssignElevatorSheet(
+                          context,
+                          customers[i],
+                          elevators,
+                        )
+                      : null,
+                ),
+              );
+            },
           ),
         );
       },
+      ),
     );
   }
 }
@@ -277,7 +395,9 @@ class _ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = _roleStyle(profile.role);
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final style = _roleStyle(context, profile.role);
 
     ElevatorModel? linkedElevator;
     if (profile.elevatorId != null && elevators != null) {
@@ -289,16 +409,16 @@ class _ProfileCard extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+          color: colors.outlineVariant.withValues(alpha: 0.4),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: colors.onSurface.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -322,10 +442,9 @@ class _ProfileCard extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   profile.initials,
-                  style: TextStyle(
+                  style: textTheme.titleMedium?.copyWith(
                     color: style.avatarFg,
                     fontWeight: FontWeight.w800,
-                    fontSize: 16,
                   ),
                 ),
               ),
@@ -337,10 +456,9 @@ class _ProfileCard extends StatelessWidget {
                   children: [
                     Text(
                       profile.displayName,
-                      style: const TextStyle(
+                      style: textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                        color: AppColors.onSurface,
+                        color: colors.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -349,29 +467,27 @@ class _ProfileCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         profile.email!,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.outline,
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colors.outline,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
                     if (profile.phone != null && profile.phone!.isNotEmpty) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.phone_outlined,
                             size: 12,
-                            color: AppColors.onSurfaceVariant,
+                            color: colors.onSurfaceVariant,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppSpacing.xs),
                           Text(
                             profile.phone!,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.onSurfaceVariant,
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colors.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -380,7 +496,7 @@ class _ProfileCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               // Role badge
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -395,11 +511,10 @@ class _ProfileCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(style.icon, size: 12, color: style.fg),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       profile.roleTr,
-                      style: TextStyle(
-                        fontSize: 11,
+                      style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: style.fg,
                       ),
@@ -415,15 +530,15 @@ class _ProfileCard extends StatelessWidget {
             const SizedBox(height: 12),
             Divider(
               height: 1,
-              color: AppColors.outlineVariant.withValues(alpha: 0.25),
+              color: colors.outlineVariant.withValues(alpha: 0.25),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.elevator_outlined,
                   size: 14,
-                  color: AppColors.onSurfaceVariant,
+                  color: colors.onSurfaceVariant,
                 ),
                 const SizedBox(width: 6),
                 Expanded(
@@ -433,35 +548,33 @@ class _ProfileCard extends StatelessWidget {
                           children: [
                             Text(
                               linkedElevator.buildingName,
-                              style: const TextStyle(
-                                fontSize: 12,
+                              style: textTheme.labelSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.onSurface,
+                                color: colors.onSurface,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                             if (linkedElevator.address != null)
                               Text(
                                 linkedElevator.address!,
-                                style: const TextStyle(
+                                style: textTheme.labelSmall?.copyWith(
                                   fontSize: 11,
-                                  color: AppColors.outline,
+                                  color: colors.outline,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                           ],
                         )
-                      : const Text(
+                      : Text(
                           'Asansör bağlı değil',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.outline,
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colors.outline,
                             fontStyle: FontStyle.italic,
                           ),
                         ),
                 ),
                 if (onAssignElevator != null) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   TextButton.icon(
                     onPressed: onAssignElevator,
                     icon: Icon(
@@ -472,10 +585,10 @@ class _ProfileCard extends StatelessWidget {
                     ),
                     label: Text(
                       linkedElevator != null ? 'Değiştir' : 'Ata',
-                      style: const TextStyle(fontSize: 12),
+                      style: textTheme.labelSmall,
                     ),
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.primary,
+                      foregroundColor: colors.primary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 4,
@@ -498,12 +611,12 @@ class _ProfileCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onEditRole,
                   icon: const Icon(Icons.manage_accounts_outlined, size: 14),
-                  label: const Text(
+                  label: Text(
                     'Rol Değiştir',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.onSurfaceVariant,
+                    foregroundColor: colors.onSurfaceVariant,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                       vertical: 4,
@@ -569,7 +682,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
         SnackBar(
           content: Text(state.error.toString().replaceFirst('Exception: ', '')),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppThemeColors.of(context).error,
         ),
       );
     } else {
@@ -581,7 +694,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
             '${_roleTr(_selectedRole)} olarak güncellendi.',
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.success,
+          backgroundColor: AppThemeColors.of(context).success,
         ),
       );
     }
@@ -589,13 +702,15 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final isLoading = ref.watch(profileUpdateControllerProvider).isLoading;
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.lg),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -606,7 +721,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.outlineVariant,
+                    color: colors.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -620,12 +735,12 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: colors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.manage_accounts_outlined,
-                      color: AppColors.primary,
+                      color: colors.primary,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -633,19 +748,17 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Rol Değiştir',
-                          style: TextStyle(
-                            fontSize: 17,
+                          style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppColors.onSurface,
+                            color: colors.onSurface,
                           ),
                         ),
                         Text(
                           widget.profile.displayName,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.outline,
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colors.outline,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -654,8 +767,8 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-
+              const SizedBox(height: AppSpacing.lg),
+              
               // Role options
               ...[
                 (
@@ -678,7 +791,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                 ),
               ].map((item) {
                 final (roleValue, roleLabel, roleIcon, roleSubtitle) = item;
-                final style = _roleStyle(roleValue);
+                final style = _roleStyle(context, roleValue);
                 final isSelected = _selectedRole == roleValue;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
@@ -693,7 +806,7 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? style.bg.withValues(alpha: 0.18)
-                            : AppColors.surfaceContainer,
+                            : colors.surfaceContainer,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: isSelected
@@ -710,13 +823,13 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? style.bg
-                                  : AppColors.outlineVariant,
+                                  : colors.outlineVariant,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
                               roleIcon,
                               size: 18,
-                              color: isSelected ? style.fg : Colors.white,
+                              color: isSelected ? style.fg : colors.surface,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -726,19 +839,17 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
                               children: [
                                 Text(
                                   roleLabel,
-                                  style: TextStyle(
+                                  style: textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.w700,
-                                    fontSize: 14,
                                     color: isSelected
                                         ? style.fg
-                                        : AppColors.onSurface,
+                                        : colors.onSurface,
                                   ),
                                 ),
                                 Text(
                                   roleSubtitle,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.onSurfaceVariant,
+                                  style: textTheme.labelSmall?.copyWith(
+                                    color: colors.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -757,26 +868,26 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
               FilledButton(
                 onPressed: isLoading ? null : _save,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: colors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: isLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: colors.surface,
                         ),
                       )
-                    : const Text(
+                    : Text(
                         'Kaydet',
-                        style: TextStyle(
+                        style: textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
-                          fontSize: 15,
+                          color: colors.surface,
                         ),
                       ),
               ),
@@ -843,7 +954,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
         SnackBar(
           content: Text(state.error.toString().replaceFirst('Exception: ', '')),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppThemeColors.of(context).error,
         ),
       );
     } else {
@@ -861,7 +972,6 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                 : '${widget.customer.displayName} asansör bağlantısı kaldırıldı.',
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.success,
         ),
       );
     }
@@ -869,6 +979,8 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final isLoading = ref.watch(profileUpdateControllerProvider).isLoading;
 
     return DraggableScrollableSheet(
@@ -878,7 +990,7 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
       expand: false,
       builder: (context, scrollController) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
           child: Column(
             children: [
               // Handle bar
@@ -887,13 +999,13 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.outlineVariant,
+                    color: colors.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-
+              const SizedBox(height: AppSpacing.md),
+              
               // Title
               Row(
                 children: [
@@ -901,12 +1013,12 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: colors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.elevator_outlined,
-                      color: AppColors.primary,
+                      color: colors.primary,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -914,19 +1026,17 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Asansör Ata',
-                          style: TextStyle(
-                            fontSize: 17,
+                          style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppColors.onSurface,
+                            color: colors.onSurface,
                           ),
                         ),
                         Text(
                           widget.customer.displayName,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.outline,
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colors.outline,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -935,13 +1045,13 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               Divider(
                 height: 1,
-                color: AppColors.outlineVariant.withValues(alpha: 0.3),
+                color: colors.outlineVariant.withValues(alpha: 0.3),
               ),
-              const SizedBox(height: 8),
-
+              const SizedBox(height: AppSpacing.sm),
+              
               // Elevator list
               Expanded(
                 child: ListView(
@@ -982,30 +1092,30 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
               // Save button (pinned at bottom)
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                   child: FilledButton(
                     onPressed: isLoading ? null : _save,
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: colors.primary,
                       minimumSize: const Size.fromHeight(50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: isLoading
-                        ? const SizedBox(
+                        ? SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: colors.surface,
                             ),
                           )
-                        : const Text(
+                        : Text(
                             'Kaydet',
-                            style: TextStyle(
+                            style: textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w700,
-                              fontSize: 15,
+                              color: colors.surface,
                             ),
                           ),
                   ),
@@ -1038,7 +1148,10 @@ class _ElevatorOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = isDestructive ? AppColors.error : AppColors.primary;
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final accentColor = isDestructive ? colors.error : colors.primary;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -1048,7 +1161,7 @@ class _ElevatorOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? accentColor.withValues(alpha: 0.08)
-              : AppColors.surfaceContainer,
+              : colors.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
@@ -1060,7 +1173,7 @@ class _ElevatorOption extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: isSelected ? accentColor : AppColors.outline,
+              color: isSelected ? accentColor : colors.outline,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -1070,17 +1183,15 @@ class _ElevatorOption extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
+                    style: textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      color: isSelected ? accentColor : AppColors.onSurface,
+                      color: isSelected ? accentColor : colors.onSurface,
                     ),
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.outline,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colors.outline,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1105,19 +1216,22 @@ class _EmptyPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(48),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 56, color: AppColors.outlineVariant),
-            const SizedBox(height: 16),
+            Icon(icon, size: 56, color: colors.outlineVariant),
+            const SizedBox(height: AppSpacing.md),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.outline,
+              style: textTheme.titleSmall?.copyWith(
+                color: colors.outline,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1135,25 +1249,28 @@ class _ErrorPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 56, color: AppColors.error),
-            const SizedBox(height: 16),
+            Icon(Icons.error_outline, size: 56, color: colors.error),
+            const SizedBox(height: AppSpacing.md),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.onSurfaceVariant),
+              style: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+              style: FilledButton.styleFrom(backgroundColor: colors.primary),
             ),
           ],
         ),

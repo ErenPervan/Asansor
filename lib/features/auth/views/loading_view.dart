@@ -11,7 +11,7 @@ class LoadingView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(appAuthStateProvider);
-    
+
     if (authState.status == AuthStatus.error) {
       return Scaffold(
         backgroundColor: AppThemeColors.of(context).background,
@@ -38,10 +38,13 @@ class LoadingView extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 FilledButton.icon(
-                  onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
+                  onPressed: () =>
+                      ref.read(authControllerProvider.notifier).signOut(),
                   icon: const Icon(Icons.logout),
                   label: const Text('Çıkış Yap'),
-                  style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.error,
+                  ),
                 ),
               ],
             ),

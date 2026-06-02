@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 
 // ── Map Preview Card ──────────────────────────────────────────────────────────
@@ -54,7 +55,7 @@ class DashboardMapCard extends StatelessWidget {
                   size: 28,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,7 +79,7 @@ class DashboardMapCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               const Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: Colors.white70,

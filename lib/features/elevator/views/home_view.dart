@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -67,17 +68,17 @@ class HomeView extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.md),
                     ActiveFaultsSection(
                       activeFaults: activeFaults,
                       elevators: elevators.valueOrNull,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xl),
                     DailyAgendaSection(
                       mySchedules: mySchedules,
                       elevators: elevators.valueOrNull,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xl),
                     StatsSection(
                       activeFaultCount: isAdmin
                           ? (adminStatsAsync.valueOrNull?.activeFaults ?? 0)
@@ -90,7 +91,7 @@ class HomeView extends ConsumerWidget {
                           ? 'BU AY TAMAMLANAN'
                           : 'TAMAMLANAN',
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.lg),
                     ElevatorsShortcutCard(
                       onTap: () => context.push('/elevators'),
                     ),

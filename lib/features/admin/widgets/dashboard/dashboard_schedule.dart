@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:asansor/core/widgets/empty_state.dart';
 import 'package:asansor/core/theme/app_colors.dart';
@@ -36,11 +37,11 @@ class DashboardScheduleList extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.md),
         schedules.when(
           loading: () => Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: CircularProgressIndicator(color: colors.primary),
             ),
           ),
@@ -94,7 +95,7 @@ class DashboardScheduleCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
@@ -160,7 +161,7 @@ class DashboardScheduleCard extends StatelessWidget {
                         color: colors.onSurfaceVariant,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Icon(
                       Icons.person_outline,
                       size: 13,
@@ -183,7 +184,7 @@ class DashboardScheduleCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           // Status badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

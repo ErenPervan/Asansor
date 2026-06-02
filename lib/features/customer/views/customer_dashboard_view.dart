@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,9 +27,11 @@ class CustomerDashboardView extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppThemeColors.of(context).background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Asansör Durumu',
-          style: TextStyle(fontWeight: FontWeight.w700),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
         backgroundColor: AppThemeColors.of(context).surface,
@@ -42,14 +45,12 @@ class CustomerDashboardView extends ConsumerWidget {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Çıkış Yap'),
-                  content: const Text(
-                    'Oturumu kapatmak istediğinize emin misiniz?',
-                  ),
+                  title: Text('Çıkış Yap'),
+                  content: Text('Oturumu kapatmak istediğinize emin misiniz?'),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text('İptal'),
+                      child: Text('İptal'),
                     ),
                     FilledButton(
                       style: FilledButton.styleFrom(
@@ -57,7 +58,7 @@ class CustomerDashboardView extends ConsumerWidget {
                         foregroundColor: AppThemeColors.of(context).onError,
                       ),
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Çıkış Yap'),
+                      child: Text('Çıkış Yap'),
                     ),
                   ],
                 ),
@@ -87,22 +88,22 @@ class CustomerDashboardView extends ConsumerWidget {
                     ref.invalidate(customerMaintenanceLogsProvider);
                   },
                   child: ListView(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppSpacing.md),
                     physics: const AlwaysScrollableScrollPhysics(),
                     children: [
                       _ElevatorHealthCard(elevator: elevator),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.lg),
                       _ReportFaultButton(elevatorId: elevator.id),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xl),
                       Text(
                         'Son Bakım Geçmişi',
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppThemeColors.of(context).onSurface,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.md),
                       _MaintenanceLogList(
                         logsAsync: logsAsync,
                         onRetry: () {
@@ -161,7 +162,7 @@ class _ElevatorHealthCard extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(24),
@@ -183,22 +184,22 @@ class _ElevatorHealthCard extends StatelessWidget {
             ),
             child: Icon(iconData, size: 72, color: iconColor),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             elevator.buildingName.isNotEmpty
                 ? elevator.buildingName
                 : 'Asansör',
-            style: TextStyle(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 22,
               fontWeight: FontWeight.w800,
               color: iconColor.withValues(alpha: 0.9),
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             statusText,
-            style: TextStyle(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 28,
               fontWeight: FontWeight.w900,
               color: iconColor,
@@ -238,9 +239,9 @@ class _ReportFaultButton extends StatelessWidget {
         );
       },
       icon: const Icon(Icons.report_problem_outlined, size: 28),
-      label: const Text(
+      label: Text(
         'Arıza Bildir',
-        style: TextStyle(
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.5,
@@ -314,7 +315,7 @@ class _MaintenanceLogList extends StatelessWidget {
                 ),
                 title: Text(
                   dateStr,
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     fontSize: 16,
                   ),
@@ -323,7 +324,7 @@ class _MaintenanceLogList extends StatelessWidget {
                   log.notes != null && log.notes!.isNotEmpty
                       ? log.notes!
                       : 'Periyodik Bakım',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppThemeColors.of(context).onSurfaceVariant,
                   ),
                   maxLines: 2,

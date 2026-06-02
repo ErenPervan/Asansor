@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/connectivity_providers.dart';
@@ -38,7 +39,7 @@ class OfflineBanner extends ConsumerWidget {
         child: Row(
           children: [
             Icon(Icons.cloud_off_rounded, size: 16, color: colors.warning),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
                 'Çevrimdışı Mod – Son yedeklenen veriler gösteriliyor',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 
 import 'package:flutter_map/flutter_map.dart';
 
@@ -21,6 +22,7 @@ import '../models/schedule_model.dart';
 import '../providers/admin_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/loading_state.dart';
 
 // Marker colours (match Google Maps palette for familiarity)
 const _colorFault = AppColors.error;
@@ -215,11 +217,7 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
         ],
       ),
       body: elevatorsAsync.when(
-        loading: () => Center(
-          child: CircularProgressIndicator(
-            color: AppThemeColors.of(context).primary,
-          ),
-        ),
+        loading: () => const LoadingState(isList: false, height: 400),
         error: (e, _) => _ErrorBody(
           message: e.toString().replaceFirst('Exception: ', ''),
           onRetry: () {
@@ -427,7 +425,7 @@ class _ElevatorSheet extends StatelessWidget {
 
             // Address
             if (elevator.address != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
                   Icon(
@@ -449,7 +447,7 @@ class _ElevatorSheet extends StatelessWidget {
               ),
             ],
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
 
             // Action button
             SizedBox(
@@ -631,7 +629,7 @@ class _LegendSheet extends StatelessWidget {
                     size: 14,
                     color: AppThemeColors.of(context).onSurfaceVariant,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       '$unmappedCount asansörün koordinatı eksik — haritada gösterilmiyor.',
@@ -685,7 +683,7 @@ class _LegendItem extends StatelessWidget {
           ),
           child: Icon(icon, color: Colors.white, size: 13),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.sm),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -721,12 +719,12 @@ class _ErrorBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppThemeColors.of(context).errorContainer,
                 shape: BoxShape.circle,
@@ -737,7 +735,7 @@ class _ErrorBody extends StatelessWidget {
                 size: 32,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Text(
               message,
               textAlign: TextAlign.center,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'calendar_helpers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -198,7 +199,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
             Expanded(
               child: SingleChildScrollView(
                 controller: scrollCtrl,
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -217,7 +218,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                               letterSpacing: 0.2,
                             ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       PickerField(
                         hint: 'Asansör seçin...',
                         value: _selectedElevator?.buildingName,
@@ -244,7 +245,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                               letterSpacing: 0.2,
                             ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       PickerField(
                         hint: 'Teknisyen seçin...',
                         value: _selectedTechnician?.displayName,
@@ -271,7 +272,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                               letterSpacing: 0.2,
                             ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Row(
                         children: [
                           Expanded(
@@ -330,7 +331,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                               letterSpacing: 0.2,
                             ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       TextFormField(
                         controller: _notesCtrl,
                         maxLines: 3,
@@ -362,7 +363,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                         ),
                       ),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xl),
 
                       // ── Submit button ────────────────────────────────────
                       SizedBox(
@@ -393,7 +394,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
                 ),

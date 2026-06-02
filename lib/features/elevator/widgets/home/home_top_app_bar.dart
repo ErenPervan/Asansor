@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase_flutter;
@@ -106,10 +107,10 @@ class TopAppBar extends StatelessWidget {
                 ),
               ),
             ),
-          if (isAdmin) const SizedBox(width: 8),
+          if (isAdmin) const SizedBox(width: AppSpacing.sm),
           // Cloud sync status indicator
           SyncStatusButton(pendingCount: pendingSyncCount, isOnline: isOnline),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           // Sign-out button
           Material(
             color: colors.surfaceContainerLowest,
@@ -391,7 +392,7 @@ class SyncSheet extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           if (hasPending && isOnline)
             FilledButton.icon(

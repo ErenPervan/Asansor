@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:asansor/core/theme/app_colors.dart';
@@ -58,7 +59,7 @@ class ActiveFaultsSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.md),
 
         // Content
         activeFaults.when(
@@ -86,7 +87,7 @@ class ActiveFaultsSection extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     itemCount: faults.length,
                     separatorBuilder: (context, index) =>
-                        const SizedBox(width: 16),
+                        const SizedBox(width: AppSpacing.md),
                     itemBuilder: (context, i) {
                       final elevator = findElevator(
                         faults[i].elevatorId,

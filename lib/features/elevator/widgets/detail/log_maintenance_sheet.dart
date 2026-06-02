@@ -1,3 +1,4 @@
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,7 +34,9 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
       HapticFeedback.heavyImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Oturum bilgisi alınamadı. Lütfen tekrar giriş yapın.'),
+          content: Text(
+            'Oturum bilgisi alÃ„Â±namadÃ„Â±. LÃƒÂ¼tfen tekrar giriÃ…Å¸ yapÃ„Â±n.',
+          ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.error,
         ),
@@ -73,9 +76,9 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
             SnackBar(
               content: Text(
                 log.isOfflineQueued
-                    ? 'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, '
-                          'bağlantı sağlandığında otomatik senkronize edilecek.'
-                    : 'Bakım kaydı başarıyla eklendi.',
+                    ? 'Ã„Â°nternet baÃ„Å¸lantÃ„Â±sÃ„Â± yok. KayÃ„Â±t cihaza kaydedildi, '
+                          'baÃ„Å¸lantÃ„Â± saÃ„Å¸landÃ„Â±Ã„Å¸Ã„Â±nda otomatik senkronize edilecek.'
+                    : 'BakÃ„Â±m kaydÃ„Â± baÃ…Å¸arÃ„Â±yla eklendi.',
               ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: log.isOfflineQueued
@@ -109,7 +112,7 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
         if (!didPop && isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Lütfen kayıt tamamlanana kadar bekleyin.'),
+              content: Text('LÃƒÂ¼tfen kayÃ„Â±t tamamlanana kadar bekleyin.'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -148,35 +151,33 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                           color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.build_outlined,
                           color: AppColors.primary,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Bakım Ekle',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.onSurface,
-                            ),
+                            'BakÃ„Â±m Ekle',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.onSurface,
+                                ),
                           ),
                           Text(
-                            'Yapılan bakımı kaydedin.',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.outline,
-                            ),
+                            'YapÃ„Â±lan bakÃ„Â±mÃ„Â± kaydedin.',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: AppColors.outline),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.lg),
                   TextFormField(
                     controller: _notesController,
                     maxLines: 4,
@@ -184,17 +185,17 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                     textInputAction: TextInputAction.newline,
                     enabled: !isLoading,
                     decoration: const InputDecoration(
-                      labelText: 'Bakım Notları',
-                      hintText: 'Yapılan işlemleri açıklayın...',
+                      labelText: 'BakÃ„Â±m NotlarÃ„Â±',
+                      hintText: 'YapÃ„Â±lan iÃ…Å¸lemleri aÃƒÂ§Ã„Â±klayÃ„Â±n...',
                       alignLabelWithHint: true,
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
-                        return 'Lütfen bakım notları girin.';
+                        return 'LÃƒÂ¼tfen bakÃ„Â±m notlarÃ„Â± girin.';
                       }
                       if (v.trim().length < 10) {
-                        return 'Notlar en az 10 karakter olmalıdır.';
+                        return 'Notlar en az 10 karakter olmalÃ„Â±dÃ„Â±r.';
                       }
                       return null;
                     },
@@ -215,12 +216,10 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text(
-                            'Bakımı Kaydet',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
+                        : Text(
+                            'BakÃ„Â±mÃ„Â± Kaydet',
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(fontWeight: FontWeight.w600),
                           ),
                   ),
                 ],

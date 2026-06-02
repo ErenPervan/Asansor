@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/features/elevator/providers/elevator_providers.dart';
@@ -43,7 +44,7 @@ class SystemMonitorSection extends ConsumerWidget {
       children: [
         // ── "Sistem İzleme" panel ──────────────────────────────────────────
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
             color: colors.surfaceContainerLow,
             borderRadius: BorderRadius.circular(16),
@@ -58,7 +59,7 @@ class SystemMonitorSection extends ConsumerWidget {
                   color: colors.onSurface,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               // Pending(IoT): Re-enable IoT connections and daily trip metrics when telemetry is live
               // Stat chips
               Row(
@@ -80,12 +81,12 @@ class SystemMonitorSection extends ConsumerWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.md),
 
         // ── "Sıradaki Bakım" panel ────────────────────────────────────────
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
             color: colors.primaryDark,
             borderRadius: BorderRadius.circular(16),
@@ -189,7 +190,7 @@ class NextMaintenanceContent extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.7),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.lg),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -202,7 +203,7 @@ class NextMaintenanceContent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.check_circle, color: Colors.white, size: 16),
-              SizedBox(width: 8),
+              SizedBox(width: AppSpacing.sm),
               Text(
                 'Planlandı',
                 style: textTheme.labelSmall?.copyWith(
@@ -240,7 +241,7 @@ class SystemStatusIndicator extends StatelessWidget {
           height: 8,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.sm),
         Text(
           label,
           style: textTheme.labelLarge?.copyWith(

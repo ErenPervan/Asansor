@@ -167,13 +167,12 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
             child: TextField(
               controller: _searchController,
               onChanged: (v) => setState(() => _query = v),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppThemeColors.of(context).onSurface,
-                fontSize: 14,
               ),
               decoration: InputDecoration(
                 hintText: 'Bina adı veya adres ile ara…',
-                hintStyle: TextStyle(
+                hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppThemeColors.of(
                     context,
                   ).outline.withValues(alpha: 0.8),

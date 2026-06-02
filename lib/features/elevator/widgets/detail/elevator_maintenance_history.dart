@@ -1,3 +1,4 @@
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:printing/printing.dart';
@@ -46,7 +47,7 @@ class MaintenanceHistorySectionState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'PDF oluşturulamadı: ${e.toString().replaceFirst('Exception: ', '')}',
+            'PDF oluÃ…Å¸turulamadÃ„Â±: ${e.toString().replaceFirst('Exception: ', '')}',
           ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppThemeColors.of(context).error,
@@ -71,7 +72,7 @@ class MaintenanceHistorySectionState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Bakım Geçmişi',
+              'BakÃ„Â±m GeÃƒÂ§miÃ…Å¸i',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: colors.onSurface,
@@ -80,9 +81,9 @@ class MaintenanceHistorySectionState
             ),
             Row(
               children: [
-                // ── PDF Report button ──────────────────────────────────
+                // Ã¢â€â‚¬Ã¢â€â‚¬ PDF Report button Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
                 Tooltip(
-                  message: 'PDF Rapor Oluştur (Son 6 Ay)',
+                  message: 'PDF Rapor OluÃ…Å¸tur (Son 6 Ay)',
                   child: _generatingPdf
                       ? SizedBox(
                           width: 18,
@@ -103,7 +104,7 @@ class MaintenanceHistorySectionState
                           onPressed: _generateAndPreviewPdf,
                         ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 IconButton(
                   tooltip: 'Yenile',
                   padding: EdgeInsets.zero,
@@ -116,31 +117,33 @@ class MaintenanceHistorySectionState
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.md),
 
         // Timeline content
         logsAsync.when(
           loading: () => Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: CircularProgressIndicator(color: colors.primary),
             ),
           ),
           error: (err, _) => Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               color: colors.errorContainer,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               err.toString().replaceFirst('Exception: ', ''),
-              style: TextStyle(color: colors.onErrorContainer),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: colors.onErrorContainer),
             ),
           ),
           data: (logs) {
             if (logs.isEmpty) {
               return Container(
-                padding: const EdgeInsets.all(32),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
                   color: colors.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(16),
@@ -155,7 +158,7 @@ class MaintenanceHistorySectionState
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Henüz bakım kaydı yok.',
+                        'HenÃƒÂ¼z bakÃ„Â±m kaydÃ„Â± yok.',
                         style: textTheme.titleSmall?.copyWith(
                           color: colors.outline,
                           fontWeight: FontWeight.w500,
@@ -167,7 +170,7 @@ class MaintenanceHistorySectionState
               );
             }
 
-            // Timeline list — vertical line drawn as left-column Container
+            // Timeline list Ã¢â‚¬â€ vertical line drawn as left-column Container
             return Column(
               children: logs.asMap().entries.map((entry) {
                 return FadeInSlide(
@@ -186,7 +189,7 @@ class MaintenanceHistorySectionState
   }
 }
 
-// ── Timeline item ─────────────────────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬ Timeline item Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 class TimelineItem extends StatelessWidget {
   const TimelineItem({super.key, required this.log, required this.isLast});
@@ -203,18 +206,18 @@ class TimelineItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Left column: dot + connector line ──────────────────────────
+          // Ã¢â€â‚¬Ã¢â€â‚¬ Left column: dot + connector line Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
           SizedBox(
             width: 32,
             child: Column(
               children: [
                 const SizedBox(height: 6),
-                // Dot with ring effect (ring-4 ring-surface → white border)
+                // Dot with ring effect (ring-4 ring-surface Ã¢â€ â€™ white border)
                 Container(
                   width: 16,
                   height: 16,
                   decoration: BoxDecoration(
-                    // Approved → primary dot; pending → outline-variant dot
+                    // Approved Ã¢â€ â€™ primary dot; pending Ã¢â€ â€™ outline-variant dot
                     color: log.isApproved
                         ? colors.primary
                         : colors.outlineVariant,
@@ -235,7 +238,7 @@ class TimelineItem extends StatelessWidget {
             ),
           ),
 
-          // ── Right column: card ─────────────────────────────────────────
+          // Ã¢â€â‚¬Ã¢â€â‚¬ Right column: card Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(left: 16, bottom: isLast ? 0 : 24),
@@ -322,7 +325,7 @@ class TimelineCard extends StatelessWidget {
 
           // Notes text (italic like the Stitch design)
           Text(
-            '"${log.notes ?? 'Not belirtilmemiş'}"',
+            '"${log.notes ?? 'Not belirtilmemiÃ…Å¸'}"',
             style: textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: colors.onSurface,
@@ -336,7 +339,7 @@ class TimelineCard extends StatelessWidget {
           Row(
             children: [
               StatusChip(
-                label: log.isApproved ? 'ONAYLANDI' : 'BEKLİYOR',
+                label: log.isApproved ? 'ONAYLANDI' : 'BEKLÃ„Â°YOR',
                 bg: log.isApproved
                     ? colors
                           .errorContainer // secondary-container
@@ -388,13 +391,13 @@ class StatusChip extends StatelessWidget {
 
 final List<String> _monthsTr = [
   'Oca',
-  'Şub',
+  'Ã…Âub',
   'Mar',
   'Nis',
   'May',
   'Haz',
   'Tem',
-  'Ağu',
+  'AÃ„Å¸u',
   'Eyl',
   'Eki',
   'Kas',

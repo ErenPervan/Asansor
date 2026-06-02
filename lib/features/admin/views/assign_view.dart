@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -208,7 +209,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
           ),
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Form(
             key: _formKey,
             child: Column(
@@ -394,7 +395,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                           ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.lg),
               ],
             ),
           ),
@@ -526,7 +527,7 @@ class _PickerButton extends StatelessWidget {
                 size: 18,
                 color: hasValue ? colors.primary : colors.onSurfaceVariant,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   label,
@@ -564,7 +565,7 @@ class _InlineError extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.error_outline, color: colors.onErrorContainer, size: 18),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               message,

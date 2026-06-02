@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../elevator/models/elevator_model.dart';
 import '../../models/profile_model.dart';
@@ -43,9 +44,12 @@ class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
     return AlertDialog(
       backgroundColor: AppColors.surfaceContainerLowest,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: const Text(
+      title: Text(
         'Asansör Seç',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+        ),
       ),
       contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
       content: SizedBox(
@@ -75,7 +79,7 @@ class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
                 onChanged: (v) => setState(() => _query = v),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Flexible(
               child: ListView.builder(
                 shrinkWrap: true,
@@ -103,7 +107,7 @@ class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
                     ),
                     title: Text(
                       e.buildingName,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: isSelected
                             ? AppColors.primary
@@ -115,10 +119,11 @@ class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
                             e.address!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.outline,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  fontSize: 12,
+                                  color: AppColors.outline,
+                                ),
                           )
                         : null,
                     trailing: isSelected
@@ -138,7 +143,7 @@ class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Vazgeç'),
+          child: Text('Vazgeç'),
         ),
       ],
     );
@@ -185,9 +190,12 @@ class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
     return AlertDialog(
       backgroundColor: AppColors.surfaceContainerLowest,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: const Text(
+      title: Text(
         'Teknisyen Seç',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+        ),
       ),
       contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
       content: SizedBox(
@@ -217,13 +225,15 @@ class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
                 onChanged: (v) => setState(() => _query = v),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             if (widget.technicians.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(24),
+              Padding(
+                padding: EdgeInsets.all(AppSpacing.lg),
                 child: Text(
                   'Henüz kayıtlı teknisyen yok.',
-                  style: TextStyle(color: AppColors.outline),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.outline),
                 ),
               )
             else
@@ -242,18 +252,19 @@ class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
                         radius: 18,
                         child: Text(
                           p.initials,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: isSelected
-                                ? Colors.white
-                                : AppColors.onSurface,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.onSurface,
+                              ),
                         ),
                       ),
                       title: Text(
                         p.displayName,
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: isSelected
                               ? AppColors.primary
@@ -263,10 +274,11 @@ class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
                       subtitle: p.phone != null
                           ? Text(
                               p.phone!,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.outline,
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    fontSize: 12,
+                                    color: AppColors.outline,
+                                  ),
                             )
                           : null,
                       trailing: isSelected
@@ -286,7 +298,7 @@ class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Vazgeç'),
+          child: Text('Vazgeç'),
         ),
       ],
     );

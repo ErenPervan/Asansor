@@ -221,7 +221,7 @@ class _UserListTab extends ConsumerWidget {
                                     _showEditRoleSheet(context, profiles[idx1]),
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: AppSpacing.md),
                             Expanded(
                               child: idx2 < profiles.length
                                   ? _ProfileCard(
@@ -328,7 +328,7 @@ class _CustomerTab extends ConsumerWidget {
                                     : null,
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: AppSpacing.md),
                             Expanded(
                               child: idx2 < customers.length
                                   ? _ProfileCard(

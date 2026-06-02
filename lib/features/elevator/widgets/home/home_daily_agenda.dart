@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:asansor/core/theme/app_colors.dart';
@@ -57,7 +58,7 @@ class DailyAgendaSection extends StatelessWidget {
                     letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 // Live dot — visible only when the stream is active
                 mySchedules.when(
                   loading: () => const SizedBox.shrink(),
@@ -75,7 +76,7 @@ class DailyAgendaSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.md),
 
         // Content
         mySchedules.when(
@@ -107,7 +108,7 @@ class DailyAgendaSection extends StatelessWidget {
                     count: todayTasks.length,
                     highlight: true,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   ...todayTasks.map(
                     (s) => AgendaTaskCard(
                       schedule: s,
@@ -123,7 +124,7 @@ class DailyAgendaSection extends StatelessWidget {
                     count: upcomingTasks.length,
                     highlight: false,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   ...upcomingTasks
                       .take(3)
                       .map(
@@ -350,7 +351,7 @@ class AgendaTaskCard extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       // Building name
                       Text(
                         elevator?.buildingName ?? 'Asansör $shortElevatorId',

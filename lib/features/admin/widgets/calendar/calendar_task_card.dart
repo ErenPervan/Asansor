@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'calendar_helpers.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../elevator/models/elevator_model.dart';
@@ -68,14 +69,15 @@ class CalendarTaskCard extends StatelessWidget {
                         children: [
                           Text(
                             formatTime(schedule.scheduledDate),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: pColor,
-                              letterSpacing: 0.5,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: pColor,
+                                  letterSpacing: 0.5,
+                                ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           PriorityBadge(priority: schedule.priority),
                           const Spacer(),
                           StatusBadge(
@@ -84,12 +86,12 @@ class CalendarTaskCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       // Elevator name
                       Text(
                         elevator?.buildingName ??
                             'Asansör ${schedule.elevatorId.substring(0, 6)}',
-                        style: const TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
                           color: AppColors.onSurface,
@@ -112,10 +114,11 @@ class CalendarTaskCard extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   elevator!.address!,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.outline,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(
+                                        fontSize: 12,
+                                        color: AppColors.outline,
+                                      ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -136,15 +139,16 @@ class CalendarTaskCard extends StatelessWidget {
                           Text(
                             technician?.displayName ??
                                 'Teknisyen ${schedule.technicianId.substring(0, 6)}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.onSurfaceVariant,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  fontSize: 12,
+                                  color: AppColors.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
                           ),
                           if (schedule.notes != null &&
                               schedule.notes!.isNotEmpty) ...[
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.sm),
                             const Icon(
                               Icons.notes_outlined,
                               size: 13,
@@ -154,10 +158,11 @@ class CalendarTaskCard extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 schedule.notes!,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.outline,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      fontSize: 12,
+                                      color: AppColors.outline,
+                                    ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -180,9 +185,11 @@ class CalendarTaskCard extends StatelessWidget {
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
                             icon: const Icon(Icons.cancel_outlined, size: 14),
-                            label: const Text(
+                            label: Text(
                               'İptal Et',
-                              style: TextStyle(fontSize: 12),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(fontSize: 12),
                             ),
                           ),
                         ),
@@ -216,7 +223,7 @@ class PriorityBadge extends StatelessWidget {
       ),
       child: Text(
         getPriorityLabel(priority),
-        style: TextStyle(
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontSize: 10,
           fontWeight: FontWeight.w700,
           color: color,
@@ -242,7 +249,7 @@ class StatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontSize: 10,
           fontWeight: FontWeight.w700,
           color: color,

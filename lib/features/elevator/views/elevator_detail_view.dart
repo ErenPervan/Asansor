@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../elevator/models/elevator_model.dart';
@@ -54,7 +55,7 @@ class ElevatorDetailView extends ConsumerWidget {
       // ── Body ─────────────────────────────────────────────────────────────
       body: elevatorAsync.when(
         loading: () => const Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(AppSpacing.md),
           child: LoadingState(isList: false),
         ),
         error: (err, _) => ErrorState(
@@ -121,22 +122,22 @@ class _DetailScrollBody extends StatelessWidget {
         children: [
           // 1 ── Header identity card ───────────────────────────────────────
           ElevatorDetailHeader(elevator: elevator),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // 2 ── Quick action buttons ───────────────────────────────────────
           ElevatorDetailActions(
             onReportFault: onReportFault,
             onLogMaintenance: onLogMaintenance,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // 3 ── System monitor + next maintenance ─────────────────────────
           SystemMonitorSection(elevatorId: elevatorId),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // 4 ── Maintenance history timeline ───────────────────────────────
           MaintenanceHistorySection(elevatorId: elevatorId, elevator: elevator),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
         ],
       ),
     );

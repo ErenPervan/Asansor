@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -334,7 +335,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                                   height: 1.4,
                                 ),
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: AppSpacing.xl),
 
                           // ── E-posta ──────────────────────────────────────
                           _FormLabel(label: l10n.loginEmailLabel),
@@ -409,7 +410,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                               return null;
                             },
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: AppSpacing.xl),
 
                           // ── Login button ──────────────────────────────────
                           SizedBox(
@@ -428,12 +429,12 @@ class _LoginViewState extends ConsumerState<LoginView>
                                 ),
                               ),
                               child: isLoading
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       height: 20,
                                       width: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        color: Colors.white,
+                                        color: colors.onPrimary,
                                       ),
                                     )
                                   : Text(

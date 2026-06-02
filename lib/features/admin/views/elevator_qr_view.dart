@@ -1,8 +1,10 @@
+import 'package:asansor/core/widgets/loading_state.dart';
 import 'dart:typed_data';
 
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,7 +24,7 @@ import '../../elevator/models/elevator_model.dart';
 import '../../elevator/providers/elevator_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
-// ─────────────────────────────────────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 class ElevatorQrView extends ConsumerWidget {
   const ElevatorQrView({super.key, required this.elevatorId});
@@ -35,8 +37,7 @@ class ElevatorQrView extends ConsumerWidget {
     final elevAsync = ref.watch(elevatorByIdProvider(elevatorId));
 
     return elevAsync.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => Scaffold(body: const LoadingState()),
       error: (e, st) => Scaffold(
         appBar: AppBar(title: const Text('QR Kodu')),
         body: Center(
@@ -46,7 +47,7 @@ class ElevatorQrView extends ConsumerWidget {
               Icon(Icons.error_outline, size: 48, color: colors.primary),
               const SizedBox(height: 12),
               Text('$e'),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               FilledButton(
                 onPressed: () =>
                     ref.invalidate(elevatorByIdProvider(elevatorId)),
@@ -61,7 +62,7 @@ class ElevatorQrView extends ConsumerWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 class _QrScaffold extends StatelessWidget {
   const _QrScaffold({required this.elevator});
@@ -83,7 +84,7 @@ class _QrScaffold extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.print_outlined),
-            tooltip: 'Yazdır / Kaydet',
+            tooltip: 'YazdÃ„Â±r / Kaydet',
             onPressed: () => _printQr(context, elevator),
           ),
         ],
@@ -91,7 +92,7 @@ class _QrScaffold extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 48),
         children: [
-          // ── Success banner ────────────────────────────────────────
+          // Ã¢â€â‚¬Ã¢â€â‚¬ Success banner Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
@@ -112,7 +113,7 @@ class _QrScaffold extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Asansör başarıyla oluşturuldu!',
+                        'AsansÃƒÂ¶r baÃ…Å¸arÃ„Â±yla oluÃ…Å¸turuldu!',
                         style: textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w800,
                           color: colors.success,
@@ -120,7 +121,7 @@ class _QrScaffold extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'QR kodu yazdırın ve asansöre yapıştırın.',
+                        'QR kodu yazdÃ„Â±rÃ„Â±n ve asansÃƒÂ¶re yapÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n.',
                         style: textTheme.labelSmall?.copyWith(
                           color: colors.success.withValues(alpha: 0.8),
                         ),
@@ -132,11 +133,11 @@ class _QrScaffold extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
-          // ── Elevator info card ────────────────────────────────────
+          // Ã¢â€â‚¬Ã¢â€â‚¬ Elevator info card Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               color: colors.surface,
               borderRadius: BorderRadius.circular(16),
@@ -210,9 +211,9 @@ class _QrScaffold extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
-          // ── QR code card ──────────────────────────────────────────
+          // Ã¢â€â‚¬Ã¢â€â‚¬ QR code card Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
             decoration: BoxDecoration(
@@ -245,7 +246,7 @@ class _QrScaffold extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'ASANSÖR QR KODU',
+                      'ASANSÃƒâ€“R QR KODU',
                       style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: colors.primary,
@@ -283,7 +284,7 @@ class _QrScaffold extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.md),
 
                 // UUID display
                 Container(
@@ -309,7 +310,7 @@ class _QrScaffold extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 Text(
-                  'Bu QR kodu tarayarak asansör bilgilerine ulaşabilirsiniz.',
+                  'Bu QR kodu tarayarak asansÃƒÂ¶r bilgilerine ulaÃ…Å¸abilirsiniz.',
                   textAlign: TextAlign.center,
                   style: textTheme.bodySmall?.copyWith(
                     color: colors.outline,
@@ -320,13 +321,13 @@ class _QrScaffold extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
-          // ── Actions ───────────────────────────────────────────────
+          // Ã¢â€â‚¬Ã¢â€â‚¬ Actions Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
           FilledButton.icon(
             icon: const Icon(Icons.print_outlined),
             label: Text(
-              'Yazdır / Kaydet',
+              'YazdÃ„Â±r / Kaydet',
               style: textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -343,7 +344,7 @@ class _QrScaffold extends StatelessWidget {
 
           OutlinedButton.icon(
             icon: const Icon(Icons.elevator_outlined),
-            label: const Text('Asansör Detayına Git'),
+            label: const Text('AsansÃƒÂ¶r DetayÃ„Â±na Git'),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 50),
               side: BorderSide(color: colors.outlineVariant),
@@ -356,7 +357,7 @@ class _QrScaffold extends StatelessWidget {
 
           TextButton.icon(
             icon: const Icon(Icons.add_rounded),
-            label: const Text('Yeni Asansör Ekle'),
+            label: const Text('Yeni AsansÃƒÂ¶r Ekle'),
             style: TextButton.styleFrom(
               minimumSize: const Size(double.infinity, 48),
               foregroundColor: colors.primary,
@@ -379,7 +380,7 @@ class _QrScaffold extends StatelessWidget {
         final colors = AppThemeColors.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Yazdırma hatası: $e'),
+            content: Text('YazdÃ„Â±rma hatasÃ„Â±: $e'),
             backgroundColor: colors.primary,
             behavior: SnackBarBehavior.floating,
           ),
@@ -402,7 +403,7 @@ class _QrScaffold extends StatelessWidget {
       600,
       format: ui.ImageByteFormat.png,
     );
-    if (imageData == null) throw Exception('QR verisi alınamadı');
+    if (imageData == null) throw Exception('QR verisi alÃ„Â±namadÃ„Â±');
     final qrBytes = imageData.buffer.asUint8List();
 
     final doc = pw.Document(
@@ -421,7 +422,7 @@ class _QrScaffold extends StatelessWidget {
         build: (ctx) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.center,
           children: [
-            // ── Header ────────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Header Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             pw.Container(
               width: double.infinity,
               padding: const pw.EdgeInsets.symmetric(
@@ -436,7 +437,7 @@ class _QrScaffold extends StatelessWidget {
                 crossAxisAlignment: pw.CrossAxisAlignment.center,
                 children: [
                   pw.Text(
-                    'ASANSÖR SİSTEMİ',
+                    'ASANSÃƒâ€“R SÃ„Â°STEMÃ„Â°',
                     style: pw.TextStyle(
                       color: PdfColors.white,
                       fontSize: 20,
@@ -445,7 +446,7 @@ class _QrScaffold extends StatelessWidget {
                   ),
                   pw.SizedBox(height: 4),
                   pw.Text(
-                    'Bakım ve Arıza Takip Sistemi',
+                    'BakÃ„Â±m ve ArÃ„Â±za Takip Sistemi',
                     style: pw.TextStyle(color: PdfColors.white, fontSize: 12),
                   ),
                 ],
@@ -454,7 +455,7 @@ class _QrScaffold extends StatelessWidget {
 
             pw.SizedBox(height: 28),
 
-            // ── Building info ──────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Building info Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             pw.Text(
               elevator.buildingName,
               style: pw.TextStyle(
@@ -474,11 +475,11 @@ class _QrScaffold extends StatelessWidget {
               ),
             ],
 
-            pw.SizedBox(height: 32),
+            pw.SizedBox(height: AppSpacing.xl),
 
-            // ── QR code ────────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ QR code Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             pw.Container(
-              padding: const pw.EdgeInsets.all(16),
+              padding: const pw.EdgeInsets.all(AppSpacing.md),
               decoration: pw.BoxDecoration(
                 border: pw.Border.all(color: PdfColors.grey300, width: 1),
                 borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
@@ -486,9 +487,9 @@ class _QrScaffold extends StatelessWidget {
               child: pw.Image(pw.MemoryImage(qrBytes), width: 220, height: 220),
             ),
 
-            pw.SizedBox(height: 16),
+            pw.SizedBox(height: AppSpacing.md),
 
-            // ── UUID ───────────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ UUID Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             pw.Container(
               padding: const pw.EdgeInsets.symmetric(
                 horizontal: 12,
@@ -507,21 +508,21 @@ class _QrScaffold extends StatelessWidget {
               ),
             ),
 
-            pw.SizedBox(height: 24),
+            pw.SizedBox(height: AppSpacing.lg),
 
             pw.Text(
-              'Bu QR kodu tarayarak asansör bilgilerine ulaşabilirsiniz.',
+              'Bu QR kodu tarayarak asansÃƒÂ¶r bilgilerine ulaÃ…Å¸abilirsiniz.',
               style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
               textAlign: pw.TextAlign.center,
             ),
 
             pw.Spacer(),
 
-            // ── Footer ────────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Footer Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             pw.Divider(color: PdfColors.grey300),
             pw.SizedBox(height: 4),
             pw.Text(
-              'Oluşturulma: $now',
+              'OluÃ…Å¸turulma: $now',
               style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
             ),
           ],
@@ -533,7 +534,7 @@ class _QrScaffold extends StatelessWidget {
   }
 }
 
-// ── Status chip ───────────────────────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬ Status chip Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.status});
@@ -567,9 +568,9 @@ class _StatusChip extends StatelessWidget {
       case 'active':
         return ('Aktif', colors.successContainer, colors.success);
       case 'faulty':
-        return ('Arızalı', colors.errorContainer, colors.error);
+        return ('ArÃ„Â±zalÃ„Â±', colors.errorContainer, colors.error);
       case 'under_maintenance':
-        return ('Bakımda', colors.warningContainer, colors.warning);
+        return ('BakÃ„Â±mda', colors.warningContainer, colors.warning);
       default:
         return ('Pasif', colors.surfaceContainer, colors.outline);
     }

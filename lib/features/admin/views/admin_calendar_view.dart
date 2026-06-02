@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -106,24 +107,24 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
       backgroundColor: colors.surface,
       appBar: AppBar(
         backgroundColor: colors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colors.onPrimary,
         title: Text(
           'Bakım Takvimi',
           style: textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: colors.onPrimary,
           ),
         ),
         actions: [
           if (schedulesAsync.isLoading)
-            const Padding(
-              padding: EdgeInsets.only(right: 16),
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
               child: SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  color: colors.onPrimary,
                 ),
               ),
             ),
@@ -228,7 +229,7 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                     color: colors.onSurface,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,

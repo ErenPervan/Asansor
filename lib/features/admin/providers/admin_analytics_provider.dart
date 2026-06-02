@@ -54,8 +54,9 @@ class FaultCategoryData {
 /// RPC functions used:
 ///   • `get_fault_category_counts()` → [(category, count)]
 ///   • `get_monthly_fault_counts(months_back)` → [(year, month, count)]
-final adminAnalyticsProvider =
-    FutureProvider.autoDispose<AdminAnalyticsState>((ref) async {
+final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
+  ref,
+) async {
   final supabase = ref.read(supabaseClientProvider);
 
   final now = DateTime.now();
@@ -89,10 +90,9 @@ final adminAnalyticsProvider =
   // ── 5. Monthly trend — server-side aggregation via RPC ────────────────────
   // Returns: [{year, month, count}]
   // Only aggregated numbers cross the wire — zero raw fault rows.
-  final monthlyRows = await supabase.rpc(
-    'get_monthly_fault_counts',
-    params: {'months_back': 5},
-  ) as List<dynamic>;
+  final monthlyRows =
+      await supabase.rpc('get_monthly_fault_counts', params: {'months_back': 5})
+          as List<dynamic>;
 
   // Build a lookup: 'YYYY-M' → count
   final Map<String, int> monthlyLookup = {
@@ -106,19 +106,20 @@ final adminAnalyticsProvider =
   for (int i = 5; i >= 0; i--) {
     final d = DateTime(now.year, now.month - i, 1);
     final key = '${d.year}-${d.month}';
-    monthlyFaults.add(MonthlyFaultData(
-      month: monthFormat.format(d),
-      value: (monthlyLookup[key] ?? 0).toDouble(),
-    ));
+    monthlyFaults.add(
+      MonthlyFaultData(
+        month: monthFormat.format(d),
+        value: (monthlyLookup[key] ?? 0).toDouble(),
+      ),
+    );
   }
 
   // ── 6. Category distribution — server-side classification via RPC ─────────
   // Returns: [{category, count}]
   // Keyword matching and grouping execute entirely in PostgreSQL.
   // No description text, no raw rows, no client-side string.contains().
-  final categoryRows = await supabase.rpc(
-    'get_fault_category_counts',
-  ) as List<dynamic>;
+  final categoryRows =
+      await supabase.rpc('get_fault_category_counts') as List<dynamic>;
 
   final colors = [
     AppColors.blue,
@@ -139,11 +140,13 @@ final adminAnalyticsProvider =
     final row = categoryRows[i];
     final count = row['count'] as int? ?? 0;
     final percent = totalCount > 0 ? (count / totalCount) * 100.0 : 0.0;
-    faultCategories.add(FaultCategoryData(
-      label: row['category'] as String? ?? 'Diğer',
-      percent: percent,
-      color: colors[i % colors.length],
-    ));
+    faultCategories.add(
+      FaultCategoryData(
+        label: row['category'] as String? ?? 'Diğer',
+        percent: percent,
+        color: colors[i % colors.length],
+      ),
+    );
   }
 
   return AdminAnalyticsState(

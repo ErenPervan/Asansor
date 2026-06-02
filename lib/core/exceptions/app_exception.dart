@@ -67,9 +67,7 @@ class NotFoundException extends AppException {
 ///
 /// Recovery: show an "Access denied" message; possibly sign out.
 class PermissionException extends AppException {
-  const PermissionException(
-    super.message,
-  );
+  const PermissionException(super.message);
 }
 
 /// The server returned an unexpected error (HTTP 5xx or an unrecognised
@@ -102,7 +100,9 @@ AppException mapPostgrestException(PostgrestException e, [String? context]) {
 
   // HTTP 401 — unauthenticated
   if (code == '401' || e.message.contains('JWT')) {
-    return AppAuthException('${prefix}Oturum süresi doldu, lütfen tekrar giriş yapın.');
+    return AppAuthException(
+      '${prefix}Oturum süresi doldu, lütfen tekrar giriş yapın.',
+    );
   }
 
   // HTTP 403 — RLS / permission denied

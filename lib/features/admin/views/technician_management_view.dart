@@ -997,8 +997,16 @@ class _SmallBadge extends StatelessWidget {
   ) {
     final colors = AppThemeColors.of(context);
     final (lbl, bg, fg) = switch (s) {
-      ScheduleStatus.completed => ('TAMAMLANDI', colors.successContainer, colors.success),
-      ScheduleStatus.inProgress => ('DEVAM', colors.warningContainer, colors.warning),
+      ScheduleStatus.completed => (
+        'TAMAMLANDI',
+        colors.successContainer,
+        colors.success,
+      ),
+      ScheduleStatus.inProgress => (
+        'DEVAM',
+        colors.warningContainer,
+        colors.warning,
+      ),
       ScheduleStatus.cancelled => (
         'İPTAL',
         colors.surfaceContainerHigh,

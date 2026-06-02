@@ -137,7 +137,8 @@ class _ElevatorHealthCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isFaulty = elevator.status == ElevatorStatus.faulty;
-    final bool isUnderMaintenance = elevator.status == ElevatorStatus.underMaintenance;
+    final bool isUnderMaintenance =
+        elevator.status == ElevatorStatus.underMaintenance;
 
     final colors = AppThemeColors.of(context);
     Color bgColor = colors.successContainer;

@@ -164,7 +164,8 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
                     enabled: !isLoading,
                     decoration: const InputDecoration(
                       labelText: 'ArÃ„Â±za AÃƒÂ§Ã„Â±klamasÃ„Â±',
-                      hintText: 'ArÃ„Â±zayÃ„Â± detaylÃ„Â± aÃƒÂ§Ã„Â±klayÃ„Â±n...',
+                      hintText:
+                          'ArÃ„Â±zayÃ„Â± detaylÃ„Â± aÃƒÂ§Ã„Â±klayÃ„Â±n...',
                       alignLabelWithHint: true,
                       border: OutlineInputBorder(),
                     ),

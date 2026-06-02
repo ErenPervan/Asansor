@@ -6,8 +6,15 @@ import '../models/fault_report_model.dart';
 abstract interface class IFaultRepository {
   Future<List<FaultReportModel>> getAllFaults();
   Future<DateTime?> getLatestFaultDate(String elevatorId);
-  Future<FaultReportModel> reportFault({required String elevatorId, required String description, String? photoUrl});
-  Future<FaultReportModel> resolveFault(String faultId, {String? resolutionNotes});
+  Future<FaultReportModel> reportFault({
+    required String elevatorId,
+    required String description,
+    String? photoUrl,
+  });
+  Future<FaultReportModel> resolveFault(
+    String faultId, {
+    String? resolutionNotes,
+  });
   Future<FaultReportModel> reopenFault(String faultId);
   Future<FaultReportModel> getFaultById(String id);
   Future<List<FaultReportModel>> getAllActiveFaults();
@@ -233,4 +240,3 @@ class FaultRepository implements IFaultRepository {
     }
   }
 }
-

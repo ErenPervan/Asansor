@@ -17,9 +17,11 @@ final authRepositoryProvider = Provider<IAuthRepository>((ref) {
 ///
 /// Returns `null` when the user is not authenticated.
 final authStateProvider = StreamProvider<User?>((ref) {
-  return ref.watch(supabaseClientProvider).auth.onAuthStateChange.map(
-    (event) => event.session?.user,
-  );
+  return ref
+      .watch(supabaseClientProvider)
+      .auth
+      .onAuthStateChange
+      .map((event) => event.session?.user);
 });
 
 // ── Auth Controller ──────────────────────────────────────────────────────────

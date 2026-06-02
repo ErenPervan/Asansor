@@ -228,7 +228,8 @@ class _UserListTab extends ConsumerWidget {
                               child: idx2 < profiles.length
                                   ? _ProfileCard(
                                       profile: profiles[idx2],
-                                      isAdminViewer: currentRole == UserRole.admin,
+                                      isAdminViewer:
+                                          currentRole == UserRole.admin,
                                       onEditRole: () => _showEditRoleSheet(
                                         context,
                                         profiles[idx2],
@@ -282,7 +283,8 @@ class _CustomerTab extends ConsumerWidget {
         ),
         error: (e, _) => _ErrorPane(
           message: e.toString().replaceFirst('Exception: ', ''),
-          onRetry: () => ref.invalidate(profilesByRoleProvider(UserRole.customer)),
+          onRetry: () =>
+              ref.invalidate(profilesByRoleProvider(UserRole.customer)),
         ),
         data: (customers) {
           if (customers.isEmpty) {
@@ -335,13 +337,15 @@ class _CustomerTab extends ConsumerWidget {
                               child: idx2 < customers.length
                                   ? _ProfileCard(
                                       profile: customers[idx2],
-                                      isAdminViewer: currentRole == UserRole.admin,
+                                      isAdminViewer:
+                                          currentRole == UserRole.admin,
                                       elevators: elevators,
                                       onEditRole: () => _showEditRoleSheet(
                                         context,
                                         customers[idx2],
                                       ),
-                                      onAssignElevator: currentRole == UserRole.admin
+                                      onAssignElevator:
+                                          currentRole == UserRole.admin
                                           ? () => _showAssignElevatorSheet(
                                               context,
                                               customers[idx2],

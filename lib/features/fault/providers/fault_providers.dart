@@ -32,9 +32,7 @@ final allFaultsProvider = FutureProvider<List<FaultReportModel>>((ref) async {
     unawaited(cache.saveAllFaults(data));
     return data;
   } catch (e) {
-    final cached = cache
-        .loadAllFaults()
-        .cast<FaultReportModel>();
+    final cached = cache.loadAllFaults().cast<FaultReportModel>();
     if (cached.isNotEmpty) return cached;
     rethrow;
   }
@@ -63,9 +61,7 @@ final activeFaultsProvider = FutureProvider<List<FaultReportModel>>((
     unawaited(cache.saveActiveFaults(data));
     return data;
   } catch (e) {
-    final cached = cache
-        .loadActiveFaults()
-        .cast<FaultReportModel>();
+    final cached = cache.loadActiveFaults().cast<FaultReportModel>();
     if (cached.isNotEmpty) return cached;
     rethrow;
   }

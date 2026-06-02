@@ -15,9 +15,7 @@ class ChecklistNotifier
     final cache = ref.read(readCacheServiceProvider);
 
     if (!isOnline) {
-      return cache
-          .loadChecklistItems()
-          .cast<ChecklistItemModel>();
+      return cache.loadChecklistItems().cast<ChecklistItemModel>();
     }
 
     try {
@@ -32,9 +30,7 @@ class ChecklistNotifier
       await cache.saveChecklistItems(items);
       return items;
     } catch (e) {
-      final cached = cache
-          .loadChecklistItems()
-          .cast<ChecklistItemModel>();
+      final cached = cache.loadChecklistItems().cast<ChecklistItemModel>();
       if (cached.isNotEmpty) return cached;
       rethrow;
     }

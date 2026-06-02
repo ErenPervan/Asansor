@@ -4,10 +4,22 @@ import '../../../core/exceptions/app_exception.dart';
 import '../models/maintenance_log_model.dart';
 
 abstract interface class IMaintenanceRepository {
-  Future<MaintenanceLogModel> addLog({required String elevatorId, required String technicianId, required String notes, required DateTime maintenanceDate, Map<String, dynamic>? checklist, List<String>? photos, String? signatureUrl, String? customerSignatureUrl});
+  Future<MaintenanceLogModel> addLog({
+    required String elevatorId,
+    required String technicianId,
+    required String notes,
+    required DateTime maintenanceDate,
+    Map<String, dynamic>? checklist,
+    List<String>? photos,
+    String? signatureUrl,
+    String? customerSignatureUrl,
+  });
   Future<List<MaintenanceLogModel>> getAllPendingLogs();
   Future<int> getCompletedTodayCount();
-  Future<List<MaintenanceLogModel>> getLogsForReport(String elevatorId, {int months = 6});
+  Future<List<MaintenanceLogModel>> getLogsForReport(
+    String elevatorId, {
+    int months = 6,
+  });
   Future<List<MaintenanceLogModel>> getLogsByElevatorId(String elevatorId);
 }
 
@@ -183,4 +195,3 @@ class MaintenanceRepository implements IMaintenanceRepository {
     }
   }
 }
-

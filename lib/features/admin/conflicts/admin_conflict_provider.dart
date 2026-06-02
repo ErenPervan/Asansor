@@ -99,20 +99,14 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
         ..remove('base_version')
         ..remove('updated_at'); // will be set by DB or updated here
 
-      // Increment version based on remote payload to enforce OCC
       final currentVersion = (report.remotePayload['version'] as int?) ?? 1;
-      sanitized['version'] = currentVersion + 1;
-      sanitized['updated_at'] = DateTime.now().toUtc().toIso8601String();
 
-      await _client
-          .from('elevators')
-          .update(sanitized)
-          .eq('id', report.elevatorId);
-
-      await _client
-          .from('conflict_reports')
-          .update({'status': 'resolved_forced'})
-          .eq('id', report.id);
+      await _client.rpc('resolve_elevator_conflict', params: {
+        'p_conflict_id': report.id,
+        'p_elevator_id': report.elevatorId,
+        'p_current_version': currentVersion,
+        'p_payload': sanitized,
+      });
 
       state = AsyncData(await _fetchPending());
     } catch (e, st) {

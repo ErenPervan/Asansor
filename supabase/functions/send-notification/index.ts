@@ -58,26 +58,65 @@ serve(async (req: Request) => {
     let notificationData: Record<string, string> = {};
 
     // ── 1. Check Payload Type & Extract Targets ─────────────────────────────
-    if (reqBody.type === "INSERT" && reqBody.table === "fault_reports" && reqBody.record) {
+    if (reqBody.type === "INSERT" && reqBody.record) {
       // It's a Database Webhook trigger
-      const record = reqBody.record;
-      title = "Yeni Arıza Bildirimi";
-      bodyText = record.description || "Yeni bir arıza bildirildi.";
-      notificationData = { route: `/fault/${record.id}` };
-
-      // Broadcast to all admins
-      const { data: admins, error } = await supabase
-        .from("profiles")
-        .select("fcm_token")
-        .eq("role", "admin")
-        .not("fcm_token", "is", null);
-
-      if (error) {
-        console.error("Admin profile lookup failed:", error.message);
-        throw error;
+      
+      // Verify Webhook Secret
+      const secretHeader = req.headers.get("x-webhook-secret");
+      const expectedSecret = Deno.env.get("WEBHOOK_SECRET") || "local-dev-secret-key";
+      if (secretHeader !== expectedSecret) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized: Invalid webhook secret." }),
+          { status: 401, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
       }
-      targets = admins || [];
-      console.log(`[Webhook] Broadcasting to ${targets.length} admins.`);
+
+      if (reqBody.table === "fault_reports") {
+        const record = reqBody.record;
+        title = "Yeni Arıza Bildirimi";
+        bodyText = record.description || "Yeni bir arıza bildirildi.";
+        notificationData = { route: `/fault/${record.id}` };
+
+        // Broadcast to all admins
+        const { data: admins, error } = await supabase
+          .from("profiles")
+          .select("fcm_token")
+          .eq("role", "admin")
+          .not("fcm_token", "is", null);
+
+        if (error) {
+          console.error("Admin profile lookup failed:", error.message);
+          throw error;
+        }
+        targets = admins || [];
+        console.log(`[Webhook] Broadcasting to ${targets.length} admins.`);
+      } else if (reqBody.table === "maintenance_schedules") {
+        const record = reqBody.record;
+        title = "Yeni Bakım Görevi";
+        bodyText = "Size yeni bir asansör bakım görevi atandı.";
+        notificationData = { route: `/home` };
+
+        const { data: tech, error } = await supabase
+          .from("profiles")
+          .select("fcm_token")
+          .eq("id", record.technician_id)
+          .maybeSingle();
+        
+        if (error) {
+          console.error("Technician lookup failed:", error.message);
+          throw error;
+        }
+        
+        if (tech?.fcm_token) {
+          targets.push({ fcm_token: tech.fcm_token });
+        }
+        console.log(`[Webhook] Sending to technician ${record.technician_id}. Found: ${!!tech?.fcm_token}`);
+      } else {
+        return new Response(
+          JSON.stringify({ error: `Unsupported webhook table: ${reqBody.table}` }),
+          { status: 400, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
     }
     else if (reqBody.to_user_id && reqBody.title && reqBody.body) {
       // Direct App Call — MUST verify the caller is an authenticated Supabase user

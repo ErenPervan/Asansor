@@ -4,8 +4,6 @@ import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/providers/auth_providers.dart';
-import '../../admin/providers/profile_providers.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 // â”€â”€ CustomerNoElevatorView â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -25,23 +23,8 @@ class CustomerNoElevatorView extends ConsumerStatefulWidget {
 
 class _CustomerNoElevatorViewState
     extends ConsumerState<CustomerNoElevatorView> {
-  @override
-  void initState() {
-    super.initState();
-    routerRoleNotifier.addListener(_checkElevatorId);
-  }
-
-  @override
-  void dispose() {
-    routerRoleNotifier.removeListener(_checkElevatorId);
-    super.dispose();
-  }
-
-  void _checkElevatorId() {
-    if (routerRoleNotifier.elevatorId != null) {
-      context.go('/customer/dashboard');
-    }
-  }
+  // Navigation when elevator is assigned is now handled automatically
+  // by GoRouter's redirect logic listening to appAuthStateProvider.
 
   @override
   Widget build(BuildContext context) {

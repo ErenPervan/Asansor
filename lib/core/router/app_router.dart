@@ -1,11 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../enums/app_enums.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../features/auth/providers/auth_providers.dart';
 import '../../features/admin/providers/profile_providers.dart';
 import '../../features/admin/views/admin_calendar_view.dart';
 import '../../features/admin/views/admin_dashboard_view.dart';
@@ -31,125 +29,156 @@ import '../../features/maintenance/views/maintenance_log_entry_view.dart';
 import '../../features/admin/conflicts/admin_conflict_management_view.dart';
 import '../../features/admin/views/admin_statistics_dashboard.dart';
 
-// ── Auth-aware refresh notifier ──────────────────────────────────────────────
+// ── App Auth State Machine ───────────────────────────────────────────────────
 
-/// Bridges the Supabase auth stream into a [ChangeNotifier] so that
-/// [GoRouter] re-evaluates its `redirect` on every sign-in / sign-out event.
-class _AuthChangeNotifier extends ChangeNotifier {
-  _AuthChangeNotifier() {
-    _subscription = Supabase.instance.client.auth.onAuthStateChange.listen((
-      AuthState state,
-    ) {
-      if (state.session == null) {
-        routerRoleNotifier.clear();
-      }
-      notifyListeners();
-    });
+final appAuthStateProvider = Provider<AuthStateModel>((ref) {
+  final userAsync = ref.watch(authStateProvider);
+
+  if (userAsync.isLoading && !userAsync.hasValue) {
+    return const AuthStateModel(status: AuthStatus.initial);
   }
 
-  late final StreamSubscription<AuthState> _subscription;
+  if (userAsync.hasError) {
+    return AuthStateModel(
+      status: AuthStatus.error,
+      errorMessage: userAsync.error.toString(),
+    );
+  }
+
+  final user = userAsync.value;
+  if (user == null) {
+    return const AuthStateModel(status: AuthStatus.unauthenticated);
+  }
+
+  // User is authenticated, wait for profile.
+  final profileAsync = ref.watch(currentProfileProvider);
+
+  if (profileAsync.isLoading && !profileAsync.hasValue) {
+    return AuthStateModel(status: AuthStatus.profileLoading, user: user);
+  }
+
+  if (profileAsync.hasError) {
+    return AuthStateModel(
+      status: AuthStatus.error,
+      user: user,
+      errorMessage: profileAsync.error.toString(),
+    );
+  }
+
+  final profile = profileAsync.value;
+  if (profile == null) {
+    return AuthStateModel(
+      status: AuthStatus.error,
+      user: user,
+      errorMessage: 'Profile missing or could not be loaded.',
+    );
+  }
+
+  return AuthStateModel(
+    status: AuthStatus.authorized,
+    user: user,
+    role: profile.role,
+    elevatorId: profile.isCustomer ? profile.elevatorId : null,
+  );
+});
+
+// ── Auth-aware refresh notifier ──────────────────────────────────────────────
+
+class RouterNotifier extends ChangeNotifier {
+  final Ref _ref;
+  ProviderSubscription? _subscription;
+
+  RouterNotifier(this._ref) {
+    _subscription = _ref.listen<AuthStateModel>(
+      appAuthStateProvider,
+      (previous, current) => notifyListeners(),
+      fireImmediately: true,
+    );
+  }
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _subscription?.close();
     super.dispose();
   }
 }
 
-// Singletons — live as long as the app.
-final _authChangeNotifier = _AuthChangeNotifier();
-
 // ── Global navigator key ──────────────────────────────────────────────────────
 
-/// Owned here so that GoRouter, the notification service, and main.dart all
-/// share a single reference without circular imports.
-///
-/// Usage pattern:
-///   • Pass to `GoRouter(navigatorKey: navigatorKey, ...)` so GoRouter uses
-///     this key for its root Navigator.
-///   • Check `navigatorKey.currentState?.mounted == true` before navigating
-///     from outside the widget tree (e.g. FCM callbacks).
-///   • Call `appRouter.go(route)` — NOT `navigatorKey.currentState!.pushNamed`
-///     — to keep GoRouter's redirect guards in the loop.
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 // ── Router ────────────────────────────────────────────────────────────────────
 
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final routerNotifier = RouterNotifier(ref);
+
   return GoRouter(
-    navigatorKey: navigatorKey, // ← GoRouter now owns the key's Navigator
+    navigatorKey: navigatorKey,
     initialLocation: '/',
-
-    // Refresh whenever auth state OR the resolved role changes so that the
-    // admin-route guard is re-evaluated as soon as the profile is loaded.
-    refreshListenable: Listenable.merge([
-      _authChangeNotifier,
-      routerRoleNotifier,
-    ]),
-
-    /// Guards every navigation attempt.
-    ///
-    /// Rules:
-    /// 1. Unauthenticated → `/login`
-    /// 2. Authenticated on `/login` → `/`
-    /// 3. Admin-only: non-admin confirmed role on `/admin/*` → `/`
-    /// 4. Customer-scoped: customer redirected to their elevator detail page;
-    ///    if no elevator is assigned yet → `/customer/no-elevator`.
-    ///    Customers are also blocked from all other routes (home, scan, admin).
-    ///
-    /// Note on rules 3 & 4: while the role is `null` (still loading but user is
-    /// authenticated), the user is redirected to `/loading`. Once the role is
-    /// confirmed, the router is refreshed and the correct guard fires.
+    refreshListenable: routerNotifier,
     redirect: (BuildContext context, GoRouterState state) {
-      final isAuthenticated = Supabase.instance.client.auth.currentUser != null;
+      final authState = ref.read(appAuthStateProvider);
       final loc = state.matchedLocation;
       final isOnLoginPage = loc == '/login';
+      final isOnLoadingPage = loc == '/loading';
 
-      // Rule 1 & 2 — auth presence gate.
-      if (!isAuthenticated && !isOnLoginPage) return '/login';
-      if (isAuthenticated && isOnLoginPage) return '/';
+      switch (authState.status) {
+        case AuthStatus.initial:
+          return isOnLoginPage ? null : '/login';
 
-      final role = routerRoleNotifier.role;
+        case AuthStatus.unauthenticated:
+          return isOnLoginPage ? null : '/login';
 
-      // ── ROLE IS STILL LOADING ──────────────────────────────────────────────
-      if (isAuthenticated && role == null) {
-        // Block ALL protected routes until the role is confirmed.
-        // Show a loading splash instead of leaking any screen.
-        if (loc != '/loading') return '/loading';
-        return null;
+        case AuthStatus.profileLoading:
+          return isOnLoadingPage ? null : '/loading';
+
+        case AuthStatus.error:
+          // Remain on loading to display the error/retry UI, unless logging out
+          if (isOnLoginPage) return null;
+          return isOnLoadingPage ? null : '/loading';
+
+        case AuthStatus.authorized:
+          // Let authorized users out of the login/loading pages
+          if (isOnLoginPage || isOnLoadingPage) {
+            return '/';
+          }
+
+          final role = authState.role;
+
+          // Rule 3 — Admin route guard
+          if (loc.startsWith('/admin')) {
+            if (role != UserRole.admin) return '/';
+          }
+
+          // Rule 4 — Customer-scoped routing
+          if (role == UserRole.customer) {
+            final custElevatorId = authState.elevatorId;
+            final isOnNoElevatorPage = loc == '/customer/no-elevator';
+            final isOnDashboard = loc == '/customer/dashboard';
+            final isOnFaultDetail = loc.startsWith('/fault/');
+
+            // Block access if they have no elevator assigned
+            if (custElevatorId == null || custElevatorId.isEmpty) {
+              if (isOnNoElevatorPage) return null;
+              return '/customer/no-elevator';
+            }
+
+            // Customer HAS an elevator. Allow valid pages.
+            if (isOnDashboard || isOnFaultDetail || isOnNoElevatorPage) {
+              return null;
+            }
+
+            // Default redirect for customers with an elevator is their dashboard
+            return '/customer/dashboard';
+          }
+
+          // Non-customers should never land on customer pages
+          if (loc.startsWith('/customer/')) {
+            return '/';
+          }
+
+          return null;
       }
-
-      // If we are on loading but role is now known, go home.
-      if (loc == '/loading' && role != null) {
-        return '/';
-      }
-
-      // Rule 3 — admin route guard.
-      if (loc.startsWith('/admin')) {
-        if (role != UserRole.admin) return '/';
-      }
-
-      // Rule 4 — customer-scoped routing.
-      if (role == UserRole.customer) {
-        final custElevatorId = routerRoleNotifier.elevatorId;
-        final isOnNoElevatorPage = loc == '/customer/no-elevator';
-        final isOnDashboard = loc == '/customer/dashboard';
-
-        // The customer is already on the correct page or navigating to a fault — let them through.
-        final isOnFaultDetail = loc.startsWith('/fault/');
-        if (isOnDashboard || isOnNoElevatorPage || isOnFaultDetail) return null;
-
-        // Send them to their dashboard, or to the "not yet assigned" page.
-        if (custElevatorId != null && custElevatorId.isNotEmpty) {
-          return '/customer/dashboard';
-        }
-        return '/customer/no-elevator';
-      }
-
-      // Non-customers should never land on customer pages.
-      if (loc.startsWith('/customer/')) return '/';
-
-      return null;
     },
 
     routes: [

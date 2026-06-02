@@ -47,6 +47,8 @@ const _androidChannel = AndroidNotificationChannel(
 // Service
 // ─────────────────────────────────────────────────────────────────────────────
 
+enum NotificationServiceState { notStarted, initializing, ready, failed }
+
 /// Central service for Firebase Cloud Messaging and local notifications.
 ///
 /// ### Lifecycle
@@ -65,7 +67,7 @@ class NotificationService {
   final _messaging = FirebaseMessaging.instance;
   final _localNotifications = FlutterLocalNotificationsPlugin();
 
-  bool _initialised = false;
+  NotificationServiceState _state = NotificationServiceState.notStarted;
   StreamSubscription<String>? _tokenRefreshSub;
 
   // ── Setup ─────────────────────────────────────────────────────────────────
@@ -77,55 +79,67 @@ class NotificationService {
   /// Does NOT check [FirebaseMessaging.instance.getInitialMessage]; call
   /// [handleInitialMessage] after the widget tree is built instead.
   Future<void> initialize() async {
-    if (_initialised) return;
-    _initialised = true;
+    if (_state == NotificationServiceState.initializing ||
+        _state == NotificationServiceState.ready) {
+      return;
+    }
+    
+    _state = NotificationServiceState.initializing;
 
-    // The background handler MUST be registered before any other Firebase
-    // call.  main.dart also registers it before runApp(); this guard makes
-    // sure it is set even if initialize() is somehow called first.
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    try {
+      // The background handler MUST be registered before any other Firebase
+      // call.  main.dart also registers it before runApp(); this guard makes
+      // sure it is set even if initialize() is somehow called first.
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-    // Request notification permissions (Android 13+, iOS).
-    await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: false,
-    );
+      // Request notification permissions (Android 13+, iOS).
+      await _messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+      );
 
-    // Set foreground notification presentation options for iOS.
-    await _messaging.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+      // Set foreground notification presentation options for iOS.
+      await _messaging.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
 
-    // Initialise flutter_local_notifications.
-    const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosInit = DarwinInitializationSettings(
-      requestAlertPermission: false, // already requested via FirebaseMessaging
-      requestBadgePermission: false,
-      requestSoundPermission: false,
-    );
+      // Initialise flutter_local_notifications.
+      const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const iosInit = DarwinInitializationSettings(
+        requestAlertPermission: false, // already requested via FirebaseMessaging
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+      );
 
-    await _localNotifications.initialize(
-      const InitializationSettings(android: androidInit, iOS: iosInit),
-      // State 3 — foreground tap: user tapped a local notification while the
-      // app was already open.
-      onDidReceiveNotificationResponse: _onLocalNotificationTapped,
-    );
+      await _localNotifications.initialize(
+        const InitializationSettings(android: androidInit, iOS: iosInit),
+        // State 3 — foreground tap: user tapped a local notification while the
+        // app was already open.
+        onDidReceiveNotificationResponse: _onLocalNotificationTapped,
+      );
 
-    // Create the high-priority Android channel.
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(_androidChannel);
+      // Create the high-priority Android channel.
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.createNotificationChannel(_androidChannel);
 
-    // State 2 — background tap: app was in the background and the user tapped
-    // the system notification to bring it to the foreground.
-    FirebaseMessaging.onMessage.listen(_onForegroundMessage);
-    FirebaseMessaging.onMessageOpenedApp.listen(_onNotificationOpenedApp);
+      // State 2 — background tap: app was in the background and the user tapped
+      // the system notification to bring it to the foreground.
+      FirebaseMessaging.onMessage.listen(_onForegroundMessage);
+      FirebaseMessaging.onMessageOpenedApp.listen(_onNotificationOpenedApp);
+
+      _state = NotificationServiceState.ready;
+    } catch (e) {
+      _state = NotificationServiceState.failed;
+      debugPrint('[FCM] NotificationService initialization failed: $e');
+      rethrow;
+    }
   }
 
   // ── Terminated-state tap ──────────────────────────────────────────────────

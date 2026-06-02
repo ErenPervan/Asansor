@@ -5,7 +5,14 @@ import '../models/elevator_model.dart';
 
 abstract interface class IElevatorRepository {
   Future<List<ElevatorModel>> getAllElevators();
-  Future<ElevatorModel> createElevator({required String buildingName, String? address, String status = 'active', double? latitude, double? longitude, int? maintenanceDay});
+  Future<ElevatorModel> createElevator({
+    required String buildingName,
+    String? address,
+    String status = 'active',
+    double? latitude,
+    double? longitude,
+    int? maintenanceDay,
+  });
   Future<ElevatorModel> getElevatorById(String id);
 }
 
@@ -99,4 +106,3 @@ class ElevatorRepository implements IElevatorRepository {
     }
   }
 }
-

@@ -170,7 +170,9 @@ class SyncQueueService extends ChangeNotifier {
       final dropCount = entries.length - maxQueueSize;
       final keysToRemove = entries.take(dropCount).map((e) => e.key).toList();
       await _box.deleteAll(keysToRemove);
-      debugPrint('[SyncQueue] Dropped $dropCount oldest items to enforce maxQueueSize of $maxQueueSize');
+      debugPrint(
+        '[SyncQueue] Dropped $dropCount oldest items to enforce maxQueueSize of $maxQueueSize',
+      );
     }
 
     notifyListeners();
@@ -409,18 +411,20 @@ class SyncQueueService extends ChangeNotifier {
               .toList() ??
           <ChecklistItem>[];
 
-      final pdfFile = await PdfService().generateMaintenanceReport(
-        log: logModel,
-        checklistDetails: checklistDetails,
-        mediaUrls: logModel.photos,
-        signatureUrl: logModel.signatureUrl,
-        customerSignatureUrl: logModel.customerSignatureUrl,
-      ).timeout(
-        _pdfGenerationTimeout,
-        onTimeout: () => throw TimeoutException(
-          '[SyncQueue] PDF generation timed out after ${_pdfGenerationTimeout.inSeconds}s for log ${logModel.id}',
-        ),
-      );
+      final pdfFile = await PdfService()
+          .generateMaintenanceReport(
+            log: logModel,
+            checklistDetails: checklistDetails,
+            mediaUrls: logModel.photos,
+            signatureUrl: logModel.signatureUrl,
+            customerSignatureUrl: logModel.customerSignatureUrl,
+          )
+          .timeout(
+            _pdfGenerationTimeout,
+            onTimeout: () => throw TimeoutException(
+              '[SyncQueue] PDF generation timed out after ${_pdfGenerationTimeout.inSeconds}s for log ${logModel.id}',
+            ),
+          );
 
       final fileName =
           'report_${logModel.elevatorId}_${DateTime.now().millisecondsSinceEpoch}.pdf';
@@ -587,12 +591,14 @@ class SyncQueueService extends ChangeNotifier {
           'maintenance_logs/${elevatorId ?? 'unknown'}/${technicianId ?? 'unknown'}_${DateTime.now().millisecondsSinceEpoch}_$index.$extension';
       index++;
 
-      await storage.upload(fileName, file).timeout(
-        _uploadTimeout,
-        onTimeout: () => throw TimeoutException(
-          '[SyncQueue] Photo upload timed out after ${_uploadTimeout.inSeconds}s: $fileName',
-        ),
-      );
+      await storage
+          .upload(fileName, file)
+          .timeout(
+            _uploadTimeout,
+            onTimeout: () => throw TimeoutException(
+              '[SyncQueue] Photo upload timed out after ${_uploadTimeout.inSeconds}s: $fileName',
+            ),
+          );
       uploadedUrls.add(storage.getPublicUrl(fileName));
     }
 

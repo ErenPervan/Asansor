@@ -104,9 +104,7 @@ final logsByElevatorProvider =
       final cache = ref.read(readCacheServiceProvider);
 
       if (!isOnline) {
-        return cache
-            .loadPastLogs(elevatorId)
-            .cast<MaintenanceLogModel>();
+        return cache.loadPastLogs(elevatorId).cast<MaintenanceLogModel>();
       }
 
       try {
@@ -311,10 +309,12 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
     // After a successful log, auto-complete any matching scheduled task
     // for the same elevator+technician on today's date.
     if (!state.hasError && state.value != null) {
-      await ref.read(scheduleRepositoryProvider).completeMatchingSchedule(
-        elevatorId: elevatorId,
-        technicianId: technicianId,
-      );
+      await ref
+          .read(scheduleRepositoryProvider)
+          .completeMatchingSchedule(
+            elevatorId: elevatorId,
+            technicianId: technicianId,
+          );
 
       // Notify all admins that a maintenance job has been completed.
       await NotificationService.instance.notifyAllAdmins(

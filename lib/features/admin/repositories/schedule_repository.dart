@@ -9,7 +9,14 @@ import '../models/schedule_model.dart';
 import '../models/schedule_with_details.dart';
 
 abstract interface class IScheduleRepository {
-  Future<ScheduleModel> assignTask({required String elevatorId, required String technicianId, required DateTime scheduledDate, String? notes, required String createdBy, String priority = 'normal'});
+  Future<ScheduleModel> assignTask({
+    required String elevatorId,
+    required String technicianId,
+    required DateTime scheduledDate,
+    String? notes,
+    required String createdBy,
+    String priority = 'normal',
+  });
   Future<int> bulkInsertPeriodicSchedules(List<Map<String, dynamic>> rows);
   Future<Set<String>> getScheduledElevatorIdsForMonth(DateTime month);
   Future<List<ScheduleModel>> getTechnicianTasks(String technicianId);
@@ -19,10 +26,22 @@ abstract interface class IScheduleRepository {
   Stream<List<ScheduleModel>> getMyTasksStream(String technicianId);
   Future<List<ScheduleModel>> getTodayAllSchedules();
   Future<Map<String, int>> getMonthlyCompletedCountPerTechnician();
-  Future<ScheduleModel> updateTaskStatus({required String taskId, required ScheduleStatus status});
-  Future<void> completeMatchingSchedule({required String elevatorId, required String technicianId});
-  Future<List<ScheduleWithDetails>> getAllSchedulesWithDetails({int? lookbackDays = 90});
-  Future<List<ScheduleModel>> getSchedulesForDateRange(DateTime start, DateTime end, {int? limit});
+  Future<ScheduleModel> updateTaskStatus({
+    required String taskId,
+    required ScheduleStatus status,
+  });
+  Future<void> completeMatchingSchedule({
+    required String elevatorId,
+    required String technicianId,
+  });
+  Future<List<ScheduleWithDetails>> getAllSchedulesWithDetails({
+    int? lookbackDays = 90,
+  });
+  Future<List<ScheduleModel>> getSchedulesForDateRange(
+    DateTime start,
+    DateTime end, {
+    int? limit,
+  });
   Future<DateTime?> getNextScheduledMaintenanceDate(String elevatorId);
 }
 
@@ -192,7 +211,9 @@ class ScheduleRepository implements IScheduleRepository {
       var query = _client.from(_table).select();
 
       if (lookbackDays != null) {
-        final since = DateTime.now().toUtc().subtract(Duration(days: lookbackDays));
+        final since = DateTime.now().toUtc().subtract(
+          Duration(days: lookbackDays),
+        );
         query = query.gte('scheduled_date', since.toIso8601String());
       }
 
@@ -395,30 +416,36 @@ class ScheduleRepository implements IScheduleRepository {
   /// Returns schedules with joined elevator and technician data within the last
   /// [lookbackDays] days. Pass null to fetch all history without limit.
   @override
-  Future<List<ScheduleWithDetails>> getAllSchedulesWithDetails({int? lookbackDays = 90}) async {
+  Future<List<ScheduleWithDetails>> getAllSchedulesWithDetails({
+    int? lookbackDays = 90,
+  }) async {
     try {
       var query = _client
           .from(_table)
-          .select('*, elevators:elevator_id(building_name, address), profiles:technician_id(full_name)');
+          .select(
+            '*, elevators:elevator_id(building_name, address), profiles:technician_id(full_name)',
+          );
 
       if (lookbackDays != null) {
-        final since = DateTime.now().toUtc().subtract(Duration(days: lookbackDays));
+        final since = DateTime.now().toUtc().subtract(
+          Duration(days: lookbackDays),
+        );
         query = query.gte('scheduled_date', since.toIso8601String());
       }
 
       final response = await query.order('scheduled_date', ascending: false);
-          
+
       return (response as List).map((json) {
         final Map<String, dynamic> data = json as Map<String, dynamic>;
         final schedule = ScheduleModel.fromJson(data);
-        
+
         final elevator = data['elevators'] as Map<String, dynamic>?;
         final profile = data['profiles'] as Map<String, dynamic>?;
-        
-        final techName = schedule.isUnassigned 
-            ? 'Atanmamış' 
+
+        final techName = schedule.isUnassigned
+            ? 'Atanmamış'
             : (profile?['full_name'] as String? ?? 'Teknisyen');
-            
+
         return ScheduleWithDetails(
           schedule: schedule,
           buildingName: elevator?['building_name'] as String? ?? 'Asansör',
@@ -493,9 +520,15 @@ class ScheduleRepository implements IScheduleRepository {
     } on AppException {
       rethrow;
     } on PostgrestException catch (e) {
-      throw mapPostgrestException(e, 'getNextScheduledMaintenanceDate($elevatorId)');
+      throw mapPostgrestException(
+        e,
+        'getNextScheduledMaintenanceDate($elevatorId)',
+      );
     } catch (e) {
-      throw mapUnknownException(e, 'getNextScheduledMaintenanceDate($elevatorId)');
+      throw mapUnknownException(
+        e,
+        'getNextScheduledMaintenanceDate($elevatorId)',
+      );
     }
   }
 }

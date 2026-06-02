@@ -96,7 +96,10 @@ void main() {
         status: ScheduleStatus.pending,
       );
 
-      final updated = original.copyWith(status: ScheduleStatus.completed, priority: 'high');
+      final updated = original.copyWith(
+        status: ScheduleStatus.completed,
+        priority: 'high',
+      );
 
       expect(updated.id, 'orig');
       expect(updated.status, ScheduleStatus.completed);

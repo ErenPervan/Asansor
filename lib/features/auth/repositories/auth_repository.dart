@@ -34,7 +34,9 @@ class AuthRepository implements IAuthRepository {
 
       final user = response.user;
       if (user == null) {
-        throw const ServerException('Giriş başarılı ancak kullanıcı döndürülmedi.');
+        throw const ServerException(
+          'Giriş başarılı ancak kullanıcı döndürülmedi.',
+        );
       }
 
       // Register this device's FCM token with the user's profile so we can
@@ -70,6 +72,4 @@ class AuthRepository implements IAuthRepository {
   User? getCurrentUser() {
     return _client.auth.currentUser;
   }
-
 }
-

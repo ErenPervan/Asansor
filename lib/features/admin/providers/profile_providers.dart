@@ -103,7 +103,9 @@ final allProfilesProvider = FutureProvider<List<ProfileModel>>((ref) {
 /// Usage: `ref.watch(profilesByRoleProvider('technician'))`
 final profilesByRoleProvider =
     FutureProvider.family<List<ProfileModel>, UserRole>((ref, role) {
-      return ref.watch(profileRepositoryProvider).getProfilesByRole(role.dbValue);
+      return ref
+          .watch(profileRepositoryProvider)
+          .getProfilesByRole(role.dbValue);
     });
 
 // ── Mutation notifier ─────────────────────────────────────────────────────────
@@ -121,7 +123,9 @@ class ProfileUpdateController extends AutoDisposeAsyncNotifier<void> {
   Future<void> updateRole(String userId, UserRole newRole) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(profileRepositoryProvider).updateRole(userId, newRole.dbValue);
+      await ref
+          .read(profileRepositoryProvider)
+          .updateRole(userId, newRole.dbValue);
       _invalidateAllLists(ref);
       // Refresh the current user's own profile in case they edited themselves.
       ref.invalidate(currentProfileProvider);

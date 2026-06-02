@@ -98,10 +98,7 @@ void main() {
   group('ReadCacheService - Past Logs', () {
     test('savePastLogs empty elevatorId does nothing', () async {
       await service.savePastLogs('', [TestFactories.createMaintenanceLog()]);
-      expect(
-        service.loadPastLogs(''),
-        isEmpty,
-      );
+      expect(service.loadPastLogs(''), isEmpty);
     });
 
     test('save and load past logs works correctly', () async {

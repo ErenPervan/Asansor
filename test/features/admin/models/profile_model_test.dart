@@ -123,18 +123,27 @@ void main() {
 
     group('roleTr', () {
       test('translates roles correctly', () {
-        expect(TestFactories.createProfile(role: UserRole.admin).roleTr, 'Admin');
+        expect(
+          TestFactories.createProfile(role: UserRole.admin).roleTr,
+          'Admin',
+        );
         expect(
           TestFactories.createProfile(role: UserRole.technician).roleTr,
           'Teknisyen',
         );
-        expect(TestFactories.createProfile(role: UserRole.customer).roleTr, 'Müşteri');
+        expect(
+          TestFactories.createProfile(role: UserRole.customer).roleTr,
+          'Müşteri',
+        );
       });
     });
 
     group('role booleans', () {
       test('isAdmin', () {
-        expect(TestFactories.createProfile(role: UserRole.admin).isAdmin, isTrue);
+        expect(
+          TestFactories.createProfile(role: UserRole.admin).isAdmin,
+          isTrue,
+        );
         expect(
           TestFactories.createProfile(role: UserRole.technician).isAdmin,
           isFalse,
@@ -157,7 +166,10 @@ void main() {
           TestFactories.createProfile(role: UserRole.customer).isCustomer,
           isTrue,
         );
-        expect(TestFactories.createProfile(role: UserRole.admin).isCustomer, isFalse);
+        expect(
+          TestFactories.createProfile(role: UserRole.admin).isCustomer,
+          isFalse,
+        );
       });
     });
 

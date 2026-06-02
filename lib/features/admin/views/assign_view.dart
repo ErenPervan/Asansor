@@ -183,7 +183,9 @@ class _AssignViewState extends ConsumerState<AssignView> {
     final textTheme = Theme.of(context).textTheme;
 
     final elevatorsAsync = ref.watch(elevatorsProvider);
-    final techniciansAsync = ref.watch(profilesByRoleProvider(UserRole.technician));
+    final techniciansAsync = ref.watch(
+      profilesByRoleProvider(UserRole.technician),
+    );
     final controllerState = ref.watch(scheduleControllerProvider);
     final isLoading = controllerState.isLoading;
 

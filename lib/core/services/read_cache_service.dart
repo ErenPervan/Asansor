@@ -121,7 +121,9 @@ class ReadCacheService {
     if (raw == null) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((j) => ChecklistItemModel.fromJson(j as Map<String, dynamic>)).toList();
+      return list
+          .map((j) => ChecklistItemModel.fromJson(j as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       return [];
     }
@@ -130,7 +132,10 @@ class ReadCacheService {
   // ── Past Logs ─────────────────────────────────────────────────────────────
 
   /// Persists the past logs for [elevatorId]. Overwrites any previous value.
-  Future<void> savePastLogs(String elevatorId, List<MaintenanceLogModel> logs) async {
+  Future<void> savePastLogs(
+    String elevatorId,
+    List<MaintenanceLogModel> logs,
+  ) async {
     if (elevatorId.isEmpty) return;
     final encoded = jsonEncode(logs.map((l) => l.toJson()).toList());
     await _pastLogsBox.put(elevatorId, encoded);
@@ -143,7 +148,9 @@ class ReadCacheService {
     if (raw == null) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((j) => MaintenanceLogModel.fromJson(j as Map<String, dynamic>)).toList();
+      return list
+          .map((j) => MaintenanceLogModel.fromJson(j as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       return [];
     }
@@ -163,7 +170,9 @@ class ReadCacheService {
     if (raw == null) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((j) => FaultReportModel.fromJson(j as Map<String, dynamic>)).toList();
+      return list
+          .map((j) => FaultReportModel.fromJson(j as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       return [];
     }
@@ -181,7 +190,9 @@ class ReadCacheService {
     if (raw == null) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((j) => FaultReportModel.fromJson(j as Map<String, dynamic>)).toList();
+      return list
+          .map((j) => FaultReportModel.fromJson(j as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       return [];
     }

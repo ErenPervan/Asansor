@@ -43,10 +43,15 @@ class HomeView extends StatelessWidget {
                 final isOnline = ref.watch(isOnlineProvider);
                 final role = ref.watch(roleProvider);
                 final isAdmin = role == UserRole.admin;
-                
-                final activeFaultCount = isAdmin 
-                    ? (ref.watch(adminStatsProvider).valueOrNull?.activeFaults ?? 0)
-                    : (ref.watch(activeFaultsProvider).valueOrNull?.length ?? 0);
+
+                final activeFaultCount = isAdmin
+                    ? (ref
+                              .watch(adminStatsProvider)
+                              .valueOrNull
+                              ?.activeFaults ??
+                          0)
+                    : (ref.watch(activeFaultsProvider).valueOrNull?.length ??
+                          0);
 
                 return TopAppBar(
                   userEmail: authState.valueOrNull?.email ?? '',
@@ -54,7 +59,8 @@ class HomeView extends StatelessWidget {
                   isOnline: isOnline,
                   isAdmin: isAdmin,
                   activeFaultCount: activeFaultCount,
-                  onSignOut: () => ref.read(authControllerProvider.notifier).signOut(),
+                  onSignOut: () =>
+                      ref.read(authControllerProvider.notifier).signOut(),
                 );
               },
             ),
@@ -75,37 +81,56 @@ class HomeView extends StatelessWidget {
                           activeFaults: ref.watch(activeFaultsProvider),
                           elevators: ref.watch(elevatorsProvider).valueOrNull,
                         );
-                      }
+                      },
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     Consumer(
                       builder: (context, ref, _) {
                         return DailyAgendaSection(
-                          mySchedules: ref.watch(technicianScheduleStreamProvider),
+                          mySchedules: ref.watch(
+                            technicianScheduleStreamProvider,
+                          ),
                           elevators: ref.watch(elevatorsProvider).valueOrNull,
                         );
-                      }
+                      },
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     Consumer(
                       builder: (context, ref, _) {
                         final role = ref.watch(roleProvider);
                         final isAdmin = role == UserRole.admin;
-                        
-                        final activeFaultCount = isAdmin 
-                            ? (ref.watch(adminStatsProvider).valueOrNull?.activeFaults ?? 0)
-                            : (ref.watch(activeFaultsProvider).valueOrNull?.length ?? 0);
-                            
+
+                        final activeFaultCount = isAdmin
+                            ? (ref
+                                      .watch(adminStatsProvider)
+                                      .valueOrNull
+                                      ?.activeFaults ??
+                                  0)
+                            : (ref
+                                      .watch(activeFaultsProvider)
+                                      .valueOrNull
+                                      ?.length ??
+                                  0);
+
                         final completedCount = isAdmin
-                            ? (ref.watch(adminStatsProvider).valueOrNull?.completedThisMonth ?? 0)
-                            : (ref.watch(completedTodayCountProvider).valueOrNull ?? 0);
-                            
+                            ? (ref
+                                      .watch(adminStatsProvider)
+                                      .valueOrNull
+                                      ?.completedThisMonth ??
+                                  0)
+                            : (ref
+                                      .watch(completedTodayCountProvider)
+                                      .valueOrNull ??
+                                  0);
+
                         return StatsSection(
                           activeFaultCount: activeFaultCount,
                           completedCount: completedCount,
-                          completedLabel: isAdmin ? 'BU AY TAMAMLANAN' : 'TAMAMLANAN',
+                          completedLabel: isAdmin
+                              ? 'BU AY TAMAMLANAN'
+                              : 'TAMAMLANAN',
                         );
-                      }
+                      },
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     ElevatorsShortcutCard(

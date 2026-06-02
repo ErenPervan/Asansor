@@ -8,8 +8,15 @@ abstract interface class IProfileRepository {
   Future<List<ProfileModel>> getAllProfiles();
   Future<List<ProfileModel>> getProfilesByRole(String role);
   Future<ProfileModel> updateRole(String userId, String newRole);
-  Future<ProfileModel> updateCustomerElevator(String userId, String? elevatorId);
-  Future<ProfileModel> updateProfile({required String userId, String? fullName, String? phone});
+  Future<ProfileModel> updateCustomerElevator(
+    String userId,
+    String? elevatorId,
+  );
+  Future<ProfileModel> updateProfile({
+    required String userId,
+    String? fullName,
+    String? phone,
+  });
 }
 
 class ProfileRepository implements IProfileRepository {
@@ -170,4 +177,3 @@ class ProfileRepository implements IProfileRepository {
     }
   }
 }
-

@@ -27,7 +27,8 @@ class StatsSection extends StatelessWidget {
             // Left ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â completed (primary background)
             Expanded(
               child: Semantics(
-                label: 'Tamamlanan bakÃƒâ€Ã‚Â±m sayÃƒâ€Ã‚Â±sÃƒâ€Ã‚Â±: $completedCount',
+                label:
+                    'Tamamlanan bakÃƒâ€Ã‚Â±m sayÃƒâ€Ã‚Â±sÃƒâ€Ã‚Â±: $completedCount',
                 child: AspectRatio(
                   aspectRatio: ratio,
                   child: Container(
@@ -97,7 +98,8 @@ class StatsSection extends StatelessWidget {
             // Right ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â active faults (surface background)
             Expanded(
               child: Semantics(
-                label: 'AÃƒÆ’Ã‚Â§Ãƒâ€Ã‚Â±k arÃƒâ€Ã‚Â±za sayÃƒâ€Ã‚Â±sÃƒâ€Ã‚Â±: $activeFaultCount',
+                label:
+                    'AÃƒÆ’Ã‚Â§Ãƒâ€Ã‚Â±k arÃƒâ€Ã‚Â±za sayÃƒâ€Ã‚Â±sÃƒâ€Ã‚Â±: $activeFaultCount',
                 child: AspectRatio(
                   aspectRatio: ratio,
                   child: Container(

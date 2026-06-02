@@ -26,15 +26,18 @@ void main() {
         ],
       );
 
-      final result = await container.read(latestFaultDateProvider('elevator-1').future);
+      final result = await container.read(
+        latestFaultDateProvider('elevator-1').future,
+      );
       expect(result, isNull);
       verifyNever(() => mockFaultRepository.getLatestFaultDate(any()));
     });
 
     test('calls repository when online and returns date', () async {
       final expectedDate = DateTime.utc(2026, 6, 2, 12, 0);
-      when(() => mockFaultRepository.getLatestFaultDate('elevator-1'))
-          .thenAnswer((_) async => expectedDate);
+      when(
+        () => mockFaultRepository.getLatestFaultDate('elevator-1'),
+      ).thenAnswer((_) async => expectedDate);
 
       final container = createContainer(
         overrides: [
@@ -43,9 +46,13 @@ void main() {
         ],
       );
 
-      final result = await container.read(latestFaultDateProvider('elevator-1').future);
+      final result = await container.read(
+        latestFaultDateProvider('elevator-1').future,
+      );
       expect(result, expectedDate);
-      verify(() => mockFaultRepository.getLatestFaultDate('elevator-1')).called(1);
+      verify(
+        () => mockFaultRepository.getLatestFaultDate('elevator-1'),
+      ).called(1);
     });
   });
 
@@ -58,15 +65,22 @@ void main() {
         ],
       );
 
-      final result = await container.read(nextScheduledMaintenanceProvider('elevator-1').future);
+      final result = await container.read(
+        nextScheduledMaintenanceProvider('elevator-1').future,
+      );
       expect(result, isNull);
-      verifyNever(() => mockScheduleRepository.getNextScheduledMaintenanceDate(any()));
+      verifyNever(
+        () => mockScheduleRepository.getNextScheduledMaintenanceDate(any()),
+      );
     });
 
     test('calls repository when online and returns date', () async {
       final expectedDate = DateTime.utc(2026, 6, 15, 10, 0);
-      when(() => mockScheduleRepository.getNextScheduledMaintenanceDate('elevator-1'))
-          .thenAnswer((_) async => expectedDate);
+      when(
+        () => mockScheduleRepository.getNextScheduledMaintenanceDate(
+          'elevator-1',
+        ),
+      ).thenAnswer((_) async => expectedDate);
 
       final container = createContainer(
         overrides: [
@@ -75,9 +89,15 @@ void main() {
         ],
       );
 
-      final result = await container.read(nextScheduledMaintenanceProvider('elevator-1').future);
+      final result = await container.read(
+        nextScheduledMaintenanceProvider('elevator-1').future,
+      );
       expect(result, expectedDate);
-      verify(() => mockScheduleRepository.getNextScheduledMaintenanceDate('elevator-1')).called(1);
+      verify(
+        () => mockScheduleRepository.getNextScheduledMaintenanceDate(
+          'elevator-1',
+        ),
+      ).called(1);
     });
   });
 }

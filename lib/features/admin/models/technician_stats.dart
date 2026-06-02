@@ -27,7 +27,8 @@ class TechnicianTask {
   final String? notes;
 
   bool get isCompleted => status == ScheduleStatus.completed;
-  bool get isActive => status == ScheduleStatus.pending || status == ScheduleStatus.inProgress;
+  bool get isActive =>
+      status == ScheduleStatus.pending || status == ScheduleStatus.inProgress;
 }
 
 /// Aggregated stats for a single technician for the current day and month.

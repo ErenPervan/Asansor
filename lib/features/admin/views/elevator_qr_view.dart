@@ -564,7 +564,10 @@ class _StatusChip extends StatelessWidget {
     );
   }
 
-  static (String, Color, Color) _styles(ElevatorStatus s, AppThemeColors colors) {
+  static (String, Color, Color) _styles(
+    ElevatorStatus s,
+    AppThemeColors colors,
+  ) {
     switch (s) {
       case ElevatorStatus.active:
         return ('Aktif', colors.successContainer, colors.success);

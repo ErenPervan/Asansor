@@ -264,7 +264,8 @@ class AgendaTaskCard extends ConsumerWidget {
     return Text(label, style: style);
   }
 
-  static bool _isActive(ScheduleStatus s) => s == ScheduleStatus.pending || s == ScheduleStatus.inProgress;
+  static bool _isActive(ScheduleStatus s) =>
+      s == ScheduleStatus.pending || s == ScheduleStatus.inProgress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -457,7 +458,8 @@ class AgendaTaskCard extends ConsumerWidget {
                                   ? 'Tamamlandı'
                                   : 'İptal Edildi',
                               style: textTheme.labelMedium?.copyWith(
-                                color: schedule.status == ScheduleStatus.completed
+                                color:
+                                    schedule.status == ScheduleStatus.completed
                                     ? colors.success
                                     : colors.outline,
                                 fontWeight: FontWeight.w600,

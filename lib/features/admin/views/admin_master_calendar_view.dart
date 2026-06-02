@@ -450,7 +450,9 @@ class _CalendarSection extends StatelessWidget {
   /// GREEN â†’ all active tasks are completed.
   /// AMBER â†’ â‰¥1 pending/in-progress task.
   static Color? _markerColor(List<ScheduleWithDetails> events) {
-    final active = events.where((e) => e.status != ScheduleStatus.cancelled).toList();
+    final active = events
+        .where((e) => e.status != ScheduleStatus.cancelled)
+        .toList();
     if (active.isEmpty) return null;
 
     if (active.any(
@@ -808,7 +810,10 @@ class _TaskStatusBadge extends StatelessWidget {
     return _Badge(label: label, bg: bg, fg: fg);
   }
 
-  static (String, Color, Color) _styles(BuildContext context, ScheduleStatus s) {
+  static (String, Color, Color) _styles(
+    BuildContext context,
+    ScheduleStatus s,
+  ) {
     final colors = AppThemeColors.of(context);
     switch (s) {
       case ScheduleStatus.completed:

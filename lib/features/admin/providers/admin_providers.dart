@@ -303,7 +303,9 @@ final technicianManagementProvider =
       final repo = ref.read(scheduleRepositoryProvider);
 
       // Start all fetches concurrently.
-      final techFuture = ref.watch(profilesByRoleProvider(UserRole.technician).future);
+      final techFuture = ref.watch(
+        profilesByRoleProvider(UserRole.technician).future,
+      );
       final elevFuture = ref.watch(elevatorsProvider.future);
       final todayFuture = repo.getTodayAllSchedules();
       final monthFuture = repo.getMonthlyCompletedCountPerTechnician();
@@ -336,7 +338,9 @@ final technicianManagementProvider =
         return TechnicianStats(
           profile: profile,
           todayTasks: todayTasks,
-          todayCompleted: myToday.where((s) => s.status == ScheduleStatus.completed).length,
+          todayCompleted: myToday
+              .where((s) => s.status == ScheduleStatus.completed)
+              .length,
           monthlyCompleted: monthlyCount[profile.id] ?? 0,
         );
       }).toList();

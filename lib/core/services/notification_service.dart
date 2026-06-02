@@ -242,16 +242,18 @@ class NotificationService {
       for (final row in admins as List) {
         final adminId = (row as Map<String, dynamic>)['id'] as String?;
         if (adminId != null) {
-          futures.add(notifyUser(
-            client: client,
-            toUserId: adminId,
-            title: title,
-            body: body,
-            data: data,
-          ));
+          futures.add(
+            notifyUser(
+              client: client,
+              toUserId: adminId,
+              title: title,
+              body: body,
+              data: data,
+            ),
+          );
         }
       }
-      
+
       await Future.wait(futures);
     } catch (_) {}
   }

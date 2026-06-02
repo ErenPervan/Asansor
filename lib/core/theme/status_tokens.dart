@@ -43,7 +43,10 @@ abstract final class StatusTokens {
     }
   }
 
-  static Color scheduleBackgroundDynamic(BuildContext context, ScheduleStatus status) {
+  static Color scheduleBackgroundDynamic(
+    BuildContext context,
+    ScheduleStatus status,
+  ) {
     final colors = AppThemeColors.of(context);
     switch (status) {
       case ScheduleStatus.inProgress:
@@ -57,7 +60,10 @@ abstract final class StatusTokens {
     }
   }
 
-  static Color scheduleForegroundDynamic(BuildContext context, ScheduleStatus status) {
+  static Color scheduleForegroundDynamic(
+    BuildContext context,
+    ScheduleStatus status,
+  ) {
     final colors = AppThemeColors.of(context);
     switch (status) {
       case ScheduleStatus.inProgress:

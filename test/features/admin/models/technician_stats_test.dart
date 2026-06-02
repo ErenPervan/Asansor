@@ -6,15 +6,21 @@ import '../../../helpers/test_factories.dart';
 void main() {
   group('TechnicianTask Tests', () {
     test('isCompleted getter works correctly', () {
-      final task1 = TestFactories.createTechnicianTask(status: ScheduleStatus.completed);
+      final task1 = TestFactories.createTechnicianTask(
+        status: ScheduleStatus.completed,
+      );
       expect(task1.isCompleted, isTrue);
 
-      final task2 = TestFactories.createTechnicianTask(status: ScheduleStatus.pending);
+      final task2 = TestFactories.createTechnicianTask(
+        status: ScheduleStatus.pending,
+      );
       expect(task2.isCompleted, isFalse);
     });
 
     test('isActive getter works correctly', () {
-      final pending = TestFactories.createTechnicianTask(status: ScheduleStatus.pending);
+      final pending = TestFactories.createTechnicianTask(
+        status: ScheduleStatus.pending,
+      );
       expect(pending.isActive, isTrue);
 
       final inProgress = TestFactories.createTechnicianTask(
@@ -22,10 +28,14 @@ void main() {
       );
       expect(inProgress.isActive, isTrue);
 
-      final completed = TestFactories.createTechnicianTask(status: ScheduleStatus.completed);
+      final completed = TestFactories.createTechnicianTask(
+        status: ScheduleStatus.completed,
+      );
       expect(completed.isActive, isFalse);
 
-      final cancelled = TestFactories.createTechnicianTask(status: ScheduleStatus.cancelled);
+      final cancelled = TestFactories.createTechnicianTask(
+        status: ScheduleStatus.cancelled,
+      );
       expect(cancelled.isActive, isFalse);
     });
   });
@@ -35,10 +45,16 @@ void main() {
 
     test('computed fields are calculated correctly when tasks exist', () {
       final tasks = [
-        TestFactories.createTechnicianTask(status: ScheduleStatus.completed), // 1
+        TestFactories.createTechnicianTask(
+          status: ScheduleStatus.completed,
+        ), // 1
         TestFactories.createTechnicianTask(status: ScheduleStatus.pending), // 2
-        TestFactories.createTechnicianTask(status: ScheduleStatus.inProgress), // 3
-        TestFactories.createTechnicianTask(status: ScheduleStatus.cancelled), // 4
+        TestFactories.createTechnicianTask(
+          status: ScheduleStatus.inProgress,
+        ), // 3
+        TestFactories.createTechnicianTask(
+          status: ScheduleStatus.cancelled,
+        ), // 4
       ];
 
       final stats = TechnicianStats(
@@ -72,7 +88,9 @@ void main() {
     );
 
     test('progressValue is clamped to 1.0 if todayCompleted > todayTotal', () {
-      final tasks = [TestFactories.createTechnicianTask(status: ScheduleStatus.completed)];
+      final tasks = [
+        TestFactories.createTechnicianTask(status: ScheduleStatus.completed),
+      ];
 
       // Technically anomalous data, but test clamp protection
       final stats = TechnicianStats(

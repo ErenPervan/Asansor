@@ -300,7 +300,8 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                       ),
                       onCancel:
                           selectedEvents[i].status == ScheduleStatus.pending ||
-                              selectedEvents[i].status == ScheduleStatus.inProgress
+                              selectedEvents[i].status ==
+                                  ScheduleStatus.inProgress
                           ? () => _confirmCancel(context, selectedEvents[i].id)
                           : null,
                     ),
@@ -345,7 +346,10 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                 Navigator.pop(ctx);
                 ref
                     .read(scheduleControllerProvider.notifier)
-                    .updateStatus(taskId: taskId, status: ScheduleStatus.cancelled);
+                    .updateStatus(
+                      taskId: taskId,
+                      status: ScheduleStatus.cancelled,
+                    );
               },
               child: const Text('İptal Et'),
             ),

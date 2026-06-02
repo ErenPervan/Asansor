@@ -1,13 +1,17 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:asansor/features/elevator/repositories/elevator_repository.dart';
 import 'package:asansor/features/admin/repositories/schedule_repository.dart';
+import 'package:asansor/features/admin/repositories/profile_repository.dart';
 import 'package:asansor/features/maintenance/repositories/maintenance_repository.dart';
 import 'package:asansor/features/fault/repositories/fault_repository.dart';
+import 'package:asansor/features/auth/repositories/auth_repository.dart';
 import 'package:asansor/core/services/pdf_service.dart';
 
-// Supabase Mocks
+// ── Supabase Mocks ────────────────────────────────────────────────────────────
+
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
 class MockGoTrueClient extends Mock implements GoTrueClient {}
@@ -24,20 +28,29 @@ class MockPostgrestFilterBuilder extends Mock
 class MockPostgrestTransformBuilder<T> extends Mock
     implements PostgrestTransformBuilder<T> {}
 
-// Hive Mocks
+// ── Hive Mocks ────────────────────────────────────────────────────────────────
+
 class MockHiveBox<T> extends Mock implements Box<T> {}
 
-// Repository Mocks
-class MockElevatorRepository extends Mock implements ElevatorRepository {}
+// ── Repository Mocks (implement interfaces, not concrete classes) ─────────────
 
-class MockScheduleRepository extends Mock implements ScheduleRepository {}
+class MockElevatorRepository extends Mock implements IElevatorRepository {}
 
-class MockMaintenanceRepository extends Mock implements MaintenanceRepository {}
+class MockScheduleRepository extends Mock implements IScheduleRepository {}
 
-class MockFaultRepository extends Mock implements FaultRepository {}
+class MockMaintenanceRepository extends Mock
+    implements IMaintenanceRepository {}
 
-// Service Mocks
+class MockFaultRepository extends Mock implements IFaultRepository {}
+
+class MockAuthRepository extends Mock implements IAuthRepository {}
+
+class MockProfileRepository extends Mock implements IProfileRepository {}
+
+// ── Service Mocks ─────────────────────────────────────────────────────────────
+
 class MockPdfService extends Mock implements PdfService {}
 
-// Fake Classes for Fallbacks (if needed for mocktail)
+// ── Fake Classes (mocktail fallbacks) ─────────────────────────────────────────
+
 class FakeDateTime extends Fake implements DateTime {}

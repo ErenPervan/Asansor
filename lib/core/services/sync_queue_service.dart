@@ -22,7 +22,9 @@ const _maintenancePhotosBucket = 'maintenance-photos';
 const _maintenanceReportsBucket = 'maintenance-reports';
 const _statusPending = 'pending';
 const _statusPdfPending = 'pdf_pending';
+const _statusSchedulePending = 'schedule_pending';
 const _statusConflictDetected = 'conflict_detected';
+const _statusDeadLetter = 'dead_letter';
 
 // ── Timeout constants ─────────────────────────────────────────────────────────
 // All network / storage / PDF operations inside flush() are guarded by these.
@@ -91,7 +93,8 @@ class SyncQueueService extends ChangeNotifier {
   int get pendingCount => _box.values.where((raw) {
     try {
       final item = jsonDecode(raw) as Map<String, dynamic>;
-      return item['status'] != _statusConflictDetected;
+      final status = item['status'];
+      return status != _statusConflictDetected && status != _statusDeadLetter;
     } catch (_) {
       return true;
     }
@@ -130,10 +133,6 @@ class SyncQueueService extends ChangeNotifier {
 
   // ── Write ─────────────────────────────────────────────────────────────────
 
-  /// The maximum number of pending items allowed in the queue.
-  /// If this limit is reached, the oldest items are removed to prevent storage exhaustion.
-  static const int maxQueueSize = 100;
-
   /// Saves [payload] as a pending operation of the given [type].
   ///
   /// [type] must be one of the [SyncItemType] constants.
@@ -152,28 +151,6 @@ class SyncQueueService extends ChangeNotifier {
       'status': _statusPending,
     });
     await _box.put(id, item);
-
-    // Enforce capacity limit
-    if (_box.length > maxQueueSize) {
-      final entries = _box.toMap().entries.toList();
-      entries.sort((a, b) {
-        try {
-          final aJson = jsonDecode(a.value) as Map<String, dynamic>;
-          final bJson = jsonDecode(b.value) as Map<String, dynamic>;
-          final aTime = DateTime.parse(aJson['queued_at'] as String);
-          final bTime = DateTime.parse(bJson['queued_at'] as String);
-          return aTime.compareTo(bTime);
-        } catch (_) {
-          return 0;
-        }
-      });
-      final dropCount = entries.length - maxQueueSize;
-      final keysToRemove = entries.take(dropCount).map((e) => e.key).toList();
-      await _box.deleteAll(keysToRemove);
-      debugPrint(
-        '[SyncQueue] Dropped $dropCount oldest items to enforce maxQueueSize of $maxQueueSize',
-      );
-    }
 
     notifyListeners();
   }
@@ -204,9 +181,9 @@ class SyncQueueService extends ChangeNotifier {
         try {
           final item = jsonDecode(raw) as Map<String, dynamic>;
 
-          if (item['status'] == _statusConflictDetected) {
+          if (item['status'] == _statusConflictDetected || item['status'] == _statusDeadLetter) {
             failed++;
-            continue; // Skip conflicted items, they require manual resolution
+            continue; // Skip conflicted/dead items, they require manual resolution
           }
 
           await _processWithVersionTracking(client, item, key, versionMap);
@@ -220,7 +197,13 @@ class SyncQueueService extends ChangeNotifier {
           failed++;
         } catch (e, s) {
           debugPrint('[SyncQueue] Unexpected error in flush: $e\n$s');
-          // Keep in the queue; will retry next time we're online.
+          if (_isTerminalError(e)) {
+            final item = jsonDecode(raw) as Map<String, dynamic>;
+            item['status'] = _statusDeadLetter;
+            item['error_details'] = e.toString();
+            await _box.put(key, jsonEncode(item));
+          }
+          // Keep in the queue; will retry next time we're online (unless dead_letter).
           failed++;
         }
       }
@@ -292,11 +275,25 @@ class SyncQueueService extends ChangeNotifier {
     final elevatorId = payload['elevator_id'] as String?;
     final technicianId = payload['technician_id'] as String?;
 
+    if (queueItem['status'] == _statusSchedulePending) {
+      await _completeMatchingSchedule(
+        client,
+        elevatorId: elevatorId,
+        technicianId: technicianId,
+        maintenanceDate: payload['maintenance_date'] as String?,
+      );
+      return;
+    }
+
     if (queueItem['status'] == _statusPdfPending) {
       await _generateUploadAndAttachPdf(
         client,
         _pdfPendingRemoteState(queueItem),
       );
+      
+      queueItem['status'] = _statusSchedulePending;
+      await _box.put(key, jsonEncode(queueItem));
+
       await _completeMatchingSchedule(
         client,
         elevatorId: elevatorId,
@@ -376,6 +373,9 @@ class SyncQueueService extends ChangeNotifier {
     if (response != null) {
       await _generateUploadAndAttachPdf(client, response);
     }
+
+    queueItem['status'] = _statusSchedulePending;
+    await _box.put(key, jsonEncode(queueItem));
 
     await _completeMatchingSchedule(
       client,
@@ -527,41 +527,37 @@ class SyncQueueService extends ChangeNotifier {
   }) async {
     if (elevatorId == null || technicianId == null) return;
 
-    try {
-      final targetDate = maintenanceDate != null
-          ? DateTime.parse(maintenanceDate)
-          : DateTime.now();
-      final start = DateTime(
-        targetDate.year,
-        targetDate.month,
-        targetDate.day,
-      ).toIso8601String();
-      final end = DateTime(
-        targetDate.year,
-        targetDate.month,
-        targetDate.day,
-        23,
-        59,
-        59,
-      ).toIso8601String();
+    final targetDate = maintenanceDate != null
+        ? DateTime.parse(maintenanceDate)
+        : DateTime.now();
+    final start = DateTime(
+      targetDate.year,
+      targetDate.month,
+      targetDate.day,
+    ).toIso8601String();
+    final end = DateTime(
+      targetDate.year,
+      targetDate.month,
+      targetDate.day,
+      23,
+      59,
+      59,
+    ).toIso8601String();
 
-      await client
-          .from('maintenance_schedules')
-          .update({'status': 'completed'})
-          .eq('elevator_id', elevatorId)
-          .eq('technician_id', technicianId)
-          .inFilter('status', ['pending', 'in_progress'])
-          .gte('scheduled_date', start)
-          .lte('scheduled_date', end)
-          .timeout(
-            _dbWriteTimeout,
-            onTimeout: () => throw TimeoutException(
-              '[SyncQueue] Schedule completion update timed out after ${_dbWriteTimeout.inSeconds}s',
-            ),
-          );
-    } catch (_) {
-      // Schedule completion is best-effort; don't fail the whole sync.
-    }
+    await client
+        .from('maintenance_schedules')
+        .update({'status': 'completed'})
+        .eq('elevator_id', elevatorId)
+        .eq('technician_id', technicianId)
+        .inFilter('status', ['pending', 'in_progress'])
+        .gte('scheduled_date', start)
+        .lte('scheduled_date', end)
+        .timeout(
+          _dbWriteTimeout,
+          onTimeout: () => throw TimeoutException(
+            '[SyncQueue] Schedule completion update timed out after ${_dbWriteTimeout.inSeconds}s',
+          ),
+        );
   }
 
   Future<List<String>> _resolveMaintenancePhotos(
@@ -681,6 +677,28 @@ class SyncQueueService extends ChangeNotifier {
         throw Exception('Elevator not found for update.');
       }
     }
+  }
+
+  // ── Error Classification ──────────────────────────────────────────────────
+
+  bool _isTerminalError(Object error) {
+    if (error is PostgrestException) {
+      if (error.code != null) {
+        final code = error.code!;
+        // 22xxx (Data Exception), 23xxx (Integrity Constraint Violation), 42xxx (Syntax Error/Access Rule)
+        if (code.startsWith('22') || code.startsWith('23') || code.startsWith('42')) {
+          return true;
+        }
+      }
+    } else if (error is StorageException) {
+      if (error.statusCode != null) {
+        final code = int.tryParse(error.statusCode!);
+        if (code != null && code >= 400 && code < 500 && code != 429) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   // ── Conflict Resolution ───────────────────────────────────────────────────

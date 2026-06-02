@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/enums/app_enums.dart';
 
@@ -7,43 +6,7 @@ import '../../auth/providers/auth_providers.dart';
 import '../models/profile_model.dart';
 import '../repositories/profile_repository.dart';
 
-// ── Router role notifier ──────────────────────────────────────────────────────
-//
-// A lightweight ChangeNotifier that sits outside Riverpod and can be referenced
-// by GoRouter as a refreshListenable.  Updated by [currentProfileProvider]
-// whenever the current user's profile loads or the session changes.
-
-class RouterRoleNotifier extends ChangeNotifier {
-  UserRole? _role;
-  String? _elevatorId;
-
-  /// The currently cached role.
-  ///
-  /// `null` means either the user is not signed in, or the profile is still loading.
-  UserRole? get role => _role;
-
-  /// For `customer` role: the elevator UUID linked to this user's profile.
-  /// `null` when the role is not `'customer'`, the profile is loading,
-  /// or the customer has no elevator assigned yet.
-  String? get elevatorId => _elevatorId;
-
-  void update(UserRole? role, String? elevatorId) {
-    if (_role == role && _elevatorId == elevatorId) return;
-    _role = role;
-    _elevatorId = elevatorId;
-    notifyListeners();
-  }
-
-  void clear() {
-    if (_role == null && _elevatorId == null) return;
-    _role = null;
-    _elevatorId = null;
-    notifyListeners();
-  }
-}
-
-/// Singleton accessible from `app_router.dart` without going through Riverpod.
-final routerRoleNotifier = RouterRoleNotifier();
+// ── Router role notifier removed (now handled by auth_providers.dart) ──
 
 // ── Repository ────────────────────────────────────────────────────────────────
 
@@ -67,15 +30,6 @@ final currentProfileProvider = FutureProvider<ProfileModel?>((ref) async {
 
   final repo = ref.read(profileRepositoryProvider);
   final profile = await repo.getProfile(user.id);
-
-  // Propagate role + elevatorId to the router so it can enforce both the
-  // admin guard and the customer-scoped elevator redirect synchronously.
-  // Note: While this is a side-effect in a provider, we rely on it to feed
-  // GoRouter synchronously. It is cleared atomically in _AuthChangeNotifier.
-  routerRoleNotifier.update(
-    profile?.role,
-    profile?.isCustomer == true ? profile?.elevatorId : null,
-  );
 
   return profile;
 });

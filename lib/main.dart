@@ -98,7 +98,11 @@ Future<void> main() async {
   await Hive.openBox<String>(faultsCacheBoxName, encryptionCipher: cipher);
 
   // Set up FCM permissions, notification channels, and message listeners.
-  await NotificationService.instance.initialize();
+  try {
+    await NotificationService.instance.initialize();
+  } catch (e) {
+    debugPrint('NotificationService initialization failed during bootstrap: $e');
+  }
 
   await initializeDateFormatting('tr_TR', null);
 

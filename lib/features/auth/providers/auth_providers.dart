@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/enums/app_enums.dart';
 import '../../../core/providers/connectivity_providers.dart';
 import '../repositories/auth_repository.dart';
 
@@ -63,3 +64,33 @@ class AuthController extends AsyncNotifier<User?> {
 final authControllerProvider = AsyncNotifierProvider<AuthController, User?>(
   AuthController.new,
 );
+
+// ── App Auth State Machine ───────────────────────────────────────────────────
+
+enum AuthStatus {
+  initial,
+  unauthenticated,
+  profileLoading,
+  authorized,
+  error,
+}
+
+class AuthStateModel {
+  final AuthStatus status;
+  final User? user;
+  final UserRole? role;
+  final String? elevatorId;
+  final String? errorMessage;
+
+  const AuthStateModel({
+    required this.status,
+    this.user,
+    this.role,
+    this.elevatorId,
+    this.errorMessage,
+  });
+}
+
+// We cannot import profile_providers here to avoid circular dependency.
+// So we will define this in a new file, or we can just keep the model here and 
+// define the provider in app_router.dart where it can import everything.

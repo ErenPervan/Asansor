@@ -253,7 +253,7 @@ class _AdminStatisticsDashboardState
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
-          
+
           AppSectionHeader(
             title: 'Aylık Arıza Trendi',
             subtitle: 'Son 6 aylık arıza kayıtları',
@@ -265,7 +265,7 @@ class _AdminStatisticsDashboardState
             child: _BarChartCard(monthlyFaults: data.monthlyFaults),
           ),
           const SizedBox(height: AppSpacing.xl),
-          
+
           const AppSectionHeader(
             title: 'Arıza Dağılımı',
             subtitle: 'Bileşen bazında analiz',

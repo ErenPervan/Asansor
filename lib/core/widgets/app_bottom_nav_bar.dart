@@ -49,9 +49,7 @@ class AppBottomNavBar extends ConsumerWidget {
               icon: Icons.event_note_outlined,
               label: 'Program',
               isActive: navigationShell.currentIndex == 2,
-              onPressed: isAdmin
-                  ? () => _goBranch(2)
-                  : null,
+              onPressed: isAdmin ? () => _goBranch(2) : null,
             ),
             _NavItem(
               icon: Icons.history,

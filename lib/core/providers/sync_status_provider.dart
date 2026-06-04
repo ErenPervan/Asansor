@@ -1,12 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'connectivity_providers.dart';
 
-enum SyncState {
-  online,
-  offline,
-  syncing,
-  syncError,
-}
+enum SyncState { online, offline, syncing, syncError }
 
 final syncStatusProvider = Provider<SyncState>((ref) {
   final isOnline = ref.watch(isOnlineProvider);
@@ -15,7 +10,7 @@ final syncStatusProvider = Provider<SyncState>((ref) {
   if (!isOnline) {
     return SyncState.offline;
   }
-  
+
   if (pendingCount > 0) {
     return SyncState.syncing;
   }

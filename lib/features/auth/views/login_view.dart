@@ -485,4 +485,3 @@ class _LoginViewState extends ConsumerState<LoginView>
 }
 
 // ── Small helpers ──────────────────────────────────────────────────────────────
-

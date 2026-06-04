@@ -219,10 +219,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/',
-                builder: (context, state) => const HomeView(),
-              ),
+              GoRoute(path: '/', builder: (context, state) => const HomeView()),
             ],
           ),
         ],
@@ -248,7 +245,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── Fault routes ──────────────────────────────────────────────────────
-
       GoRoute(
         path: '/fault/:id',
         builder: (_, state) {

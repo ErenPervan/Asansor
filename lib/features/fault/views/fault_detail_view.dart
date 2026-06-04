@@ -46,7 +46,7 @@ class FaultDetailView extends ConsumerWidget {
             onPressed: () => context.pop(),
           ),
           title: Text(
-            'ArÄ±za DetayÄ±',
+            'Arıza Detayı',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: AppThemeColors.of(context).onSurface,
@@ -74,7 +74,7 @@ class FaultDetailView extends ConsumerWidget {
             onPressed: () => context.pop(),
           ),
           title: Text(
-            'ArÄ±za DetayÄ±',
+            'Arıza Detayı',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: AppThemeColors.of(context).onSurface,
@@ -94,7 +94,7 @@ class FaultDetailView extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'ArÄ±za yÃ¼klenemedi',
+                'Arıza yüklenemedi',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: AppThemeColors.of(context).onSurface,
                 ),
@@ -159,7 +159,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     final elevatorAsync = ref.watch(elevatorByIdProvider(fault.elevatorId));
     final updateState = ref.watch(faultUpdateControllerProvider);
 
-    final elevatorName = elevatorAsync.valueOrNull?.buildingName ?? 'â€”';
+    final elevatorName = elevatorAsync.valueOrNull?.buildingName ?? '—';
     final elevatorAddress = elevatorAsync.valueOrNull?.address ?? '';
 
     final colors = AppThemeColors.of(context);
@@ -186,7 +186,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                 actions: [
                   if (!fault.isResolved)
                     IconButton(
-                      tooltip: 'AsansÃ¶re Git',
+                      tooltip: 'Asansöre Git',
                       icon: Icon(
                         Icons.elevator_outlined,
                         color: colors.onPrimary,
@@ -206,7 +206,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                   ),
                 ),
                 title: Text(
-                  'ArÄ±za DetayÄ±',
+                  'Arıza Detayı',
                   style: textTheme.titleMedium?.copyWith(
                     color: colors.onPrimary,
                     fontWeight: FontWeight.w700,
@@ -233,7 +233,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                             children: [
                               SectionLabel(
                                 icon: Icons.elevator_outlined,
-                                label: 'AsansÃ¶r',
+                                label: 'Asansör',
                                 uppercase: true,
                               ),
                               const SizedBox(height: 10),
@@ -281,14 +281,14 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                           children: [
                             SectionLabel(
                               icon: Icons.report_problem_outlined,
-                              label: 'ArÄ±za AÃ§Ä±klamasÄ±',
+                              label: 'Arıza Açıklaması',
                               uppercase: true,
                             ),
                             const SizedBox(height: 10),
                             Text(
                               fault.description.isNotEmpty
                                   ? fault.description
-                                  : 'AÃ§Ä±klama girilmedi.',
+                                  : 'Açıklama girilmedi.',
                               style: textTheme.bodyLarge?.copyWith(
                                 color: colors.onSurface,
                                 height: 1.55,
@@ -317,7 +317,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                             children: [
                               SectionLabel(
                                 icon: Icons.check_circle_outline,
-                                label: 'Ã‡Ã¶zÃ¼m Notu',
+                                label: 'Çözüm Notu',
                                 color: colors.success,
                                 uppercase: true,
                               ),
@@ -349,7 +349,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                               Divider(height: 20, color: colors.outlineVariant),
                               _TimeRow(
                                 icon: Icons.check_circle_outline,
-                                label: 'OnarÄ±m Tarihi',
+                                label: 'Onarım Tarihi',
                                 time: fault.resolvedAt!,
                                 color: colors.success,
                               ),
@@ -369,9 +369,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                               : CrossFadeState.showFirst,
                           firstChild: OutlinedButton.icon(
                             icon: const Icon(Icons.note_add_outlined),
-                            label: const Text(
-                              'Ã‡Ã¶zÃ¼m notu ekle (isteÄŸe baÄŸlÄ±)',
-                            ),
+                            label: const Text('Çözüm notu ekle (isteğe bağlı)'),
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(double.infinity, 48),
                               side: BorderSide(color: colors.outlineVariant),
@@ -384,9 +382,8 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                             controller: _notesController,
                             maxLines: 3,
                             decoration: InputDecoration(
-                              labelText: 'Ã‡Ã¶zÃ¼m Notu',
-                              hintText:
-                                  'YapÄ±lan iÅŸlemleri kÄ±saca aÃ§Ä±klayÄ±nâ€¦',
+                              labelText: 'Çözüm Notu',
+                              hintText: 'Yapılan işlemleri kısaca açıklayın…',
                               alignLabelWithHint: true,
                               suffixIcon: IconButton(
                                 icon: const Icon(Icons.close),
@@ -415,8 +412,8 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                               : const Icon(Icons.check_circle_outline),
                           label: Text(
                             updateState.isLoading
-                                ? 'Kaydediliyorâ€¦'
-                                : 'ArÄ±zayÄ± Onar',
+                                ? 'Kaydediliyor…'
+                                : 'Arızayı Onar',
                           ),
                           style: FilledButton.styleFrom(
                             minimumSize: const Size(double.infinity, 52),
@@ -431,7 +428,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                         // Navigate to elevator
                         OutlinedButton.icon(
                           icon: const Icon(Icons.elevator_outlined),
-                          label: Text('$elevatorName DetayÄ±na Git'),
+                          label: Text('$elevatorName Detayına Git'),
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 48),
                             side: BorderSide(color: colors.outlineVariant),
@@ -454,8 +451,8 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                               : const Icon(Icons.refresh),
                           label: Text(
                             updateState.isLoading
-                                ? 'Ä°ÅŸleniyorâ€¦'
-                                : 'ArÄ±zayÄ± Yeniden AÃ§',
+                                ? 'İşleniyor…'
+                                : 'Arızayı Yeniden Aç',
                           ),
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 48),
@@ -473,7 +470,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                         const SizedBox(height: AppSpacing.sm),
                         OutlinedButton.icon(
                           icon: const Icon(Icons.elevator_outlined),
-                          label: Text('$elevatorName DetayÄ±na Git'),
+                          label: Text('$elevatorName Detayına Git'),
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 48),
                             side: BorderSide(color: colors.outlineVariant),
@@ -518,14 +515,14 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('ArÄ±zayÄ± Onar'),
+        title: const Text('Arızayı Onar'),
         content: const Text(
-          'Bu arÄ±zayÄ± onarÄ±ldÄ± olarak iÅŸaretlemek istediÄŸinize emin misiniz?',
+          'Bu arızayı onarıldı olarak işaretlemek istediğinize emin misiniz?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Ä°ptal'),
+            child: const Text('İptal'),
           ),
           FilledButton(
             onPressed: () {
@@ -557,9 +554,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-            'ArÄ±za baÅŸarÄ±yla onarÄ±ldÄ± olarak iÅŸaretlendi.',
-          ),
+          content: const Text('Arıza başarıyla onarıldı olarak işaretlendi.'),
           backgroundColor: AppThemeColors.of(context).success,
           behavior: SnackBarBehavior.floating,
           duration: AppDurations.snackBarSuccess,
@@ -595,7 +590,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('ArÄ±za yeniden aÃ§Ä±ldÄ±.'),
+          content: Text('Arıza yeniden açıldı.'),
           behavior: SnackBarBehavior.floating,
           duration: AppDurations.snackBarSuccess,
         ),
@@ -652,9 +647,9 @@ class _StatusHeader extends StatelessWidget {
     final icon = isResolved
         ? Icons.check_circle_rounded
         : Icons.warning_rounded;
-    final label = isResolved ? 'Ã‡Ã–ZÃœLDÃœ' : 'AÃ‡IK ARIZA';
+    final label = isResolved ? 'ÇÖZÜLDÜ' : 'AÇIK ARIZA';
     final sub = isResolved
-        ? 'OnarÄ±ldÄ±: ${_fmt(resolvedAt ?? reportedAt)}'
+        ? 'Onarıldı: ${_fmt(resolvedAt ?? reportedAt)}'
         : 'Bildirildi: ${_fmt(reportedAt)}';
 
     return GestureDetector(
@@ -725,7 +720,7 @@ class _StatusHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'Onarmak iÃ§in basÄ±lÄ± tutun',
+                      'Onarmak için basılı tutun',
                       style: textTheme.labelSmall?.copyWith(
                         color: colors.onPrimary,
                         fontWeight: FontWeight.w600,
@@ -828,7 +823,7 @@ class _StatusBadge extends StatelessWidget {
           ),
           const SizedBox(width: 5),
           Text(
-            isResolved ? 'Ã‡Ã¶zÃ¼ldÃ¼' : 'AÃ§Ä±k',
+            isResolved ? 'Çözüldü' : 'Açık',
             style: textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w700,
               color: isResolved ? colors.success : colors.error,
@@ -924,7 +919,7 @@ class _ElevatorErrorRow extends StatelessWidget {
         Icon(Icons.error_outline, size: 16, color: colors.outline),
         const SizedBox(width: 6),
         Text(
-          'AsansÃ¶r bilgisi yÃ¼klenemedi',
+          'Asansör bilgisi yüklenemedi',
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: colors.outline),

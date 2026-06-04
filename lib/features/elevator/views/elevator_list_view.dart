@@ -6,7 +6,6 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/animations/fade_in_slide.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/widgets/offline_banner.dart';
 import '../../../core/enums/app_enums.dart';
 import '../models/elevator_model.dart';
 import '../providers/elevator_providers.dart';
@@ -217,10 +216,6 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
       // ── Body ─────────────────────────────────────────────────────────────
       body: Column(
         children: [
-          // Shows an amber "offline / cached data" strip when there is no
-          // internet connection; renders nothing when online.
-          const OfflineBanner(),
-
           // Status Filters
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/providers/connectivity_providers.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/offline_banner.dart';
 import '../../admin/providers/admin_providers.dart';
 import '../../admin/providers/profile_providers.dart';
 import '../../../core/enums/app_enums.dart';
@@ -62,8 +61,6 @@ class HomeView extends StatelessWidget {
                 );
               },
             ),
-            // Shown only when the device is offline; renders nothing otherwise.
-            const OfflineBanner(),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(

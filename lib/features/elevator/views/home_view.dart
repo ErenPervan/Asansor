@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/providers/connectivity_providers.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../core/widgets/offline_banner.dart';
 import '../../admin/providers/admin_providers.dart';
 import '../../admin/providers/profile_providers.dart';
@@ -16,7 +15,6 @@ import '../../fault/providers/fault_providers.dart';
 import '../../maintenance/providers/maintenance_providers.dart';
 import '../widgets/home/home_active_faults.dart';
 import '../widgets/home/home_daily_agenda.dart';
-import '../widgets/home/home_qr_fab.dart';
 import '../widgets/home/home_stats_section.dart';
 import '../widgets/home/home_top_app_bar.dart';
 
@@ -145,9 +143,6 @@ class HomeView extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: QrFab(onPressed: () => context.push('/scan')),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const AppBottomNavBar(currentIndex: 3),
     );
   }
 }

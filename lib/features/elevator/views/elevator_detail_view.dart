@@ -15,7 +15,6 @@ import '../widgets/detail/elevator_system_monitor.dart';
 import '../widgets/detail/elevator_maintenance_history.dart';
 import '../widgets/detail/report_fault_sheet.dart';
 import '../widgets/detail/log_maintenance_sheet.dart';
-import '../../../core/widgets/app_bottom_nav_bar.dart';
 
 // ── ElevatorDetailView ────────────────────────────────────────────────────────
 
@@ -92,8 +91,6 @@ class ElevatorDetailView extends ConsumerWidget {
         ),
       ),
 
-      // ── Bottom Navigation ─────────────────────────────────────────────────
-      bottomNavigationBar: const AppBottomNavBar(currentIndex: -1),
     );
   }
 }

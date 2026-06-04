@@ -7,9 +7,16 @@ import '../../core/theme/app_colors.dart';
 import '../../features/admin/providers/profile_providers.dart';
 
 class AppBottomNavBar extends ConsumerWidget {
-  const AppBottomNavBar({super.key, required this.currentIndex});
+  const AppBottomNavBar({super.key, required this.navigationShell});
 
-  final int currentIndex;
+  final StatefulNavigationShell navigationShell;
+
+  void _goBranch(int index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,29 +35,29 @@ class AppBottomNavBar extends ConsumerWidget {
             _NavItem(
               icon: Icons.domain_outlined,
               label: 'Filo',
-              isActive: currentIndex == 0,
-              onPressed: () => context.go('/elevators'),
+              isActive: navigationShell.currentIndex == 0,
+              onPressed: () => _goBranch(0),
             ),
             _NavItem(
               icon: Icons.error_outline,
               label: 'Arızalar',
-              isActive: currentIndex == 1,
-              onPressed: () => context.go('/faults'),
+              isActive: navigationShell.currentIndex == 1,
+              onPressed: () => _goBranch(1),
             ),
             const SizedBox(width: 56), // spacer for the centre FAB
             _NavItem(
               icon: Icons.event_note_outlined,
               label: 'Program',
-              isActive: currentIndex == 2,
+              isActive: navigationShell.currentIndex == 2,
               onPressed: isAdmin
-                  ? () => context.go('/admin/master-calendar')
+                  ? () => _goBranch(2)
                   : null,
             ),
             _NavItem(
               icon: Icons.history,
               label: 'Günlük',
-              isActive: currentIndex == 3,
-              onPressed: () => context.go('/'),
+              isActive: navigationShell.currentIndex == 3,
+              onPressed: () => _goBranch(3),
             ),
           ],
         ),

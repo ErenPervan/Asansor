@@ -32,7 +32,7 @@ class AppCard extends StatelessWidget {
     final card = Material(
       color: color ?? colors.surfaceContainerLowest,
       elevation: elevation,
-      shadowColor: colors.outline.withOpacity(0.1),
+      shadowColor: colors.outline.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: borderRadius ?? BorderRadius.circular(AppSpacing.radiusLg),
         side: border != null
@@ -48,8 +48,8 @@ class AppCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        splashColor: colors.primary.withOpacity(0.05),
-        highlightColor: colors.primary.withOpacity(0.05),
+        splashColor: colors.primary.withValues(alpha: 0.05),
+        highlightColor: colors.primary.withValues(alpha: 0.05),
         child: Padding(
           padding: padding ?? const EdgeInsets.all(AppSpacing.md),
           child: child,

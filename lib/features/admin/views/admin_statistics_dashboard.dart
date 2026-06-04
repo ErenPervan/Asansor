@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/animations/fade_in_slide.dart';
+import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_section_header.dart';
 
 // ── Mock data ──────────────────────────────────────────────
 
@@ -76,66 +78,186 @@ class _AdminStatisticsDashboardState
     AdminAnalyticsState data,
     AppThemeColors colors,
   ) {
-    final kpiCards = [
-      _KpiData(
-        value: data.activeFaults.toString(),
-        label: 'Aktif Arızalar',
-        subtitle: 'Çözüm bekliyor',
-        icon: Icons.warning_amber_rounded,
-        color: colors.error,
-        bg: colors.errorContainer,
-        trend: 'Güncel',
-        trendUp: false,
-      ),
-      _KpiData(
-        value: data.completedMaintenancesThisMonth.toString(),
-        label: 'Bu Ay Çözülen',
-        subtitle: 'Tamamlanan görevler',
-        icon: Icons.check_circle_outline_rounded,
-        color: colors.success,
-        bg: colors.successContainer,
-        trend: 'Bu ay',
-        trendUp: true,
-      ),
-      _KpiData(
-        value: data.totalElevators.toString(),
-        label: 'Toplam Asansör',
-        subtitle: 'Sistemde kayıtlı',
-        icon: Icons.elevator_rounded,
-        color: colors.primary,
-        bg: colors.primaryContainer,
-        trend: 'Sistem geneli',
-        trendUp: true,
-      ),
-      _KpiData(
-        value: data.pendingMaintenances.toString(),
-        label: 'Bekleyen Bakım',
-        subtitle: 'Bu ay planlanmış',
-        icon: Icons.pending_actions_rounded,
-        color: colors.warning,
-        bg: colors.warningContainer,
-        trend: 'Planlanmış',
-        trendUp: false,
-      ),
-    ];
-
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionHeader(
-            title: 'Performans Özeti',
-            subtitle: 'Anlık sistem verileri',
+          // ── Operasyonlar ──
+          const AppSectionHeader(
+            title: 'Operasyonlar',
+            subtitle: 'Arıza ve müdahale durumu',
           ),
           const SizedBox(height: AppSpacing.md),
-          _KpiGrid(kpiCards: kpiCards),
+          Row(
+            children: [
+              Expanded(
+                child: _KpiCard(
+                  data: _KpiData(
+                    value: data.activeFaults.toString(),
+                    label: 'Aktif Arızalar',
+                    subtitle: 'Çözüm bekliyor',
+                    icon: Icons.warning_amber_rounded,
+                    color: colors.error,
+                    bg: colors.errorContainer,
+                    trend: 'Güncel',
+                    trendUp: false,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _KpiCard(
+                  data: _KpiData(
+                    value: data.completedMaintenancesThisMonth.toString(),
+                    label: 'Bu Ay Çözülen',
+                    subtitle: 'Tamamlanan görevler',
+                    icon: Icons.check_circle_outline_rounded,
+                    color: colors.success,
+                    bg: colors.successContainer,
+                    trend: 'Bu ay',
+                    trendUp: true,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _QuickActionCard(
+                  action: _QuickAction(
+                    label: 'Arızalar',
+                    icon: Icons.build_circle_outlined,
+                    color: colors.error,
+                    bg: colors.errorContainer,
+                    route: '/',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Spacer(),
+            ],
+          ),
           const SizedBox(height: AppSpacing.xl),
-          _SectionHeader(
+
+          // ── Kişiler ──
+          const AppSectionHeader(
+            title: 'Kişiler',
+            subtitle: 'Personel ve yetki yönetimi',
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: _QuickActionCard(
+                  action: _QuickAction(
+                    label: 'Teknisyenler',
+                    icon: Icons.engineering_outlined,
+                    color: colors.violet,
+                    bg: colors.violetContainer,
+                    route: '/admin/technicians',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _QuickActionCard(
+                  action: _QuickAction(
+                    label: 'Rol Yönetimi',
+                    icon: Icons.manage_accounts_outlined,
+                    color: colors.primary,
+                    bg: colors.primaryContainer,
+                    route: '',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xl),
+
+          // ── Planlama ──
+          const AppSectionHeader(
+            title: 'Planlama',
+            subtitle: 'Bakım ve yönlendirme',
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: _KpiCard(
+                  data: _KpiData(
+                    value: data.pendingMaintenances.toString(),
+                    label: 'Bekleyen Bakım',
+                    subtitle: 'Bu ay planlanmış',
+                    icon: Icons.pending_actions_rounded,
+                    color: colors.warning,
+                    bg: colors.warningContainer,
+                    trend: 'Planlanmış',
+                    trendUp: false,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _QuickActionCard(
+                  action: _QuickAction(
+                    label: 'Harita',
+                    icon: Icons.map_outlined,
+                    color: colors.teal,
+                    bg: colors.tealContainer,
+                    route: '/admin/map',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xl),
+
+          // ── Sistem ──
+          const AppSectionHeader(
+            title: 'Sistem',
+            subtitle: 'Sistem geneli metrikler',
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: _KpiCard(
+                  data: _KpiData(
+                    value: data.totalElevators.toString(),
+                    label: 'Toplam Asansör',
+                    subtitle: 'Sistemde kayıtlı',
+                    icon: Icons.elevator_rounded,
+                    color: colors.primary,
+                    bg: colors.primaryContainer,
+                    trend: 'Sistem geneli',
+                    trendUp: true,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _QuickActionCard(
+                  action: _QuickAction(
+                    label: 'Rapor İndir',
+                    icon: Icons.download_rounded,
+                    color: colors.primary,
+                    bg: colors.primaryContainer,
+                    route: '',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          
+          AppSectionHeader(
             title: 'Aylık Arıza Trendi',
             subtitle: 'Son 6 aylık arıza kayıtları',
-            trailing: _LegendDot(color: colors.primary, label: 'Arıza'),
+            action: _LegendDot(color: colors.primary, label: 'Arıza'),
           ),
           const SizedBox(height: AppSpacing.md),
           FadeInSlide(
@@ -143,7 +265,8 @@ class _AdminStatisticsDashboardState
             child: _BarChartCard(monthlyFaults: data.monthlyFaults),
           ),
           const SizedBox(height: AppSpacing.xl),
-          const _SectionHeader(
+          
+          const AppSectionHeader(
             title: 'Arıza Dağılımı',
             subtitle: 'Bileşen bazında analiz',
           ),
@@ -156,13 +279,6 @@ class _AdminStatisticsDashboardState
               onTouch: (i) => setState(() => _touchedPieIndex = i),
             ),
           ),
-          const SizedBox(height: AppSpacing.xl),
-          const _SectionHeader(
-            title: 'Hızlı Eylemler',
-            subtitle: 'Sık kullanılan yönetim işlemleri',
-          ),
-          const SizedBox(height: AppSpacing.md),
-          const _QuickActionsGrid(),
         ],
       ),
     );
@@ -268,53 +384,6 @@ class _AdminStatisticsDashboardState
 
 // --- Section Header ---
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    required this.subtitle,
-    this.trailing,
-  });
-
-  final String title;
-  final String subtitle;
-  final Widget? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: colors.onSurface,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colors.outline,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-        ?trailing,
-      ],
-    );
-  }
-}
-
 class _LegendDot extends StatelessWidget {
   const _LegendDot({required this.color, required this.label});
 
@@ -348,27 +417,6 @@ class _LegendDot extends StatelessWidget {
 
 // --- KPI Cards ---
 
-class _KpiGrid extends StatelessWidget {
-  const _KpiGrid({required this.kpiCards});
-  final List<_KpiData> kpiCards;
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.45,
-      ),
-      itemCount: kpiCards.length,
-      itemBuilder: (_, i) => _KpiCard(data: kpiCards[i]),
-    );
-  }
-}
-
 class _KpiCard extends StatelessWidget {
   const _KpiCard({required this.data});
 
@@ -376,20 +424,8 @@ class _KpiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppCard(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-      decoration: BoxDecoration(
-        color: AppThemeColors.of(context).surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppThemeColors.of(context).outline),
-        boxShadow: [
-          BoxShadow(
-            color: AppThemeColors.of(context).onSurface.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -432,7 +468,7 @@ class _KpiCard extends StatelessWidget {
               ),
             ],
           ),
-          const Spacer(),
+          const SizedBox(height: 12),
           Text(
             data.value,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -449,28 +485,20 @@ class _KpiCard extends StatelessWidget {
               fontWeight: FontWeight.w700,
               color: AppThemeColors.of(context).onSurface,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
           Text(
-            data.trend,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: data.trendUp
-                  ? AppThemeColors.of(context).success
-                  : AppThemeColors.of(context).outline,
+            data.subtitle,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppThemeColors.of(context).outline,
               fontWeight: FontWeight.w500,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
 }
-
-// --- Bar Chart ---
 
 class _BarChartCard extends StatelessWidget {
   const _BarChartCard({required this.monthlyFaults});
@@ -805,100 +833,49 @@ class _QuickAction {
   final String route;
 }
 
-class _QuickActionsGrid extends StatelessWidget {
-  const _QuickActionsGrid();
+class _QuickActionCard extends StatelessWidget {
+  const _QuickActionCard({required this.action});
+  final _QuickAction action;
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-    final quickActions = [
-      _QuickAction(
-        label: 'Rapor İndir',
-        icon: Icons.download_rounded,
-        color: colors.primary,
-        bg: colors.primaryContainer,
-        route: '',
-      ),
-      _QuickAction(
-        label: 'Arızalar',
-        icon: Icons.build_circle_outlined,
-        color: colors.error,
-        bg: colors.errorContainer,
-        route: '/',
-      ),
-      _QuickAction(
-        label: 'Harita',
-        icon: Icons.map_outlined,
-        color: colors.teal,
-        bg: colors.tealContainer,
-        route: '/admin/map',
-      ),
-      _QuickAction(
-        label: 'Teknisyenler',
-        icon: Icons.engineering_outlined,
-        color: colors.violet,
-        bg: colors.violetContainer,
-        route: '/admin/technicians',
-      ),
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.85,
-      ),
-      itemCount: quickActions.length,
-      itemBuilder: (_, i) {
-        final action = quickActions[i];
-        return GestureDetector(
-          onTap: () {
-            if (action.route.isNotEmpty) {
-              context.push(action.route);
-            }
-          },
-          child: Container(
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      onTap: () {
+        if (action.route.isNotEmpty) {
+          context.push(action.route);
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: colors.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: colors.outline),
-              boxShadow: [
-                BoxShadow(
-                  color: colors.onSurface.withValues(alpha: 0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+              color: action.bg,
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: action.bg,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(action.icon, color: action.color, size: 22),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  action.label,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colors.onSurface,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+            child: Icon(action.icon, color: action.color, size: 20),
+          ),
+          const SizedBox(height: 34),
+          Text(
+            action.label,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppThemeColors.of(context).onSurface,
             ),
           ),
-        );
-      },
+          const SizedBox(height: 4),
+          Text(
+            'Yönetime Git',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppThemeColors.of(context).primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

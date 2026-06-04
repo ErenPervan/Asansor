@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/providers/auth_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
-// â”€â”€ CustomerNoElevatorView â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── CustomerNoElevatorView ────────────────────────────────────────────────────
 
 /// Shown to customers who have the `customer` role but no `elevator_id`
 /// assigned to their profile yet.
@@ -35,7 +35,7 @@ class _CustomerNoElevatorViewState
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
             children: [
-              // â”€â”€ Top bar with sign-out â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Top bar with sign-out ──────────────────────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Row(
@@ -55,15 +55,15 @@ class _CustomerNoElevatorViewState
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: Text('Ã‡Ä±kÄ±ÅŸ Yap'),
+                            title: Text('Çıkış Yap'),
                             content: Text(
-                              'Oturumu kapatmak istediÄŸinize emin misiniz?',
+                              'Oturumu kapatmak istediğinize emin misiniz?',
                             ),
                             actions: [
                               TextButton(
                                 onPressed: () =>
                                     Navigator.of(context).pop(false),
-                                child: Text('Ä°ptal'),
+                                child: Text('İptal'),
                               ),
                               FilledButton(
                                 style: FilledButton.styleFrom(
@@ -71,7 +71,7 @@ class _CustomerNoElevatorViewState
                                 ),
                                 onPressed: () =>
                                     Navigator.of(context).pop(true),
-                                child: Text('Ã‡Ä±kÄ±ÅŸ Yap'),
+                                child: Text('Çıkış Yap'),
                               ),
                             ],
                           ),
@@ -83,7 +83,7 @@ class _CustomerNoElevatorViewState
                         }
                       },
                       icon: Icon(Icons.logout_outlined, size: 16),
-                      label: Text('Ã‡Ä±kÄ±ÅŸ Yap'),
+                      label: Text('Çıkış Yap'),
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.outline,
                         textStyle: Theme.of(
@@ -97,7 +97,7 @@ class _CustomerNoElevatorViewState
 
               const Spacer(),
 
-              // â”€â”€ Illustration area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Illustration area ─────────────────────────────────────
               Container(
                 width: 100,
                 height: 100,
@@ -113,9 +113,9 @@ class _CustomerNoElevatorViewState
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // â”€â”€ Title â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Title ─────────────────────────────────────────────────
               Text(
-                'AsansÃ¶r AtanmamÄ±ÅŸ',
+                'Asansör Atanmamış',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
@@ -126,10 +126,10 @@ class _CustomerNoElevatorViewState
               ),
               const SizedBox(height: 12),
 
-              // â”€â”€ Description â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Description ───────────────────────────────────────────
               Text(
-                'HesabÄ±nÄ±za henÃ¼z bir asansÃ¶r tanÄ±mlanmamÄ±ÅŸ.\n'
-                'LÃ¼tfen bina yÃ¶neticiniz veya sistem adminiyle iletiÅŸime geÃ§in.',
+                'Hesabınıza henüz bir asansör tanımlanmamış.\n'
+                'Lütfen bina yöneticiniz veya sistem adminiyle iletişime geçin.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: 15,
                   color: AppColors.onSurfaceVariant,
@@ -139,7 +139,7 @@ class _CustomerNoElevatorViewState
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // â”€â”€ Info card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Info card ─────────────────────────────────────────────
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
@@ -159,8 +159,8 @@ class _CustomerNoElevatorViewState
                     SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'AsansÃ¶r atandÄ±ktan sonra otomatik olarak '
-                        'bakÄ±m ve durum bilgilerinize eriÅŸebilirsiniz.',
+                        'Asansör atandıktan sonra otomatik olarak '
+                        'bakım ve durum bilgilerinize erişebilirsiniz.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: 13,
                           color: AppColors.onSurfaceVariant,
@@ -174,7 +174,7 @@ class _CustomerNoElevatorViewState
 
               const Spacer(flex: 2),
 
-              // â”€â”€ Sign-out button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Sign-out button ───────────────────────────────────────
               FilledButton.icon(
                 onPressed: () async =>
                     await ref.read(authControllerProvider.notifier).signOut(),

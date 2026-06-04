@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:signature/signature.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../elevator/providers/elevator_providers.dart';
 import '../../admin/providers/checklist_provider.dart';
 import '../providers/maintenance_providers.dart';
@@ -20,7 +21,6 @@ import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/section_label.dart';
-import '../../../core/widgets/animations/animated_press_button.dart';
 import '../../../core/constants/app_durations.dart';
 
 class MaintenanceLogEntryView extends ConsumerStatefulWidget {
@@ -208,14 +208,15 @@ class _MaintenanceLogEntryViewState
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
 
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) {
       await HapticFeedback.heavyImpact();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Oturum bilgisi alınamadı.'),
+        SnackBar(
+          content: Text(l10n.maintenanceSessionError),
           duration: AppDurations.snackBarError,
         ),
       );
@@ -235,9 +236,7 @@ class _MaintenanceLogEntryViewState
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-              'Lütfen hem teknisyen hem de müşteri imzasını tamamlayın.',
-            ),
+            content: Text(l10n.maintenanceSignatureError),
             backgroundColor: colors.error,
             duration: AppDurations.snackBarError,
           ),
@@ -310,7 +309,7 @@ class _MaintenanceLogEntryViewState
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       Text(
-                        'Bakım Kaydedildi',
+                        l10n.maintenanceSavedTitle,
                         style: Theme.of(context).textTheme.headlineSmall
                             ?.copyWith(
                               fontWeight: FontWeight.bold,
@@ -326,7 +325,7 @@ class _MaintenanceLogEntryViewState
                         backgroundColor: colors.primary,
                         foregroundColor: colors.surface,
                       ),
-                      child: const Text('Tamam'),
+                      child: Text(l10n.maintenanceSavedConfirm),
                     ),
                   ],
                   actionsAlignment: MainAxisAlignment.center,
@@ -347,7 +346,7 @@ class _MaintenanceLogEntryViewState
       final colors = AppThemeColors.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Kayıt sırasında hata oluştu: $e'),
+          content: Text(l10n.maintenanceSaveError(e.toString())),
           backgroundColor: colors.error,
           duration: AppDurations.snackBarError,
         ),
@@ -362,6 +361,7 @@ class _MaintenanceLogEntryViewState
     final sectionLabelStyle = textTheme.titleMedium?.copyWith(
       fontWeight: FontWeight.bold,
     );
+    final l10n = AppLocalizations.of(context)!;
 
     final maintenanceState = ref.watch(maintenanceControllerProvider);
     final elevatorAsync = ref.watch(elevatorByIdProvider(widget.elevatorId));
@@ -373,9 +373,7 @@ class _MaintenanceLogEntryViewState
         if (!didPop && maintenanceState.isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text(
-                'Lütfen kaydetme işlemi tamamlanana kadar bekleyin.',
-              ),
+              content: Text(l10n.maintenanceSavePrevention),
               backgroundColor: colors.error,
               duration: AppDurations.snackBarInfo,
             ),
@@ -383,7 +381,7 @@ class _MaintenanceLogEntryViewState
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Yeni Bakım Formu')),
+        appBar: AppBar(title: Text(l10n.maintenanceFormTitle)),
         body: elevatorAsync.when(
           data: (elevator) => Form(
             key: _formKey,
@@ -440,7 +438,7 @@ class _MaintenanceLogEntryViewState
 
                 // Checklist Section
                 SectionLabel(
-                  label: 'Kontrol Listesi',
+                  label: l10n.maintenanceChecklistSection,
                   textStyle: sectionLabelStyle,
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -449,11 +447,13 @@ class _MaintenanceLogEntryViewState
                   data: (items) {
                     final activeItems = items.where((i) => i.isActive).toList();
                     if (activeItems.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.md,
+                        ),
                         child: EmptyState(
                           icon: Icons.checklist_rtl_rounded,
-                          message: 'Aktif kontrol öğesi bulunamadı.',
+                          message: l10n.maintenanceChecklistEmpty,
                         ),
                       );
                     }
@@ -478,7 +478,10 @@ class _MaintenanceLogEntryViewState
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '$checkedCount / $totalCount tamamlandı',
+                                l10n.maintenanceChecklistProgress(
+                                  checkedCount,
+                                  totalCount,
+                                ),
                                 style: textTheme.labelMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: colors.outline,
@@ -592,7 +595,9 @@ class _MaintenanceLogEntryViewState
                   error: (err, stack) => Padding(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: ErrorState(
-                      message: 'Kontrol listesi yüklenemedi: $err',
+                      message: l10n.maintenanceChecklistLoadError(
+                        err.toString(),
+                      ),
                       onRetry: () => ref.invalidate(checklistProvider),
                     ),
                   ),
@@ -602,7 +607,7 @@ class _MaintenanceLogEntryViewState
 
                 // Photo Section
                 SectionLabel(
-                  label: 'Fotoğraflar',
+                  label: l10n.maintenancePhotosSection,
                   textStyle: sectionLabelStyle,
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -612,7 +617,7 @@ class _MaintenanceLogEntryViewState
                       child: OutlinedButton.icon(
                         onPressed: _addPhotoFromCamera,
                         icon: const Icon(Icons.photo_camera_outlined),
-                        label: const Text('Kamera'),
+                        label: Text(l10n.maintenancePhotosCamera),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -620,7 +625,7 @@ class _MaintenanceLogEntryViewState
                       child: OutlinedButton.icon(
                         onPressed: _addPhotosFromGallery,
                         icon: const Icon(Icons.photo_library_outlined),
-                        label: const Text('Galeri'),
+                        label: Text(l10n.maintenancePhotosGallery),
                       ),
                     ),
                   ],
@@ -674,7 +679,7 @@ class _MaintenanceLogEntryViewState
                                 padding: const EdgeInsets.all(2),
                                 minimumSize: const Size(24, 24),
                               ),
-                              tooltip: 'Fotoğrafı kaldır',
+                              tooltip: l10n.maintenancePhotosRemoveTooltip,
                             ),
                           ),
                         ],
@@ -683,14 +688,14 @@ class _MaintenanceLogEntryViewState
                   ),
                 ] else ...[
                   const SizedBox(height: AppSpacing.sm),
-                  const Text('Henüz fotoğraf eklenmedi.'),
+                  Text(l10n.maintenancePhotosEmpty),
                 ],
 
                 const SizedBox(height: AppSpacing.lg),
 
                 // Notes Section
                 SectionLabel(
-                  label: 'Bakım Notları',
+                  label: l10n.maintenanceNotesSection,
                   textStyle: sectionLabelStyle,
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -698,18 +703,20 @@ class _MaintenanceLogEntryViewState
                   controller: _notesController,
                   maxLines: 4,
                   decoration: appInputDecoration(
-                    hint:
-                        'Yapılan işlemleri, değiştirilen parçaları vb. buraya yazın...',
+                    hint: l10n.maintenanceNotesHint,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
 
                 // Signature Section
-                SectionLabel(label: 'İmzalar', textStyle: sectionLabelStyle),
+                SectionLabel(
+                  label: l10n.maintenanceSignaturesSection,
+                  textStyle: sectionLabelStyle,
+                ),
                 const SizedBox(height: AppSpacing.sm),
 
                 _buildSignaturePad(
-                  label: 'Teknisyen İmzası',
+                  label: l10n.maintenanceSignatureTechLabel,
                   controller: _techSignatureController,
                   showError: _techSignatureError,
                   onClear: () => _techSignatureController.clear(),
@@ -722,7 +729,7 @@ class _MaintenanceLogEntryViewState
                 const SizedBox(height: AppSpacing.md),
 
                 _buildSignaturePad(
-                  label: 'Müşteri İmzası',
+                  label: l10n.maintenanceSignatureCustLabel,
                   controller: _custSignatureController,
                   showError: _custSignatureError,
                   onClear: () => _custSignatureController.clear(),
@@ -736,35 +743,32 @@ class _MaintenanceLogEntryViewState
                 const SizedBox(height: AppSpacing.xl),
 
                 // Submit Button
-                AnimatedPressButton(
-                  onPressed: maintenanceState.isLoading ? null : _submit,
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: FilledButton.icon(
-                      onPressed: maintenanceState.isLoading ? null : () {},
-                      icon: maintenanceState.isLoading
-                          ? SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                color: colors.onError,
-                              ),
-                            )
-                          : const Icon(Icons.check_circle_outline),
-                      label: Text(
-                        maintenanceState.isLoading
-                            ? 'Kaydediliyor...'
-                            : 'Bakımı Kaydet',
-                        style: textTheme.titleMedium?.copyWith(
-                          color: colors.surface,
-                        ),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: FilledButton.icon(
+                    onPressed: maintenanceState.isLoading ? null : _submit,
+                    icon: maintenanceState.isLoading
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: colors.surface,
+                            ),
+                          )
+                        : const Icon(Icons.check_circle_outline),
+                    label: Text(
+                      maintenanceState.isLoading
+                          ? l10n.maintenanceSavingMessage
+                          : l10n.maintenanceSubmitButton,
+                      style: textTheme.titleMedium?.copyWith(
+                        color: colors.surface,
                       ),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: colors.primary,
-                        foregroundColor: colors.surface,
-                      ),
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: colors.primary,
+                      foregroundColor: colors.surface,
                     ),
                   ),
                 ),
@@ -773,7 +777,7 @@ class _MaintenanceLogEntryViewState
           ),
           loading: () => const LoadingState(),
           error: (err, stack) => ErrorState(
-            message: 'Hata: $err',
+            message: l10n.generalError(err.toString()),
             onRetry: () =>
                 ref.invalidate(elevatorByIdProvider(widget.elevatorId)),
           ),
@@ -791,6 +795,7 @@ class _MaintenanceLogEntryViewState
   }) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
     final borderColor = showError ? colors.error : colors.outline;
 
     return AnimatedBuilder(
@@ -834,7 +839,7 @@ class _MaintenanceLogEntryViewState
                   children: [
                     TextButton(
                       onPressed: onClear,
-                      child: const Text('Temizle'),
+                      child: Text(l10n.maintenanceSignatureClear),
                     ),
                   ],
                 ),

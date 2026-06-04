@@ -16,7 +16,7 @@ import '../models/technician_stats.dart';
 import '../providers/admin_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
-// â”€â”€ Main view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Main view ─────────────────────────────────────────────────────────────────
 
 class TechnicianManagementView extends ConsumerWidget {
   const TechnicianManagementView({super.key});
@@ -54,7 +54,7 @@ class TechnicianManagementView extends ConsumerWidget {
   }
 }
 
-// â”€â”€ List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── List ──────────────────────────────────────────────────────────────────────
 
 class _TechnicianList extends StatelessWidget {
   const _TechnicianList({required this.stats});
@@ -155,7 +155,7 @@ class _TechnicianList extends StatelessWidget {
   }
 }
 
-// â”€â”€ Summary header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Summary header ────────────────────────────────────────────────────────────
 
 class _SummaryHeader extends StatelessWidget {
   const _SummaryHeader({
@@ -261,7 +261,7 @@ class _StatPill extends StatelessWidget {
   }
 }
 
-// â”€â”€ Technician card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Technician card ───────────────────────────────────────────────────────────
 
 class _TechnicianCard extends StatelessWidget {
   const _TechnicianCard({required this.stats, required this.onTap});
@@ -300,7 +300,7 @@ class _TechnicianCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // â”€â”€ Top row: avatar + info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Top row: avatar + info ──────────────────────────
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -423,7 +423,7 @@ class _TechnicianCard extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                // â”€â”€ Workload bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Workload bar ────────────────────────────────────
                 if (stats.todayTotal > 0) ...[
                   Row(
                     children: [
@@ -475,7 +475,7 @@ class _TechnicianCard extends StatelessWidget {
 
                 Divider(height: 20, color: colors.outlineVariant),
 
-                // â”€â”€ Action buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Action buttons ──────────────────────────────────
                 Row(
                   children: [
                     _ActionButton(
@@ -570,7 +570,7 @@ class _TechnicianCard extends StatelessWidget {
   }
 }
 
-// â”€â”€ Monthly badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Monthly badge ─────────────────────────────────────────────────────────────
 
 class _MonthlyBadge extends StatelessWidget {
   const _MonthlyBadge({
@@ -602,7 +602,7 @@ class _MonthlyBadge extends StatelessWidget {
   }
 }
 
-// â”€â”€ Action button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Action button ─────────────────────────────────────────────────────────────
 
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
@@ -649,7 +649,7 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-// â”€â”€ Technician detail sheet (DraggableScrollableSheet) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Technician detail sheet (DraggableScrollableSheet) ────────────────────────
 
 class _TechnicianDetailSheet extends StatelessWidget {
   const _TechnicianDetailSheet({required this.stats});
@@ -674,7 +674,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // â”€â”€ Handle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Handle ─────────────────────────────────────────────
               const SizedBox(height: 12),
               Center(
                 child: Container(
@@ -688,7 +688,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
 
-              // â”€â”€ Sheet header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Sheet header ────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -738,7 +738,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
 
               Divider(height: 20, color: colors.outlineVariant),
 
-              // â”€â”€ Task list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Task list ───────────────────────────────────────────
               Expanded(
                 child: stats.todayTasks.isEmpty
                     ? _SheetEmptyView(name: stats.profile.displayName)
@@ -766,7 +766,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
   }
 }
 
-// â”€â”€ Timeline task item â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Timeline task item ────────────────────────────────────────────────────────
 
 class _TimelineTaskItem extends StatelessWidget {
   const _TimelineTaskItem({
@@ -975,7 +975,7 @@ class _TimelineTaskItem extends StatelessWidget {
   }
 }
 
-// â”€â”€ Small badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Small badge ───────────────────────────────────────────────────────────────
 
 class _SmallBadge extends StatelessWidget {
   const _SmallBadge({
@@ -1053,7 +1053,7 @@ class _SmallBadge extends StatelessWidget {
   }
 }
 
-// â”€â”€ Empty / error states â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Empty / error states ──────────────────────────────────────────────────────
 
 class _EmptyBody extends StatelessWidget {
   const _EmptyBody();

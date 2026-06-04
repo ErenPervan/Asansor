@@ -34,9 +34,7 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
       HapticFeedback.heavyImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Oturum bilgisi alÃ„Â±namadÃ„Â±. LÃƒÂ¼tfen tekrar giriÃ…Å¸ yapÃ„Â±n.',
-          ),
+          content: Text('Oturum bilgisi alınamadı. Lütfen tekrar giriş yapın.'),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.error,
         ),
@@ -76,9 +74,9 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
             SnackBar(
               content: Text(
                 log.isOfflineQueued
-                    ? 'Ã„Â°nternet baÃ„Å¸lantÃ„Â±sÃ„Â± yok. KayÃ„Â±t cihaza kaydedildi, '
-                          'baÃ„Å¸lantÃ„Â± saÃ„Å¸landÃ„Â±Ã„Å¸Ã„Â±nda otomatik senkronize edilecek.'
-                    : 'BakÃ„Â±m kaydÃ„Â± baÃ…Å¸arÃ„Â±yla eklendi.',
+                    ? 'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, '
+                          'bağlantı sağlandığında otomatik senkronize edilecek.'
+                    : 'Bakım kaydı başarıyla eklendi.',
               ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: log.isOfflineQueued
@@ -112,7 +110,7 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
         if (!didPop && isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('LÃƒÂ¼tfen kayÃ„Â±t tamamlanana kadar bekleyin.'),
+              content: Text('Lütfen kayıt tamamlanana kadar bekleyin.'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -161,7 +159,7 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'BakÃ„Â±m Ekle',
+                            'Bakım Ekle',
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w700,
@@ -169,7 +167,7 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                                 ),
                           ),
                           Text(
-                            'YapÃ„Â±lan bakÃ„Â±mÃ„Â± kaydedin.',
+                            'Yapılan bakımı kaydedin.',
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: AppColors.outline),
                           ),
@@ -185,17 +183,17 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                     textInputAction: TextInputAction.newline,
                     enabled: !isLoading,
                     decoration: const InputDecoration(
-                      labelText: 'BakÃ„Â±m NotlarÃ„Â±',
-                      hintText: 'YapÃ„Â±lan iÃ…Å¸lemleri aÃƒÂ§Ã„Â±klayÃ„Â±n...',
+                      labelText: 'Bakım Notları',
+                      hintText: 'Yapılan işlemleri açıklayın...',
                       alignLabelWithHint: true,
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
-                        return 'LÃƒÂ¼tfen bakÃ„Â±m notlarÃ„Â± girin.';
+                        return 'Lütfen bakım notları girin.';
                       }
                       if (v.trim().length < 10) {
-                        return 'Notlar en az 10 karakter olmalÃ„Â±dÃ„Â±r.';
+                        return 'Notlar en az 10 karakter olmalıdır.';
                       }
                       return null;
                     },
@@ -217,7 +215,7 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                             ),
                           )
                         : Text(
-                            'BakÃ„Â±mÃ„Â± Kaydet',
+                            'Bakımı Kaydet',
                             style: Theme.of(context).textTheme.labelLarge
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),

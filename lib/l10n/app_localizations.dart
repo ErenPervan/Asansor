@@ -141,6 +141,210 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Günlük Ajandam'**
   String get homeDailyAgenda;
+
+  /// No description provided for @loginSubTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabınıza erişmek için bilgilerinizi girin.'**
+  String get loginSubTitle;
+
+  /// No description provided for @loginEmailValidationErrorEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen e-posta adresinizi girin.'**
+  String get loginEmailValidationErrorEmpty;
+
+  /// No description provided for @loginEmailValidationErrorInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir e-posta adresi girin.'**
+  String get loginEmailValidationErrorInvalid;
+
+  /// No description provided for @loginPasswordValidationErrorEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen şifrenizi girin.'**
+  String get loginPasswordValidationErrorEmpty;
+
+  /// No description provided for @loginPasswordValidationErrorLength.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre en az 6 karakter olmalıdır.'**
+  String get loginPasswordValidationErrorLength;
+
+  /// No description provided for @loginSecureConnection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvenli Bağlantı'**
+  String get loginSecureConnection;
+
+  /// No description provided for @appSubTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bakım & Arıza Takip Sistemi'**
+  String get appSubTitle;
+
+  /// No description provided for @maintenanceFormTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Bakım Formu'**
+  String get maintenanceFormTitle;
+
+  /// No description provided for @maintenanceSavedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bakım Kaydedildi'**
+  String get maintenanceSavedTitle;
+
+  /// No description provided for @maintenanceSavedConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get maintenanceSavedConfirm;
+
+  /// No description provided for @maintenanceSaveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt sırasında hata oluştu: {error}'**
+  String maintenanceSaveError(String error);
+
+  /// No description provided for @maintenanceSavePrevention.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen kaydetme işlemi tamamlanana kadar bekleyin.'**
+  String get maintenanceSavePrevention;
+
+  /// No description provided for @maintenanceSessionError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oturum bilgisi alınamadı.'**
+  String get maintenanceSessionError;
+
+  /// No description provided for @maintenanceSignatureError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen hem teknisyen hem de müşteri imzasını tamamlayın.'**
+  String get maintenanceSignatureError;
+
+  /// No description provided for @maintenanceChecklistSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kontrol Listesi'**
+  String get maintenanceChecklistSection;
+
+  /// No description provided for @maintenanceChecklistEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aktif kontrol öğesi bulunamadı.'**
+  String get maintenanceChecklistEmpty;
+
+  /// No description provided for @maintenanceChecklistProgress.
+  ///
+  /// In tr, this message translates to:
+  /// **'{checked} / {total} tamamlandı'**
+  String maintenanceChecklistProgress(int checked, int total);
+
+  /// No description provided for @maintenanceChecklistLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kontrol listesi yüklenemedi: {error}'**
+  String maintenanceChecklistLoadError(String error);
+
+  /// No description provided for @maintenancePhotosSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraflar'**
+  String get maintenancePhotosSection;
+
+  /// No description provided for @maintenancePhotosCamera.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kamera'**
+  String get maintenancePhotosCamera;
+
+  /// No description provided for @maintenancePhotosGallery.
+  ///
+  /// In tr, this message translates to:
+  /// **'Galeri'**
+  String get maintenancePhotosGallery;
+
+  /// No description provided for @maintenancePhotosRemoveTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğrafı kaldır'**
+  String get maintenancePhotosRemoveTooltip;
+
+  /// No description provided for @maintenancePhotosEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz fotoğraf eklenmedi.'**
+  String get maintenancePhotosEmpty;
+
+  /// No description provided for @maintenanceNotesSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bakım Notları'**
+  String get maintenanceNotesSection;
+
+  /// No description provided for @maintenanceNotesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yapılan işlemleri, değiştirilen parçaları vb. buraya yazın...'**
+  String get maintenanceNotesHint;
+
+  /// No description provided for @maintenanceSignaturesSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'İmzalar'**
+  String get maintenanceSignaturesSection;
+
+  /// No description provided for @maintenanceSignatureTechLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Teknisyen İmzası'**
+  String get maintenanceSignatureTechLabel;
+
+  /// No description provided for @maintenanceSignatureCustLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Müşteri İmzası'**
+  String get maintenanceSignatureCustLabel;
+
+  /// No description provided for @maintenanceSignatureClear.
+  ///
+  /// In tr, this message translates to:
+  /// **'Temizle'**
+  String get maintenanceSignatureClear;
+
+  /// No description provided for @maintenanceSubmitButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bakımı Kaydet'**
+  String get maintenanceSubmitButton;
+
+  /// No description provided for @maintenanceSavingMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydediliyor...'**
+  String get maintenanceSavingMessage;
+
+  /// No description provided for @generalError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hata: {error}'**
+  String generalError(String error);
+
+  /// No description provided for @generalRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar Dene'**
+  String get generalRetry;
+
+  /// No description provided for @generalCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get generalCancel;
 }
 
 class _AppLocalizationsDelegate

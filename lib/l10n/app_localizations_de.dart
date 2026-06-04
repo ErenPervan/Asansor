@@ -28,4 +28,124 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get homeDailyAgenda => 'Tagesordnung';
+
+  @override
+  String get loginSubTitle =>
+      'Geben Sie Ihre Daten ein, um auf Ihr Konto zuzugreifen.';
+
+  @override
+  String get loginEmailValidationErrorEmpty =>
+      'Bitte geben Sie Ihre E-Mail-Adresse ein.';
+
+  @override
+  String get loginEmailValidationErrorInvalid =>
+      'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
+
+  @override
+  String get loginPasswordValidationErrorEmpty =>
+      'Bitte geben Sie Ihr Passwort ein.';
+
+  @override
+  String get loginPasswordValidationErrorLength =>
+      'Das Passwort muss mindestens 6 Zeichen lang sein.';
+
+  @override
+  String get loginSecureConnection => 'Sichere Verbindung';
+
+  @override
+  String get appSubTitle => 'Wartungs- & Störungsverfolgungssystem';
+
+  @override
+  String get maintenanceFormTitle => 'Neues Wartungsformular';
+
+  @override
+  String get maintenanceSavedTitle => 'Wartung gespeichert';
+
+  @override
+  String get maintenanceSavedConfirm => 'OK';
+
+  @override
+  String maintenanceSaveError(String error) {
+    return 'Fehler beim Speichern aufgetreten: $error';
+  }
+
+  @override
+  String get maintenanceSavePrevention =>
+      'Bitte warten Sie, bis der Speichervorgang abgeschlossen ist.';
+
+  @override
+  String get maintenanceSessionError =>
+      'Sitzungsinformationen konnten nicht abgerufen werden.';
+
+  @override
+  String get maintenanceSignatureError =>
+      'Bitte vervollständigen Sie beide Unterschriften.';
+
+  @override
+  String get maintenanceChecklistSection => 'Checkliste';
+
+  @override
+  String get maintenanceChecklistEmpty =>
+      'Keine aktiven Checklisten-Elemente gefunden.';
+
+  @override
+  String maintenanceChecklistProgress(int checked, int total) {
+    return '$checked / $total abgeschlossen';
+  }
+
+  @override
+  String maintenanceChecklistLoadError(String error) {
+    return 'Checkliste konnte nicht geladen werden: $error';
+  }
+
+  @override
+  String get maintenancePhotosSection => 'Fotos';
+
+  @override
+  String get maintenancePhotosCamera => 'Kamera';
+
+  @override
+  String get maintenancePhotosGallery => 'Galerie';
+
+  @override
+  String get maintenancePhotosRemoveTooltip => 'Foto entfernen';
+
+  @override
+  String get maintenancePhotosEmpty => 'Noch keine Fotos hinzugefügt.';
+
+  @override
+  String get maintenanceNotesSection => 'Wartungsnotizen';
+
+  @override
+  String get maintenanceNotesHint =>
+      'Geben Sie hier durchgeführte Aktionen, ausgetauschte Teile usw. ein...';
+
+  @override
+  String get maintenanceSignaturesSection => 'Unterschriften';
+
+  @override
+  String get maintenanceSignatureTechLabel => 'Unterschrift des Technikers';
+
+  @override
+  String get maintenanceSignatureCustLabel => 'Unterschrift des Kunden';
+
+  @override
+  String get maintenanceSignatureClear => 'Löschen';
+
+  @override
+  String get maintenanceSubmitButton => 'Wartung speichern';
+
+  @override
+  String get maintenanceSavingMessage => 'Wird gespeichert...';
+
+  @override
+  String generalError(String error) {
+    return 'Fehler: $error';
+  }
+
+  @override
+  String get generalRetry => 'Erneut versuchen';
+
+  @override
+  String get generalCancel => 'Abbrechen';
 }

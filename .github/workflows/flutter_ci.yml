@@ -43,6 +43,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Check for mojibake (corrupted Turkish characters)
+        run: |
+          if git grep -q -P "\xc3\x83|\xc3\x84|\xc3\x85|\xc3\xa2\xe2\x82\xac" lib/; then
+            echo "❌ Mojibake detected. Fix encoding before committing."
+            git grep -n -P "\xc3\x83|\xc3\x84|\xc3\x85|\xc3\xa2\xe2\x82\xac" lib/
+            exit 1
+          fi
+          echo "✅ No mojibake found."
+
       - name: Create dummy .env file
         run: touch .env
 

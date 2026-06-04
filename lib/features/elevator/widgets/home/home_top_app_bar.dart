@@ -162,7 +162,7 @@ class TopAppBar extends StatelessWidget {
   }
 }
 
-// â”€â”€ Sync status button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Sync status button ────────────────────────────────────────────────────────
 
 /// Small button shown in the top bar to indicate cloud sync state.
 ///

@@ -22,7 +22,7 @@ class AppStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     double verticalPadding;
     double horizontalPadding;
     TextStyle textStyle;

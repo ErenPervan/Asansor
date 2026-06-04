@@ -452,7 +452,7 @@ class _Field extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    
+
     return AppFormField(
       controller: controller,
       maxLines: maxLines,

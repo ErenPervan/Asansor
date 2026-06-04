@@ -33,12 +33,11 @@ class AppAsyncView<T> extends StatelessWidget {
         onRetry: onRetry,
       ),
       data: (d) {
-        final emptyCheck = isEmpty != null ? isEmpty!(d) : (d is Iterable && d.isEmpty);
+        final emptyCheck = isEmpty != null
+            ? isEmpty!(d)
+            : (d is Iterable && d.isEmpty);
         if (emptyCheck) {
-          return EmptyState(
-            message: emptyMessage,
-            icon: emptyIcon,
-          );
+          return EmptyState(message: emptyMessage, icon: emptyIcon);
         }
         return data(d);
       },

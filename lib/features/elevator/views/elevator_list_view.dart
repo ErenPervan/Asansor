@@ -266,7 +266,8 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
             child: AppAsyncView<List<ElevatorModel>>(
               value: elevatorsAsync,
               onRetry: () => ref.invalidate(elevatorsProvider),
-              emptyMessage: 'Asansör Bulunamadı\n\nSisteme henüz asansör eklenmemiş.\nLütfen yöneticinizle iletişime geçin.',
+              emptyMessage:
+                  'Asansör Bulunamadı\n\nSisteme henüz asansör eklenmemiş.\nLütfen yöneticinizle iletişime geçin.',
               emptyIcon: Icons.elevator_outlined,
               data: (all) {
                 final items = _applyFilter(all);

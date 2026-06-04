@@ -33,16 +33,11 @@ class AppCard extends StatelessWidget {
       elevation: elevation,
       shadowColor: colors.outline.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
-        borderRadius: borderRadius ?? BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius:
+            borderRadius ?? BorderRadius.circular(AppSpacing.radiusLg),
         side: border != null
-            ? BorderSide(
-                color: border!.top.color,
-                width: border!.top.width,
-              )
-            : BorderSide(
-                color: colors.outlineVariant,
-                width: 1,
-              ),
+            ? BorderSide(color: border!.top.color, width: border!.top.width)
+            : BorderSide(color: colors.outlineVariant, width: 1),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -57,10 +52,7 @@ class AppCard extends StatelessWidget {
     );
 
     if (margin != null) {
-      return Padding(
-        padding: margin!,
-        child: card,
-      );
+      return Padding(padding: margin!, child: card);
     }
 
     return card;

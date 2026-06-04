@@ -8,10 +8,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 
 class ScaffoldWithNavBar extends ConsumerWidget {
-  const ScaffoldWithNavBar({
-    super.key,
-    required this.navigationShell,
-  });
+  const ScaffoldWithNavBar({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 

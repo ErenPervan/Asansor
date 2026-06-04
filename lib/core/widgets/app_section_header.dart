@@ -29,11 +29,7 @@ class AppSectionHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (icon != null) ...[
-            Icon(
-              icon,
-              size: 20,
-              color: colors.primary,
-            ),
+            Icon(icon, size: 20, color: colors.primary),
             const SizedBox(width: AppSpacing.sm),
           ],
           Expanded(

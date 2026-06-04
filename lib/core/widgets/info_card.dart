@@ -35,7 +35,7 @@ class InfoCard extends StatelessWidget {
       border: Border.all(
         color: borderColor ??
             (accentColor != null
-                ? accentColor!.withOpacity(0.3)
+                ? accentColor!.withValues(alpha: 0.3)
                 : colors.outlineVariant),
       ),
       child: SizedBox(

@@ -17,7 +17,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/loading_state.dart';
-import '../../../core/widgets/app_async_view.dart';
 import '../../../core/widgets/app_section_header.dart';
 import '../../../core/constants/app_durations.dart';
 import 'package:confetti/confetti.dart';

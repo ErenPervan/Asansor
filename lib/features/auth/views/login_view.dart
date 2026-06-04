@@ -12,7 +12,6 @@ import '../../../l10n/app_localizations.dart';
 import '../providers/auth_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_form_field.dart';
 import '../../../core/constants/app_durations.dart';
 // ── Brand palette ──────────────────────────────────────────────────────────────

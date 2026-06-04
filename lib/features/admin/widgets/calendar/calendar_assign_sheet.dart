@@ -3,13 +3,14 @@ import 'package:asansor/core/theme/app_spacing.dart';
 import 'calendar_helpers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/section_label.dart';
+import '../../../../core/widgets/app_section_header.dart';
 import '../../../elevator/models/elevator_model.dart';
 import '../../../elevator/providers/elevator_providers.dart';
 import '../../models/profile_model.dart';
 import '../../providers/admin_providers.dart';
 import '../../providers/profile_providers.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../core/widgets/app_form_field.dart';
 import 'calendar_pickers.dart';
 
 // ── AssignTaskSheet ──────────────────────────────────────────────────────────
@@ -207,17 +208,9 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // ── Elevator picker ─────────────────────────────────
-                      SectionLabel(
+                      const AppSectionHeader(
                         icon: Icons.elevator_outlined,
-                        label: 'Asansör',
-                        color: AppColors.primary,
-                        iconSize: 15,
-                        gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.2,
-                            ),
+                        title: 'Asansör',
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       PickerField(
@@ -234,17 +227,9 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Technician picker ────────────────────────────────
-                      SectionLabel(
+                      const AppSectionHeader(
                         icon: Icons.engineering_outlined,
-                        label: 'Teknisyen',
-                        color: AppColors.primary,
-                        iconSize: 15,
-                        gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.2,
-                            ),
+                        title: 'Teknisyen',
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       PickerField(
@@ -261,17 +246,9 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Date & Time pickers ──────────────────────────────
-                      SectionLabel(
+                      const AppSectionHeader(
                         icon: Icons.calendar_today_outlined,
-                        label: 'Tarih ve Saat',
-                        color: AppColors.primary,
-                        iconSize: 15,
-                        gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.2,
-                            ),
+                        title: 'Tarih ve Saat',
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Row(
@@ -299,17 +276,9 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Priority selector ────────────────────────────────
-                      SectionLabel(
+                      const AppSectionHeader(
                         icon: Icons.flag_outlined,
-                        label: 'Öncelik',
-                        color: AppColors.primary,
-                        iconSize: 15,
-                        gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.2,
-                            ),
+                        title: 'Öncelik',
                       ),
                       const SizedBox(height: 10),
                       PrioritySelector(
@@ -320,48 +289,16 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                       const SizedBox(height: 20),
 
                       // ── Notes ────────────────────────────────────────────
-                      SectionLabel(
+                      const AppSectionHeader(
                         icon: Icons.notes_outlined,
-                        label: 'Notlar (İsteğe Bağlı)',
-                        color: AppColors.primary,
-                        iconSize: 15,
-                        gap: 6,
-                        textStyle: Theme.of(context).textTheme.titleSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.2,
-                            ),
+                        title: 'Notlar (İsteğe Bağlı)',
                       ),
                       const SizedBox(height: AppSpacing.sm),
-                      TextFormField(
+                      AppFormField(
                         controller: _notesCtrl,
                         maxLines: 3,
-                        decoration: InputDecoration(
-                          hintText:
-                              'Görev hakkında ek bilgi veya talimatlar...',
-                          hintStyle: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: AppColors.outline),
-                          filled: true,
-                          fillColor: AppColors.surfaceContainer,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: AppColors.outlineVariant,
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: AppColors.primary,
-                              width: 1.5,
-                            ),
-                          ),
-                        ),
+                        label: '',
+                        hint: 'Görev hakkında ek bilgi veya talimatlar...',
                       ),
 
                       const SizedBox(height: AppSpacing.xl),

@@ -17,7 +17,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/loading_state.dart';
-import '../../../core/widgets/section_label.dart';
+import '../../../core/widgets/app_async_view.dart';
+import '../../../core/widgets/app_section_header.dart';
 import '../../../core/constants/app_durations.dart';
 import 'package:confetti/confetti.dart';
 // ── Local colour tokens (matches global theme) ──────────────────────────────
@@ -228,10 +229,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                           data: (elevator) => Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SectionLabel(
+                              const AppSectionHeader(
                                 icon: Icons.elevator_outlined,
-                                label: 'Asansör',
-                                uppercase: true,
+                                title: 'ASANSÖR',
                               ),
                               const SizedBox(height: 10),
                               Text(
@@ -276,10 +276,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SectionLabel(
+                            const AppSectionHeader(
                               icon: Icons.report_problem_outlined,
-                              label: 'Arıza Açıklaması',
-                              uppercase: true,
+                              title: 'ARIZA AÇIKLAMASI',
                             ),
                             const SizedBox(height: 10),
                             Text(
@@ -312,11 +311,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SectionLabel(
+                              AppSectionHeader(
                                 icon: Icons.check_circle_outline,
-                                label: 'Çözüm Notu',
-                                color: colors.success,
-                                uppercase: true,
+                                title: 'ÇÖZÜM NOTU',
                               ),
                               const SizedBox(height: 10),
                               Text(

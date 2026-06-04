@@ -16,6 +16,8 @@ import '../providers/admin_providers.dart';
 import '../../../core/enums/app_enums.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_async_view.dart';
+import '../../../core/widgets/app_section_header.dart';
 
 // Dot colours for calendar markers.
 const _dotRed = AppColors.error;
@@ -1038,7 +1040,7 @@ class _FilterSheet extends ConsumerWidget {
 
               // ── Technician section ──────────────────────────────────
               if (technicians.isNotEmpty) ...[
-                const _SheetSectionLabel('TEKNİSYEN'),
+                const AppSectionHeader(title: 'TEKNİSYEN'),
                 const SizedBox(height: AppSpacing.sm),
                 Wrap(
                   spacing: 8,
@@ -1066,7 +1068,7 @@ class _FilterSheet extends ConsumerWidget {
               ],
 
               // ── Status section ──────────────────────────────────────
-              const _SheetSectionLabel('DURUM'),
+              const AppSectionHeader(title: 'DURUM'),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
                 spacing: 8,
@@ -1085,23 +1087,6 @@ class _FilterSheet extends ConsumerWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SheetSectionLabel extends StatelessWidget {
-  const _SheetSectionLabel(this.text);
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-        fontWeight: FontWeight.w700,
-        color: AppThemeColors.of(context).onSurfaceVariant,
-        letterSpacing: 1.2,
       ),
     );
   }

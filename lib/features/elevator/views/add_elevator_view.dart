@@ -12,7 +12,8 @@ import '../providers/elevator_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/input_decorations.dart';
-import '../../../core/widgets/section_label.dart';
+import '../../../core/widgets/app_form_field.dart';
+import '../../../core/widgets/app_section_header.dart';
 import '../../../core/constants/app_durations.dart';
 // ── Status options ────────────────────────────────────────────────────────────
 
@@ -114,11 +115,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 48),
             children: [
               // ── Building info ─────────────────────────────────────────
-              SectionLabel(
+              AppSectionHeader(
                 icon: Icons.domain_outlined,
-                label: 'Bina Bilgileri',
-                color: AppThemeColors.of(context).onSurfaceVariant,
-                uppercase: true,
+                title: 'BİNA BİLGİLERİ',
               ),
               const SizedBox(height: 12),
 
@@ -159,11 +158,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
               const SizedBox(height: 20),
 
               // ── Status ────────────────────────────────────────────────
-              SectionLabel(
+              AppSectionHeader(
                 icon: Icons.info_outline_rounded,
-                label: 'Durum',
-                color: AppThemeColors.of(context).onSurfaceVariant,
-                uppercase: true,
+                title: 'DURUM',
               ),
               const SizedBox(height: 12),
               _StatusPicker(
@@ -174,11 +171,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
               const SizedBox(height: 20),
 
               // ── Periodic maintenance contract ─────────────────────────
-              SectionLabel(
+              AppSectionHeader(
                 icon: Icons.event_repeat_outlined,
-                label: 'Periyodik Bakım Sözleşmesi',
-                color: AppThemeColors.of(context).onSurfaceVariant,
-                uppercase: true,
+                title: 'PERİYODİK BAKIM SÖZLEŞMESİ',
               ),
               const SizedBox(height: 12),
               _MaintenanceDayPicker(
@@ -459,18 +454,13 @@ class _Field extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
-    return TextFormField(
+    return AppFormField(
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
-      style: textTheme.bodyLarge?.copyWith(color: colors.onSurface),
-      decoration: appInputDecoration(
-        label: required ? '$label *' : label,
-        hint: hint,
-        prefixIcon: Icon(icon, size: 18, color: colors.outline),
-        fillColor: colors.surface,
-        radius: 12,
-      ),
+      label: required ? '$label *' : label,
+      hint: hint,
+      prefixIcon: Icon(icon, size: 18, color: colors.outline),
       validator: validator,
     );
   }

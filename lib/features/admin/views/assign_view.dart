@@ -19,7 +19,8 @@ import '../providers/profile_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/enums/app_enums.dart';
 import '../../../core/theme/input_decorations.dart';
-import '../../../core/widgets/section_label.dart';
+import '../../../core/widgets/app_form_field.dart';
+import '../../../core/widgets/app_section_header.dart';
 import '../../../core/constants/app_durations.dart';
 // ── AssignView ────────────────────────────────────────────────────────────────
 
@@ -219,9 +220,9 @@ class _AssignViewState extends ConsumerState<AssignView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ── Elevator Selector ───────────────────────────────────────
-                const SectionLabel(
+                const AppSectionHeader(
                   icon: Icons.elevator_outlined,
-                  label: 'Asansör Seç',
+                  title: 'Asansör Seç',
                 ),
                 const SizedBox(height: 12),
                 elevatorsAsync.when(
@@ -248,9 +249,9 @@ class _AssignViewState extends ConsumerState<AssignView> {
                 const SizedBox(height: 28),
 
                 // ── Technician UUID ─────────────────────────────────────────
-                const SectionLabel(
+                const AppSectionHeader(
                   icon: Icons.person_search_outlined,
-                  label: 'Teknisyen Seç',
+                  title: 'Teknisyen Seç',
                 ),
                 const SizedBox(height: 12),
                 techniciansAsync.when(
@@ -323,9 +324,9 @@ class _AssignViewState extends ConsumerState<AssignView> {
                 const SizedBox(height: 28),
 
                 // ── Date & Time ───────────────────────────────────────────────
-                const SectionLabel(
+                const AppSectionHeader(
                   icon: Icons.event_outlined,
-                  label: 'Tarih ve Saat',
+                  title: 'Tarih ve Saat',
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -353,17 +354,16 @@ class _AssignViewState extends ConsumerState<AssignView> {
                 const SizedBox(height: 28),
 
                 // ── Notes (optional) ──────────────────────────────────────────
-                const SectionLabel(
+                const AppSectionHeader(
                   icon: Icons.notes_outlined,
-                  label: 'Notlar (İsteğe Bağlı)',
+                  title: 'Notlar (İsteğe Bağlı)',
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
+                AppFormField(
                   controller: _notesController,
                   maxLines: 4,
-                  decoration: appInputDecoration(
-                    hint: 'Bakım ile ilgili ek notlar...',
-                  ),
+                  label: '',
+                  hint: 'Bakım ile ilgili ek notlar...',
                 ),
 
                 const SizedBox(height: 40),

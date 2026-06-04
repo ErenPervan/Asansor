@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
+import 'app_card.dart';
 
 class InfoCard extends StatelessWidget {
   const InfoCard({
@@ -26,30 +27,21 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    return Container(
-      width: double.infinity,
+    
+    return AppCard(
       padding: padding,
-      decoration: BoxDecoration(
-        color: backgroundColor ?? colors.surface,
-        borderRadius: BorderRadius.circular(radius),
-        border: Border.all(
-          color:
-              borderColor ??
-              (accentColor != null
-                  ? accentColor!.withValues(alpha: 0.3)
-                  : colors.outlineVariant),
-        ),
-        boxShadow:
-            boxShadow ??
-            [
-              BoxShadow(
-                color: colors.onSurface.withValues(alpha: 0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+      color: backgroundColor ?? colors.surface,
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: borderColor ??
+            (accentColor != null
+                ? accentColor!.withOpacity(0.3)
+                : colors.outlineVariant),
       ),
-      child: child,
+      child: SizedBox(
+        width: double.infinity,
+        child: child,
+      ),
     );
   }
 }

@@ -7,6 +7,8 @@ import '../../../core/widgets/animations/fade_in_slide.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/enums/app_enums.dart';
+import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_status_chip.dart';
 import '../models/elevator_model.dart';
 import '../providers/elevator_providers.dart';
 
@@ -358,124 +360,87 @@ class _ElevatorCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final style = _statusStyle(elevator.status, colors);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: colors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
+    return AppCard(
+      margin: const EdgeInsets.only(bottom: 12),
+      onTap: onTap,
+      child: Row(
+        children: [
+          // ── Status icon ──────────────────────────────────────────
+          Container(
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: colors.outlineVariant.withValues(alpha: 0.45),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: colors.outline.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+              color: style.iconBg,
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: Row(
-              children: [
-                // ── Status icon ──────────────────────────────────────────
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: style.iconBg,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(style.icon, color: style.iconFg, size: 26),
-                ),
-                const SizedBox(width: 14),
+            child: Icon(style.icon, color: style.iconFg, size: 26),
+          ),
+          const SizedBox(width: 14),
 
-                // ── Name + address ───────────────────────────────────────
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          // ── Name + address ───────────────────────────────────────
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  elevator.buildingName,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colors.onSurface,
+                    letterSpacing: -0.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (elevator.address != null &&
+                    elevator.address!.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Row(
                     children: [
-                      Material(
-                        color: Colors.transparent,
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 13,
+                        color: colors.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 3),
+                      Expanded(
                         child: Text(
-                          elevator.buildingName,
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: colors.onSurface,
-                            letterSpacing: -0.2,
+                          elevator.address!,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                            height: 1.3,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (elevator.address != null &&
-                          elevator.address!.isNotEmpty) ...[
-                        const SizedBox(height: AppSpacing.xs),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on_outlined,
-                              size: 13,
-                              color: colors.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 3),
-                            Expanded(
-                              child: Text(
-                                elevator.address!,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                  height: 1.3,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
                     ],
                   ),
-                ),
-                const SizedBox(width: 10),
-
-                // ── Status badge + chevron ───────────────────────────────
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: style.bg,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        style.label,
-                        style: textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: style.fg,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 13,
-                      color: colors.outline,
-                    ),
-                  ],
-                ),
+                ],
               ],
             ),
           ),
-        ),
+          const SizedBox(width: 10),
+
+          // ── Status badge + chevron ───────────────────────────────
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              AppStatusChip(
+                label: style.label,
+                color: style.fg,
+                backgroundColor: style.bg,
+                size: AppStatusChipSize.small,
+              ),
+              const SizedBox(height: 10),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 13,
+                color: colors.outline,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

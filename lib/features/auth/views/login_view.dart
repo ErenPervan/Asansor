@@ -12,6 +12,8 @@ import '../../../l10n/app_localizations.dart';
 import '../providers/auth_providers.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../core/widgets/app_form_field.dart';
 import '../../../core/constants/app_durations.dart';
 // ── Brand palette ──────────────────────────────────────────────────────────────
 
@@ -338,24 +340,15 @@ class _LoginViewState extends ConsumerState<LoginView>
                           const SizedBox(height: AppSpacing.xl),
 
                           // ── E-posta ──────────────────────────────────────
-                          _FormLabel(label: l10n.loginEmailLabel),
-                          const SizedBox(height: 6),
-                          TextFormField(
+                          AppFormField(
                             controller: _emailController,
+                            label: l10n.loginEmailLabel,
+                            hint: 'ornek@sirket.com',
                             keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            autocorrect: false,
-                            enabled: !isLoading,
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(color: colors.onSurface),
-                            decoration: InputDecoration(
-                              hintText: 'ornek@sirket.com',
-                              filled: true,
-                              fillColor: colors.surfaceContainerLow,
-                              prefixIcon: const Icon(
-                                Icons.email_outlined,
-                                size: 18,
-                              ),
+                            readOnly: isLoading,
+                            prefixIcon: const Icon(
+                              Icons.email_outlined,
+                              size: 18,
                             ),
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
@@ -370,34 +363,25 @@ class _LoginViewState extends ConsumerState<LoginView>
                           const SizedBox(height: 20),
 
                           // ── Şifre ────────────────────────────────────────
-                          _FormLabel(label: l10n.loginPasswordLabel),
-                          const SizedBox(height: 6),
-                          TextFormField(
+                          AppFormField(
                             controller: _passwordController,
+                            label: l10n.loginPasswordLabel,
+                            hint: '••••••••',
                             obscureText: _obscurePassword,
-                            textInputAction: TextInputAction.done,
-                            enabled: !isLoading,
-                            onFieldSubmitted: (_) => _submit(),
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(color: colors.onSurface),
-                            decoration: InputDecoration(
-                              hintText: '••••••••',
-                              filled: true,
-                              fillColor: colors.surfaceContainerLow,
-                              prefixIcon: const Icon(
-                                Icons.lock_outlined,
+                            readOnly: isLoading,
+                            prefixIcon: const Icon(
+                              Icons.lock_outlined,
+                              size: 18,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
                                 size: 18,
                               ),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  size: 18,
-                                ),
-                                onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword,
-                                ),
+                              onPressed: () => setState(
+                                () => _obscurePassword = !_obscurePassword,
                               ),
                             ),
                             validator: (v) {
@@ -503,20 +487,3 @@ class _LoginViewState extends ConsumerState<LoginView>
 
 // ── Small helpers ──────────────────────────────────────────────────────────────
 
-class _FormLabel extends StatelessWidget {
-  const _FormLabel({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: colors.onSurface,
-        letterSpacing: 0.1,
-      ),
-    );
-  }
-}

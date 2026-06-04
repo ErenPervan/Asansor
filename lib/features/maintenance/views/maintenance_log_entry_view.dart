@@ -20,7 +20,9 @@ import '../../../core/theme/input_decorations.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/empty_state.dart';
-import '../../../core/widgets/section_label.dart';
+import '../../../core/widgets/app_async_view.dart';
+import '../../../core/widgets/app_form_field.dart';
+import '../../../core/widgets/app_section_header.dart';
 import '../../../core/constants/app_durations.dart';
 
 class MaintenanceLogEntryView extends ConsumerStatefulWidget {
@@ -437,9 +439,9 @@ class _MaintenanceLogEntryViewState
                 const SizedBox(height: AppSpacing.lg),
 
                 // Checklist Section
-                SectionLabel(
-                  label: l10n.maintenanceChecklistSection,
-                  textStyle: sectionLabelStyle,
+                AppSectionHeader(
+                  icon: Icons.checklist_rounded,
+                  title: l10n.maintenanceChecklistSection,
                 ),
                 const SizedBox(height: AppSpacing.sm),
 
@@ -606,9 +608,9 @@ class _MaintenanceLogEntryViewState
                 const SizedBox(height: AppSpacing.lg),
 
                 // Photo Section
-                SectionLabel(
-                  label: l10n.maintenancePhotosSection,
-                  textStyle: sectionLabelStyle,
+                AppSectionHeader(
+                  icon: Icons.photo_library_outlined,
+                  title: l10n.maintenancePhotosSection,
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Row(
@@ -694,24 +696,23 @@ class _MaintenanceLogEntryViewState
                 const SizedBox(height: AppSpacing.lg),
 
                 // Notes Section
-                SectionLabel(
-                  label: l10n.maintenanceNotesSection,
-                  textStyle: sectionLabelStyle,
+                AppSectionHeader(
+                  icon: Icons.notes_outlined,
+                  title: l10n.maintenanceNotesSection,
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                TextFormField(
+                AppFormField(
                   controller: _notesController,
                   maxLines: 4,
-                  decoration: appInputDecoration(
-                    hint: l10n.maintenanceNotesHint,
-                  ),
+                  label: '',
+                  hint: l10n.maintenanceNotesHint,
                 ),
                 const SizedBox(height: AppSpacing.xl),
 
                 // Signature Section
-                SectionLabel(
-                  label: l10n.maintenanceSignaturesSection,
-                  textStyle: sectionLabelStyle,
+                AppSectionHeader(
+                  icon: Icons.draw_outlined,
+                  title: l10n.maintenanceSignaturesSection,
                 ),
                 const SizedBox(height: AppSpacing.sm),
 

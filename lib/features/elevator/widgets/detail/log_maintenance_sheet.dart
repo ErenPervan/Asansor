@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/widgets/app_form_field.dart';
 import 'package:asansor/features/auth/providers/auth_providers.dart';
 import 'package:asansor/features/maintenance/providers/maintenance_providers.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
@@ -176,18 +177,11 @@ class LogMaintenanceSheetState extends ConsumerState<LogMaintenanceSheet> {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  TextFormField(
+                  AppFormField(
                     controller: _notesController,
                     maxLines: 4,
-                    minLines: 3,
-                    textInputAction: TextInputAction.newline,
-                    enabled: !isLoading,
-                    decoration: const InputDecoration(
-                      labelText: 'Bakım Notları',
-                      hintText: 'Yapılan işlemleri açıklayın...',
-                      alignLabelWithHint: true,
-                      border: OutlineInputBorder(),
-                    ),
+                    label: 'Bakım Notları',
+                    hint: 'Yapılan işlemleri açıklayın...',
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
                         return 'Lütfen bakım notları girin.';

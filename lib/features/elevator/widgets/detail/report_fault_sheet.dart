@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_form_field.dart';
 import '../../../fault/models/fault_report_model.dart';
 import '../../../fault/providers/fault_providers.dart';
 
@@ -156,18 +157,11 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  TextFormField(
+                  AppFormField(
                     controller: _descController,
                     maxLines: 4,
-                    minLines: 3,
-                    textInputAction: TextInputAction.newline,
-                    enabled: !isLoading,
-                    decoration: const InputDecoration(
-                      labelText: 'Arıza Açıklaması',
-                      hintText: 'Arızayı detaylı açıklayın...',
-                      alignLabelWithHint: true,
-                      border: OutlineInputBorder(),
-                    ),
+                    label: 'Arıza Açıklaması',
+                    hint: 'Arızayı detaylı açıklayın...',
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
                         return 'Lütfen bir açıklama girin.';

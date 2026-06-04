@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/widgets/app_form_field.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../models/checklist_item_model.dart';
 import '../providers/checklist_provider.dart';
@@ -262,14 +263,11 @@ class ChecklistManagementView extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.lg),
 
                       // Label field
-                      TextFormField(
+                      AppFormField(
                         controller: labelCtrl,
-                        textInputAction: TextInputAction.next,
-                        decoration: const InputDecoration(
-                          labelText: 'Kalem Adı',
-                          hintText: 'Ör: Fren kontrolü',
-                          prefixIcon: Icon(Icons.label_outline_rounded),
-                        ),
+                        label: 'Kalem Adı',
+                        hint: 'Ör: Fren kontrolü',
+                        prefixIcon: const Icon(Icons.label_outline_rounded),
                         validator: (v) => (v == null || v.trim().isEmpty)
                             ? 'Zorunlu alan'
                             : null,
@@ -277,16 +275,12 @@ class ChecklistManagementView extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.md),
 
                       // Description field
-                      TextFormField(
+                      AppFormField(
                         controller: descCtrl,
                         maxLines: 3,
-                        textInputAction: TextInputAction.done,
-                        decoration: const InputDecoration(
-                          labelText: 'Açıklama',
-                          hintText: 'Kontrol adımının detaylı açıklaması...',
-                          prefixIcon: Icon(Icons.description_outlined),
-                          alignLabelWithHint: true,
-                        ),
+                        label: 'Açıklama',
+                        hint: 'Kontrol adımının detaylı açıklaması...',
+                        prefixIcon: const Icon(Icons.description_outlined),
                         validator: (v) => (v == null || v.trim().isEmpty)
                             ? 'Zorunlu alan'
                             : null,

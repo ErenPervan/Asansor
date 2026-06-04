@@ -4,10 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/widgets/error_state.dart';
+import '../../../core/widgets/loading_state.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/app_async_view.dart';
+import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_status_chip.dart';
 import '../../../core/theme/app_colors.dart';
 
-import '../../../core/widgets/app_async_view.dart';
-import '../../../core/widgets/empty_state.dart';
 import '../providers/fault_providers.dart';
 import '../models/fault_report_model.dart';
 import '../../elevator/providers/elevator_providers.dart';
@@ -163,93 +167,71 @@ class _FaultCard extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
-    return Card(
+    return AppCard(
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      elevation: 0,
-      color: colors.surface,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => context.push('/fault/${fault.id}'),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      onTap: () => context.push('/fault/${fault.id}'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: isResolved
-                          ? colors.success.withValues(alpha: 0.1)
-                          : colors.error.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      isResolved
-                          ? Icons.check_circle_outline
-                          : Icons.warning_amber_rounded,
-                      color: isResolved ? colors.success : colors.error,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          elevatorName,
-                          style: textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          dateStr,
-                          style: textTheme.labelSmall?.copyWith(
-                            color: colors.outline,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isResolved
-                          ? colors.success.withValues(alpha: 0.1)
-                          : colors.error.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      isResolved ? 'ÇÖZÜLDÜ' : 'AÇIK',
-                      style: textTheme.labelSmall?.copyWith(
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isResolved
+                      ? colors.success.withOpacity(0.1)
+                      : colors.error.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isResolved
+                      ? Icons.check_circle_outline
+                      : Icons.warning_amber_rounded,
+                  color: isResolved ? colors.success : colors.error,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      elevatorName,
+                      style: textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: isResolved ? colors.success : colors.error,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      dateStr,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colors.outline,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                fault.description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: textTheme.bodyMedium?.copyWith(color: colors.onSurface),
+              AppStatusChip(
+                label: isResolved ? 'ÇÖZÜLDÜ' : 'AÇIK',
+                color: isResolved ? colors.success : colors.error,
+                backgroundColor: isResolved
+                    ? colors.success.withOpacity(0.1)
+                    : colors.error.withOpacity(0.1),
+                size: AppStatusChipSize.small,
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 12),
+          Text(
+            fault.description,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.bodyMedium?.copyWith(color: colors.onSurface),
+          ),
+        ],
       ),
     );
   }

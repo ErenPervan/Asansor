@@ -7,8 +7,7 @@ import '../../elevator/providers/elevator_providers.dart';
 import '../../fault/providers/fault_providers.dart';
 import '../../maintenance/providers/maintenance_providers.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/loading_state.dart';
-import '../../../core/widgets/error_state.dart';
+import '../../../core/widgets/app_async_view.dart';
 import '../widgets/detail/elevator_detail_header.dart';
 import '../widgets/detail/elevator_detail_actions.dart';
 import '../widgets/detail/elevator_system_monitor.dart';
@@ -52,15 +51,10 @@ class ElevatorDetailView extends ConsumerWidget {
       ),
 
       // ── Body ─────────────────────────────────────────────────────────────
-      body: elevatorAsync.when(
-        loading: () => const Padding(
-          padding: EdgeInsets.all(AppSpacing.md),
-          child: LoadingState(isList: false),
-        ),
-        error: (err, _) => ErrorState(
-          message: err.toString().replaceFirst('Exception: ', ''),
-          onRetry: () => ref.invalidate(elevatorByIdProvider(elevatorId)),
-        ),
+      body: AppAsyncView<ElevatorModel>(
+        value: elevatorAsync,
+        onRetry: () => ref.invalidate(elevatorByIdProvider(elevatorId)),
+        isList: false,
         data: (elevator) => _DetailScrollBody(
           elevator: elevator,
           elevatorId: elevatorId,

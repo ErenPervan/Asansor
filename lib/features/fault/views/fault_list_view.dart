@@ -6,8 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 
-import '../../../core/widgets/error_state.dart';
-import '../../../core/widgets/loading_state.dart';
+import '../../../core/widgets/app_async_view.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../providers/fault_providers.dart';
 import '../models/fault_report_model.dart';
@@ -69,12 +68,9 @@ class _FaultListViewState extends ConsumerState<FaultListView> {
           ),
         ),
       ),
-      body: faultsAsync.when(
-        loading: () => const LoadingState(),
-        error: (err, _) => ErrorState(
-          message: err.toString(),
-          onRetry: () => ref.invalidate(allFaultsProvider),
-        ),
+      body: AppAsyncView<List<FaultReportModel>>(
+        value: faultsAsync,
+        onRetry: () => ref.invalidate(allFaultsProvider),
         data: (allFaults) {
           final filtered = allFaults.where((f) {
             if (_filterIndex == 1) return !f.isResolved;

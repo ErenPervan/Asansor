@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/widgets/loading_state.dart';
-import '../../../../core/widgets/empty_state.dart';
-import '../../../../core/widgets/error_state.dart';
-import '../../../../core/widgets/animations/fade_in_slide.dart';
+import '../../../core/widgets/app_async_view.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/animations/fade_in_slide.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/offline_banner.dart';
@@ -267,25 +266,13 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
           ),
 
           Expanded(
-            child: elevatorsAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.all(AppSpacing.md),
-                child: LoadingState(count: 6),
-              ),
-              error: (e, _) => ErrorState(
-                message: e.toString().replaceFirst('Exception: ', ''),
-                onRetry: () => ref.invalidate(elevatorsProvider),
-              ),
+            child: AppAsyncView<List<ElevatorModel>>(
+              value: elevatorsAsync,
+              onRetry: () => ref.invalidate(elevatorsProvider),
+              emptyMessage: 'Asansör Bulunamadı\n\nSisteme henüz asansör eklenmemiş.\nLütfen yöneticinizle iletişime geçin.',
+              emptyIcon: Icons.elevator_outlined,
               data: (all) {
                 final items = _applyFilter(all);
-
-                if (all.isEmpty) {
-                  return const EmptyState(
-                    icon: Icons.elevator_outlined,
-                    message:
-                        'Asansör Bulunamadı\n\nSisteme henüz asansör eklenmemiş.\nLütfen yöneticinizle iletişime geçin.',
-                  );
-                }
 
                 if (items.isEmpty) {
                   return EmptyState(

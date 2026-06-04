@@ -16,11 +16,9 @@ import '../../admin/providers/checklist_provider.dart';
 import '../providers/maintenance_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/input_decorations.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/empty_state.dart';
-import '../../../core/widgets/app_async_view.dart';
 import '../../../core/widgets/app_form_field.dart';
 import '../../../core/widgets/app_section_header.dart';
 import '../../../core/constants/app_durations.dart';
@@ -360,9 +358,6 @@ class _MaintenanceLogEntryViewState
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final sectionLabelStyle = textTheme.titleMedium?.copyWith(
-      fontWeight: FontWeight.bold,
-    );
     final l10n = AppLocalizations.of(context)!;
 
     final maintenanceState = ref.watch(maintenanceControllerProvider);

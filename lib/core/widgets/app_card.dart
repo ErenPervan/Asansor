@@ -27,7 +27,6 @@ class AppCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final theme = Theme.of(context);
 
     final card = Material(
       color: color ?? colors.surfaceContainerLowest,

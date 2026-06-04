@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/widgets/error_state.dart';
-import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/app_async_view.dart';
 import '../../../core/widgets/app_card.dart';
@@ -181,8 +179,8 @@ class _FaultCard extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: isResolved
-                      ? colors.success.withOpacity(0.1)
-                      : colors.error.withOpacity(0.1),
+                      ? colors.success.withValues(alpha: 0.1)
+                      : colors.error.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -218,8 +216,8 @@ class _FaultCard extends StatelessWidget {
                 label: isResolved ? 'ÇÖZÜLDÜ' : 'AÇIK',
                 color: isResolved ? colors.success : colors.error,
                 backgroundColor: isResolved
-                    ? colors.success.withOpacity(0.1)
-                    : colors.error.withOpacity(0.1),
+                    ? colors.success.withValues(alpha: 0.1)
+                    : colors.error.withValues(alpha: 0.1),
                 size: AppStatusChipSize.small,
               ),
             ],

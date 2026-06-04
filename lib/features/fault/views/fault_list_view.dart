@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_bottom_nav_bar.dart';
+
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -103,7 +103,6 @@ class _FaultListViewState extends ConsumerState<FaultListView> {
           );
         },
       ),
-      bottomNavigationBar: const AppBottomNavBar(currentIndex: 1),
     );
   }
 }

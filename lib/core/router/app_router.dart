@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../enums/app_enums.dart';
 
 import '../../features/auth/providers/auth_providers.dart';
+import '../widgets/scaffold_with_nav_bar.dart';
 import '../../features/admin/providers/profile_providers.dart';
 import '../../features/admin/views/admin_calendar_view.dart';
 import '../../features/admin/views/admin_dashboard_view.dart';
@@ -187,14 +188,49 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LoadingView(),
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginView()),
-      GoRoute(path: '/', builder: (context, state) => const HomeView()),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return ScaffoldWithNavBar(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/elevators',
+                builder: (context, _) => const ElevatorListView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/faults',
+                builder: (context, _) => const FaultListView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/master-calendar',
+                builder: (context, _) => const AdminMasterCalendarView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => const HomeView(),
+              ),
+            ],
+          ),
+        ],
+      ),
       // `/home` is a stable alias used in FCM notification data payloads so that
       // the edge function does not need to know the root path convention.
       GoRoute(path: '/home', redirect: (_, _) => '/'),
-      GoRoute(
-        path: '/elevators',
-        builder: (context, _) => const ElevatorListView(),
-      ),
+
       GoRoute(path: '/scan', builder: (context, state) => const ScannerView()),
       GoRoute(
         path: '/elevator/:id',
@@ -212,7 +248,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── Fault routes ──────────────────────────────────────────────────────
-      GoRoute(path: '/faults', builder: (context, _) => const FaultListView()),
+
       GoRoute(
         path: '/fault/:id',
         builder: (_, state) {
@@ -247,10 +283,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/admin/calendar',
         builder: (context, _) => const AdminCalendarView(),
       ),
-      GoRoute(
-        path: '/admin/master-calendar',
-        builder: (context, _) => const AdminMasterCalendarView(),
-      ),
+
       GoRoute(
         path: '/admin/technicians',
         builder: (context, _) => const TechnicianManagementView(),

@@ -1,250 +1,485 @@
-# Dynamic UI Implementation Plan
+# Sprint 1 (Phase 0): Kritik Hatalar ve Temel Düzeltmeler — Implementation Plan
+
+**GitHub Issue:** [#3 Sprint 1 (Phase 0): Kritik Hatalar ve Temel Düzeltmeler](https://github.com/ErenPervan/Asansor/issues/3)  
+**Hazırlanma Tarihi:** 2026-06-04  
+**Statik Analiz Kaynağı:** Tüm dosyalar satır-satır tarandı, aşağıdaki veriler doğrulanmış bulgulardır.  
+**Tahmini Efor:** 3–4 iş günü
+
+---
+
+## Bağlam & Kesin Durum Analizi
+
+Statik kod taraması şu kritik bulguları ortaya koydu:
+
+| Dosya | Satır Sonu | Mojibake Şiddeti | Etkilenen String Sayısı |
+|---|---|---|---|
+| `admin_statistics_dashboard.dart` | LF | **ÇOK AĞIR (çift/üçlü encoding)** | ~30+ |
+| `fault_detail_view.dart` | **CRLF** | Orta | ~28 |
+| `technician_management_view.dart` | LF | Orta | ~23 |
+| `pdf_service.dart` | LF | Orta | ~22 |
+| `log_maintenance_sheet.dart` | LF | Orta | ~12 |
+| `elevator_maintenance_history.dart` | LF | Hafif | ~8 |
+| `maintenance_log_entry_view.dart` | **CRLF** | **YOK — Temiz dosya** | 0 |
 
 > [!IMPORTANT]
-> **Status: APPROVED — Awaiting Phase 1 green light.**
-> All design decisions have been resolved. The Open Questions section has been converted to Resolved Decisions below.
+> **Kritik tespit:** `maintenance_log_entry_view.dart` dosyasındaki Türkçe string'ler (`'Bakımı Kaydet'`, `'Lütfen kaydetme işlemi...'` vb.) **doğru UTF-8 encoding ile yazılmış**. Bu dosyada yalnızca nested button yapısal hatası var, encoding sorunu yok.
 
-## Overview
+> [!WARNING]
+> **`admin_statistics_dashboard.dart`** dosyası çift/üçlü encoding kurbanı — UTF-8 byte'ları Latin-1 olarak okunmuş, o çıktı tekrar yanlış encode edilmiş. Bu dosyadaki mojibake diğerlerine kıyasla çok daha karmaşık ve comment satırları dahil her yerde mevcut.
 
-This plan covers every static, hardcoded UI value found across the entire `lib/` directory after a full audit.
-The goal is **100% dynamic, theme-aware, and responsive** UI — no raw colors, no scattered `TextStyle`s, no rigid fixed dimensions outside of semantic spacing tokens.
-
-The audit confirmed the app already has a strong foundation:
-- `AppThemeColors.of(context)` is widely adopted.
-- `AppSpacing` token class exists with spacing and radius constants.
-- `Theme.of(context).textTheme` is used in most widgets.
-
-What follows is a precise, file-by-file record of every remaining violation and the exact fix strategy.
+> [!WARNING]
+> **`test.yml` CI dosyasında kritik hatalar var** (plan kapsamına eklendi):
+> - `.env` dummy dosyası oluşturulmuyor → build sırasında başarısız olur
+> - `dart format --set-exit-if-changed .` komutu mojibake içeren dosyalarda **başarısız olur** (encoding hatalarını format hatası olarak algılar)
+> - Her iki workflow da `Flutter CI` olarak adlandırılmış (isim çakışması)
 
 ---
 
-## Pillar 1 — Dynamic Theming (Colors & Decorations)
-
-### Category A — Static `AppColors.*` used directly in widgets (not via `AppThemeColors.of(context)`)
-
-`AppColors` is a static constants class intended only as raw palette storage.
-Using it directly in widget `build()` methods bypasses the theme switch, so the widget never adapts to dark mode.
-
-| File | Violation | Fix |
-|---|---|---|
-| [admin_conflict_management_view.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_management_view.dart) | `AppColors.surface`, `AppColors.primary`, `AppColors.onSurface`, `AppColors.error`, `AppColors.onSurfaceVariant`, `AppColors.surfaceContainerLowest` | Replace all with `AppThemeColors.of(context).*` |
-| [admin_conflict_management_view.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_management_view.dart) | `backgroundColor: AppColors.surface` (Scaffold, line 18) | `AppThemeColors.of(context).background` |
-
-### Category B — File-scoped `const Color(0xFF…)` declarations
-
-These are light-mode-only values baked as compile-time constants. They never respond to dark mode.
-
-| File | Constant | Semantic Equivalent | Fix Strategy |
-|---|---|---|---|
-| [admin_conflict_detail_dialog.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_detail_dialog.dart) | `_error = Color(0xFFBA1A1A)`, `_localBg = Color(0xFFFFF1F2)`, `_localLabel = Color(0xFF93000A)`, `_serverBg`, `_serverLabel` | `colors.error`, `colors.errorContainer`, `colors.onErrorContainer` | Remove top-level constants; look up via `AppThemeColors.of(context)` in `build()` |
-| [admin_conflict_management_view.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_management_view.dart#L76) | `Color(0xFF002D59)` (gradient stop) | `colors.navy` (already defined in `AppColors`) | `AppThemeColors.of(context).navy` |
-| [admin_conflict_management_view.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_management_view.dart#L102) | `Color(0xFFFBBF24)` (warning dot), `Color(0xFF4ADE80)` (success dot) | `colors.warningLight`, `colors.successLight` | Inline lookup via `AppThemeColors.of(context)` |
-| [admin_conflict_management_view.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_management_view.dart#L271) | `Color(0xFFDCFCE7)`, `Color(0xFF166534)` (empty state circle) | `colors.successContainer`, `colors.success` | Inline lookup |
-| [admin_statistics_dashboard.dart](file:///d:/Asansor/lib/features/admin/views/admin_statistics_dashboard.dart#L232) | `Color(0xFF4ADE80)` ("live" indicator dot) | `colors.successLight` | Inline lookup |
-| [technician_management_view.dart](file:///d:/Asansor/lib/features/admin/views/technician_management_view.dart#L137) | `Color(0xFF4ADE80)` (accent dot) | `colors.successLight` | Inline lookup |
-| [user_management_view.dart](file:///d:/Asansor/lib/features/admin/views/user_management_view.dart#L31) | `Color(0xFF4CAF50)` (customer avatar bg) | `colors.successLight` | Inline lookup |
-| [user_management_view.dart](file:///d:/Asansor/lib/features/admin/views/user_management_view.dart#L37) | `Color(0xFFD6E3FF)` (technician badge bg) | `colors.primaryFixed` (already in `AppColors`) | Inline lookup |
-
-### Category C — `Colors.white` / `Colors.black` in content areas
-
-These are acceptable on top of a coloured background (e.g., white text on primary), but the following usages bypass the theme:
-
-| File | Line | Issue | Fix |
-|---|---|---|---|
-| [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart#L176) | `Icon(color: Colors.white)` | on primary/success AppBar | `colors.onPrimary` |
-| [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart#L185) | `Icon(color: Colors.white)` | action icon on primary | `colors.onPrimary` |
-| [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart#L686) | `Icon(color: Colors.white, size: 36)` | icon inside status header circle | `colors.onPrimary` |
-| [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart#L694) | `Text(color: Colors.white)` | label on coloured header | `colors.onPrimary` |
-| [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart#L702) | `Text(color: Colors.white.withValues(alpha: 0.85))` | sub-label on header | `colors.onPrimary.withValues(alpha: 0.85)` |
-| [admin_statistics_dashboard.dart](file:///d:/Asansor/lib/features/admin/views/admin_statistics_dashboard.dart#L200) | `color: Colors.white` (text on primary header) | on primary SliverAppBar | `colors.onPrimary` |
-| [admin_statistics_dashboard.dart](file:///d:/Asansor/lib/features/admin/views/admin_statistics_dashboard.dart#L207) | `Colors.white60` (sub-text on header) | on primary SliverAppBar | `colors.onPrimary.withValues(alpha: 0.6)` |
-| [admin_statistics_dashboard.dart](file:///d:/Asansor/lib/features/admin/views/admin_statistics_dashboard.dart#L241) | `color: Colors.white` ("live" badge label) | inside primary container | `colors.onPrimary` |
-| [admin_statistics_dashboard.dart](file:///d:/Asansor/lib/features/admin/views/admin_statistics_dashboard.dart#L503) | `Colors.white60`, `Colors.white` | chart axis labels on gradient | `colors.onPrimary.withValues(alpha: 0.7)` |
-| [admin_conflict_management_view.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_management_view.dart#L69) | `foregroundColor: Colors.white` | on primary AppBar | `colors.onPrimary` |
-| [admin_conflict_management_view.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_management_view.dart#L87) | `color: Colors.white` (title) | on primary header | `colors.onPrimary` |
-| [admin_conflict_management_view.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_management_view.dart#L113) | `Colors.white.withValues(alpha: 0.75)` | sub-text on header | `colors.onPrimary.withValues(alpha: 0.75)` |
-| [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart#L683) | `Colors.white.withValues(alpha: 0.18)` (icon circle bg) | inside status header | Replace with a translucent semantic token: `colors.onPrimary.withValues(alpha: 0.18)` |
-| [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart#L713) | `Colors.black.withValues(alpha: 0.2)` (hint pill bg) | inside status header | `colors.primaryDark.withValues(alpha: 0.35)` |
-| [maintenance_log_entry_view.dart](file:///d:/Asansor/lib/features/maintenance/views/maintenance_log_entry_view.dart#L47) | `exportBackgroundColor: Colors.transparent` | Signature controller | ✅ Acceptable — transparent canvas |
-| [shimmer_card.dart](file:///d:/Asansor/lib/core/widgets/shimmer_card.dart#L27) | `color: Colors.white` (shimmer child container) | Shimmer library requirement | ✅ Acceptable — library-mandated |
-| [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart#L502) | `Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple` | confetti colors | Map to themed palette tokens: `colors.success, colors.blue, colors.error, colors.warning, colors.violet` |
-| [user_management_view.dart](file:///d:/Asansor/lib/features/admin/views/user_management_view.dart#L533) | `backgroundColor: Theme.of(context).colorScheme.surface` | modal bottom sheet | `colors.surface` for consistency |
-
-### Category D — `Colors.black.*` used as shadow colors
-
-Using `Colors.black.withValues(alpha: X)` for shadows is a common pattern and **functionally acceptable**. However, in dark mode these shadows can look harsh. The recommended fix is to replace with `colors.outline.withValues(alpha: X)` or `colors.onSurface.withValues(alpha: X)` which are already dark-mode-aware.
-
-Affected files (partial list — shadow fixes are lower priority):
-- `info_card.dart`, `admin_map_view.dart`, `admin_master_calendar_view.dart`, `admin_statistics_dashboard.dart`, `elevator_qr_view.dart`, `technician_management_view.dart`, `user_management_view.dart`, `calendar_task_card.dart`, `dashboard_*.dart` widgets, `home_active_faults.dart`, `home_daily_agenda.dart`, `dashboard_stats.dart`
+## Kararlar (Onaylandı)
 
 > [!NOTE]
-> Shadow color fixes (`Colors.black.withValues(alpha: 0.03–0.12)`) are grouped in a single pass at the end because they are low-risk and do not affect layout. The `home_top_app_bar.dart` uses `Colors.black12` for shadowColor, which should become `colors.outline.withValues(alpha: 0.12)`.
-
-### Category E — Scanner view (intentional dark UI)
-
-`scanner_view.dart` uses `Colors.black` for its camera overlay background. This is **intentional** (camera viewfinder must be dark). Mark as exempted with a `// ignore: themed_color` annotation.
-
-`Colors.greenAccent.shade400` (line 331) for the scan-success bracket color should become `colors.successLight`.
-
----
-
-## Pillar 2 — Dynamic Typography
-
-### Category A — Standalone `const TextStyle(…)` in widget `build()` methods
-
-These are never connected to `textTheme` and will not respect font scaling or custom typeface changes.
-
-| File | Lines | Issue | Fix |
-|---|---|---|---|
-| [admin_conflict_management_view.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_management_view.dart) | L86, L112, L126, L192, L209, L224, L290, L301, L350 | `TextStyle(fontSize: X, color: AppColors.*)` | Replace with `textTheme.titleLarge?.copyWith(…)` etc., map color to `AppThemeColors.of(context)` |
-| [admin_conflict_detail_dialog.dart](file:///d:/Asansor/lib/features/admin/conflicts/admin_conflict_detail_dialog.dart) | L42, L57, L171, L194, L204 | Standalone `TextStyle` with hardcoded sizes | Map to `textTheme.*` equivalents |
-| [admin_statistics_dashboard.dart](file:///d:/Asansor/lib/features/admin/views/admin_statistics_dashboard.dart) | L239, L423, L502, L510 | Standalone `TextStyle` for chart labels and section titles | Use `textTheme.labelSmall?.copyWith(…)` |
-| [checklist_management_view.dart](file:///d:/Asansor/lib/features/admin/views/checklist_management_view.dart) | L493, L509 | Standalone `TextStyle` | Replace with `textTheme.*` |
-| [maintenance_log_entry_view.dart](file:///d:/Asansor/lib/features/maintenance/views/maintenance_log_entry_view.dart) | L307–L313 (success dialog "Bakım Kaydedildi") | `const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)` | `textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: colors.onSurface)` |
-| [offline_banner.dart](file:///d:/Asansor/lib/core/widgets/offline_banner.dart) | L49–L55 | `TextStyle(fontSize: 12, …)` | `textTheme.labelSmall?.copyWith(…)` |
-| [admin_calendar_view.dart](file:///d:/Asansor/lib/features/admin/views/admin_calendar_view.dart) | L163–L202 | `TextStyle()` passed to calendar widget | Use `textTheme.labelSmall?.copyWith(…)` where possible |
-| [admin_master_calendar_view.dart](file:///d:/Asansor/lib/features/admin/views/admin_master_calendar_view.dart) | L255, L357–L404, L828 | Mixed `TextStyle` and `textTheme` | Unify to `textTheme.*?.copyWith(…)` |
-| [calendar_assign_sheet.dart](file:///d:/Asansor/lib/features/admin/widgets/calendar/calendar_assign_sheet.dart) | L183, L215, L242, L269, L307, L328, L341 | Multiple `TextStyle(color: …)` | Replace with `textTheme.*?.copyWith(color: colors.*)` |
-| [admin_map_view.dart](file:///d:/Asansor/lib/features/admin/views/admin_map_view.dart) | L412–L413, L530–L531 | `TextStyle(fontSize: 12/11)` | `textTheme.labelSmall?.copyWith(…)` |
+> **Karar 1 — ARB Kapsam:** Sprint 1'de yalnızca `maintenance_log_entry_view.dart` + auth ekranı string'leri ARB'ye taşınacak. Diğer ekranlar Sprint 2–3'te kademeli geçecek. Gerekçe: Encoding fix PR'ını genişletmemek ve production'a çıkış hızını korumak.
 
 > [!NOTE]
-> `pdf_service.dart` uses `pw.TextStyle` (the `printing` package). These are **PDF-only** and intentionally hardcoded at print resolution — they are **exempt** from Flutter text theming.
-
-### Category B — `fontSize` overrides that bypass the type scale
-
-Some widgets use `textTheme.X?.copyWith(fontSize: Y)` which overrides the central type scale. These should be audited but are lower priority than standalone `TextStyle`s.
+> **Karar 2 — Long-Press:** Fault detail ekranındaki long-press aksiyonu **tamamen kaldırılacak**, yerine görünür buton konacak. Gerekçe: Arızayı onar/yeniden aç, uygulamanın en kritik iş aksiyonu — primary action'lar her zaman tek dokunuşla erişilebilir olmalı. WCAG 2.5.1 bunu zorunlu kılıyor.
 
 ---
 
-## Pillar 3 — Responsive Layouts & Scaling
-
-### Category A — Rigid fixed heights / widths without `MediaQuery` scaling
-
-| File | Widget / Issue | Fix |
-|---|---|---|
-| [login_view.dart](file:///d:/Asansor/lib/features/auth/views/login_view.dart) | Hero panel uses `screenH * 0.38` — check it clamps correctly on tablets (≥600 dp) | Add `.clamp(220.0, 320.0)` |
-| [admin_statistics_dashboard.dart](file:///d:/Asansor/lib/features/admin/views/admin_statistics_dashboard.dart#L484) | `height: 220` (chart container) — fixed regardless of screen size | Replace with `(screenH * 0.28).clamp(180.0, 260.0)` |
-| [add_elevator_view.dart](file:///d:/Asansor/lib/features/elevator/views/add_elevator_view.dart#L248) | `height: 200` (map preview?) | Apply `.clamp()` based on screen height |
-| Various `SizedBox(height: 40)` in scroll views | Absolute gaps in `ListView` children | Replace with `AppSpacing.xl` (32) or `AppSpacing.xxl` (48) tokens |
-
-### Category B — `AppSpacing` token adoption
-
-The `AppSpacing` class exists but many files still use raw integer literals for padding and spacing. All `const EdgeInsets.all(16)`, `const EdgeInsets.all(24)`, `const EdgeInsets.all(32)` should be expressed as `AppSpacing.md`, `AppSpacing.lg`, `AppSpacing.xl` respectively.
-
-Priority files with the most raw spacing literals:
-1. `admin_conflict_management_view.dart` — uses raw `16`, `20`, `40`, `100`
-2. `admin_conflict_detail_dialog.dart` — uses raw `20`, `16`, `8`, `12`, `24`
-3. `fault_detail_view.dart` — uses raw `16`, `20`, `40`, `32`
-4. `elevator_list_view.dart` — uses raw `16`, `12`, `8`
-5. `user_management_view.dart` — uses raw `16`, `10`, `12`, `24`, `14`
-
-### Category C — Missing `LayoutBuilder` / `MediaQuery` for multi-size support
-
-The app is locked to portrait mode but still needs to handle:
-- Small phones (< 360 dp width): font scaling must remain legible
-- Tablets (> 600 dp width): dashboard grids should expand to 3+ columns
-
-| File | Current | Recommended |
-|---|---|---|
-| `admin_dashboard_view.dart` | `LayoutBuilder` already in use ✅ | Verify breakpoints at 600 dp |
-| `elevator_list_view.dart` | Single-column `ListView` | Add `LayoutBuilder` → `GridView` at ≥ 600 dp |
-| `user_management_view.dart` | Single-column list | Add `LayoutBuilder` for tablet layout |
-| `technician_management_view.dart` | Single-column list | Same as above |
+## Önerilen Değişiklikler
 
 ---
 
-## Pillar 4 — State-Driven UI Dynamics
+### Workstream 1 — Mojibake Encoding Düzeltmeleri
 
-### Category A — Missing animated transitions on state changes
-
-| File | Current Behavior | Improvement |
-|---|---|---|
-| [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart) | `AnimatedSwitcher` on the status icon ✅ | Extend to the subtitle text below the icon |
-| [elevator_list_view.dart](file:///d:/Asansor/lib/features/elevator/views/elevator_list_view.dart) | `FadeInSlide` on list items ✅ | Add `AnimatedSwitcher` on the filter chips row when `_selectedStatus` changes |
-| [user_management_view.dart](file:///d:/Asansor/lib/features/admin/views/user_management_view.dart) | Tab switch is instant | Wrap `TabBarView` content panes with `AnimatedSwitcher` |
-| `admin_statistics_dashboard.dart` | Charts appear instantly | Wrap chart containers with `AnimatedOpacity` / `FadeInSlide` on first build |
-
-### Category B — Loading skeleton coverage
-
-| Screen | Current | Gap |
-|---|---|---|
-| `fault_detail_view.dart` (loading state) | Full-screen `LoadingState` ✅ | AppBar also shown during load — good |
-| `user_management_view.dart` | `CircularProgressIndicator` only | Replace with `LoadingState(count: 4)` shimmer skeleton |
-| `elevator_list_view.dart` | `LoadingState(count: 6)` ✅ | — |
-| `admin_conflict_management_view.dart` | `CircularProgressIndicator` | Replace with `LoadingState(count: 3)` |
-
-### Category C — Error state consistency
-
-`admin_conflict_management_view.dart` uses a custom `_ErrorState` widget that duplicates the `ErrorState` core widget. Replace with the shared core widget for consistency.
+Uygulama sırası şiddete göre belirlendi (en kritik önce):
 
 ---
 
-## Proposed Execution Order
+#### [MODIFY] [admin_statistics_dashboard.dart](file:///d:/Asansor/lib/features/admin/views/admin_statistics_dashboard.dart)
 
-Phases are ordered from highest risk reduction to lowest:
+**Şiddet: ÇOK AĞIR — Çift/üçlü mojibake**
 
-### Phase 1 — Color Tokens (Critical)
-Fix all `AppColors.*` direct usages and file-scoped `const Color(0xFF…)` declarations. This is the highest-priority work because it causes incorrect dark-mode rendering.
+> [!CAUTION]
+> Bu dosyada `// ──` gibi yorum satırı ayraçları da bozulmuş. Dosyayı doğrudan bir metin editöründe düzeltmeye çalışmak yerine VS Code ile `Reopen with Encoding → UTF-8` yaklaşımı denenmelidir. Eğer bu çalışmazsa, aşağıdaki string'ler manuel olarak tek tek düzeltilmelidir.
 
-**Files to touch (in order):**
-1. `app_colors.dart` — add `navyDark = Color(0xFF1E293B)` token and wire it into `AppThemeColors` (light keeps `navy`, dark uses `navyDark`). This must land first since Phase 1 files depend on it.
-2. `admin_conflict_management_view.dart` — most violations, touches `AppColors.*` and `const Color`; gradient stop now uses `colors.navy`
-3. `admin_conflict_detail_dialog.dart` — file-scoped color constants
-4. `admin_statistics_dashboard.dart` — `const Color(0xFF4ADE80)` + `Colors.white*` on header
-5. `technician_management_view.dart` — `const Color(0xFF4ADE80)` accent
-6. `user_management_view.dart` — technician badge bg uses `colors.primaryDark.withValues(alpha: 0.25)` in dark, `colors.primaryFixed` in light (no new static token)
-7. `fault_detail_view.dart` — `Colors.white` → `colors.onPrimary`; confetti mapped to `[colors.success, colors.blue, colors.error, colors.warning, colors.violet]`
-8. `scanner_view.dart` — `Colors.greenAccent.shade400` → `colors.successLight`
-
-### Phase 2 — Typography Normalization
-Replace all standalone `TextStyle(…)` instances with `textTheme.*?.copyWith(…)` equivalents.
-
-**Files to touch (in order):**
-1. `admin_conflict_management_view.dart` (9 sites)
-2. `admin_conflict_detail_dialog.dart` (5 sites)
-3. `maintenance_log_entry_view.dart` (success dialog)
-4. `offline_banner.dart`
-5. `admin_statistics_dashboard.dart` (chart labels)
-6. `checklist_management_view.dart`
-7. `calendar_assign_sheet.dart`
-8. `admin_map_view.dart`
-9. `admin_master_calendar_view.dart`
-10. `admin_calendar_view.dart`
-
-### Phase 3 — Shadow Color Tokens
-Sweep all `Colors.black.withValues(alpha: X)` shadow usages and replace with `colors.onSurface.withValues(alpha: X)`.
-
-### Phase 4 — Spacing Tokens
-Replace raw spacing literals with `AppSpacing.*` constants across high-traffic files.
-
-### Phase 5 — Responsive Layout Enhancements
-Add **width-based** `LayoutBuilder` grid expansions for tablet portrait (≥ 600 dp). Landscape and true multi-window support are deferred until the portrait orientation lock is lifted.
-
-### Phase 6 — Animation & Skeleton Polish
-Add `AnimatedSwitcher` transitions and replace `CircularProgressIndicator` with shimmer skeletons.
-
----
-
-## Resolved Decisions
-
-All open questions have been answered by the user. These decisions are final and baked into the relevant phases above.
-
-| # | Question | Decision |
+| Satır | Bozuk Metin | Doğru Türkçe |
 |---|---|---|
-| Q1 | `navy` in dark mode | ✅ Add `navyDark = Color(0xFF1E293B)` to `AppColors` and wire into `AppThemeColors`. Gradient stops use `colors.navy` (light) / `colors.navyDark` (dark). |
-| Q2 | `primaryFixed` in dark mode | ✅ **No new static token.** Technician badge bg dynamically falls back to `colors.primaryDark.withValues(alpha: 0.25)` in dark mode. |
-| Q3 | Confetti colors | ✅ Map to app palette: `[colors.success, colors.blue, colors.error, colors.warning, colors.violet]`. |
-| Q4 | Phase 5 scope | ✅ Width-based grid expansion for tablet portrait (≥ 600 dp) only. Landscape deferred. |
+| 82 | `'Aktif ArÃƒâ€Ã‚Â±zalar'` | `'Aktif Arızalar'` |
+| 83 | `'ÃƒÆ'Ã¢â‚¬Â¡ÃƒÆ'Ã‚Â¶zÃƒÆ'Ã‚Â¼m bekliyor'` | `'Çözüm bekliyor'` |
+| 87 | `'GÃƒÆ'Ã‚Â¼ncel'` | `'Güncel'` |
+| 92 | `'Bu Ay ÃƒÆ'Ã¢â‚¬Â¡ÃƒÆ'Ã‚Â¶zÃƒÆ'Ã‚Â¼len'` | `'Bu Ay Çözülen'` |
+| 93 | `'Tamamlanan gÃƒÆ'Ã‚Â¶revler'` | `'Tamamlanan görevler'` |
+| 102 | `'Toplam AsansÃƒÆ'Ã‚Â¶r'` | `'Toplam Asansör'` |
+| 103 | `'Sistemde kayÃƒâ€Ã‚Â±tlÃƒâ€Ã‚Â±'` | `'Sistemde kayıtlı'` |
+| 112 | `'Bekleyen BakÃƒâ€Ã‚Â±m'` | `'Bekleyen Bakım'` |
+| 113 | `'Bu ay planlanmÃƒâ€Ã‚Â±Ãƒâ€¦Ã…Â¸'` | `'Bu ay planlanmış'` |
+| 117 | `'PlanlanmÃƒâ€Ã‚Â±Ãƒâ€¦Ã…Â¸'` | `'Planlanmış'` |
+| 129 | `'Performans ÃƒÆ'Ã‚Â¶zeti'` | `'Performans Özeti'` |
+| 130 | `'AnlÃƒâ€Ã‚Â±k sistem verileri'` | `'Anlık sistem verileri'` |
+| 136 | `'AylÃƒâ€Ã‚Â±k ArÃƒâ€Ã‚Â±za Trendi'` | `'Aylık Arıza Trendi'` |
+| 138 | `'Son 6 aylÃƒâ€Ã‚Â±k arÃƒâ€Ã‚Â±za kayÃƒâ€Ã‚Â±tlarÃƒâ€Ã‚Â±'` | `'Son 6 aylık arıza kayıtları'` |
+| 139 | `'ArÃƒâ€Ã‚Â±za'` | `'Arıza'` |
+| 148 | `'ArÃƒâ€Ã‚Â±za DaÃƒâ€Ã…Â¸Ãƒâ€Ã‚Â±lÃƒâ€Ã‚Â±mÃƒâ€Ã‚Â±'` | `'Arıza Dağılımı'` |
+| 149 | `'BileÃƒâ€¦Ã…Â¸en bazÃƒâ€Ã‚Â±nda analiz'` | `'Bileşen bazında analiz'` |
+| 162 | `'HÃƒâ€Ã‚Â±zlÃƒâ€Ã‚Â± Eylemler'` | `'Hızlı Eylemler'` |
+| 164 | `'SÃƒâ€Ã‚Â±k kullanÃƒâ€Ã‚Â±lan yÃƒÆ'Ã‚Â¶netim iÃƒâ€¦Ã…Â¸lemleri'` | `'Sık kullanılan yönetim işlemleri'` |
+| 175 | `'Veriler yÃƒÆ'Ã‚Â¼klenemedi:\\n$err'` | `'Veriler yüklenemedi:\\n$err'` |
+| 211 | `'Ãƒâ€Ã‚Â°statistikler & Analizler'` | `'İstatistikler & Analizler'` |
+| 219 | `'YÃƒÆ'Ã‚Â¶netici Paneli'` | `'Yönetici Paneli'` |
+| 252 | `'CanlÃƒâ€Ã‚Â±'` | `'Canlı'` |
+| 529 | `'${rod.toY.toInt()} arÃƒâ€Ã‚Â±za'` | `'${rod.toY.toInt()} arıza'` |
+| 818 | `'Rapor Ãƒâ€Ã‚Â°ndir'` | `'Rapor İndir'` |
+| 825 | `'ArÃƒâ€Ã‚Â±zalar'` | `'Arızalar'` |
+
+Yorum satırlarındaki (`// ──`) bozuk box-drawing karakterleri de temizlenecek (satır 13, 37 vb.).
 
 ---
 
-## Verification Plan
+#### [MODIFY] [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart)
 
-### After Each Phase
-- Run `flutter analyze` — zero new warnings.
-- Hot-reload in both **light mode** and **dark mode** on a simulator and confirm no visual regressions.
+**Not:** Bu dosya **CRLF** satır sonları kullanıyor. Düzeltme sırasında satır sonları LF'ye normalize edilmeli (`.gitattributes` veya editör ayarı ile).
 
-### Full Regression Check (After All Phases)
-- Toggle system theme between light/dark; verify every screen adapts correctly.
-- Walk through: Login → Admin Dashboard → Statistics → Technician List → User Management → Elevator List → Fault Detail → Maintenance Log Entry → Conflict Management.
-- Confirm no `Colors.white` or `Colors.black` text appears on a same-tone background in either mode.
+| Satır | Bozuk Metin | Doğru Türkçe |
+|---|---|---|
+| 49, 77, 209 | `'ArÄ±za DetayÄ±'` | `'Arıza Detayı'` |
+| 97 | `'ArÄ±za yÃ¼klenemedi'` | `'Arıza yüklenemedi'` |
+| 189 | `'AsansÃ¶re Git'` | `'Asansöre Git'` |
+| 236 | `'AsansÃ¶r'` | `'Asansör'` |
+| 284 | `'ArÄ±za AÃ§Ä±klamasÄ±'` | `'Arıza Açıklaması'` |
+| 291 | `'AÃ§Ä±klama girilmedi.'` | `'Açıklama girilmedi.'` |
+| 320, 387 | `'Ã‡Ã¶zÃ¼m Notu'` | `'Çözüm Notu'` |
+| 352 | `'OnarÄ±m Tarihi'` | `'Onarım Tarihi'` |
+| 373 | `'Ã‡Ã¶zÃ¼m notu ekle (isteÄŸe baÄŸlÄ±)'` | `'Çözüm notu ekle (isteğe bağlı)'` |
+| 389 | `'YapÄ±lan iÅŸlemleri kÄ±saca aÃ§Ä±klayÄ±nâ€¦'` | `'Yapılan işlemleri kısaca açıklayın…'` |
+| 418 | `'Kaydediliyorâ€¦'` | `'Kaydediliyor…'` |
+| 419 | `'ArÄ±zayÄ± Onar'` | `'Arızayı Onar'` |
+| 434, 476 | `'$elevatorName DetayÄ±na Git'` | `'$elevatorName Detayına Git'` |
+| 457 | `'Ä°ÅŸleniyorâ€¦'` | `'İşleniyor…'` |
+| 458 | `'ArÄ±zayÄ± Yeniden AÃ§'` | `'Arızayı Yeniden Aç'` |
+| 521 | `'ArÄ±zayÄ± Onar'` | `'Arızayı Onar'` |
+| 523 | `'Bu arÄ±zayÄ± onarÄ±ldÄ± olarak iÅŸaretlemek...'` | `'Bu arızayı onarıldı olarak işaretlemek istediğinize emin misiniz?'` |
+| 528 | `'Ä°ptal'` | `'İptal'` |
+| 561 | `'ArÄ±za baÅŸarÄ±yla onarÄ±ldÄ± olarak iÅŸaretlendi.'` | `'Arıza başarıyla onarıldı olarak işaretlendi.'` |
+| 598 | `'ArÄ±za yeniden aÃ§Ä±ldÄ±.'` | `'Arıza yeniden açıldı.'` |
+| 655 | `'Ã‡Ã–ZÃœLDÃœ'` | `'ÇÖZÜLDÜ'` |
+| 728 | `'Onarmak iÃ§in basÄ±lÄ± tutun'` | `'Onarmak için basılı tutun'` |
+| 831 | `'Ã‡Ã¶zÃ¼ldÃ¼'` | `'Çözüldü'` |
+| 927 | `'AsansÃ¶r bilgisi yÃ¼klenemedi'` | `'Asansör bilgisi yüklenemedi'` |
+
+---
+
+#### [MODIFY] [technician_management_view.dart](file:///d:/Asansor/lib/features/admin/views/technician_management_view.dart)
+
+| Satır | Bozuk Metin | Doğru Türkçe |
+|---|---|---|
+| 197 | `'MÃ¼sait'` | `'Müsait'` |
+| 214 | `'BugÃ¼n'` | `'Bugün'` |
+| 431 | `'BugÃ¼nkÃ¼ Ä°lerleme'` | `'Bugünkü İlerleme'` |
+| 439 | `'${stats.todayCompleted}/${stats.todayTotal} gÃ¶rev'` | `'${stats.todayCompleted}/${stats.todayTotal} görev'` |
+| 460 | `'âœ" TÃ¼m gÃ¶revler tamamlandÄ±'` | `'✓ Tüm görevler tamamlandı'` |
+| 461 | `'${stats.todayPending} gÃ¶rev bekliyor'` | `'${stats.todayPending} görev bekliyor'` |
+| 469 | `'BugÃ¼n iÃ§in planlanmÄ±ÅŸ gÃ¶rev yok'` | `'Bugün için planlanmış görev yok'` |
+| 509 | `'${stats.todayTotal} GÃ¶rev'` | `'${stats.todayTotal} Görev'` |
+| 510 | `'GÃ¶revler'` | `'Görevler'` |
+| 536, 556 | `'$name iÃ§in telefon numarasÄ± kayÄ±tlÄ± deÄŸil.'` | `'$name için telefon numarası kayıtlı değil.'` |
+| 545 | `'$name: $phone â€" KopyalandÄ±'` | `'$name: $phone – Kopyalandı'` |
+| 565 | `'Numara kopyalandÄ±: $phone'` | `'Numara kopyalandı: $phone'` |
+| 595 | `'Bu Ay: $count Ä°ÅŸ'` | `'Bu Ay: $count İş'` |
+| 721 | `'BugÃ¼n gÃ¶rev yok'` | `'Bugün görev yok'` |
+| 722 | `'${stats.todayTotal} gÃ¶rev â€" ${stats.todayCompleted} tamamlandÄ±'` | `'${stats.todayTotal} görev – ${stats.todayCompleted} tamamlandı'` |
+| 1027 | `'ACÄ°L'` | `'ACİL'` |
+| 1028 | `'YÃœKSEK'` | `'YÜKSEK'` |
+| 1030 | `'DÃœÅÃœK'` | `'DÜŞÜK'` |
+| 1088 | `'HenÃ¼z teknisyen kaydÄ± yok'` | `'Henüz teknisyen kaydı yok'` |
+| 1096 | `'KullanÄ±cÄ± yÃ¶netiminden teknisyen rolÃ¼ atayÄ±n.'` | `'Kullanıcı yönetiminden teknisyen rolü atayın.'` |
+| 1128 | `'Veriler yÃ¼klenemedi'` | `'Veriler yüklenemedi'` |
+| 1180 | `'$name iÃ§in bugÃ¼n\nplanlanmÄ±ÅŸ gÃ¶rev yok'` | `'$name için bugün\nplanlanmış görev yok'` |
+
+---
+
+#### [MODIFY] [pdf_service.dart](file:///d:/Asansor/lib/core/services/pdf_service.dart)
+
+> [!WARNING]
+> `pdf_service.dart` string'leri ARB'ye **taşınamaz**. `pdf` paketi Flutter `BuildContext`'ine erişemez; `AppLocalizations.of(context)` çağrılamaz. PDF string'leri encoding düzeltmesiyle sabit Türkçe olarak kalacak.
+
+| Satır | Bozuk Metin | Doğru Türkçe |
+|---|---|---|
+| 534 | `'ASANSÃƒâ€"R BAKIM RAPORU'` | `'ASANSÖR BAKIM RAPORU'` |
+| 593 | `'ASANSÃƒâ€"R BÃ„Â°LGÃ„Â°LERÃ„Â°'` | `'ASANSÖR BİLGİLERİ'` |
+| 600 | `'Bina AdÃ„Â±'` | `'Bina Adı'` |
+| 610 | `elevator.address ?? 'BelirtilmemiÃ…Å¸'` | `elevator.address ?? 'Belirtilmemiş'` |
+| 630 | `'Rapor DÃƒÂ¶nemi'` | `'Rapor Dönemi'` |
+| 648 | `'BAKIM GEÃƒâ€¡MÃ„Â°Ã…ÂÃ„Â°'` | `'BAKIM GEÇMİŞİ'` |
+| 663 | `'TARÃ„Â°H'` | `'TARİH'` |
+| 664 | `'TEKNÃ„Â°SYEN'` | `'TEKNİSYEN'` |
+| 665 | `'YAPILAN Ã„Â°Ã…ÂLEMLER / NOTLAR'` | `'YAPILAN İŞLEMLER / NOTLAR'` |
+| 676 | `'Bu dÃƒÂ¶nemde kayÃ„Â±t bulunamadÃ„Â±.'` | `'Bu dönemde kayıt bulunamadı.'` |
+| 698 | `log.isApproved ? 'Ã¢Å"â€œ' : 'Ã¢ÂÂ³'` | `log.isApproved ? '✓' : '✗'` |
+| 711 | `'Toplam kayÃ„Â±t: ${logs.length}'` | `'Toplam kayıt: ${logs.length}'` |
+| 734 | `'Onaylayan / Ã„Â°mza'` | `'Onaylayan / İmza'` |
+| 761 | `'OluÃ…Å¸turulma Tarihi'` | `'Oluşturulma Tarihi'` |
+| 780 | `'Bu rapor otomatik olarak oluÃ…Å¸turulmuÃ…Å¸tur.'` | `'Bu rapor otomatik olarak oluşturulmuştur.'` |
+| 907 | `'Ã…Âub'` | `'Şub'` |
+| 913 | `'AÃ„Å¸u'` | `'Ağu'` |
+| 938 | `'ArÃ„Â±zalÃ„Â±'` | `'Arızalı'` |
+| 940 | `'BakÃ„Â±mda'` | `'Bakımda'` |
+
+---
+
+#### [MODIFY] [log_maintenance_sheet.dart](file:///d:/Asansor/lib/features/elevator/widgets/detail/log_maintenance_sheet.dart)
+
+| Satır | Bozuk Metin | Doğru Türkçe |
+|---|---|---|
+| 38 | `'Oturum bilgisi alÃ„Â±namadÃ„Â±. LÃƒÂ¼tfen tekrar giriÃ…Å¸ yapÄ±n.'` | `'Oturum bilgisi alınamadı. Lütfen tekrar giriş yapın.'` |
+| 79–80 | `'Ã„Â°nternet baÃ„Å¸lantÃ„Â±sÃ„Â± yok...'` | `'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, bağlantı sağlandığında otomatik senkronize edilecek.'` |
+| 81 | `'BakÃ„Â±m kaydÃ„Â± baÃ…Å¸arÃ„Â±yla eklendi.'` | `'Bakım kaydı başarıyla eklendi.'` |
+| 115 | `'LÃƒÂ¼tfen kayÃ„Â±t tamamlanana kadar bekleyin.'` | `'Lütfen kayıt tamamlanana kadar bekleyin.'` |
+| 164 | `'BakÃ„Â±m Ekle'` | `'Bakım Ekle'` |
+| 172 | `'YapÃ„Â±lan bakÃ„Â±mÃ„Â± kaydedin.'` | `'Yapılan bakımı kaydedin.'` |
+| 188 | `'BakÃ„Â±m NotlarÃ„Â±'` | `'Bakım Notları'` |
+| 189 | `'YapÃ„Â±lan iÃ…Å¸lemleri aÃƒÂ§Ä±klayÃ„Â±n...'` | `'Yapılan işlemleri açıklayın...'` |
+| 195 | `'LÃƒÂ¼tfen bakÃ„Â±m notlarÃ„Â± girin.'` | `'Lütfen bakım notları girin.'` |
+| 198 | `'Notlar en az 10 karakter olmalÃ„Â±dÃ„Â±r.'` | `'Notlar en az 10 karakter olmalıdır.'` |
+| 220 | `'BakÃ„Â±mÃ„Â± Kaydet'` | `'Bakımı Kaydet'` |
+
+---
+
+#### [MODIFY] [elevator_maintenance_history.dart](file:///d:/Asansor/lib/features/elevator/widgets/detail/elevator_maintenance_history.dart)
+
+| Satır | Bozuk Metin | Doğru Türkçe |
+|---|---|---|
+| 50 | `'PDF oluÃ…Å¸turulamadÃ„Â±: ...'` | `'PDF oluşturulamadı: ...'` |
+| 75 | `'BakÃ„Â±m GeÃƒÂ§miÃ…Å¸i'` | `'Bakım Geçmişi'` |
+| 86 | `'PDF Rapor OluÃ…Å¸tur (Son 6 Ay)'` | `'PDF Rapor Oluştur (Son 6 Ay)'` |
+| 161 | `'HenÃƒÂ¼z bakÃ„Â±m kaydÃ„Â± yok.'` | `'Henüz bakım kaydı yok.'` |
+| 328 | `'Not belirtilmemiÃ…Å¸'` | `'Not belirtilmemiş'` |
+| 342 | `'BEKLÃ„Â°YOR'` | `'BEKLİYOR'` |
+| 394 | `'Ã…Âub'` | `'Şub'` |
+| 400 | `'AÃ„Å¸u'` | `'Ağu'` |
+
+---
+
+### Workstream 2 — ARB Lokalizasyon Geçişi (Kapsam: Maintenance Form + Auth)
+
+**Sprint 1 kapsamı kasıtlı olarak daraltılmıştır.** Yalnızca `maintenance_log_entry_view.dart` (temiz UTF-8, sadece buton fix'i var) ve auth ekranı string'leri bu sprintte taşınacak. Diğer mojibake'li dosyalar encoding düzeltmesi sonrasında Sprint 2–3'te kademeli olarak ARB'ye geçecek.
+
+#### [MODIFY] [app_tr.arb](file:///d:/Asansor/lib/l10n/app_tr.arb)
+#### [MODIFY] [app_en.arb](file:///d:/Asansor/lib/l10n/app_en.arb)
+#### [MODIFY] [app_de.arb](file:///d:/Asansor/lib/l10n/app_de.arb)
+
+**Eklenecek key'ler:**
+
+```json
+// app_tr.arb — mevcut 8 key'e ek olarak:
+"maintenanceFormTitle": "Yeni Bakım Formu",
+"maintenanceSubmitButton": "Bakımı Kaydet",
+"maintenanceSavingMessage": "Kaydediliyor...",
+"maintenanceSavedTitle": "Bakım Kaydedildi",
+"maintenanceSavedConfirm": "Tamam",
+"maintenanceSignatureError": "Lütfen hem teknisyen hem de müşteri imzasını tamamlayın.",
+"maintenanceSessionError": "Oturum bilgisi alınamadı.",
+"maintenanceSaveError": "Kayıt sırasında hata oluştu: {error}",
+"maintenanceSavePrevention": "Lütfen kaydetme işlemi tamamlanana kadar bekleyin.",
+"generalRetry": "Tekrar Dene",
+"generalCancel": "İptal",
+"generalError": "Hata: {error}"
+
+// app_en.arb:
+"maintenanceFormTitle": "New Maintenance Form",
+"maintenanceSubmitButton": "Save Maintenance",
+"maintenanceSavingMessage": "Saving...",
+"maintenanceSavedTitle": "Maintenance Saved",
+"maintenanceSavedConfirm": "OK",
+"maintenanceSignatureError": "Please complete both the technician and customer signatures.",
+"maintenanceSessionError": "Session information could not be retrieved.",
+"maintenanceSaveError": "Error during save: {error}",
+"maintenanceSavePrevention": "Please wait until the save operation completes.",
+"generalRetry": "Retry",
+"generalCancel": "Cancel",
+"generalError": "Error: {error}"
+
+// app_de.arb:
+"maintenanceFormTitle": "Neues Wartungsformular",
+"maintenanceSubmitButton": "Wartung speichern",
+"maintenanceSavingMessage": "Wird gespeichert...",
+"maintenanceSavedTitle": "Wartung gespeichert",
+"maintenanceSavedConfirm": "OK",
+"maintenanceSignatureError": "Bitte vervollständigen Sie beide Unterschriften.",
+"maintenanceSessionError": "Sitzungsinformationen konnten nicht abgerufen werden.",
+"maintenanceSaveError": "Fehler beim Speichern: {error}",
+"maintenanceSavePrevention": "Bitte warten Sie, bis der Speichervorgang abgeschlossen ist.",
+"generalRetry": "Erneut versuchen",
+"generalCancel": "Abbrechen",
+"generalError": "Fehler: {error}"
+```
+
+#### [MODIFY] [maintenance_log_entry_view.dart](file:///d:/Asansor/lib/features/maintenance/views/maintenance_log_entry_view.dart)
+
+ARB key'leri eklenip `flutter gen-l10n` çalıştırıldıktan sonra, bu dosyadaki hard-coded string'ler `AppLocalizations.of(context)!.maintenanceFormTitle` gibi çağrılarla değiştirilecek. Bu dosya temiz UTF-8 ile yazıldığından encoding düzeltmesi gerekmez — yalnızca ARB geçişi ve buton fix'i uygulanacak.
+
+---
+
+### Workstream 3 — Kritik Etkileşim Hataları
+
+#### 3a — [MODIFY] [maintenance_log_entry_view.dart](file:///d:/Asansor/lib/features/maintenance/views/maintenance_log_entry_view.dart) — Submit Buton Yapısı
+
+**Sorun (Satır 739–770):**
+
+```dart
+// ❌ MEVCUT — İç içe interaktif widget, inner callback boş
+AnimatedPressButton(
+  onPressed: maintenanceState.isLoading ? null : _submit,
+  child: SizedBox(
+    width: double.infinity,
+    height: 50,
+    child: FilledButton.icon(
+      onPressed: maintenanceState.isLoading ? null : () {}, // ← BOŞ!
+      ...
+    ),
+  ),
+),
+```
+
+**Düzeltme (Önerilen — Seçenek A):**
+
+`AnimatedPressButton` widget'ını incele: eğer kendi `GestureDetector`/`InkWell`'i varsa, bunu `IgnorePointer` ile sarmala ya da gesture'ı child'a geçirecek şekilde refactor et. `FilledButton.icon`'ın `onPressed`'ini gerçek `_submit`'e bağla:
+
+```dart
+// ✅ DÜZELTME
+AnimatedPressButton(
+  // AnimatedPressButton yalnızca scale/press animasyonu yapar,
+  // tap event'ini FilledButton yakalar
+  child: FilledButton.icon(
+    onPressed: maintenanceState.isLoading ? null : _submit, // ← GERÇEK
+    icon: maintenanceState.isLoading
+        ? const SizedBox(
+            width: 24, height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5, color: Colors.white,
+            ),
+          )
+        : const Icon(Icons.check_circle_outline),
+    label: Text(
+      maintenanceState.isLoading ? 'Kaydediliyor...' : 'Bakımı Kaydet',
+      style: textTheme.titleMedium?.copyWith(color: colors.surface),
+    ),
+    style: FilledButton.styleFrom(
+      minimumSize: const Size(double.infinity, 50),
+      backgroundColor: colors.primary,
+      foregroundColor: colors.surface,
+    ),
+  ),
+),
+```
+
+> [!NOTE]
+> Eğer `AnimatedPressButton`'ın kendi gesture katmanı çıkarılamıyorsa (kütüphane widget'ı ise), **Seçenek B:** `AnimatedPressButton`'ı tamamen kaldır, direkt `FilledButton.icon` kullan. Animasyon kaybı ihmal edilebilir düzeyde.
+
+---
+
+#### 3b — [MODIFY] [fault_detail_view.dart](file:///d:/Asansor/lib/features/fault/views/fault_detail_view.dart) — Long-Press Kaldırma
+
+**Sorun:** Satır 728'deki durum header'ı yalnızca long-press ile aksiyon tetikliyor. `'Onarmak için basılı tutun'` tooltip'inin varlığı, bu sorunu tasarım aşamasında fark eden ekibin bunu telafi etmeye çalıştığının göstergesi.
+
+**Karar: Long-press tamamen kaldırılacak, yerine duruma göre değişen görünür butonlar konacak.**
+
+Gerekçe: Arızayı onar/yeniden aç, bu uygulamanın birincil iş aksiyonu. WCAG 2.5.1'e göre primary action'lar tek dokunuşla erişilebilir olmak zorunda. Confirm dialog zaten ikinci güvenlik katmanı görevi görüyor — long-press gereksiz.
+
+**Düzeltme:**
+
+```dart
+// 1. Header'daki GestureDetector/InkWell long-press handler'ını KALDIR
+// 2. Satır 728'deki 'Onarmak için basılı tutun' tooltip'ini KALDIR
+// 3. Aksiyon alanına aşağıdaki butonları EKLE:
+
+// Arıza durumuna göre koşullu aksiyon butonu:
+if (fault.status != FaultStatus.resolved)
+  FilledButton.icon(
+    onPressed: _onResolvePressed, // mevcut confirm dialog'u tetikler
+    icon: const Icon(Icons.check_circle_outline),
+    label: const Text('Arızayı Onar'),
+    style: FilledButton.styleFrom(
+      minimumSize: const Size(double.infinity, 48),
+    ),
+  )
+else
+  OutlinedButton.icon(
+    onPressed: _onReopenPressed, // mevcut confirm dialog'u tetikler
+    icon: const Icon(Icons.refresh_rounded),
+    label: const Text('Arızayı Yeniden Aç'),
+    style: OutlinedButton.styleFrom(
+      minimumSize: const Size(double.infinity, 48),
+    ),
+  ),
+```
+
+> [!NOTE]
+> Mevcut confirm dialog'lar (`'Bu arızayı onarıldı olarak işaretlemek istediğinize emin misiniz?'`) **korunacak** — long-press kaldırılıyor, doğrulama akışı aynı kalıyor.
+
+---
+
+### Workstream 4 — CI/CD İyileştirmeleri
+
+#### [MODIFY] [flutter_ci.yml](file:///d:/Asansor/.github/workflows/flutter_ci.yml)
+
+`flutter analyze` adımından **önce** mojibake kontrolü ekle:
+
+```yaml
+- name: Check for mojibake (corrupted Turkish characters)
+  run: |
+    if grep -rn --include="*.dart" -P "[\xc3][\x80-\xbf]|[\xc4][\x80-\xbf]|[\xc5][\x80-\xbf]" lib/; then
+      echo "❌ Mojibake detected. Fix encoding before committing."
+      exit 1
+    fi
+    echo "✅ No mojibake found."
+```
+
+#### [MODIFY] [test.yml](file:///d:/Asansor/.github/workflows/test.yml)
+
+Mevcut `test.yml`'de tespit edilen 3 kritik sorun düzeltilecek:
+
+```yaml
+# 1. Workflow adını değiştir (flutter_ci.yml ile çakışıyor)
+name: Flutter Test & Format  # "Flutter CI" yerine
+
+# 2. .env dummy dosyası ekle (şu anda eksik — build başarısız olur)
+- name: Create dummy .env file
+  run: touch .env
+
+# 3. dart format satırını geçici olarak comment'e al (mojibake fix tamamlanana kadar)
+# - run: dart format --output=none --set-exit-if-changed .
+# Mojibake düzeltmeleri push edildikten SONRA bu satır aktif edilecek
+```
+
+> [!CAUTION]
+> `dart format --set-exit-if-changed .` komutu, mojibake içeren dosyaları format hatası olarak algılıyor ve CI'ı başarısız yapıyor. Bu satır **önce encoding düzeltilir, sonra aktif edilir**.
+
+---
+
+## Uygulama Sıralaması
+
+```
+Gün 1 AM  → admin_statistics_dashboard.dart (en ağır — çift/üçlü mojibake)
+Gün 1 PM  → fault_detail_view.dart (CRLF → LF normalizasyonu dahil)
+Gün 2 AM  → technician_management_view.dart + pdf_service.dart
+Gün 2 PM  → log_maintenance_sheet.dart + elevator_maintenance_history.dart
+Gün 3 AM  → ARB key'leri ekle (maintenance + auth) + flutter gen-l10n çalıştır
+Gün 3 PM  → maintenance_log_entry_view.dart: string'leri ARB çağrılarıyla değiştir
+             + submit buton yapısını düzelt (inner callback → _submit)
+Gün 4 AM  → fault_detail_view.dart: long-press kaldır, görünür aksiyon butonları ekle
+Gün 4 PM  → test.yml sorunlarını düzelt + CI mojibake kontrolü ekle
+             + flutter analyze + flutter test + dart format → PR aç
+```
+
+---
+
+## Doğrulama Planı
+
+### Otomatik Testler
+
+```bash
+# 1. Mojibake taraması (sıfır sonuç beklenir)
+grep -rn --include="*.dart" -P "[\xc3][\x80-\xbf]|Ã|Ä±|Ã¼" lib/
+
+# 2. Lokalizasyon derleme
+flutter gen-l10n
+
+# 3. Statik analiz
+flutter analyze
+
+# 4. Mevcut test suite
+flutter test
+
+# 5. Format kontrolü (yalnızca mojibake fix tamamlandıktan sonra)
+dart format --output=none --set-exit-if-changed .
+```
+
+### Manuel Doğrulama
+
+| Ekran | Kontrol Noktası |
+|---|---|
+| Arıza Detayı | Sayfa başlığı, butonlar, durum etiketleri doğru Türkçe |
+| Teknisyen Yönetimi | Durum etiketleri, snackbar mesajları, görev sayaçları doğru |
+| Admin İstatistik | Tüm metrik kartları, grafik etiketleri, hızlı eylemler doğru |
+| Bakım Geçmişi | Bölüm başlığı, PDF butonu, boş durum mesajı doğru |
+| Bakım Formu Submit | Tek tıklamada `_submit` tetikleniyor, loading spinner doğru çalışıyor |
+| Bakım Formu Submit | Ekran okuyucu (TalkBack/VoiceOver) butonu doğru okuyor |
+| Arıza Detayı Aksiyon | Long-press **yok**, görünür `FilledButton`/`OutlinedButton` ile aksiyon yapılabiliyor |
+| Arıza Detayı Aksiyon | Confirm dialog çalışıyor (doğrulama akışı bozulmamış) |
+| PDF Oluştur | Başlık, tablo header'ları, ay isimleri, durum etiketleri doğru Türkçe |
+| CI Pipeline | Mojibake check adımı yeşil, `dart format` adımı aktif ve geçiyor |
+
+---
+
+## Kabul Kriterleri
+
+- [ ] `grep -rn --include="*.dart" -P "[\xc3][\x80-\xbf]|Ã|Ä±|Ã¼" lib/` **sıfır sonuç** döndürüyor
+- [ ] Manuel PDF oluşturma testi: başlıklar, tablo header'ları, ay isimleri doğru Türkçe
+- [ ] `app_tr.arb`, `app_en.arb`, `app_de.arb`'de maintenance ile ilgili 12 yeni key mevcut (3 dil × 12)
+- [ ] `flutter gen-l10n` hatasız tamamlanıyor
+- [ ] Bakım formu submit butonuna tıklandığında yalnızca `_submit` çağrılıyor (iç içe boş callback yok)
+- [ ] Fault detail'de `GestureDetector` long-press handler **kaldırıldı**, yerine `FilledButton`/`OutlinedButton` var
+- [ ] Arıza onar/yeniden aç confirm dialog akışı bozulmadan çalışıyor
+- [ ] `flutter analyze` sıfır hata ile tamamlanıyor
+- [ ] `test.yml` isim çakışması düzeltildi, `.env` adımı eklendi, `dart format` adımı aktif
+- [ ] CI pipeline'a mojibake kontrolü eklendi ve tüm değişiklikler push edildikten sonra yeşil

@@ -47,7 +47,7 @@ class MaintenanceHistorySectionState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'PDF oluÃ…Å¸turulamadÃ„Â±: ${e.toString().replaceFirst('Exception: ', '')}',
+            'PDF oluşturulamadı: ${e.toString().replaceFirst('Exception: ', '')}',
           ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppThemeColors.of(context).error,
@@ -72,7 +72,7 @@ class MaintenanceHistorySectionState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'BakÃ„Â±m GeÃƒÂ§miÃ…Å¸i',
+              'Bakım Geçmişi',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: colors.onSurface,
@@ -81,9 +81,9 @@ class MaintenanceHistorySectionState
             ),
             Row(
               children: [
-                // Ã¢â€â‚¬Ã¢â€â‚¬ PDF Report button Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+                // ─â‚¬─â‚¬ PDF Report button ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
                 Tooltip(
-                  message: 'PDF Rapor OluÃ…Å¸tur (Son 6 Ay)',
+                  message: 'PDF Rapor Oluştur (Son 6 Ay)',
                   child: _generatingPdf
                       ? SizedBox(
                           width: 18,
@@ -158,7 +158,7 @@ class MaintenanceHistorySectionState
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'HenÃƒÂ¼z bakÃ„Â±m kaydÃ„Â± yok.',
+                        'Henüz bakım kaydı yok.',
                         style: textTheme.titleSmall?.copyWith(
                           color: colors.outline,
                           fontWeight: FontWeight.w500,
@@ -189,7 +189,7 @@ class MaintenanceHistorySectionState
   }
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬ Timeline item Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// ─â‚¬─â‚¬ Timeline item ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
 
 class TimelineItem extends StatelessWidget {
   const TimelineItem({super.key, required this.log, required this.isLast});
@@ -206,18 +206,18 @@ class TimelineItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Ã¢â€â‚¬Ã¢â€â‚¬ Left column: dot + connector line Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+          // ─â‚¬─â‚¬ Left column: dot + connector line ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
           SizedBox(
             width: 32,
             child: Column(
               children: [
                 const SizedBox(height: 6),
-                // Dot with ring effect (ring-4 ring-surface Ã¢â€ â€™ white border)
+                // Dot with ring effect (ring-4 ring-surface ─ â€™ white border)
                 Container(
                   width: 16,
                   height: 16,
                   decoration: BoxDecoration(
-                    // Approved Ã¢â€ â€™ primary dot; pending Ã¢â€ â€™ outline-variant dot
+                    // Approved ─ â€™ primary dot; pending ─ â€™ outline-variant dot
                     color: log.isApproved
                         ? colors.primary
                         : colors.outlineVariant,
@@ -238,7 +238,7 @@ class TimelineItem extends StatelessWidget {
             ),
           ),
 
-          // Ã¢â€â‚¬Ã¢â€â‚¬ Right column: card Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+          // ─â‚¬─â‚¬ Right column: card ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(left: 16, bottom: isLast ? 0 : 24),
@@ -325,7 +325,7 @@ class TimelineCard extends StatelessWidget {
 
           // Notes text (italic like the Stitch design)
           Text(
-            '"${log.notes ?? 'Not belirtilmemiÃ…Å¸'}"',
+            '"${log.notes ?? 'Not belirtilmemiş'}"',
             style: textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: colors.onSurface,
@@ -339,7 +339,7 @@ class TimelineCard extends StatelessWidget {
           Row(
             children: [
               StatusChip(
-                label: log.isApproved ? 'ONAYLANDI' : 'BEKLÃ„Â°YOR',
+                label: log.isApproved ? 'ONAYLANDI' : 'BEKLİYOR',
                 bg: log.isApproved
                     ? colors
                           .errorContainer // secondary-container
@@ -391,13 +391,13 @@ class StatusChip extends StatelessWidget {
 
 final List<String> _monthsTr = [
   'Oca',
-  'Ã…Âub',
+  'Şub',
   'Mar',
   'Nis',
   'May',
   'Haz',
   'Tem',
-  'AÃ„Å¸u',
+  'Ağu',
   'Eyl',
   'Eki',
   'Kas',

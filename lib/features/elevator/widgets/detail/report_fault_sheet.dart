@@ -54,9 +54,9 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
             SnackBar(
               content: Text(
                 fault.isOfflineQueued
-                    ? 'Ã„Â°nternet baÃ„Å¸lantÃ„Â±sÃ„Â± yok. KayÃ„Â±t cihaza kaydedildi, '
-                          'baÃ„Å¸lantÃ„Â± saÃ„Å¸landÃ„Â±Ã„Å¸Ã„Â±nda otomatik senkronize edilecek.'
-                    : 'ArÃ„Â±za baÃ…Å¸arÃ„Â±yla bildirildi.',
+                    ? 'İnternet bağlantısı yok. Kayıt cihaza kaydedildi, '
+                          'bağlantı sağlandığında otomatik senkronize edilecek.'
+                    : 'Arıza başarıyla bildirildi.',
               ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: fault.isOfflineQueued
@@ -90,7 +90,7 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
         if (!didPop && isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('LÃƒÂ¼tfen kayÃ„Â±t tamamlanana kadar bekleyin.'),
+              content: Text('Lütfen kayıt tamamlanana kadar bekleyin.'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -139,7 +139,7 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'ArÃ„Â±za Bildir',
+                            'Arıza Bildir',
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w700,
@@ -147,7 +147,7 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
                                 ),
                           ),
                           Text(
-                            'GÃƒÂ¶zlemlenen arÃ„Â±zayÃ„Â± aÃƒÂ§Ã„Â±klayÃ„Â±n.',
+                            'Gözlemlenen arızayı açıklayın.',
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: AppColors.outline),
                           ),
@@ -163,18 +163,17 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
                     textInputAction: TextInputAction.newline,
                     enabled: !isLoading,
                     decoration: const InputDecoration(
-                      labelText: 'ArÃ„Â±za AÃƒÂ§Ã„Â±klamasÃ„Â±',
-                      hintText:
-                          'ArÃ„Â±zayÃ„Â± detaylÃ„Â± aÃƒÂ§Ã„Â±klayÃ„Â±n...',
+                      labelText: 'Arıza Açıklaması',
+                      hintText: 'Arızayı detaylı açıklayın...',
                       alignLabelWithHint: true,
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
-                        return 'LÃƒÂ¼tfen bir aÃƒÂ§Ã„Â±klama girin.';
+                        return 'Lütfen bir açıklama girin.';
                       }
                       if (v.trim().length < 10) {
-                        return 'AÃƒÂ§Ã„Â±klama en az 10 karakter olmalÃ„Â±dÃ„Â±r.';
+                        return 'Açıklama en az 10 karakter olmalıdır.';
                       }
                       return null;
                     },
@@ -196,7 +195,7 @@ class _ReportFaultSheetState extends ConsumerState<ReportFaultSheet> {
                             ),
                           )
                         : Text(
-                            'ArÃ„Â±zayÃ„Â± GÃƒÂ¶nder',
+                            'Arızayı Gönder',
                             style: Theme.of(context).textTheme.labelLarge
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),

@@ -9,5 +9,72 @@
   "loginPasswordLabel": "Password",
   "loginButton": "Sign In",
   "homeActiveFaults": "Active Faults",
-  "homeDailyAgenda": "Daily Agenda"
+  "homeDailyAgenda": "Daily Agenda",
+
+  "loginSubTitle": "Enter your details to access your account.",
+  "loginEmailValidationErrorEmpty": "Please enter your email address.",
+  "loginEmailValidationErrorInvalid": "Please enter a valid email address.",
+  "loginPasswordValidationErrorEmpty": "Please enter your password.",
+  "loginPasswordValidationErrorLength": "Password must be at least 6 characters.",
+  "loginSecureConnection": "Secure Connection",
+  "appSubTitle": "Maintenance & Fault Tracking System",
+
+  "maintenanceFormTitle": "New Maintenance Form",
+  "maintenanceSavedTitle": "Maintenance Saved",
+  "maintenanceSavedConfirm": "OK",
+  "maintenanceSaveError": "Error occurred during save: {error}",
+  "@maintenanceSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenanceSavePrevention": "Please wait until the save operation completes.",
+  "maintenanceSessionError": "Session information could not be retrieved.",
+  "maintenanceSignatureError": "Please complete both the technician and customer signatures.",
+  "maintenanceChecklistSection": "Checklist",
+  "maintenanceChecklistEmpty": "No active checklist items found.",
+  "maintenanceChecklistProgress": "{checked} / {total} completed",
+  "@maintenanceChecklistProgress": {
+    "placeholders": {
+      "checked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "maintenanceChecklistLoadError": "Could not load checklist: {error}",
+  "@maintenanceChecklistLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenancePhotosSection": "Photos",
+  "maintenancePhotosCamera": "Camera",
+  "maintenancePhotosGallery": "Gallery",
+  "maintenancePhotosRemoveTooltip": "Remove photo",
+  "maintenancePhotosEmpty": "No photos added yet.",
+  "maintenanceNotesSection": "Maintenance Notes",
+  "maintenanceNotesHint": "Enter actions taken, parts replaced, etc. here...",
+  "maintenanceSignaturesSection": "Signatures",
+  "maintenanceSignatureTechLabel": "Technician Signature",
+  "maintenanceSignatureCustLabel": "Customer Signature",
+  "maintenanceSignatureClear": "Clear",
+  "maintenanceSubmitButton": "Save Maintenance",
+  "maintenanceSavingMessage": "Saving...",
+  "generalError": "Error: {error}",
+  "@generalError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "generalRetry": "Retry",
+  "generalCancel": "Cancel"
 }

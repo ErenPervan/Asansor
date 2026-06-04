@@ -273,7 +273,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                           ),
                         ),
                         child: Text(
-                          'Bakım & Arıza Takip Sistemi',
+                          l10n.appSubTitle,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 fontWeight: FontWeight.w600,
@@ -328,7 +328,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Hesabınıza erişmek için bilgilerinizi girin.',
+                            l10n.loginSubTitle,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   color: colors.onSurfaceVariant,
@@ -359,10 +359,10 @@ class _LoginViewState extends ConsumerState<LoginView>
                             ),
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
-                                return 'Lütfen e-posta adresinizi girin.';
+                                return l10n.loginEmailValidationErrorEmpty;
                               }
                               if (!v.contains('@')) {
-                                return 'Geçerli bir e-posta adresi girin.';
+                                return l10n.loginEmailValidationErrorInvalid;
                               }
                               return null;
                             },
@@ -402,10 +402,10 @@ class _LoginViewState extends ConsumerState<LoginView>
                             ),
                             validator: (v) {
                               if (v == null || v.isEmpty) {
-                                return 'Lütfen şifrenizi girin.';
+                                return l10n.loginPasswordValidationErrorEmpty;
                               }
                               if (v.length < 6) {
-                                return 'Şifre en az 6 karakter olmalıdır.';
+                                return l10n.loginPasswordValidationErrorLength;
                               }
                               return null;
                             },
@@ -466,7 +466,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                               ),
                               const SizedBox(width: 10),
                               Text(
-                                'Güvenli Bağlantı',
+                                l10n.loginSecureConnection,
                                 style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
                                       color: colors.onSurfaceVariant,

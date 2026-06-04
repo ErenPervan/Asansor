@@ -22,7 +22,7 @@ const _dotRed = AppColors.error;
 const _dotGreen = AppColors.successLight;
 const _dotAmber = AppColors.warningLight;
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 class AdminMasterCalendarView extends ConsumerStatefulWidget {
   const AdminMasterCalendarView({super.key});
@@ -51,8 +51,8 @@ class _AdminMasterCalendarViewState
         data: (result) {
           if (result == null) return;
           final msg = result.inserted > 0
-              ? '${result.inserted} adet asansÃ¶rÃ¼n bakÄ±mÄ± takvime eklendi! âœ…'
-              : 'Bu ay iÃ§in tÃ¼m periyodik bakÄ±mlar zaten mevcut.';
+              ? '${result.inserted} adet asansörün bakımı takvime eklendi! âœ…'
+              : 'Bu ay için tüm periyodik bakımlar zaten mevcut.';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(msg),
@@ -124,7 +124,7 @@ class _AdminMasterCalendarViewState
           ),
         ],
       ),
-      // â”€â”€ FAB: "Bu AyÄ± Planla" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // ── FAB: "Bu Ayı Planla" ──────────────────────────────────────────────
       floatingActionButton: FloatingActionButton.extended(
         onPressed: isGenerating
             ? null
@@ -140,7 +140,7 @@ class _AdminMasterCalendarViewState
               )
             : const Icon(Icons.auto_fix_high_rounded),
         label: Text(
-          isGenerating ? 'OluÅŸturuluyorâ€¦' : 'Bu AyÄ± Planla',
+          isGenerating ? 'Oluşturuluyor…' : 'Bu Ayı Planla',
           style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
         backgroundColor: isGenerating ? colors.outline : colors.primary,
@@ -160,7 +160,7 @@ class _AdminMasterCalendarViewState
 
           return Column(
             children: [
-              // â”€â”€ Calendar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Calendar ────────────────────────────────────────────
               _CalendarSection(
                 focusedDay: _focusedDay,
                 selectedDay: _selectedDay,
@@ -174,10 +174,10 @@ class _AdminMasterCalendarViewState
 
               Divider(height: 1, color: colors.outlineVariant),
 
-              // â”€â”€ Day header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Day header ──────────────────────────────────────────
               _DayHeader(day: _selectedDay, taskCount: dayTasks.length),
 
-              // â”€â”€ Task list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Task list ───────────────────────────────────────────
               Expanded(
                 child: dayTasks.isEmpty
                     ? _EmptyDayPlaceholder(day: _selectedDay)
@@ -244,9 +244,9 @@ class _AdminMasterCalendarViewState
           ],
         ),
         content: Text(
-          '$monthLabel ayÄ± iÃ§in eksik olan tÃ¼m periyodik bakÄ±mlar '
-          'otomatik oluÅŸturulacak.\n\n'
-          'OnaylÄ±yor musunuz?',
+          '$monthLabel ayı için eksik olan tüm periyodik bakımlar '
+          'otomatik oluşturulacak.\n\n'
+          'Onaylıyor musunuz?',
           style: textTheme.bodyMedium?.copyWith(
             height: 1.5,
             color: colors.onSurfaceVariant,
@@ -256,7 +256,7 @@ class _AdminMasterCalendarViewState
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
             child: Text(
-              'Ä°ptal',
+              'İptal',
               style: Theme.of(
                 context,
               ).textTheme.labelLarge?.copyWith(color: colors.onSurfaceVariant),
@@ -279,7 +279,7 @@ class _AdminMasterCalendarViewState
     }
   }
 
-  // â”€â”€ Pure helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Pure helpers ────────────────────────────────────────────────────────
 
   static List<ScheduleWithDetails> _applyFilter(
     List<ScheduleWithDetails> all,
@@ -313,7 +313,7 @@ class _AdminMasterCalendarViewState
       '${d.day.toString().padLeft(2, '0')}';
 }
 
-// â”€â”€ Calendar section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Calendar section ──────────────────────────────────────────────────────────
 
 class _CalendarSection extends StatelessWidget {
   const _CalendarSection({
@@ -354,7 +354,7 @@ class _CalendarSection extends StatelessWidget {
               '${day.day.toString().padLeft(2, '0')}';
           return eventMap[key] ?? [];
         },
-        // â”€â”€ Style â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Style ──────────────────────────────────────────────────────
         calendarStyle: CalendarStyle(
           // Selected day: solid crimson circle with white text.
           selectedDecoration: BoxDecoration(
@@ -424,7 +424,7 @@ class _CalendarSection extends StatelessWidget {
               ) ??
               const TextStyle(),
         ),
-        // â”€â”€ Marker builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Marker builder ─────────────────────────────────────────────
         calendarBuilders: CalendarBuilders<ScheduleWithDetails>(
           markerBuilder: (context, day, events) {
             if (events.isEmpty) return null;
@@ -466,7 +466,7 @@ class _CalendarSection extends StatelessWidget {
   }
 }
 
-// â”€â”€ Day header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Day header ────────────────────────────────────────────────────────────────
 
 class _DayHeader extends StatelessWidget {
   const _DayHeader({required this.day, required this.taskCount});
@@ -505,7 +505,7 @@ class _DayHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              '$taskCount gÃ¶rev',
+              '$taskCount görev',
               style: textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: taskCount > 0 ? colors.primary : colors.onSurfaceVariant,
@@ -518,7 +518,7 @@ class _DayHeader extends StatelessWidget {
   }
 }
 
-// â”€â”€ Task card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Task card ─────────────────────────────────────────────────────────────────
 
 class _MasterTaskCard extends StatelessWidget {
   const _MasterTaskCard({required this.task});
@@ -739,7 +739,7 @@ class _MasterTaskCard extends StatelessWidget {
   }
 }
 
-// â”€â”€ Status icon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Status icon ───────────────────────────────────────────────────────────────
 
 class _StatusIcon extends StatelessWidget {
   const _StatusIcon({required this.status});
@@ -766,7 +766,7 @@ class _StatusIcon extends StatelessWidget {
   }
 }
 
-// â”€â”€ Priority badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Priority badge ────────────────────────────────────────────────────────────
 
 class _PriorityBadge extends StatelessWidget {
   const _PriorityBadge({required this.priority});
@@ -783,22 +783,18 @@ class _PriorityBadge extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     switch (p) {
       case 'emergency':
-        return ('ACÄ°L', colors.errorContainer, colors.error);
+        return ('ACİL', colors.errorContainer, colors.error);
       case 'high':
-        return ('YÃœKSEK', colors.warningContainer, colors.warning);
+        return ('YÜKSEK', colors.warningContainer, colors.warning);
       case 'low':
-        return (
-          'DÃœÅÃœK',
-          colors.surfaceContainerHigh,
-          colors.onSurfaceVariant,
-        );
+        return ('DÜÅÜK', colors.surfaceContainerHigh, colors.onSurfaceVariant);
       default: // normal
         return ('NORMAL', colors.surfaceContainer, colors.onSurface);
     }
   }
 }
 
-// â”€â”€ Status badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Status badge ──────────────────────────────────────────────────────────────
 
 class _TaskStatusBadge extends StatelessWidget {
   const _TaskStatusBadge({required this.status});
@@ -828,7 +824,7 @@ class _TaskStatusBadge extends StatelessWidget {
   }
 }
 
-// â”€â”€ Shared badge widget â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Shared badge widget ───────────────────────────────────────────────────────
 
 class _Badge extends StatelessWidget {
   const _Badge({required this.label, required this.bg, required this.fg});
@@ -857,7 +853,7 @@ class _Badge extends StatelessWidget {
   }
 }
 
-// â”€â”€ Empty placeholder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Empty placeholder ─────────────────────────────────────────────────────────
 
 class _EmptyDayPlaceholder extends StatelessWidget {
   const _EmptyDayPlaceholder({required this.day});
@@ -887,7 +883,7 @@ class _EmptyDayPlaceholder extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              '$label iÃ§in\nplanlanmÄ±ÅŸ gÃ¶rev yok',
+              '$label için\nplanlanmış görev yok',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppThemeColors.of(context).onSurfaceVariant,
@@ -901,7 +897,7 @@ class _EmptyDayPlaceholder extends StatelessWidget {
   }
 }
 
-// â”€â”€ Error view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Error view ────────────────────────────────────────────────────────────────
 
 class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.error, required this.onRetry});
@@ -924,7 +920,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Veriler yÃ¼klenemedi',
+              'Veriler yüklenemedi',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppThemeColors.of(context).onSurface,
@@ -953,7 +949,7 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-// â”€â”€ Filter sheet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Filter sheet ──────────────────────────────────────────────────────────────
 
 class _FilterSheet extends ConsumerWidget {
   const _FilterSheet({required this.allSchedules});
@@ -961,11 +957,11 @@ class _FilterSheet extends ConsumerWidget {
   final List<ScheduleWithDetails> allSchedules;
 
   static const _statusOptions = [
-    ('', 'TÃ¼mÃ¼'),
+    ('', 'Tümü'),
     ('pending', 'Bekliyor'),
     ('in_progress', 'Devam Ediyor'),
-    ('completed', 'TamamlandÄ±'),
-    ('cancelled', 'Ä°ptal Edildi'),
+    ('completed', 'Tamamlandı'),
+    ('cancelled', 'İptal Edildi'),
   ];
 
   @override
@@ -974,8 +970,8 @@ class _FilterSheet extends ConsumerWidget {
     final notifier = ref.read(masterCalendarFilterProvider.notifier);
 
     // Build unique, alphabetically sorted technician list.
-    // Skip unassigned tasks (empty technicianId) â€” they would otherwise show
-    // up as an "AtanmamÄ±ÅŸ" entry which doesn't make sense as a filter chip.
+    // Skip unassigned tasks (empty technicianId) — they would otherwise show
+    // up as an "Atanmamış" entry which doesn't make sense as a filter chip.
     final seen = <String>{};
     final technicians = <MapEntry<String, String>>[];
     for (final s in allSchedules) {
@@ -1040,17 +1036,17 @@ class _FilterSheet extends ConsumerWidget {
               ),
               const SizedBox(height: 4),
 
-              // â”€â”€ Technician section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Technician section ──────────────────────────────────
               if (technicians.isNotEmpty) ...[
-                const _SheetSectionLabel('TEKNÄ°SYEN'),
+                const _SheetSectionLabel('TEKNİSYEN'),
                 const SizedBox(height: AppSpacing.sm),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    // "TÃ¼mÃ¼" chip
+                    // "Tümü" chip
                     _FilterChipItem(
-                      label: 'TÃ¼mÃ¼',
+                      label: 'Tümü',
                       selected: filter.technicianId == null,
                       onSelected: () => notifier.setTechnician(null),
                     ),
@@ -1069,7 +1065,7 @@ class _FilterSheet extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.md),
               ],
 
-              // â”€â”€ Status section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Status section ──────────────────────────────────────
               const _SheetSectionLabel('DURUM'),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
@@ -1148,7 +1144,7 @@ class _FilterChipItem extends StatelessWidget {
   }
 }
 
-// â”€â”€ Legend row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Legend row ────────────────────────────────────────────────────────────────
 
 /// Shown at the bottom of the calendar legend (optional, not used in main UI
 /// but exported so the admin can read what each dot colour means at a glance).
@@ -1160,11 +1156,11 @@ class CalendarLegend extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _LegendDot(color: _dotRed, label: 'Acil/YÃ¼ksek'),
+        _LegendDot(color: _dotRed, label: 'Acil/Yüksek'),
         const SizedBox(width: AppSpacing.md),
         _LegendDot(color: _dotAmber, label: 'Bekliyor'),
         const SizedBox(width: AppSpacing.md),
-        _LegendDot(color: _dotGreen, label: 'TamamlandÄ±'),
+        _LegendDot(color: _dotGreen, label: 'Tamamlandı'),
       ],
     );
   }

@@ -1,4 +1,4 @@
-name: Flutter CI
+name: Flutter Test & Format
 
 on:
   push:
@@ -26,6 +26,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Create dummy .env file
+        run: touch .env
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .

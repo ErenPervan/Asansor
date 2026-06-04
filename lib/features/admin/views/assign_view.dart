@@ -21,7 +21,7 @@ import '../../../core/enums/app_enums.dart';
 import '../../../core/theme/input_decorations.dart';
 import '../../../core/widgets/section_label.dart';
 import '../../../core/constants/app_durations.dart';
-// â”€â”€ AssignView â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── AssignView ────────────────────────────────────────────────────────────────
 
 /// Screen that allows a manager/admin to create a new maintenance schedule:
 ///  1. Select an elevator from the registered list.
@@ -52,7 +52,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
     super.dispose();
   }
 
-  // â”€â”€ Date / time pickers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Date / time pickers ───────────────────────────────────────────────────
 
   Future<void> _pickDate() async {
     final colors = AppThemeColors.of(context);
@@ -98,30 +98,30 @@ class _AssignViewState extends ConsumerState<AssignView> {
   }
 
   String get _dateLabel {
-    if (_selectedDate == null) return 'Tarih SeÃ§';
+    if (_selectedDate == null) return 'Tarih Seç';
     final d = _selectedDate!;
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
 
   String get _timeLabel {
-    if (_selectedTime == null) return 'Saat SeÃ§';
+    if (_selectedTime == null) return 'Saat Seç';
     return '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}';
   }
 
-  // â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Submit ────────────────────────────────────────────────────────────────
 
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (_selectedElevator == null) {
-      _showSnack('LÃ¼tfen bir asansÃ¶r seÃ§in.', isError: true);
+      _showSnack('Lütfen bir asansör seçin.', isError: true);
       return;
     }
     if (_selectedTechnician == null) {
-      _showSnack('LÃ¼tfen bir teknisyen seÃ§in.', isError: true);
+      _showSnack('Lütfen bir teknisyen seçin.', isError: true);
       return;
     }
     if (_selectedDate == null || _selectedTime == null) {
-      _showSnack('LÃ¼tfen tarih ve saati seÃ§in.', isError: true);
+      _showSnack('Lütfen tarih ve saati seçin.', isError: true);
       return;
     }
 
@@ -151,7 +151,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
         isError: true,
       );
     } else {
-      _showSnack('GÃ¶rev baÅŸarÄ±yla atandÄ±!');
+      _showSnack('Görev başarıyla atandı!');
       await HapticFeedback.lightImpact();
       if (mounted) context.pop();
     }
@@ -175,7 +175,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
     );
   }
 
-  // â”€â”€ Build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +266,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                   data: (techs) {
                     if (techs.isEmpty) {
                       return const _InlineError(
-                        message: 'Teknisyen bulunamadÄ±.',
+                        message: 'Teknisyen bulunamadı.',
                       );
                     }
 
@@ -314,7 +314,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
                               });
                             },
                       validator: (_) => _selectedTechnician == null
-                          ? 'Teknisyen seÃ§in.'
+                          ? 'Teknisyen seçin.'
                           : null,
                     );
                   },
@@ -322,7 +322,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
 
                 const SizedBox(height: 28),
 
-                // â”€â”€ Date & Time â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Date & Time ───────────────────────────────────────────────
                 const SectionLabel(
                   icon: Icons.event_outlined,
                   label: 'Tarih ve Saat',
@@ -352,10 +352,10 @@ class _AssignViewState extends ConsumerState<AssignView> {
 
                 const SizedBox(height: 28),
 
-                // â”€â”€ Notes (optional) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Notes (optional) ──────────────────────────────────────────
                 const SectionLabel(
                   icon: Icons.notes_outlined,
-                  label: 'Notlar (Ä°steÄŸe BaÄŸlÄ±)',
+                  label: 'Notlar (İsteğe Bağlı)',
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -368,7 +368,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
 
                 const SizedBox(height: 40),
 
-                // â”€â”€ Submit Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Submit Button ─────────────────────────────────────────────
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -408,7 +408,7 @@ class _AssignViewState extends ConsumerState<AssignView> {
   }
 }
 
-// â”€â”€ Elevator Selector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Elevator Selector ─────────────────────────────────────────────────────────
 
 class _ElevatorSelector extends StatelessWidget {
   const _ElevatorSelector({
@@ -484,7 +484,7 @@ class _ElevatorSelector extends StatelessWidget {
   }
 }
 
-// â”€â”€ Sub-widgets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Sub-widgets ───────────────────────────────────────────────────────────────
 
 class _PickerButton extends StatelessWidget {
   const _PickerButton({

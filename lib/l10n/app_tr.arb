@@ -9,5 +9,72 @@
   "loginPasswordLabel": "Şifre",
   "loginButton": "Giriş",
   "homeActiveFaults": "Aktif Arızalar",
-  "homeDailyAgenda": "Günlük Ajandam"
+  "homeDailyAgenda": "Günlük Ajandam",
+  
+  "loginSubTitle": "Hesabınıza erişmek için bilgilerinizi girin.",
+  "loginEmailValidationErrorEmpty": "Lütfen e-posta adresinizi girin.",
+  "loginEmailValidationErrorInvalid": "Geçerli bir e-posta adresi girin.",
+  "loginPasswordValidationErrorEmpty": "Lütfen şifrenizi girin.",
+  "loginPasswordValidationErrorLength": "Şifre en az 6 karakter olmalıdır.",
+  "loginSecureConnection": "Güvenli Bağlantı",
+  "appSubTitle": "Bakım & Arıza Takip Sistemi",
+
+  "maintenanceFormTitle": "Yeni Bakım Formu",
+  "maintenanceSavedTitle": "Bakım Kaydedildi",
+  "maintenanceSavedConfirm": "Tamam",
+  "maintenanceSaveError": "Kayıt sırasında hata oluştu: {error}",
+  "@maintenanceSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenanceSavePrevention": "Lütfen kaydetme işlemi tamamlanana kadar bekleyin.",
+  "maintenanceSessionError": "Oturum bilgisi alınamadı.",
+  "maintenanceSignatureError": "Lütfen hem teknisyen hem de müşteri imzasını tamamlayın.",
+  "maintenanceChecklistSection": "Kontrol Listesi",
+  "maintenanceChecklistEmpty": "Aktif kontrol öğesi bulunamadı.",
+  "maintenanceChecklistProgress": "{checked} / {total} tamamlandı",
+  "@maintenanceChecklistProgress": {
+    "placeholders": {
+      "checked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "maintenanceChecklistLoadError": "Kontrol listesi yüklenemedi: {error}",
+  "@maintenanceChecklistLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenancePhotosSection": "Fotoğraflar",
+  "maintenancePhotosCamera": "Kamera",
+  "maintenancePhotosGallery": "Galeri",
+  "maintenancePhotosRemoveTooltip": "Fotoğrafı kaldır",
+  "maintenancePhotosEmpty": "Henüz fotoğraf eklenmedi.",
+  "maintenanceNotesSection": "Bakım Notları",
+  "maintenanceNotesHint": "Yapılan işlemleri, değiştirilen parçaları vb. buraya yazın...",
+  "maintenanceSignaturesSection": "İmzalar",
+  "maintenanceSignatureTechLabel": "Teknisyen İmzası",
+  "maintenanceSignatureCustLabel": "Müşteri İmzası",
+  "maintenanceSignatureClear": "Temizle",
+  "maintenanceSubmitButton": "Bakımı Kaydet",
+  "maintenanceSavingMessage": "Kaydediliyor...",
+  "generalError": "Hata: {error}",
+  "@generalError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "generalRetry": "Tekrar Dene",
+  "generalCancel": "İptal"
 }

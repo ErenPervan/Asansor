@@ -9,5 +9,72 @@
   "loginPasswordLabel": "Passwort",
   "loginButton": "Einloggen",
   "homeActiveFaults": "Aktive Störungen",
-  "homeDailyAgenda": "Tagesordnung"
+  "homeDailyAgenda": "Tagesordnung",
+
+  "loginSubTitle": "Geben Sie Ihre Daten ein, um auf Ihr Konto zuzugreifen.",
+  "loginEmailValidationErrorEmpty": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
+  "loginEmailValidationErrorInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+  "loginPasswordValidationErrorEmpty": "Bitte geben Sie Ihr Passwort ein.",
+  "loginPasswordValidationErrorLength": "Das Passwort muss mindestens 6 Zeichen lang sein.",
+  "loginSecureConnection": "Sichere Verbindung",
+  "appSubTitle": "Wartungs- & Störungsverfolgungssystem",
+
+  "maintenanceFormTitle": "Neues Wartungsformular",
+  "maintenanceSavedTitle": "Wartung gespeichert",
+  "maintenanceSavedConfirm": "OK",
+  "maintenanceSaveError": "Fehler beim Speichern aufgetreten: {error}",
+  "@maintenanceSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenanceSavePrevention": "Bitte warten Sie, bis der Speichervorgang abgeschlossen ist.",
+  "maintenanceSessionError": "Sitzungsinformationen konnten nicht abgerufen werden.",
+  "maintenanceSignatureError": "Bitte vervollständigen Sie beide Unterschriften.",
+  "maintenanceChecklistSection": "Checkliste",
+  "maintenanceChecklistEmpty": "Keine aktiven Checklisten-Elemente gefunden.",
+  "maintenanceChecklistProgress": "{checked} / {total} abgeschlossen",
+  "@maintenanceChecklistProgress": {
+    "placeholders": {
+      "checked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "maintenanceChecklistLoadError": "Checkliste konnte nicht geladen werden: {error}",
+  "@maintenanceChecklistLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenancePhotosSection": "Fotos",
+  "maintenancePhotosCamera": "Kamera",
+  "maintenancePhotosGallery": "Galerie",
+  "maintenancePhotosRemoveTooltip": "Foto entfernen",
+  "maintenancePhotosEmpty": "Noch keine Fotos hinzugefügt.",
+  "maintenanceNotesSection": "Wartungsnotizen",
+  "maintenanceNotesHint": "Geben Sie hier durchgeführte Aktionen, ausgetauschte Teile usw. ein...",
+  "maintenanceSignaturesSection": "Unterschriften",
+  "maintenanceSignatureTechLabel": "Unterschrift des Technikers",
+  "maintenanceSignatureCustLabel": "Unterschrift des Kunden",
+  "maintenanceSignatureClear": "Löschen",
+  "maintenanceSubmitButton": "Wartung speichern",
+  "maintenanceSavingMessage": "Wird gespeichert...",
+  "generalError": "Fehler: {error}",
+  "@generalError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "generalRetry": "Erneut versuchen",
+  "generalCancel": "Abbrechen"
 }

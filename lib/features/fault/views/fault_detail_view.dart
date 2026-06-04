@@ -20,7 +20,7 @@ import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/section_label.dart';
 import '../../../core/constants/app_durations.dart';
 import 'package:confetti/confetti.dart';
-// â”€â”€ Local colour tokens (matches global theme) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Local colour tokens (matches global theme) ──────────────────────────────
 
 class FaultDetailView extends ConsumerWidget {
   const FaultDetailView({super.key, required this.faultId});
@@ -121,7 +121,7 @@ class FaultDetailView extends ConsumerWidget {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _FaultDetailScaffold extends ConsumerStatefulWidget {
   const _FaultDetailScaffold({required this.fault});
@@ -172,7 +172,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
         children: [
           CustomScrollView(
             slivers: [
-              // â”€â”€ App bar with status gradient â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── App bar with status gradient ─────────────────────────────
               SliverAppBar(
                 expandedHeight: (screenHeight * 0.22).clamp(180.0, 240.0),
                 pinned: true,
@@ -200,9 +200,6 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                     isResolved: fault.isResolved,
                     reportedAt: fault.reportedAt,
                     resolvedAt: fault.resolvedAt,
-                    onLongPress: fault.isResolved
-                        ? null
-                        : () => _showResolveDialog(context, fault.id),
                   ),
                 ),
                 title: Text(
@@ -223,7 +220,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // â”€â”€ Elevator info card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                      // ── Elevator info card ────────────────────────────────
                       InfoCard(
                         child: elevatorAsync.when(
                           loading: () => const _SkeletonRow(),
@@ -274,7 +271,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
 
                       const SizedBox(height: 12),
 
-                      // â”€â”€ Fault description â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                      // ── Fault description ─────────────────────────────────
                       InfoCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,14 +295,14 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                         ),
                       ),
 
-                      // â”€â”€ Photo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                      // ── Photo ─────────────────────────────────────────────
                       if (fault.photoUrl != null &&
                           fault.photoUrl!.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         _PhotoCard(photoUrl: fault.photoUrl!),
                       ],
 
-                      // â”€â”€ Resolution notes (if resolved) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                      // ── Resolution notes (if resolved) ────────────────────
                       if (fault.isResolved &&
                           fault.resolutionNotes != null &&
                           fault.resolutionNotes!.isNotEmpty) ...[
@@ -334,7 +331,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                         ),
                       ],
 
-                      // â”€â”€ Timestamps row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                      // ── Timestamps row ────────────────────────────────────
                       const SizedBox(height: 12),
                       InfoCard(
                         child: Column(
@@ -358,7 +355,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                         ),
                       ),
 
-                      // â”€â”€ Action area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                      // ── Action area ───────────────────────────────────────
                       const SizedBox(height: 20),
                       if (!fault.isResolved) ...[
                         // Notes toggle
@@ -421,7 +418,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                           ),
                           onPressed: updateState.isLoading
                               ? null
-                              : () => _handleResolve(context, ref, fault.id),
+                              : () => _showResolveDialog(context, fault.id),
                         ),
                         const SizedBox(height: AppSpacing.sm),
 
@@ -612,20 +609,18 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
   }
 }
 
-// â”€â”€ Sub-widgets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Sub-widgets ───────────────────────────────────────────────────────────────
 
 class _StatusHeader extends StatelessWidget {
   const _StatusHeader({
     required this.isResolved,
     required this.reportedAt,
     this.resolvedAt,
-    this.onLongPress,
   });
 
   final bool isResolved;
   final DateTime reportedAt;
   final DateTime? resolvedAt;
-  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -652,84 +647,61 @@ class _StatusHeader extends StatelessWidget {
         ? 'Onarıldı: ${_fmt(resolvedAt ?? reportedAt)}'
         : 'Bildirildi: ${_fmt(reportedAt)}';
 
-    return GestureDetector(
-      onLongPress: onLongPress,
-      child: Container(
-        decoration: BoxDecoration(gradient: gradient),
-        child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 40),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  transitionBuilder: (child, animation) {
-                    final curved = CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.elasticOut,
-                    );
-                    return FadeTransition(
-                      opacity: animation,
-                      child: ScaleTransition(scale: curved, child: child),
-                    );
-                  },
-                  child: Container(
-                    key: ValueKey<bool>(isResolved),
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: colors.onPrimary.withValues(alpha: 0.18),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(icon, color: colors.onPrimary, size: 36),
+    return Container(
+      decoration: BoxDecoration(gradient: gradient),
+      child: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 40),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                transitionBuilder: (child, animation) {
+                  final curved = CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.elasticOut,
+                  );
+                  return FadeTransition(
+                    opacity: animation,
+                    child: ScaleTransition(scale: curved, child: child),
+                  );
+                },
+                child: Container(
+                  key: ValueKey<bool>(isResolved),
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: colors.onPrimary.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
                   ),
+                  child: Icon(icon, color: colors.onPrimary, size: 36),
                 ),
-                const SizedBox(height: 10),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  child: Column(
-                    key: ValueKey<bool>(isResolved),
-                    children: [
-                      Text(
-                        label,
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: colors.onPrimary,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        sub,
-                        style: textTheme.labelSmall?.copyWith(
-                          color: colors.onPrimary.withValues(alpha: 0.85),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (!isResolved) ...[
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.onPrimary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      'Onarmak için basılı tutun',
-                      style: textTheme.labelSmall?.copyWith(
+              ),
+              const SizedBox(height: 10),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                child: Column(
+                  key: ValueKey<bool>(isResolved),
+                  children: [
+                    Text(
+                      label,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
                         color: colors.onPrimary,
-                        fontWeight: FontWeight.w600,
+                        letterSpacing: 2,
                       ),
                     ),
-                  ),
-                ],
-              ],
-            ),
+                    const SizedBox(height: 4),
+                    Text(
+                      sub,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colors.onPrimary.withValues(alpha: 0.85),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -738,13 +710,13 @@ class _StatusHeader extends StatelessWidget {
 
   String _fmt(DateTime dt) {
     final local = dt.toLocal();
-    return DateFormat('d MMM y â€“ HH:mm', 'tr_TR').format(local);
+    return DateFormat('d MMM y – HH:mm', 'tr_TR').format(local);
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _PhotoCard extends StatelessWidget {
   const _PhotoCard({required this.photoUrl});
@@ -791,9 +763,9 @@ class _PhotoCard extends StatelessWidget {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _StatusBadge extends StatelessWidget {
   const _StatusBadge({required this.isResolved});
@@ -835,7 +807,7 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _TimeRow extends StatelessWidget {
   const _TimeRow({
@@ -889,7 +861,7 @@ class _TimeRow extends StatelessWidget {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _SkeletonRow extends StatelessWidget {
   const _SkeletonRow();

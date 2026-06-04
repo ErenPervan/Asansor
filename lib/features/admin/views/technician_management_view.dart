@@ -194,7 +194,7 @@ class _SummaryHeader extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           _StatPill(
-            label: 'MÃ¼sait',
+            label: 'Müsait',
             value: free,
             light: true,
             accent: colors.warningLight,
@@ -211,7 +211,7 @@ class _SummaryHeader extends StatelessWidget {
                 ),
               ),
               Text(
-                'BugÃ¼n',
+                'Bugün',
                 style: textTheme.labelSmall?.copyWith(
                   color: Colors.white.withValues(alpha: 0.7),
                 ),
@@ -428,7 +428,7 @@ class _TechnicianCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'BugÃ¼nkÃ¼ Ä°lerleme',
+                        'Bugünkü İlerleme',
                         style: textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colors.onSurfaceVariant,
@@ -436,7 +436,7 @@ class _TechnicianCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        '${stats.todayCompleted}/${stats.todayTotal} gÃ¶rev',
+                        '${stats.todayCompleted}/${stats.todayTotal} görev',
                         style: textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: colors.onSurfaceVariant,
@@ -457,8 +457,8 @@ class _TechnicianCard extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     allDone
-                        ? 'âœ“ TÃ¼m gÃ¶revler tamamlandÄ±'
-                        : '${stats.todayPending} gÃ¶rev bekliyor',
+                        ? 'âœ“ Tüm görevler tamamlandı'
+                        : '${stats.todayPending} görev bekliyor',
                     style: textTheme.labelSmall?.copyWith(
                       color: allDone ? colors.success : colors.outline,
                       fontWeight: allDone ? FontWeight.w700 : FontWeight.normal,
@@ -466,7 +466,7 @@ class _TechnicianCard extends StatelessWidget {
                   ),
                 ] else
                   Text(
-                    'BugÃ¼n iÃ§in planlanmÄ±ÅŸ gÃ¶rev yok',
+                    'Bugün için planlanmış görev yok',
                     style: textTheme.labelSmall?.copyWith(
                       color: colors.outline,
                       fontStyle: FontStyle.italic,
@@ -506,8 +506,8 @@ class _TechnicianCard extends StatelessWidget {
                       icon: const Icon(Icons.list_alt_rounded, size: 16),
                       label: Text(
                         stats.todayTotal > 0
-                            ? '${stats.todayTotal} GÃ¶rev'
-                            : 'GÃ¶revler',
+                            ? '${stats.todayTotal} Görev'
+                            : 'Görevler',
                         style: textTheme.labelSmall,
                       ),
                       style: TextButton.styleFrom(
@@ -533,7 +533,7 @@ class _TechnicianCard extends StatelessWidget {
     if (phone == null || phone.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$name iÃ§in telefon numarasÄ± kayÄ±tlÄ± deÄŸil.'),
+          content: Text('$name için telefon numarası kayıtlı değil.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -542,7 +542,7 @@ class _TechnicianCard extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: phone));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$name: $phone â€” KopyalandÄ±'),
+        content: Text('$name: $phone — Kopyalandı'),
         behavior: SnackBarBehavior.floating,
         action: SnackBarAction(label: 'Tamam', onPressed: () {}),
       ),
@@ -553,7 +553,7 @@ class _TechnicianCard extends StatelessWidget {
     if (phone == null || phone.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$name iÃ§in telefon numarasÄ± kayÄ±tlÄ± deÄŸil.'),
+          content: Text('$name için telefon numarası kayıtlı değil.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -562,7 +562,7 @@ class _TechnicianCard extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: phone));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Numara kopyalandÄ±: $phone'),
+        content: Text('Numara kopyalandı: $phone'),
         behavior: SnackBarBehavior.floating,
         action: SnackBarAction(label: 'Tamam', onPressed: () {}),
       ),
@@ -592,7 +592,7 @@ class _MonthlyBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        'Bu Ay: $count Ä°ÅŸ',
+        'Bu Ay: $count İş',
         style: textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w700,
           color: count > 0 ? colors.success : colors.outline,
@@ -718,9 +718,9 @@ class _TechnicianDetailSheet extends StatelessWidget {
                           ),
                           Text(
                             stats.todayTotal == 0
-                                ? 'BugÃ¼n gÃ¶rev yok'
-                                : '${stats.todayTotal} gÃ¶rev â€” '
-                                      '${stats.todayCompleted} tamamlandÄ±',
+                                ? 'Bugün görev yok'
+                                : '${stats.todayTotal} görev — '
+                                      '${stats.todayCompleted} tamamlandı',
                             style: textTheme.labelSmall?.copyWith(
                               color: colors.onSurfaceVariant,
                             ),
@@ -1024,13 +1024,9 @@ class _SmallBadge extends StatelessWidget {
   ) {
     final colors = AppThemeColors.of(context);
     final (lbl, bg, fg) = switch (p) {
-      'emergency' => ('ACÄ°L', colors.errorContainer, colors.error),
-      'high' => ('YÃœKSEK', colors.warningContainer, colors.warning),
-      'low' => (
-        'DÃœÅÃœK',
-        colors.surfaceContainerHigh,
-        colors.onSurfaceVariant,
-      ),
+      'emergency' => ('ACİL', colors.errorContainer, colors.error),
+      'high' => ('YÜKSEK', colors.warningContainer, colors.warning),
+      'low' => ('DÜÅÜK', colors.surfaceContainerHigh, colors.onSurfaceVariant),
       _ => ('NORMAL', colors.surfaceContainer, colors.onSurface),
     };
     return _SmallBadge(label: lbl, bg: bg, fg: fg, textTheme: textTheme);
@@ -1085,7 +1081,7 @@ class _EmptyBody extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'HenÃ¼z teknisyen kaydÄ± yok',
+            'Henüz teknisyen kaydı yok',
             style: textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
               color: colors.onSurface,
@@ -1093,7 +1089,7 @@ class _EmptyBody extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'KullanÄ±cÄ± yÃ¶netiminden teknisyen rolÃ¼ atayÄ±n.',
+            'Kullanıcı yönetiminden teknisyen rolü atayın.',
             style: textTheme.labelMedium?.copyWith(
               color: colors.onSurfaceVariant,
             ),
@@ -1125,7 +1121,7 @@ class _ErrorBody extends StatelessWidget {
             Icon(Icons.cloud_off_outlined, size: 48, color: colors.outline),
             const SizedBox(height: 12),
             Text(
-              'Veriler yÃ¼klenemedi',
+              'Veriler yüklenemedi',
               style: textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: colors.onSurface,
@@ -1177,7 +1173,7 @@ class _SheetEmptyView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '$name iÃ§in bugÃ¼n\nplanlanmÄ±ÅŸ gÃ¶rev yok',
+              '$name için bugün\nplanlanmış görev yok',
               textAlign: TextAlign.center,
               style: textTheme.labelLarge?.copyWith(
                 color: colors.onSurfaceVariant,

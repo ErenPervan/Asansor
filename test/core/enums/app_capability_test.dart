@@ -8,21 +8,39 @@ void main() {
   group('AppCapability and UserRole Integration Tests', () {
     test('capabilityMatrix should cover all UserRoles', () {
       for (final role in UserRole.values) {
-        expect(capabilityMatrix.containsKey(role), isTrue,
-            reason: 'Missing capability matrix for role: $role');
+        expect(
+          capabilityMatrix.containsKey(role),
+          isTrue,
+          reason: 'Missing capability matrix for role: $role',
+        );
       }
     });
 
     test('Admin should have accessAdminPanel capability', () {
-      expect(capabilityMatrix[UserRole.admin]?.contains(AppCapability.accessAdminPanel), isTrue);
+      expect(
+        capabilityMatrix[UserRole.admin]?.contains(
+          AppCapability.accessAdminPanel,
+        ),
+        isTrue,
+      );
     });
 
     test('Technician should not have accessAdminPanel capability', () {
-      expect(capabilityMatrix[UserRole.technician]?.contains(AppCapability.accessAdminPanel), isFalse);
+      expect(
+        capabilityMatrix[UserRole.technician]?.contains(
+          AppCapability.accessAdminPanel,
+        ),
+        isFalse,
+      );
     });
 
     test('Customer should not have accessAdminPanel capability', () {
-      expect(capabilityMatrix[UserRole.customer]?.contains(AppCapability.accessAdminPanel), isFalse);
+      expect(
+        capabilityMatrix[UserRole.customer]?.contains(
+          AppCapability.accessAdminPanel,
+        ),
+        isFalse,
+      );
     });
   });
 

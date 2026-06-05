@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:asansor/core/widgets/app_bottom_nav_bar.dart';
 import 'package:asansor/core/enums/app_enums.dart';
@@ -17,7 +16,12 @@ void main() {
   setUp(() {
     mockNavigationShell = MockStatefulNavigationShell();
     when(() => mockNavigationShell.currentIndex).thenReturn(0);
-    when(() => mockNavigationShell.goBranch(any(), initialLocation: any(named: 'initialLocation'))).thenAnswer((_) {});
+    when(
+      () => mockNavigationShell.goBranch(
+        any(),
+        initialLocation: any(named: 'initialLocation'),
+      ),
+    ).thenAnswer((_) {});
   });
 
   group('AppBottomNavBar Widget Test', () {
@@ -25,11 +29,15 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            currentProfileProvider.overrideWith((ref) => TestFactories.createProfile(role: UserRole.admin)),
+            currentProfileProvider.overrideWith(
+              (ref) => TestFactories.createProfile(role: UserRole.admin),
+            ),
           ],
           child: pumpWithTheme(
             Scaffold(
-              bottomNavigationBar: AppBottomNavBar(navigationShell: mockNavigationShell),
+              bottomNavigationBar: AppBottomNavBar(
+                navigationShell: mockNavigationShell,
+              ),
             ),
           ),
         ),
@@ -47,7 +55,7 @@ void main() {
         matching: find.byType(Tooltip),
       );
       expect(tooltipFinder, findsNothing);
-      
+
       // Verify Opacity is NOT present
       final opacityFinder = find.ancestor(
         of: programIcon,
@@ -60,11 +68,15 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            currentProfileProvider.overrideWith((ref) => TestFactories.createProfile(role: UserRole.technician)),
+            currentProfileProvider.overrideWith(
+              (ref) => TestFactories.createProfile(role: UserRole.technician),
+            ),
           ],
           child: pumpWithTheme(
             Scaffold(
-              bottomNavigationBar: AppBottomNavBar(navigationShell: mockNavigationShell),
+              bottomNavigationBar: AppBottomNavBar(
+                navigationShell: mockNavigationShell,
+              ),
             ),
           ),
         ),
@@ -91,16 +103,20 @@ void main() {
       final Opacity opacity = tester.widget(opacityFinder);
       expect(opacity.opacity, 0.4);
     });
-    
+
     testWidgets('customer sees program tab disabled', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            currentProfileProvider.overrideWith((ref) => TestFactories.createProfile(role: UserRole.customer)),
+            currentProfileProvider.overrideWith(
+              (ref) => TestFactories.createProfile(role: UserRole.customer),
+            ),
           ],
           child: pumpWithTheme(
             Scaffold(
-              bottomNavigationBar: AppBottomNavBar(navigationShell: mockNavigationShell),
+              bottomNavigationBar: AppBottomNavBar(
+                navigationShell: mockNavigationShell,
+              ),
             ),
           ),
         ),
@@ -116,43 +132,53 @@ void main() {
       );
       expect(tooltipFinder, findsOneWidget);
     });
-    
+
     testWidgets('active tab color is primary', (tester) async {
       when(() => mockNavigationShell.currentIndex).thenReturn(1); // ARIZALAR
-      
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            currentProfileProvider.overrideWith((ref) => TestFactories.createProfile(role: UserRole.admin)),
+            currentProfileProvider.overrideWith(
+              (ref) => TestFactories.createProfile(role: UserRole.admin),
+            ),
           ],
           child: pumpWithTheme(
             Scaffold(
-              bottomNavigationBar: AppBottomNavBar(navigationShell: mockNavigationShell),
+              bottomNavigationBar: AppBottomNavBar(
+                navigationShell: mockNavigationShell,
+              ),
             ),
           ),
         ),
       );
 
-      final arizalarText = tester.widget<Text>(find.text('Arızalar'.toUpperCase()));
+      final arizalarText = tester.widget<Text>(
+        find.text('Arızalar'.toUpperCase()),
+      );
       final filoText = tester.widget<Text>(find.text('Filo'.toUpperCase()));
-      
+
       // The active tab should have fontWeight w700, inactive w500
       expect(arizalarText.style?.fontWeight, FontWeight.w700);
       expect(filoText.style?.fontWeight, FontWeight.w500);
-      
+
       // The active tab should have different color than inactive
       expect(arizalarText.style?.color, isNot(equals(filoText.style?.color)));
     });
-    
+
     testWidgets('goBranch is called on tap', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            currentProfileProvider.overrideWith((ref) => TestFactories.createProfile(role: UserRole.admin)),
+            currentProfileProvider.overrideWith(
+              (ref) => TestFactories.createProfile(role: UserRole.admin),
+            ),
           ],
           child: pumpWithTheme(
             Scaffold(
-              bottomNavigationBar: AppBottomNavBar(navigationShell: mockNavigationShell),
+              bottomNavigationBar: AppBottomNavBar(
+                navigationShell: mockNavigationShell,
+              ),
             ),
           ),
         ),
@@ -160,8 +186,10 @@ void main() {
 
       await tester.tap(find.text('Arızalar'.toUpperCase()));
       await tester.pumpAndSettle();
-      
-      verify(() => mockNavigationShell.goBranch(1, initialLocation: false)).called(1);
+
+      verify(
+        () => mockNavigationShell.goBranch(1, initialLocation: false),
+      ).called(1);
     });
   });
 }

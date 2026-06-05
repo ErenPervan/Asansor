@@ -53,8 +53,10 @@ class _HomeViewState extends State<HomeView> {
                 final pendingCount = ref.watch(pendingSyncCountProvider);
                 final isOnline = ref.watch(isOnlineProvider);
                 final profile = ref.watch(currentProfileProvider).valueOrNull;
-                final canAccessAdmin = profile?.can(AppCapability.accessAdminPanel) ?? false;
-                final canViewAdminStats = profile?.can(AppCapability.viewAdminStats) ?? false;
+                final canAccessAdmin =
+                    profile?.can(AppCapability.accessAdminPanel) ?? false;
+                final canViewAdminStats =
+                    profile?.can(AppCapability.viewAdminStats) ?? false;
 
                 final activeFaultCount = canViewAdminStats
                     ? (ref
@@ -107,8 +109,11 @@ class _HomeViewState extends State<HomeView> {
                     const SizedBox(height: AppSpacing.xl),
                     Consumer(
                       builder: (context, ref, _) {
-                        final profile = ref.watch(currentProfileProvider).valueOrNull;
-                        final canViewAdminStats = profile?.can(AppCapability.viewAdminStats) ?? false;
+                        final profile = ref
+                            .watch(currentProfileProvider)
+                            .valueOrNull;
+                        final canViewAdminStats =
+                            profile?.can(AppCapability.viewAdminStats) ?? false;
 
                         final activeFaultCount = canViewAdminStats
                             ? (ref

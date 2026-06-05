@@ -38,8 +38,8 @@ class NotFoundView extends StatelessWidget {
               Text(
                 'Aradığınız sayfa mevcut değil veya silinmiş.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppThemeColors.of(context).onSurfaceVariant,
-                    ),
+                  color: AppThemeColors.of(context).onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),

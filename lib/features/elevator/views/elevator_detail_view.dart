@@ -176,8 +176,8 @@ class _ElevatorNotFoundWidget extends StatelessWidget {
             Text(
               'Bu asansör sistemde kayıtlı değil veya silinmiş.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppThemeColors.of(context).onSurfaceVariant,
-                  ),
+                color: AppThemeColors.of(context).onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xl),

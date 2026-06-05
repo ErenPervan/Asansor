@@ -165,7 +165,7 @@ class NotificationService {
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
-          
+
       if (androidPlugin != null) {
         await androidPlugin.createNotificationChannel(_tasksChannel);
         await androidPlugin.createNotificationChannel(_faultsChannel);
@@ -308,12 +308,7 @@ class NotificationService {
     try {
       await client.functions.invoke(
         'send-notification',
-        body: {
-          'to_role': 'admin',
-          'title': title,
-          'body': body,
-          'data': data,
-        },
+        body: {'to_role': 'admin', 'title': title, 'body': body, 'data': data},
       );
     } catch (_) {}
   }
@@ -327,7 +322,7 @@ class NotificationService {
 
     final String type = message.data['type'] as String? ?? '';
     final String route = message.data['route'] as String? ?? '';
-    
+
     String channelId = _generalChannelId;
     String channelName = _generalChannelName;
     String channelDesc = _generalChannelDesc;
@@ -414,7 +409,9 @@ class NotificationService {
     final destination = determineDestination(payload, authState);
 
     if (!isAuthorized) {
-      debugPrint('[FCM] Not authorized yet. Storing pending route: $destination');
+      debugPrint(
+        '[FCM] Not authorized yet. Storing pending route: $destination',
+      );
       _pendingRoute = destination;
       return;
     }

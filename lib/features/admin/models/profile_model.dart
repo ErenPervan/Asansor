@@ -46,6 +46,7 @@ library;
 
 import '../../../core/enums/app_enums.dart';
 import '../../../core/enums/app_capability.dart';
+
 class ProfileModel {
   const ProfileModel({
     required this.id,

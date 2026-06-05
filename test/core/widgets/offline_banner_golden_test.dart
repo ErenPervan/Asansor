@@ -10,9 +10,7 @@ void main() {
     testWidgets('offline banner visible when offline', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            isOnlineProvider.overrideWithValue(false),
-          ],
+          overrides: [isOnlineProvider.overrideWithValue(false)],
           child: pumpWithTheme(const OfflineBanner()),
         ),
       );
@@ -25,9 +23,7 @@ void main() {
     testWidgets('offline banner hidden when online', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            isOnlineProvider.overrideWithValue(true),
-          ],
+          overrides: [isOnlineProvider.overrideWithValue(true)],
           child: pumpWithTheme(const OfflineBanner()),
         ),
       );

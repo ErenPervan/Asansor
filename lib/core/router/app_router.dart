@@ -98,26 +98,25 @@ class RouterNotifier extends ChangeNotifier {
   ProviderSubscription? _subscription;
 
   RouterNotifier(this._ref) {
-    _subscription = _ref.listen<AuthStateModel>(
-      appAuthStateProvider,
-      (previous, current) {
-        // Kullanıcı authorized'dan unauthenticated'a geçince tüm user verisi temizlenir
-        if (previous?.status == AuthStatus.authorized &&
-            current.status == AuthStatus.unauthenticated) {
-          _clearUserData();
-        }
+    _subscription = _ref.listen<AuthStateModel>(appAuthStateProvider, (
+      previous,
+      current,
+    ) {
+      // Kullanıcı authorized'dan unauthenticated'a geçince tüm user verisi temizlenir
+      if (previous?.status == AuthStatus.authorized &&
+          current.status == AuthStatus.unauthenticated) {
+        _clearUserData();
+      }
 
-        if (current.status == AuthStatus.authorized) {
-          NotificationService.instance.isAuthorized = true;
-          NotificationService.instance.authState = current;
-        } else {
-          NotificationService.instance.isAuthorized = false;
-          NotificationService.instance.authState = null;
-        }
-        notifyListeners();
-      },
-      fireImmediately: true,
-    );
+      if (current.status == AuthStatus.authorized) {
+        NotificationService.instance.isAuthorized = true;
+        NotificationService.instance.authState = current;
+      } else {
+        NotificationService.instance.isAuthorized = false;
+        NotificationService.instance.authState = null;
+      }
+      notifyListeners();
+    }, fireImmediately: true);
   }
 
   /// Kullanıcı oturumu kapandığında tüm user-specific Riverpod provider'larını
@@ -133,7 +132,9 @@ class RouterNotifier extends ChangeNotifier {
     _ref.invalidate(adminStatsProvider);
     _ref.invalidate(adminAnalyticsProvider);
     _ref.invalidate(allProfilesProvider);
-    _ref.invalidate(currentProfileProvider); // en son — appAuthStateProvider buna bağlı
+    _ref.invalidate(
+      currentProfileProvider,
+    ); // en son — appAuthStateProvider buna bağlı
 
     // Hive read cache'lerini temizle
     // (Sync queue kasıtlı olarak temizlenmez: offline kuyruktaki işlemler korunur)
@@ -185,7 +186,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return isOnLoadingPage ? null : '/loading';
 
         case AuthStatus.authorized:
-          final pendingRoute = NotificationService.instance.consumePendingRoute();
+          final pendingRoute = NotificationService.instance
+              .consumePendingRoute();
           if (pendingRoute != null) {
             return pendingRoute;
           }

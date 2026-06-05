@@ -22,7 +22,8 @@ class CustomerDashboardView extends ConsumerStatefulWidget {
   const CustomerDashboardView({super.key});
 
   @override
-  ConsumerState<CustomerDashboardView> createState() => _CustomerDashboardViewState();
+  ConsumerState<CustomerDashboardView> createState() =>
+      _CustomerDashboardViewState();
 }
 
 class _CustomerDashboardViewState extends ConsumerState<CustomerDashboardView> {

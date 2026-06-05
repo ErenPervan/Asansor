@@ -14,7 +14,11 @@ void main() {
     });
 
     testWidgets('custom shimmer card', (tester) async {
-      await tester.pumpWidget(pumpWithTheme(const ShimmerCard(width: 200, height: 50, borderRadius: 20)));
+      await tester.pumpWidget(
+        pumpWithTheme(
+          const ShimmerCard(width: 200, height: 50, borderRadius: 20),
+        ),
+      );
       await expectLater(
         find.byType(MaterialApp),
         matchesGoldenFile('../../goldens/shimmer_card_custom.png'),

@@ -149,7 +149,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     ElevatorsShortcutCard(
-                      onTap: () => context.push('/elevators'),
+                      onTap: () => context.go('/elevators'),
                     ),
                     // Bottom padding so content clears the FAB + nav bar.
                     SizedBox(height: 100 + bottomInset),

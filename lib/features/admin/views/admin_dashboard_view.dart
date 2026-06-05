@@ -79,7 +79,7 @@ class AdminDashboardView extends ConsumerWidget {
                       onTap: () => context.push('/admin/calendar'),
                     ),
                     MasterCalendarCard(
-                      onTap: () => context.push('/admin/master-calendar'),
+                      onTap: () => context.go('/admin/master-calendar'),
                     ),
                     TechnicianDirCard(
                       onTap: () => context.push('/admin/technicians'),

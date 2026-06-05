@@ -379,6 +379,9 @@ class _LoginViewState extends ConsumerState<LoginView>
                                     : Icons.visibility_off_outlined,
                                 size: 18,
                               ),
+                              tooltip: _obscurePassword
+                                  ? 'Şifreyi Göster'
+                                  : 'Şifreyi Gizle',
                               onPressed: () => setState(
                                 () => _obscurePassword = !_obscurePassword,
                               ),

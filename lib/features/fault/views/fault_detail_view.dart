@@ -43,6 +43,7 @@ class FaultDetailView extends ConsumerWidget {
               Icons.arrow_back,
               color: AppThemeColors.of(context).primary,
             ),
+            tooltip: 'Geri',
             onPressed: () => context.pop(),
           ),
           title: Text(
@@ -71,6 +72,7 @@ class FaultDetailView extends ConsumerWidget {
               Icons.arrow_back,
               color: AppThemeColors.of(context).primary,
             ),
+            tooltip: 'Geri',
             onPressed: () => context.pop(),
           ),
           title: Text(
@@ -181,6 +183,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                     : colors.primary,
                 leading: IconButton(
                   icon: Icon(Icons.arrow_back, color: colors.onPrimary),
+                  tooltip: 'Geri',
                   onPressed: () => context.pop(),
                 ),
                 actions: [
@@ -380,6 +383,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
                               alignLabelWithHint: true,
                               suffixIcon: IconButton(
                                 icon: const Icon(Icons.close),
+                                tooltip: 'Temizle ve Kapat',
                                 onPressed: () {
                                   _notesController.clear();
                                   setState(() => _notesExpanded = false);

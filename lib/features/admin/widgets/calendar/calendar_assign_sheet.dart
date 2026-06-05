@@ -192,6 +192,7 @@ class AssignTaskSheetState extends ConsumerState<AssignTaskSheet> {
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.close),
+                    tooltip: 'Kapat',
                     color: AppColors.outline,
                   ),
                 ],

@@ -351,6 +351,7 @@ class _ElevatorSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final (statusLabel, statusColor) = switch (status) {
       _MarkerStatus.fault => ('Aktif Arıza', _colorFault),
       _MarkerStatus.maintenance => ('Bugün Bakım', _colorMaintenance),
@@ -396,7 +397,7 @@ class _ElevatorSheet extends StatelessWidget {
                 Expanded(
                   child: Text(
                     elevator.buildingName,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: AppThemeColors.of(context).onSurface,
                       letterSpacing: 0.0,
@@ -418,7 +419,7 @@ class _ElevatorSheet extends StatelessWidget {
                   ),
                   child: Text(
                     statusLabel,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    style: textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: statusColor,
                     ),
@@ -441,7 +442,7 @@ class _ElevatorSheet extends StatelessWidget {
                   Expanded(
                     child: Text(
                       elevator.address!,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: textTheme.bodySmall?.copyWith(
                         color: AppThemeColors.of(context).outline,
                         height: 1.4,
                       ),
@@ -462,9 +463,9 @@ class _ElevatorSheet extends StatelessWidget {
                 icon: const Icon(Icons.open_in_new_rounded, size: 18),
                 label: Text(
                   'Detayları Gör',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppThemeColors.of(context).primary,
@@ -497,6 +498,8 @@ class _StatsOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -516,7 +519,7 @@ class _StatsOverlay extends StatelessWidget {
         children: [
           Text(
             '$locatedCount / $totalCount asansör haritada',
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            style: textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: AppThemeColors.of(context).onSurface,
             ),
@@ -537,7 +540,7 @@ class _StatsOverlay extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   '$faultCount aktif arıza',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  style: textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: _colorFault,
                   ),
@@ -560,6 +563,8 @@ class _LegendSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
       decoration: BoxDecoration(
@@ -637,7 +642,7 @@ class _LegendSheet extends StatelessWidget {
                   Expanded(
                     child: Text(
                       '$unmappedCount asansörün koordinatı eksik — haritada gösterilmiyor.',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      style: textTheme.labelSmall?.copyWith(
                         color: AppThemeColors.of(context).onSurfaceVariant,
                       ),
                     ),
@@ -667,6 +672,8 @@ class _LegendItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -693,14 +700,14 @@ class _LegendItem extends StatelessWidget {
           children: [
             Text(
               label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              style: textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppThemeColors.of(context).onSurface,
               ),
             ),
             Text(
               sublabel,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              style: textTheme.labelSmall?.copyWith(
                 color: AppThemeColors.of(context).outline,
               ),
             ),
@@ -721,6 +728,8 @@ class _ErrorBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -743,7 +752,7 @@ class _ErrorBody extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              style: textTheme.bodyMedium?.copyWith(
                 color: AppThemeColors.of(context).onSurfaceVariant,
               ),
             ),

@@ -55,20 +55,21 @@ class DashboardScheduleList extends StatelessWidget {
                 icon: Icons.event_note_outlined,
               );
             }
-            return ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: list.length,
-              separatorBuilder: (context, _) => const SizedBox(height: 12),
-              itemBuilder: (context, i) {
+            return Column(
+              children: List.generate(list.length, (i) {
                 final schedule = list[i];
                 final elevator = findElevator(schedule.elevatorId, elevators);
-                return DashboardScheduleCard(
-                  schedule: schedule,
-                  elevatorName: elevator?.buildingName ?? 'Asansör',
-                  address: elevator?.address,
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: i < list.length - 1 ? 12 : 0,
+                  ),
+                  child: DashboardScheduleCard(
+                    schedule: schedule,
+                    elevatorName: elevator?.buildingName ?? 'Asansör',
+                    address: elevator?.address,
+                  ),
                 );
-              },
+              }),
             );
           },
         ),

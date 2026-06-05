@@ -387,7 +387,7 @@ class _MaintenanceLogEntryViewState
               children: [
                 // Elevator Info Card
                 Card(
-                  elevation: 2,
+                  elevation: 0,
                   color: colors.surfaceContainerLowest,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

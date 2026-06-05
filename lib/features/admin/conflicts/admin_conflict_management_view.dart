@@ -105,7 +105,7 @@ class _ConflictAppBar extends StatelessWidget {
                 style: textTheme.headlineSmall?.copyWith(
                   color: colors.onPrimary,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
+                  letterSpacing: 0.0,
                   height: 1.1,
                 ),
               ),
@@ -307,7 +307,7 @@ class _EmptyState extends StatelessWidget {
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: colors.onSurface,
-                letterSpacing: -0.5,
+                letterSpacing: 0.0,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),

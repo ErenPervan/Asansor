@@ -110,7 +110,7 @@ class _UserManagementViewState extends ConsumerState<UserManagementView>
           'Kullanıcı Yönetimi',
           style: textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
-            letterSpacing: -0.3,
+            letterSpacing: 0.0,
             color: colors.surface,
           ),
         ),

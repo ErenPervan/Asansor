@@ -357,7 +357,7 @@ class _TechnicianCard extends StatelessWidget {
                                   style: textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.w800,
                                     color: colors.onSurface,
-                                    letterSpacing: -0.3,
+                                    letterSpacing: 0.0,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,

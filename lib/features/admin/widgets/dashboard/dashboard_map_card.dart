@@ -65,7 +65,7 @@ class DashboardMapCard extends StatelessWidget {
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
-                        letterSpacing: -0.3,
+                        letterSpacing: 0.0,
                       ),
                     ),
                     const SizedBox(height: 4),

@@ -201,6 +201,7 @@ ThemeData _buildTheme(Brightness brightness) {
 
   return ThemeData(
     useMaterial3: true,
+    fontFamily: 'NunitoSans',
     colorScheme: base,
     scaffoldBackgroundColor: colors.background,
 
@@ -209,22 +210,22 @@ ThemeData _buildTheme(Brightness brightness) {
       displayLarge: TextStyle(
         color: colors.onSurface,
         fontWeight: FontWeight.w800,
-        letterSpacing: -1.5,
+        letterSpacing: 0.0,
       ),
       headlineLarge: TextStyle(
         color: colors.onSurface,
         fontWeight: FontWeight.w700,
-        letterSpacing: -0.5,
+        letterSpacing: -0.25,
       ),
       headlineMedium: TextStyle(
         color: colors.onSurface,
         fontWeight: FontWeight.w700,
-        letterSpacing: -0.3,
+        letterSpacing: -0.15,
       ),
       titleLarge: TextStyle(
         color: colors.onSurface,
         fontWeight: FontWeight.w700,
-        letterSpacing: -0.2,
+        letterSpacing: 0.0,
       ),
       bodyLarge: TextStyle(color: colors.onSurface, height: 1.5),
       bodyMedium: TextStyle(color: colors.onSurfaceVariant, height: 1.5),
@@ -246,7 +247,7 @@ ThemeData _buildTheme(Brightness brightness) {
         fontSize: 18,
         fontWeight: FontWeight.w700,
         color: Colors.white,
-        letterSpacing: -0.3,
+        letterSpacing: -0.15,
       ),
       iconTheme: IconThemeData(color: Colors.white),
       systemOverlayStyle: SystemUiOverlayStyle(

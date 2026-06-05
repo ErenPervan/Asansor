@@ -16,11 +16,25 @@ import '../widgets/home/home_active_faults.dart';
 import '../widgets/home/home_daily_agenda.dart';
 import '../widgets/home/home_stats_section.dart';
 import '../widgets/home/home_top_app_bar.dart';
+import '../../../core/widgets/notification_rationale_sheet.dart';
 
 // ── HomeView ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationRationaleSheet.checkAndShow(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

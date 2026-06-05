@@ -16,12 +16,26 @@ import '../../maintenance/models/maintenance_log_model.dart';
 import '../../elevator/widgets/detail/report_fault_sheet.dart';
 import '../../../core/constants/app_durations.dart';
 import '../providers/customer_portal_provider.dart';
+import '../../../core/widgets/notification_rationale_sheet.dart';
 
-class CustomerDashboardView extends ConsumerWidget {
+class CustomerDashboardView extends ConsumerStatefulWidget {
   const CustomerDashboardView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CustomerDashboardView> createState() => _CustomerDashboardViewState();
+}
+
+class _CustomerDashboardViewState extends ConsumerState<CustomerDashboardView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationRationaleSheet.checkAndShow(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final elevatorAsync = ref.watch(customerElevatorProvider);
     final logsAsync = ref.watch(customerMaintenanceLogsProvider);
 

@@ -118,7 +118,7 @@ serve(async (req: Request) => {
         );
       }
     }
-    else if (reqBody.to_user_id && reqBody.title && reqBody.body) {
+    else if ((reqBody.to_user_id || reqBody.to_role) && reqBody.title && reqBody.body) {
       // Direct App Call — MUST verify the caller is an authenticated Supabase user
       const authHeader = req.headers.get("Authorization");
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -148,21 +148,37 @@ serve(async (req: Request) => {
         Object.entries(rawData).map(([k, v]) => [k, String(v)])
       );
 
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("fcm_token")
-        .eq("id", reqBody.to_user_id)
-        .maybeSingle();
+      if (reqBody.to_role) {
+        const { data: profiles, error } = await supabase
+          .from("profiles")
+          .select("fcm_token")
+          .eq("role", reqBody.to_role)
+          .not("fcm_token", "is", null);
 
-      if (error) {
-        console.error("Profile lookup failed:", error.message);
-        throw error;
-      }
+        if (error) {
+          console.error("Profile lookup by role failed:", error.message);
+          throw error;
+        }
 
-      if (profile?.fcm_token) {
-        targets.push({ fcm_token: profile.fcm_token });
+        targets = profiles || [];
+        console.log(`[Direct Call] Target Role ${reqBody.to_role}. Found tokens: ${targets.length}`);
+      } else if (reqBody.to_user_id) {
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("fcm_token")
+          .eq("id", reqBody.to_user_id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Profile lookup failed:", error.message);
+          throw error;
+        }
+
+        if (profile?.fcm_token) {
+          targets.push({ fcm_token: profile.fcm_token });
+        }
+        console.log(`[Direct Call] Target User ${reqBody.to_user_id}. Found token: ${!!profile?.fcm_token}`);
       }
-      console.log(`[Direct Call] Target User ${reqBody.to_user_id}. Found token: ${!!profile?.fcm_token}`);
     }
     else {
       return new Response(

@@ -1,6 +1,8 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:asansor/features/elevator/repositories/elevator_repository.dart';
 import 'package:asansor/features/admin/repositories/schedule_repository.dart';
@@ -54,3 +56,10 @@ class MockPdfService extends Mock implements PdfService {}
 // ── Fake Classes (mocktail fallbacks) ─────────────────────────────────────────
 
 class FakeDateTime extends Fake implements DateTime {}
+
+class MockStatefulNavigationShell extends Mock implements StatefulNavigationShell {
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return super.toString();
+  }
+}

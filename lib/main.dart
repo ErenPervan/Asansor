@@ -25,22 +25,41 @@ import 'core/theme/app_colors.dart';
 // ── Hive Initialization & Recovery Helpers ─────────────────────────────────────
 
 Future<void> _initHive(FlutterSecureStorage secureStorage) async {
+  debugPrint('[Bootstrap] Initializing Hive...');
   await Hive.initFlutter();
+  debugPrint('[Bootstrap] Hive initialized. Reading from secure storage...');
+  
   final encryptionKeyString = await secureStorage.read(
     key: 'hive_encryption_key',
+  ).timeout(
+    const Duration(seconds: 3),
+    onTimeout: () {
+      debugPrint('[Bootstrap] secureStorage.read TIMEOUT! Throwing exception...');
+      throw Exception('FlutterSecureStorage read timeout');
+    },
   );
+  
+  debugPrint('[Bootstrap] secureStorage.read completed.');
   late List<int> encryptionKeyUint8List;
   if (encryptionKeyString == null) {
+    debugPrint('[Bootstrap] Generating new Hive secure key...');
     final key = Hive.generateSecureKey();
     await secureStorage.write(
       key: 'hive_encryption_key',
       value: base64UrlEncode(key),
+    ).timeout(
+      const Duration(seconds: 3),
+      onTimeout: () {
+        debugPrint('[Bootstrap] secureStorage.write TIMEOUT! Throwing exception...');
+        throw Exception('FlutterSecureStorage write timeout');
+      },
     );
     encryptionKeyUint8List = key;
   } else {
     encryptionKeyUint8List = base64Url.decode(encryptionKeyString);
   }
 
+  debugPrint('[Bootstrap] Opening Hive boxes...');
   final cipher = HiveAesCipher(encryptionKeyUint8List);
 
   await Hive.openBox<String>(syncQueueBoxName, encryptionCipher: cipher);
@@ -49,6 +68,7 @@ Future<void> _initHive(FlutterSecureStorage secureStorage) async {
   await Hive.openBox<String>(checklistCacheBoxName, encryptionCipher: cipher);
   await Hive.openBox<String>(pastLogsCacheBoxName, encryptionCipher: cipher);
   await Hive.openBox<String>(faultsCacheBoxName, encryptionCipher: cipher);
+  debugPrint('[Bootstrap] All Hive boxes opened successfully.');
 }
 
 Future<void> _clearAndReinitHive(FlutterSecureStorage secureStorage) async {
@@ -112,7 +132,11 @@ Future<void> main() async {
   );
 
   // Initialise Hive and open all persistent boxes.
-  const secureStorage = FlutterSecureStorage();
+  const secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+  );
   bool hiveRecoveryPerformed = false;
 
   try {
@@ -123,6 +147,10 @@ Future<void> main() async {
     await _clearAndReinitHive(secureStorage);
   } on FormatException catch (e) {
     debugPrint('[Hive] Base64 decode hatası: $e — önbellek temizleniyor...');
+    hiveRecoveryPerformed = true;
+    await _clearAndReinitHive(secureStorage);
+  } catch (e) {
+    debugPrint('[Hive] Beklenmeyen hata: $e — önbellek temizleniyor...');
     hiveRecoveryPerformed = true;
     await _clearAndReinitHive(secureStorage);
   }
@@ -157,9 +185,6 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
   @override
   void initState() {
     super.initState();
-    // Keep the auto-sync listener alive for the entire app lifetime so it
-    // fires regardless of which screen is currently shown.
-    setupAutoSyncListener(ref);
 
     // State 1 — terminated: wait for the first frame so GoRouter has rendered
     // its initial route before we attempt to navigate.  At this point
@@ -202,6 +227,10 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Keep the auto-sync listener alive for the entire app lifetime so it
+    // fires regardless of which screen is currently shown.
+    setupAutoSyncListener(ref);
+    
     final goRouter = ref.watch(appRouterProvider);
 
     return MaterialApp.router(

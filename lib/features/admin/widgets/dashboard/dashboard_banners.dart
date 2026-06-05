@@ -59,7 +59,7 @@ class ConflictBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '$count Senkronizasyon ÇakÖÃ‚Â±Ö¦Ş¸masÖÃ‚Â±',
+                      '$count Senkronizasyon Çakışması',
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: colors.onErrorContainer,
@@ -68,7 +68,7 @@ class ConflictBanner extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'ÇözülmemiÖ¦Ş¸ çakÖÃ‚Â±Ö¦Ş¸malar var, incelemek için dokunun',
+                      'Çözülmemiş çakışmalar var, incelemek için dokunun',
                       style: textTheme.labelMedium?.copyWith(
                         color: colors.onErrorContainer,
                         height: 1.3,
@@ -91,7 +91,7 @@ class ConflictBanner extends StatelessWidget {
   }
 }
 
-// ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ Add Elevator Banner ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬ÃƒÂ¢Ã¢â‚¬Â─šÂ¬
+// ── Add Elevator Banner ──────────────────────────────────────────────────────
 
 class AddElevatorBanner extends StatelessWidget {
   const AddElevatorBanner({super.key, required this.onTap});
@@ -162,7 +162,7 @@ class AddElevatorBanner extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'KayÖÃ‚Â±t oluÖ¦Ş¸tur ve QR kodu otomatik üret',
+                      'Kayıt oluştur ve QR kodu otomatik üret',
                       style: textTheme.labelMedium?.copyWith(
                         color: colors.onPrimary.withValues(alpha: 0.7),
                         height: 1.3,

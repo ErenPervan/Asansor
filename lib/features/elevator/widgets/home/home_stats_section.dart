@@ -24,11 +24,10 @@ class StatsSection extends StatelessWidget {
         final ratio = constraints.maxWidth > 600 ? 1.5 : 1.0;
         return Row(
           children: [
-            // Left – completed (primary background)
+            // Left –  completed (primary background)
             Expanded(
               child: Semantics(
-                label:
-                    'Tamamlanan bakÖÃ‚Â±m sayÖÃ‚Â±sÖÃ‚Â±: $completedCount',
+                label: 'Tamamlanan bakım sayısı: $completedCount',
                 child: AspectRatio(
                   aspectRatio: ratio,
                   child: Container(
@@ -61,11 +60,17 @@ class StatsSection extends StatelessWidget {
                                   color: colors.onPrimary,
                                 ),
                                 const SizedBox(width: 6),
-                                Text(
-                                  'TamamlandÖÃ‚Â±',
-                                  style: textTheme.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.onPrimary,
+                                Expanded(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Tamamlandı',
+                                      style: textTheme.labelSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: colors.onPrimary,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -78,12 +83,18 @@ class StatsSection extends StatelessWidget {
                                 color: colors.onPrimary,
                               ),
                             ),
-                            Text(
-                              completedLabel,
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: colors.onPrimary.withValues(alpha: 0.7),
-                                letterSpacing: 1.5,
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                completedLabel,
+                                style: textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: colors.onPrimary.withValues(
+                                    alpha: 0.7,
+                                  ),
+                                  letterSpacing: 1.5,
+                                ),
                               ),
                             ),
                           ],
@@ -95,11 +106,10 @@ class StatsSection extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.md),
-            // Right – active faults (surface background)
+            // Right –  active faults (surface background)
             Expanded(
               child: Semantics(
-                label:
-                    'AçÖÃ‚Â±k arÖÃ‚Â±za sayÖÃ‚Â±sÖÃ‚Â±: $activeFaultCount',
+                label: 'Açık arıza sayısı: $activeFaultCount',
                 child: AspectRatio(
                   aspectRatio: ratio,
                   child: Container(
@@ -128,11 +138,17 @@ class StatsSection extends StatelessWidget {
                                   color: colors.onSurfaceVariant,
                                 ),
                                 const SizedBox(width: 6),
-                                Text(
-                                  'AçÖÃ‚Â±k ArÖÃ‚Â±za',
-                                  style: textTheme.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.onSurfaceVariant,
+                                Expanded(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Açık Arıza',
+                                      style: textTheme.labelSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: colors.onSurfaceVariant,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -145,12 +161,16 @@ class StatsSection extends StatelessWidget {
                                 color: colors.onSurface,
                               ),
                             ),
-                            Text(
-                              'AÇIK ARIZA',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: colors.onSurfaceVariant,
-                                letterSpacing: 1.5,
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'AÇIK ARIZA',
+                                style: textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: colors.onSurfaceVariant,
+                                  letterSpacing: 1.5,
+                                ),
                               ),
                             ),
                           ],

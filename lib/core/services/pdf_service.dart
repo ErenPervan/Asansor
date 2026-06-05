@@ -645,7 +645,7 @@ class PdfService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        _sectionLabel('BAKIM GEÖ¡MİŞİ', bold),
+        _sectionLabel('BAKIM GEÇMİŞİ', bold),
         pw.SizedBox(height: 10),
         pw.Table(
           border: pw.TableBorder.all(color: _borderColor, width: 0.6),
@@ -656,17 +656,17 @@ class PdfService {
             3: const pw.FixedColumnWidth(72),
           },
           children: [
-            // ─â‚¬─â‚¬ Header row ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+            // ————————————————— Header row ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             pw.TableRow(
               decoration: const pw.BoxDecoration(color: _accentIndigo),
               children: [
                 _tableHeader('TARİH', bold),
                 _tableHeader('TEKNİSYEN', bold),
-                _tableHeader('YAPILAN İŞLEMLER / NOTLAR', bold),
+                _tableHeader('YAPILAN İŞLEMLER / NOTLAR', bold),
                 _tableHeader('ONAY', bold),
               ],
             ),
-            // ─â‚¬─â‚¬ Data rows ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+            // ————————————————— Data rows ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             if (logs.isEmpty)
               pw.TableRow(
                 children: [
@@ -693,9 +693,9 @@ class PdfService {
                   children: [
                     _tableCell(_fmtDate(log.maintenanceDate), regular),
                     _tableCell(_shortId(log.technicianId), regular),
-                    _tableCell(log.notes ?? 'Ã¢â‚¬â€', regular),
+                    _tableCell(log.notes ?? '—', regular),
                     _tableCellCenter(
-                      log.isApproved ? 'Ã¢Å“â€œ' : 'Ã¢ÂÂ³',
+                      log.isApproved ? '✓' : '✗',
                       log.isApproved ? bold : regular,
                       color: log.isApproved
                           ? PdfColor.fromInt(0xFF1B6B3A)
@@ -792,7 +792,7 @@ class PdfService {
     );
   }
 
-  // ─â‚¬─â‚¬ Small helpers ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+  // ————————————————— Small helpers ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
   pw.Widget _sectionLabel(String text, pw.Font bold) {
     return pw.Row(
@@ -884,7 +884,7 @@ class PdfService {
     );
   }
 
-  // ─â‚¬─â‚¬ Date/string utilities ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+  // ————————————————— Date/string utilities ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
   String _fmtDate(DateTime dt) {
     final d = dt.toLocal();
@@ -900,11 +900,11 @@ class PdfService {
         '${d.minute.toString().padLeft(2, '0')}';
   }
 
-  /// Returns a human-readable "last 6 months" period label, e.g. "Eki 2025 Ã¢â‚¬â€œ Nis 2026".
+  /// Returns a human-readable "last 6 months" period label, e.g. "Eki 2025 – Nis 2026".
   String _periodLabel(DateTime now) {
     const months = [
       'Oca',
-      'Şub',
+      'Şub',
       'Mar',
       'Nis',
       'May',
@@ -922,13 +922,13 @@ class PdfService {
       from.month <= 0 ? 12 + from.month : from.month,
       1,
     );
-    return '${months[fromNorm.month - 1]} ${fromNorm.year} Ã¢â‚¬â€œ '
+    return '${months[fromNorm.month - 1]} ${fromNorm.year} – '
         '${months[now.month - 1]} ${now.year}';
   }
 
   /// Shortens a UUID to a readable 8-character fragment.
   String _shortId(String id) =>
-      id.length > 8 ? 'Ã¢â‚¬Â¦${id.substring(id.length - 8)}' : id;
+      id.length > 8 ? '…${id.substring(id.length - 8)}' : id;
 
   String _statusTr(ElevatorStatus status) {
     switch (status) {

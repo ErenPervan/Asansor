@@ -162,6 +162,13 @@ class _ScannerViewState extends ConsumerState<ScannerView>
 
   @override
   Widget build(BuildContext context) {
+    final disableAnims = MediaQuery.disableAnimationsOf(context);
+    if (disableAnims && _lineAnim.isAnimating) {
+      _lineAnim.stop();
+    } else if (!disableAnims && !_lineAnim.isAnimating && !_isProcessing) {
+      _lineAnim.repeat(reverse: true);
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -194,6 +201,7 @@ class _ScannerViewState extends ConsumerState<ScannerView>
                   isProcessing: _isProcessing,
                   primaryColor: AppThemeColors.of(context).primary,
                   successColor: AppThemeColors.of(context).success,
+                  showScanLine: !disableAnims,
                 ),
               ),
             ),
@@ -277,12 +285,14 @@ class _ScanOverlayPainter extends CustomPainter {
     required this.isProcessing,
     required this.primaryColor,
     required this.successColor,
+    this.showScanLine = true,
   });
 
   final double scanLineProgress;
   final bool isProcessing;
   final Color primaryColor;
   final Color successColor;
+  final bool showScanLine;
 
   static const double _cutout = 280;
   static const double _radius = 16;
@@ -314,7 +324,7 @@ class _ScanOverlayPainter extends CustomPainter {
     canvas.restore();
 
     // ── Animated scan line (hidden while processing) ──────────────────────
-    if (!isProcessing) {
+    if (!isProcessing && showScanLine) {
       final lineY = rect.top + scanLineProgress * rect.height;
       final shader = LinearGradient(
         colors: [Colors.transparent, primaryColor, Colors.transparent],
@@ -385,7 +395,7 @@ class _CircleIconButton extends StatelessWidget {
             customBorder: const CircleBorder(),
             onTap: onTap,
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(13),
               child: Icon(icon, color: Colors.white, size: 22),
             ),
           ),

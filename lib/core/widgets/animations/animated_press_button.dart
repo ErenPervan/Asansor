@@ -44,19 +44,23 @@ class _AnimatedPressButtonState extends State<AnimatedPressButton>
 
   void _onPointerDown(PointerDownEvent event) {
     if (widget.onPressed != null) {
+      if (MediaQuery.disableAnimationsOf(context)) return;
       _controller.forward();
     }
   }
 
   void _onPointerUp(PointerUpEvent event) {
     if (widget.onPressed != null) {
-      _controller.reverse();
+      if (!MediaQuery.disableAnimationsOf(context)) {
+        _controller.reverse();
+      }
       widget.onPressed!();
     }
   }
 
   void _onPointerCancel(PointerCancelEvent event) {
     if (widget.onPressed != null) {
+      if (MediaQuery.disableAnimationsOf(context)) return;
       _controller.reverse();
     }
   }

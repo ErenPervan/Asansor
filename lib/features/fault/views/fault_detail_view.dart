@@ -167,6 +167,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final screenHeight = MediaQuery.sizeOf(context).height;
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+    final baseHeight = (screenHeight * 0.22).clamp(180.0, 240.0);
+    final expandedHeight = (baseHeight * textScale).clamp(180.0, 320.0);
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -176,7 +179,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
             slivers: [
               // ── App bar with status gradient ─────────────────────────────
               SliverAppBar(
-                expandedHeight: (screenHeight * 0.22).clamp(180.0, 240.0),
+                expandedHeight: expandedHeight,
                 pinned: true,
                 backgroundColor: fault.isResolved
                     ? colors.success
@@ -654,7 +657,7 @@ class _StatusHeader extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 12),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
                 transitionBuilder: (child, animation) {

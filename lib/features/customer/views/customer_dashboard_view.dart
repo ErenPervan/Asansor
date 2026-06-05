@@ -372,7 +372,7 @@ class _MaintenanceLogList extends StatelessWidget {
           },
         );
       },
-      loading: () => const LoadingState(),
+      loading: () => const LoadingState(shrinkWrap: true),
       error: (err, _) => ErrorState(
         message: 'Bakım geçmişi alınamadı.\n$err',
         onRetry: onRetry,

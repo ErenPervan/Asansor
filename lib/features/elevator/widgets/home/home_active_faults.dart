@@ -63,7 +63,7 @@ class ActiveFaultsSection extends StatelessWidget {
 
         // Content
         activeFaults.when(
-          loading: () => const LoadingState(),
+          loading: () => const LoadingState(shrinkWrap: true),
           error: (e, _) =>
               ErrorState(message: e.toString().replaceFirst('Exception: ', '')),
           data: (faults) {
@@ -155,6 +155,13 @@ class FaultCardState extends State<FaultCard>
 
   @override
   Widget build(BuildContext context) {
+    final disableAnims = MediaQuery.disableAnimationsOf(context);
+    if (disableAnims && _pulseCtrl.isAnimating) {
+      _pulseCtrl.stop();
+    } else if (!disableAnims && !_pulseCtrl.isAnimating) {
+      _pulseCtrl.repeat(reverse: true);
+    }
+
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
@@ -169,7 +176,9 @@ class FaultCardState extends State<FaultCard>
       child: AnimatedBuilder(
         animation: _pulse,
         builder: (context, child) {
-          final glowAlpha = isNew ? 0.08 + (_pulse.value * 0.14) : 0.06;
+          final glowAlpha = isNew
+              ? (disableAnims ? 0.15 : 0.08 + (_pulse.value * 0.14))
+              : 0.06;
           return Container(
             width: widget.cardWidth,
             decoration: BoxDecoration(

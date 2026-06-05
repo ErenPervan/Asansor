@@ -474,7 +474,7 @@ class _KpiCard extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w800,
               color: data.color,
-              
+
               height: 1,
             ),
           ),

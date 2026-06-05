@@ -171,16 +171,19 @@ class MaintenanceHistorySectionState
             }
 
             // Timeline list Ã¢â‚¬â€ vertical line drawn as left-column Container
-            return Column(
-              children: logs.asMap().entries.map((entry) {
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: logs.length,
+              itemBuilder: (context, i) {
                 return FadeInSlide(
-                  index: entry.key,
+                  index: i,
                   child: TimelineItem(
-                    log: entry.value,
-                    isLast: entry.key == logs.length - 1,
+                    log: logs[i],
+                    isLast: i == logs.length - 1,
                   ),
                 );
-              }).toList(),
+              },
             );
           },
         ),

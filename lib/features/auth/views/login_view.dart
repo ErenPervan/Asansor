@@ -187,7 +187,7 @@ class _LoginViewState extends ConsumerState<LoginView>
     });
 
     final isLoading = ref.watch(authControllerProvider).isLoading;
-    final screenH = MediaQuery.of(context).size.height;
+    final screenH = MediaQuery.sizeOf(context).height;
     final colors = AppThemeColors.of(context);
     final l10n = AppLocalizations.of(context)!;
 

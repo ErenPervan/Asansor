@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class FadeInSlide extends StatefulWidget {
   final Widget child;
@@ -25,6 +26,7 @@ class _FadeInSlideState extends State<FadeInSlide>
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
+  Timer? _delayTimer;
 
   @override
   void initState() {
@@ -43,7 +45,7 @@ class _FadeInSlideState extends State<FadeInSlide>
 
     // Stagger based on index (cap at 10 items to prevent huge delays on long lists)
     final delay = Duration(milliseconds: (widget.index.clamp(0, 10)) * 50);
-    Future.delayed(delay, () {
+    _delayTimer = Timer(delay, () {
       if (mounted) {
         _controller.forward();
       }
@@ -52,6 +54,7 @@ class _FadeInSlideState extends State<FadeInSlide>
 
   @override
   void dispose() {
+    _delayTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }

@@ -82,7 +82,6 @@ class ElevatorPickerDialogState extends State<ElevatorPickerDialog> {
             const SizedBox(height: AppSpacing.sm),
             Flexible(
               child: ListView.builder(
-                shrinkWrap: true,
                 itemCount: _filtered.length,
                 itemBuilder: (_, i) {
                   final e = _filtered[i];
@@ -239,7 +238,6 @@ class TechnicianPickerDialogState extends State<TechnicianPickerDialog> {
             else
               Flexible(
                 child: ListView.builder(
-                  shrinkWrap: true,
                   itemCount: _filtered.length,
                   itemBuilder: (_, i) {
                     final p = _filtered[i];

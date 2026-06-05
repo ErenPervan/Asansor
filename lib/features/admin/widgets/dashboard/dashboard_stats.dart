@@ -245,7 +245,7 @@ class DashboardStatCard extends StatelessWidget {
                 textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: valueFg,
-                  
+
                   height: 1,
                 ) ??
                 const TextStyle(),

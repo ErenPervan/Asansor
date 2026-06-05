@@ -16,10 +16,54 @@ import 'l10n/app_localizations.dart';
 import 'core/constants/supabase_constants.dart';
 import 'core/providers/connectivity_providers.dart';
 import 'core/router/app_router.dart'; // also exports: appRouter, navigatorKey
+import 'core/services/deep_link_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/read_cache_service.dart';
 import 'core/services/sync_queue_service.dart';
 import 'core/theme/app_colors.dart';
+
+// ── Hive Initialization & Recovery Helpers ─────────────────────────────────────
+
+Future<void> _initHive(FlutterSecureStorage secureStorage) async {
+  await Hive.initFlutter();
+  final encryptionKeyString = await secureStorage.read(
+    key: 'hive_encryption_key',
+  );
+  late List<int> encryptionKeyUint8List;
+  if (encryptionKeyString == null) {
+    final key = Hive.generateSecureKey();
+    await secureStorage.write(
+      key: 'hive_encryption_key',
+      value: base64UrlEncode(key),
+    );
+    encryptionKeyUint8List = key;
+  } else {
+    encryptionKeyUint8List = base64Url.decode(encryptionKeyString);
+  }
+
+  final cipher = HiveAesCipher(encryptionKeyUint8List);
+
+  await Hive.openBox<String>(syncQueueBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(elevatorsCacheBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(tasksCacheBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(checklistCacheBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(pastLogsCacheBoxName, encryptionCipher: cipher);
+  await Hive.openBox<String>(faultsCacheBoxName, encryptionCipher: cipher);
+}
+
+Future<void> _clearAndReinitHive(FlutterSecureStorage secureStorage) async {
+  await Hive.close();
+  await Hive.deleteBoxFromDisk(syncQueueBoxName);
+  await Hive.deleteBoxFromDisk(elevatorsCacheBoxName);
+  await Hive.deleteBoxFromDisk(tasksCacheBoxName);
+  await Hive.deleteBoxFromDisk(checklistCacheBoxName);
+  await Hive.deleteBoxFromDisk(pastLogsCacheBoxName);
+  await Hive.deleteBoxFromDisk(faultsCacheBoxName);
+  await secureStorage.delete(key: 'hive_encryption_key');
+  await _initHive(secureStorage);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,35 +111,21 @@ Future<void> main() async {
     anonKey: SupabaseConstants.supabaseAnonKey,
   );
 
-  // Initialise Hive and open all persistent boxes:
-  //   • sync queue  – write operations queued while offline
-  //   • read caches – last-known-good snapshots for offline reads
-  await Hive.initFlutter();
-
+  // Initialise Hive and open all persistent boxes.
   const secureStorage = FlutterSecureStorage();
-  final encryptionKeyString = await secureStorage.read(
-    key: 'hive_encryption_key',
-  );
-  late List<int> encryptionKeyUint8List;
-  if (encryptionKeyString == null) {
-    final key = Hive.generateSecureKey();
-    await secureStorage.write(
-      key: 'hive_encryption_key',
-      value: base64UrlEncode(key),
-    );
-    encryptionKeyUint8List = key;
-  } else {
-    encryptionKeyUint8List = base64Url.decode(encryptionKeyString);
+  bool hiveRecoveryPerformed = false;
+
+  try {
+    await _initHive(secureStorage);
+  } on HiveError catch (e) {
+    debugPrint('[Hive] Şifre çözme hatası: $e — önbellek temizleniyor...');
+    hiveRecoveryPerformed = true;
+    await _clearAndReinitHive(secureStorage);
+  } on FormatException catch (e) {
+    debugPrint('[Hive] Base64 decode hatası: $e — önbellek temizleniyor...');
+    hiveRecoveryPerformed = true;
+    await _clearAndReinitHive(secureStorage);
   }
-
-  final cipher = HiveAesCipher(encryptionKeyUint8List);
-
-  await Hive.openBox<String>(syncQueueBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(elevatorsCacheBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(tasksCacheBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(checklistCacheBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(pastLogsCacheBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(faultsCacheBoxName, encryptionCipher: cipher);
 
   // Set up FCM permissions, notification channels, and message listeners.
   try {
@@ -108,11 +138,12 @@ Future<void> main() async {
 
   await initializeDateFormatting('tr_TR', null);
 
-  runApp(const ProviderScope(child: AsansorApp()));
+  runApp(ProviderScope(child: AsansorApp(hiveRecoveryPerformed: hiveRecoveryPerformed)));
 }
 
 class AsansorApp extends ConsumerStatefulWidget {
-  const AsansorApp({super.key});
+  const AsansorApp({super.key, this.hiveRecoveryPerformed = false});
+  final bool hiveRecoveryPerformed;
 
   @override
   ConsumerState<AsansorApp> createState() => _AsansorAppState();
@@ -122,6 +153,10 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
   @override
   void initState() {
     super.initState();
+    // Keep the auto-sync listener alive for the entire app lifetime so it
+    // fires regardless of which screen is currently shown.
+    setupAutoSyncListener(ref);
+
     // State 1 — terminated: wait for the first frame so GoRouter has rendered
     // its initial route before we attempt to navigate.  At this point
     // `navigatorKey.currentState` is guaranteed to be non-null.
@@ -134,16 +169,35 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
           Supabase.instance.client,
         );
       }
+
+      // Initialize Deep Links
+      final router = ref.read(appRouterProvider);
+      DeepLinkService.instance.initialize(router);
+
+      // Show recovery snackbar if Hive was corrupted
+      if (widget.hiveRecoveryPerformed) {
+        _showHiveRecoverySnackbar();
+      }
     });
+  }
+
+  void _showHiveRecoverySnackbar() {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return;
+    ScaffoldMessenger.of(ctx).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Yerel veri önbelleği bozulmuştu. Veriler sıfırlandı, '
+          'uygulamanız güvenle çalışmaya devam ediyor.',
+        ),
+        duration: const Duration(seconds: 6),
+        backgroundColor: AppColors.warning,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Keep the auto-sync listener alive for the entire app lifetime so it
-    // fires regardless of which screen is currently shown.  Previously this
-    // was only watched inside HomeView, which meant the listener would die
-    // whenever the technician navigated to another screen via context.go().
-    setupAutoSyncListener(ref);
     final goRouter = ref.watch(appRouterProvider);
 
     return MaterialApp.router(

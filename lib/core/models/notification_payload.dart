@@ -1,4 +1,5 @@
-import '../enums/app_enums.dart';
+import '../enums/app_capability.dart';
+import '../../features/auth/providers/auth_providers.dart';
 
 sealed class NotificationPayload {
   const NotificationPayload();
@@ -82,17 +83,15 @@ class FallbackPayload extends NotificationPayload {
 }
 
 /// Rol bazlı hedeflenen yönlendirme rotasını belirler.
-String determineDestination(NotificationPayload payload, UserRole? role) {
+String determineDestination(NotificationPayload payload, AuthStateModel? authState) {
+  final canViewAdminCalendar = authState?.can(AppCapability.viewAdminCalendar) ?? false;
   return switch (payload) {
-    TaskAssignedPayload() => switch (role) {
-        UserRole.technician => '/', // Teknisyen için ana sayfa (görev listesi)
-        UserRole.admin => '/admin/calendar', // Yönetici için takvim ekranı
-        _ => '/',
-      },
-    TaskCompletedPayload(:final route) => switch (role) {
-        UserRole.admin => route.isNotEmpty ? route : '/admin/master-calendar',
-        _ => '/',
-      },
+    TaskAssignedPayload() => canViewAdminCalendar
+        ? '/admin/calendar' // Yönetici için takvim ekranı
+        : '/', // Teknisyen için ana sayfa (görev listesi)
+    TaskCompletedPayload(:final route) => canViewAdminCalendar
+        ? (route.isNotEmpty ? route : '/admin/master-calendar')
+        : '/',
     ElevatorDetailPayload(:final elevatorId) => '/elevator/$elevatorId',
     FaultDetailPayload(:final faultId) => '/fault/$faultId',
     ExplicitRoutePayload(:final route) => route,

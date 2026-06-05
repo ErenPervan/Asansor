@@ -17,6 +17,7 @@ import '../../../core/theme/app_spacing.dart';
 // ── Role helpers ──────────────────────────────────────────────────────────────
 
 import '../../../core/enums/app_enums.dart';
+import '../../../core/enums/app_capability.dart';
 
 _RoleStyle _roleStyle(BuildContext context, UserRole role) {
   final colors = AppThemeColors.of(context);
@@ -167,7 +168,8 @@ class _UserListTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = AppThemeColors.of(context);
-    final currentRole = ref.watch(roleProvider);
+    final profile = ref.watch(currentProfileProvider).valueOrNull;
+    final canManageUsers = profile?.can(AppCapability.manageUsers) ?? false;
     final profilesAsync = role == null
         ? ref.watch(allProfilesProvider)
         : ref.watch(profilesByRoleProvider(role!));
@@ -218,7 +220,7 @@ class _UserListTab extends ConsumerWidget {
                             Expanded(
                               child: _ProfileCard(
                                 profile: profiles[idx1],
-                                isAdminViewer: currentRole == UserRole.admin,
+                                canManageUsers: canManageUsers,
                                 onEditRole: () =>
                                     _showEditRoleSheet(context, profiles[idx1]),
                               ),
@@ -228,8 +230,7 @@ class _UserListTab extends ConsumerWidget {
                               child: idx2 < profiles.length
                                   ? _ProfileCard(
                                       profile: profiles[idx2],
-                                      isAdminViewer:
-                                          currentRole == UserRole.admin,
+                                      canManageUsers: canManageUsers,
                                       onEditRole: () => _showEditRoleSheet(
                                         context,
                                         profiles[idx2],
@@ -249,7 +250,7 @@ class _UserListTab extends ConsumerWidget {
                   separatorBuilder: (context, i) => const SizedBox(height: 10),
                   itemBuilder: (context, i) => _ProfileCard(
                     profile: profiles[i],
-                    isAdminViewer: currentRole == UserRole.admin,
+                    canManageUsers: canManageUsers,
                     onEditRole: () => _showEditRoleSheet(context, profiles[i]),
                   ),
                 );
@@ -270,7 +271,9 @@ class _CustomerTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = AppThemeColors.of(context);
-    final currentRole = ref.watch(roleProvider);
+    final profile = ref.watch(currentProfileProvider).valueOrNull;
+    final canManageUsers = profile?.can(AppCapability.manageUsers) ?? false;
+    final canAssignElevators = profile?.can(AppCapability.manageElevators) ?? false;
     final profilesAsync = ref.watch(profilesByRoleProvider(UserRole.customer));
     final elevatorsAsync = ref.watch(elevatorsProvider);
 
@@ -317,13 +320,13 @@ class _CustomerTab extends ConsumerWidget {
                             Expanded(
                               child: _ProfileCard(
                                 profile: customers[idx1],
-                                isAdminViewer: currentRole == UserRole.admin,
+                                canManageUsers: canManageUsers,
                                 elevators: elevators,
                                 onEditRole: () => _showEditRoleSheet(
                                   context,
                                   customers[idx1],
                                 ),
-                                onAssignElevator: currentRole == UserRole.admin
+                                onAssignElevator: canAssignElevators
                                     ? () => _showAssignElevatorSheet(
                                         context,
                                         customers[idx1],
@@ -337,15 +340,13 @@ class _CustomerTab extends ConsumerWidget {
                               child: idx2 < customers.length
                                   ? _ProfileCard(
                                       profile: customers[idx2],
-                                      isAdminViewer:
-                                          currentRole == UserRole.admin,
+                                      canManageUsers: canManageUsers,
                                       elevators: elevators,
                                       onEditRole: () => _showEditRoleSheet(
                                         context,
                                         customers[idx2],
                                       ),
-                                      onAssignElevator:
-                                          currentRole == UserRole.admin
+                                      onAssignElevator: canAssignElevators
                                           ? () => _showAssignElevatorSheet(
                                               context,
                                               customers[idx2],
@@ -367,10 +368,10 @@ class _CustomerTab extends ConsumerWidget {
                   separatorBuilder: (context, i) => const SizedBox(height: 10),
                   itemBuilder: (context, i) => _ProfileCard(
                     profile: customers[i],
-                    isAdminViewer: currentRole == UserRole.admin,
+                    canManageUsers: canManageUsers,
                     elevators: elevators,
                     onEditRole: () => _showEditRoleSheet(context, customers[i]),
-                    onAssignElevator: currentRole == UserRole.admin
+                    onAssignElevator: canAssignElevators
                         ? () => _showAssignElevatorSheet(
                             context,
                             customers[i],
@@ -393,14 +394,14 @@ class _CustomerTab extends ConsumerWidget {
 class _ProfileCard extends StatelessWidget {
   const _ProfileCard({
     required this.profile,
-    required this.isAdminViewer,
+    required this.canManageUsers,
     this.elevators,
     required this.onEditRole,
     this.onAssignElevator,
   });
 
   final ProfileModel profile;
-  final bool isAdminViewer;
+  final bool canManageUsers;
   final List<ElevatorModel>? elevators;
   final VoidCallback onEditRole;
   final VoidCallback? onAssignElevator;
@@ -613,7 +614,7 @@ class _ProfileCard extends StatelessWidget {
           ],
 
           // ── Admin action row ─────────────────────────────────────────
-          if (isAdminViewer) ...[
+          if (canManageUsers) ...[
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,

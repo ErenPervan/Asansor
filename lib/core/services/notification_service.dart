@@ -11,7 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../router/app_router.dart'; // exposes appRouter + navigatorKey
 import 'package:go_router/go_router.dart';
 import '../models/notification_payload.dart';
-import '../enums/app_enums.dart';
+import '../../features/auth/providers/auth_providers.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Background handler (MUST be a top-level function, not a class method)
@@ -100,8 +100,8 @@ class NotificationService {
   /// True if the user is authenticated and the router has fully processed the auth state.
   bool isAuthorized = false;
 
-  /// Current user's role.
-  UserRole? userRole;
+  /// Current user's auth state.
+  AuthStateModel? authState;
 
   /// Stores a route received from a notification before the user was authorized or the router was ready.
   String? _pendingRoute;
@@ -411,7 +411,7 @@ class NotificationService {
     if (data == null) return;
 
     final payload = NotificationPayload.fromJson(data);
-    final destination = determineDestination(payload, userRole);
+    final destination = determineDestination(payload, authState);
 
     if (!isAuthorized) {
       debugPrint('[FCM] Not authorized yet. Storing pending route: $destination');

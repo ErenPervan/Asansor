@@ -45,7 +45,7 @@
 library;
 
 import '../../../core/enums/app_enums.dart';
-
+import '../../../core/enums/app_capability.dart';
 class ProfileModel {
   const ProfileModel({
     required this.id,
@@ -144,6 +144,13 @@ class ProfileModel {
   bool get isAdmin => role == UserRole.admin;
   bool get isTechnician => role == UserRole.technician;
   bool get isCustomer => role == UserRole.customer;
+
+  // ── Capability Check ───────────────────────────────────────────────────────
+
+  /// Bu profilin belirtilen yeteneğe ([AppCapability]) sahip olup olmadığını
+  /// döndürür. Yetki kontrolleri bu metot üzerinden yapılmalıdır.
+  bool can(AppCapability capability) =>
+      capabilityMatrix[role]?.contains(capability) ?? false;
 
   @override
   String toString() =>

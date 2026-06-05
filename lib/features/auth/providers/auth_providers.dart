@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/enums/app_enums.dart';
+import '../../../core/enums/app_capability.dart';
 import '../../../core/providers/connectivity_providers.dart';
 import '../repositories/auth_repository.dart';
 
@@ -83,6 +84,13 @@ class AuthStateModel {
     this.elevatorId,
     this.errorMessage,
   });
+
+  /// Capability matrix üzerinden yetki kontrolü yapar.
+  /// [role] null ise (henüz yüklenmemiş) her zaman false döner.
+  bool can(AppCapability capability) {
+    if (status != AuthStatus.authorized || role == null) return false;
+    return capabilityMatrix[role]?.contains(capability) ?? false;
+  }
 }
 
 // We cannot import profile_providers here to avoid circular dependency.

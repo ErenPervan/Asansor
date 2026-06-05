@@ -12,7 +12,7 @@ class TopAppBar extends StatelessWidget {
     required this.userEmail,
     required this.pendingSyncCount,
     required this.isOnline,
-    required this.isAdmin,
+    required this.canAccessAdmin,
     required this.activeFaultCount,
     required this.onSignOut,
   });
@@ -20,7 +20,7 @@ class TopAppBar extends StatelessWidget {
   final String userEmail;
   final int pendingSyncCount;
   final bool isOnline;
-  final bool isAdmin;
+  final bool canAccessAdmin;
   final int activeFaultCount;
   final VoidCallback onSignOut;
 
@@ -75,7 +75,7 @@ class TopAppBar extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  isAdmin
+                  canAccessAdmin
                       ? 'Merhaba Admin — $activeFaultCount açık arıza'
                       : 'Merhaba, $displayName',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -88,7 +88,7 @@ class TopAppBar extends StatelessWidget {
             ),
           ),
           // Admin panel shortcut
-          if (isAdmin)
+          if (canAccessAdmin)
             Material(
               color: colors.surfaceContainerLowest,
               shape: const CircleBorder(),
@@ -107,7 +107,7 @@ class TopAppBar extends StatelessWidget {
                 ),
               ),
             ),
-          if (isAdmin) const SizedBox(width: AppSpacing.sm),
+          if (canAccessAdmin) const SizedBox(width: AppSpacing.sm),
           // Cloud sync status indicator
           SyncStatusButton(pendingCount: pendingSyncCount, isOnline: isOnline),
           const SizedBox(width: AppSpacing.sm),

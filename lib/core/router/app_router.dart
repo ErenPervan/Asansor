@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../enums/app_enums.dart';
+import '../enums/app_capability.dart';
 import '../services/notification_service.dart';
 
 import '../../features/auth/providers/auth_providers.dart';
@@ -109,10 +109,10 @@ class RouterNotifier extends ChangeNotifier {
 
         if (current.status == AuthStatus.authorized) {
           NotificationService.instance.isAuthorized = true;
-          NotificationService.instance.userRole = current.role;
+          NotificationService.instance.authState = current;
         } else {
           NotificationService.instance.isAuthorized = false;
-          NotificationService.instance.userRole = null;
+          NotificationService.instance.authState = null;
         }
         notifyListeners();
       },
@@ -195,15 +195,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             return '/';
           }
 
-          final role = authState.role;
-
           // Rule 3 — Admin route guard
           if (loc.startsWith('/admin')) {
-            if (role != UserRole.admin) return '/';
+            if (!authState.can(AppCapability.accessAdminPanel)) return '/';
           }
 
           // Rule 4 — Customer-scoped routing
-          if (role == UserRole.customer) {
+          if (!authState.can(AppCapability.viewAllElevators)) {
             final custElevatorId = authState.elevatorId;
             final isOnNoElevatorPage = loc == '/customer/no-elevator';
             final isOnDashboard = loc == '/customer/dashboard';

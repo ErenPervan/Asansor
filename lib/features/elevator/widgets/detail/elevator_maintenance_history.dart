@@ -81,7 +81,7 @@ class MaintenanceHistorySectionState
             ),
             Row(
               children: [
-                // ─â‚¬─â‚¬ PDF Report button ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+                // ── PDF Report button ────────────────────────────────────────
                 Tooltip(
                   message: 'PDF Rapor Oluştur (Son 6 Ay)',
                   child: _generatingPdf
@@ -170,7 +170,7 @@ class MaintenanceHistorySectionState
               );
             }
 
-            // Timeline list Ã¢â‚¬â€ vertical line drawn as left-column Container
+            // Timeline list ── vertical line drawn as left-column Container
             return ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -192,7 +192,7 @@ class MaintenanceHistorySectionState
   }
 }
 
-// ─â‚¬─â‚¬ Timeline item ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+// ── Timeline item ────────────────────────────────────────────────────────────
 
 class TimelineItem extends StatelessWidget {
   const TimelineItem({super.key, required this.log, required this.isLast});
@@ -209,18 +209,18 @@ class TimelineItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ─â‚¬─â‚¬ Left column: dot + connector line ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+          // ── Left column: dot + connector line ────────────────────────────────
           SizedBox(
             width: 32,
             child: Column(
               children: [
                 const SizedBox(height: 6),
-                // Dot with ring effect (ring-4 ring-surface ─ â€™ white border)
+                // Dot with ring effect (ring-4 ring-surface ──> white border)
                 Container(
                   width: 16,
                   height: 16,
                   decoration: BoxDecoration(
-                    // Approved ─ â€™ primary dot; pending ─ â€™ outline-variant dot
+                    // Approved ──> primary dot; pending ──> outline-variant dot
                     color: log.isApproved
                         ? colors.primary
                         : colors.outlineVariant,
@@ -241,7 +241,7 @@ class TimelineItem extends StatelessWidget {
             ),
           ),
 
-          // ─â‚¬─â‚¬ Right column: card ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+          // ── Right column: card ────────────────────────────────────────────────
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(left: 16, bottom: isLast ? 0 : 24),
@@ -394,7 +394,7 @@ class StatusChip extends StatelessWidget {
 
 final List<String> _monthsTr = [
   'Oca',
-  'Şub',
+  'Şub',
   'Mar',
   'Nis',
   'May',

@@ -457,7 +457,7 @@ class _TechnicianCard extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     allDone
-                        ? 'âœ“ Tüm görevler tamamlandı'
+                        ? '✓ Tüm görevler tamamlandı'
                         : '${stats.todayPending} görev bekliyor',
                     style: textTheme.labelSmall?.copyWith(
                       color: allDone ? colors.success : colors.outline,
@@ -1027,7 +1027,7 @@ class _SmallBadge extends StatelessWidget {
     final (lbl, bg, fg) = switch (p) {
       'emergency' => ('ACİL', colors.errorContainer, colors.error),
       'high' => ('YÜKSEK', colors.warningContainer, colors.warning),
-      'low' => ('DÜÅÜK', colors.surfaceContainerHigh, colors.onSurfaceVariant),
+      'low' => ('DÜŞÜK', colors.surfaceContainerHigh, colors.onSurfaceVariant),
       _ => ('NORMAL', colors.surfaceContainer, colors.onSurface),
     };
     return _SmallBadge(label: lbl, bg: bg, fg: fg, textTheme: textTheme);

@@ -788,7 +788,7 @@ class _PriorityBadge extends StatelessWidget {
       case 'high':
         return ('YÜKSEK', colors.warningContainer, colors.warning);
       case 'low':
-        return ('DÜÅÜK', colors.surfaceContainerHigh, colors.onSurfaceVariant);
+        return ('DÜŞÜK', colors.surfaceContainerHigh, colors.onSurfaceVariant);
       default: // normal
         return ('NORMAL', colors.surfaceContainer, colors.onSurface);
     }

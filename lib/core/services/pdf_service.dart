@@ -440,7 +440,7 @@ class PdfService {
   static const _textMuted = PdfColor.fromInt(0xFF546E7A);
   static const _accentIndigo = PdfColor.fromInt(0xFF3949AB);
 
-  // ─â‚¬─â‚¬ Public API ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+  // ─────────────────────────────────────────── Public API ───────────────────────────────────────────
 
   /// Builds a corporate-styled A4 PDF for [elevator] covering [logs].
   ///
@@ -477,7 +477,7 @@ class PdfService {
     final doc = pw.Document(theme: baseTheme);
 
     // pageTheme owns ALL page-level settings; never pass pageFormat / margin /
-    // theme / orientation / clip / textDirection alongside it Ã¢â‚¬â€ the pdf library
+    // theme / orientation / clip / textDirection alongside it — the pdf library
     // asserts that the two styles are mutually exclusive.
     doc.addPage(
       pw.MultiPage(
@@ -512,7 +512,7 @@ class PdfService {
     return doc;
   }
 
-  // ─â‚¬─â‚¬ Section builders ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
+  // ─────────────────────────────────────────── Section builders ───────────────────────────────────────────
 
   pw.Widget _buildHeader(
     ElevatorModel elevator,

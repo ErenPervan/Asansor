@@ -81,7 +81,7 @@ class DailyAgendaSection extends StatelessWidget {
 
         // Content
         mySchedules.when(
-          loading: () => const LoadingState(),
+          loading: () => const LoadingState(shrinkWrap: true),
           error: (e, _) =>
               ErrorState(message: e.toString().replaceFirst('Exception: ', '')),
           data: (schedules) {

@@ -8,11 +8,13 @@ class LoadingState extends StatelessWidget {
     this.isList = true,
     this.count = 3,
     this.height = 100,
+    this.shrinkWrap = false,
   });
 
   final bool isList;
   final int count;
   final double height;
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,10 @@ class LoadingState extends StatelessWidget {
     }
 
     return ListView.separated(
-      physics: const AlwaysScrollableScrollPhysics(),
+      shrinkWrap: shrinkWrap,
+      physics: shrinkWrap
+          ? const NeverScrollableScrollPhysics()
+          : const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(AppSpacing.md),
       itemCount: count,
       separatorBuilder: (context, index) =>

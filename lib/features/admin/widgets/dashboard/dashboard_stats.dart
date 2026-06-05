@@ -55,51 +55,57 @@ class DashboardStatsGrid extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           // ── Top row: brand card (crimson) + fault alert ──────────────
-          Row(
-            children: [
-              Expanded(
-                child: DashboardStatCard(
-                  value: s.totalElevators,
-                  label: 'Toplam Asansör',
-                  icon: Icons.elevator_outlined,
-                  variant: StatVariant.brand,
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: DashboardStatCard(
+                    value: s.totalElevators,
+                    label: 'Toplam Asansör',
+                    icon: Icons.elevator_outlined,
+                    variant: StatVariant.brand,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: DashboardStatCard(
-                  value: s.activeFaults,
-                  label: 'Açık Arıza',
-                  icon: Icons.warning_amber_rounded,
-                  variant: s.activeFaults > 0
-                      ? StatVariant.critical
-                      : StatVariant.neutral,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: DashboardStatCard(
+                    value: s.activeFaults,
+                    label: 'Açık Arıza',
+                    icon: Icons.warning_amber_rounded,
+                    variant: s.activeFaults > 0
+                        ? StatVariant.critical
+                        : StatVariant.neutral,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 12),
           // ── Bottom row: completed + pending ──────────────────────────
-          Row(
-            children: [
-              Expanded(
-                child: DashboardStatCard(
-                  value: s.completedThisMonth,
-                  label: 'Tamamlanan (Bu Ay)',
-                  icon: Icons.check_circle_outline,
-                  variant: StatVariant.success,
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: DashboardStatCard(
+                    value: s.completedThisMonth,
+                    label: 'Tamamlanan (Bu Ay)',
+                    icon: Icons.check_circle_outline,
+                    variant: StatVariant.success,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: DashboardStatCard(
-                  value: s.pendingThisMonth,
-                  label: 'Bekleyen (Bu Ay)',
-                  icon: Icons.pending_outlined,
-                  variant: StatVariant.warning,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: DashboardStatCard(
+                    value: s.pendingThisMonth,
+                    label: 'Bekleyen (Bu Ay)',
+                    icon: Icons.pending_outlined,
+                    variant: StatVariant.warning,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

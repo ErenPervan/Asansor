@@ -172,11 +172,11 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
       markers.add(
         Marker(
           point: LatLng(elevator.latitude!, elevator.longitude!),
-          width: 44,
-          height: 44,
+          width: 48,
+          height: 48,
           child: GestureDetector(
             onTap: () => _showElevatorSheet(context, elevator, status),
-            child: _MarkerPin(status: status),
+            child: Center(child: _MarkerPin(status: status)),
           ),
         ),
       );

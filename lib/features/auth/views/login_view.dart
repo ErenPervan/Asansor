@@ -97,6 +97,21 @@ class _GearDecorationState extends State<_GearDecoration>
 
   @override
   Widget build(BuildContext context) {
+    final disableAnims = MediaQuery.disableAnimationsOf(context);
+    if (disableAnims && _ctrl.isAnimating) {
+      _ctrl.stop();
+    } else if (!disableAnims && !_ctrl.isAnimating) {
+      _ctrl.repeat();
+    }
+
+    if (disableAnims) {
+      return Icon(
+        Icons.settings_outlined,
+        size: widget.size,
+        color: Colors.white.withValues(alpha: widget.opacity),
+      );
+    }
+
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (context, child) => Transform.rotate(
@@ -185,6 +200,11 @@ class _LoginViewState extends ConsumerState<LoginView>
         },
       );
     });
+
+    final disableAnims = MediaQuery.disableAnimationsOf(context);
+    if (disableAnims) {
+      _slideCtrl.value = 1.0;
+    }
 
     final isLoading = ref.watch(authControllerProvider).isLoading;
     final screenH = MediaQuery.sizeOf(context).height;

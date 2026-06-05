@@ -10,6 +10,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../router/app_router.dart'; // exposes appRouter + navigatorKey
 import 'package:go_router/go_router.dart';
+import '../models/notification_payload.dart';
+import '../enums/app_enums.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Background handler (MUST be a top-level function, not a class method)
@@ -29,16 +31,41 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 // Android notification channel
 // ─────────────────────────────────────────────────────────────────────────────
 
-const _channelId = 'asansor_notifications';
-const _channelName = 'Asansör Bildirimleri';
-const _channelDesc =
-    'Görev atamaları, bakım tamamlamaları ve arıza bildirimleri';
+const _tasksChannelId = 'asansor_tasks';
+const _tasksChannelName = 'Görev Bildirimleri';
+const _tasksChannelDesc = 'Yeni görev atamaları ve bakım hatırlatmaları';
 
-const _androidChannel = AndroidNotificationChannel(
-  _channelId,
-  _channelName,
-  description: _channelDesc,
+const _faultsChannelId = 'asansor_faults';
+const _faultsChannelName = 'Arıza Bildirimleri';
+const _faultsChannelDesc = 'Acil arıza bildirimleri ve güncellemeler';
+
+const _generalChannelId = 'asansor_general';
+const _generalChannelName = 'Genel Bildirimler';
+const _generalChannelDesc = 'Sistem mesajları ve diğer genel bildirimler';
+
+const _tasksChannel = AndroidNotificationChannel(
+  _tasksChannelId,
+  _tasksChannelName,
+  description: _tasksChannelDesc,
   importance: Importance.high,
+  playSound: true,
+  enableVibration: true,
+);
+
+const _faultsChannel = AndroidNotificationChannel(
+  _faultsChannelId,
+  _faultsChannelName,
+  description: _faultsChannelDesc,
+  importance: Importance.max,
+  playSound: true,
+  enableVibration: true,
+);
+
+const _generalChannel = AndroidNotificationChannel(
+  _generalChannelId,
+  _generalChannelName,
+  description: _generalChannelDesc,
+  importance: Importance.defaultImportance,
   playSound: true,
   enableVibration: true,
 );
@@ -70,6 +97,22 @@ class NotificationService {
   NotificationServiceState _state = NotificationServiceState.notStarted;
   StreamSubscription<String>? _tokenRefreshSub;
 
+  /// True if the user is authenticated and the router has fully processed the auth state.
+  bool isAuthorized = false;
+
+  /// Current user's role.
+  UserRole? userRole;
+
+  /// Stores a route received from a notification before the user was authorized or the router was ready.
+  String? _pendingRoute;
+
+  /// Consumes and returns the pending route, clearing it.
+  String? consumePendingRoute() {
+    final route = _pendingRoute;
+    _pendingRoute = null;
+    return route;
+  }
+
   // ── Setup ─────────────────────────────────────────────────────────────────
 
   /// Sets up permissions, local-notification channels, and message listeners.
@@ -92,13 +135,7 @@ class NotificationService {
       // sure it is set even if initialize() is somehow called first.
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-      // Request notification permissions (Android 13+, iOS).
-      await _messaging.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-        provisional: false,
-      );
+      // Permissions are no longer requested here. Use requestPermission() explicitly.
 
       // Set foreground notification presentation options for iOS.
       await _messaging.setForegroundNotificationPresentationOptions(
@@ -123,12 +160,17 @@ class NotificationService {
         onDidReceiveNotificationResponse: _onLocalNotificationTapped,
       );
 
-      // Create the high-priority Android channel.
-      await _localNotifications
+      // Create the high-priority Android channels.
+      final androidPlugin = _localNotifications
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.createNotificationChannel(_androidChannel);
+          >();
+          
+      if (androidPlugin != null) {
+        await androidPlugin.createNotificationChannel(_tasksChannel);
+        await androidPlugin.createNotificationChannel(_faultsChannel);
+        await androidPlugin.createNotificationChannel(_generalChannel);
+      }
 
       // State 2 — background tap: app was in the background and the user tapped
       // the system notification to bring it to the foreground.
@@ -159,7 +201,23 @@ class NotificationService {
     }
   }
 
-  // ── Token management ──────────────────────────────────────────────────────
+  // ── Permissions & Token management ────────────────────────────────────────
+
+  /// Returns true if the user has not yet been asked for notification permissions.
+  Future<bool> shouldShowRationale() async {
+    final settings = await _messaging.getNotificationSettings();
+    return settings.authorizationStatus == AuthorizationStatus.notDetermined;
+  }
+
+  /// Requests notification permissions from the OS.
+  Future<void> requestPermission() async {
+    await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      provisional: false,
+    );
+  }
 
   /// Retrieves the current FCM token and writes it to `profiles.fcm_token`
   /// for [userId].  Also listens for future token refreshes.
@@ -248,28 +306,15 @@ class NotificationService {
     Map<String, String> data = const {},
   }) async {
     try {
-      final admins = await client
-          .from('profiles')
-          .select('id')
-          .eq('role', 'admin');
-
-      final futures = <Future<void>>[];
-      for (final row in admins as List) {
-        final adminId = (row as Map<String, dynamic>)['id'] as String?;
-        if (adminId != null) {
-          futures.add(
-            notifyUser(
-              client: client,
-              toUserId: adminId,
-              title: title,
-              body: body,
-              data: data,
-            ),
-          );
-        }
-      }
-
-      await Future.wait(futures);
+      await client.functions.invoke(
+        'send-notification',
+        body: {
+          'to_role': 'admin',
+          'title': title,
+          'body': body,
+          'data': data,
+        },
+      );
     } catch (_) {}
   }
 
@@ -280,6 +325,29 @@ class NotificationService {
     final notification = message.notification;
     if (notification == null) return;
 
+    final String type = message.data['type'] as String? ?? '';
+    final String route = message.data['route'] as String? ?? '';
+    
+    String channelId = _generalChannelId;
+    String channelName = _generalChannelName;
+    String channelDesc = _generalChannelDesc;
+    Importance importance = Importance.defaultImportance;
+    Priority priority = Priority.defaultPriority;
+
+    if (type.contains('fault') || route.startsWith('/fault/')) {
+      channelId = _faultsChannelId;
+      channelName = _faultsChannelName;
+      channelDesc = _faultsChannelDesc;
+      importance = Importance.max;
+      priority = Priority.max;
+    } else if (type.contains('task') || route == '/' || route == '/home') {
+      channelId = _tasksChannelId;
+      channelName = _tasksChannelName;
+      channelDesc = _tasksChannelDesc;
+      importance = Importance.high;
+      priority = Priority.high;
+    }
+
     _localNotifications.show(
       // Use a stable numeric ID derived from the message ID.
       message.messageId?.hashCode ?? DateTime.now().millisecond,
@@ -287,11 +355,11 @@ class NotificationService {
       notification.body,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          channelDescription: _channelDesc,
-          importance: Importance.high,
-          priority: Priority.high,
+          channelId,
+          channelName,
+          channelDescription: channelDesc,
+          importance: importance,
+          priority: priority,
           icon: '@mipmap/ic_launcher',
           playSound: true,
           enableVibration: true,
@@ -342,19 +410,13 @@ class NotificationService {
   void handleNotificationClick(Map<String, dynamic>? data) {
     if (data == null) return;
 
-    final type = data['type'] as String?;
-    final elevatorId = data['elevator_id'] as String?;
-    final route = data['route'] as String?;
+    final payload = NotificationPayload.fromJson(data);
+    final destination = determineDestination(payload, userRole);
 
-    final String destination;
-    if (type == 'task_assigned') {
-      destination = '/';
-    } else if (elevatorId != null && elevatorId.isNotEmpty) {
-      destination = '/elevator/$elevatorId';
-    } else if (route != null && route.isNotEmpty) {
-      destination = route; // `/home` also works — it redirects to `/`
-    } else {
-      destination = '/';
+    if (!isAuthorized) {
+      debugPrint('[FCM] Not authorized yet. Storing pending route: $destination');
+      _pendingRoute = destination;
+      return;
     }
 
     _scheduleNavigation(destination);

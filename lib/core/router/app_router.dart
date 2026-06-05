@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../enums/app_enums.dart';
+import '../services/notification_service.dart';
 
 import '../../features/auth/providers/auth_providers.dart';
 import '../widgets/scaffold_with_nav_bar.dart';
@@ -92,7 +93,16 @@ class RouterNotifier extends ChangeNotifier {
   RouterNotifier(this._ref) {
     _subscription = _ref.listen<AuthStateModel>(
       appAuthStateProvider,
-      (previous, current) => notifyListeners(),
+      (previous, current) {
+        if (current.status == AuthStatus.authorized) {
+          NotificationService.instance.isAuthorized = true;
+          NotificationService.instance.userRole = current.role;
+        } else {
+          NotificationService.instance.isAuthorized = false;
+          NotificationService.instance.userRole = null;
+        }
+        notifyListeners();
+      },
       fireImmediately: true,
     );
   }
@@ -139,6 +149,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return isOnLoadingPage ? null : '/loading';
 
         case AuthStatus.authorized:
+          final pendingRoute = NotificationService.instance.consumePendingRoute();
+          if (pendingRoute != null) {
+            return pendingRoute;
+          }
+
           // Let authorized users out of the login/loading pages
           if (isOnLoginPage || isOnLoadingPage) {
             return '/';

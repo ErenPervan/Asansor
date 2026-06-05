@@ -203,7 +203,7 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
           'Canlı Operasyon Haritası',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
-            letterSpacing: -0.3,
+            letterSpacing: 0.0,
             color: AppThemeColors.of(context).onPrimary,
           ),
         ),
@@ -399,7 +399,7 @@ class _ElevatorSheet extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: AppThemeColors.of(context).onSurface,
-                      letterSpacing: -0.4,
+                      letterSpacing: 0.0,
                     ),
                   ),
                 ),

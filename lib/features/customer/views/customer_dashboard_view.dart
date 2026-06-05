@@ -227,7 +227,7 @@ class _ReportFaultButton extends StatelessWidget {
         foregroundColor: colors.onError,
         padding: const EdgeInsets.symmetric(vertical: 20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 4,
+        elevation: 0,
       ),
       onPressed: () {
         showModalBottomSheet<void>(

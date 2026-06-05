@@ -324,7 +324,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                                 ?.copyWith(
                                   fontWeight: FontWeight.w800,
                                   color: colors.onSurface,
-                                  letterSpacing: -0.5,
+                                  letterSpacing: 0.0,
                                 ),
                           ),
                           const SizedBox(height: 4),

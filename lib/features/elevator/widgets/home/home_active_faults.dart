@@ -35,7 +35,7 @@ class ActiveFaultsSection extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: AppThemeColors.of(context).onSurface,
-                letterSpacing: -0.5,
+                letterSpacing: 0.0,
               ),
             ),
             activeFaults.maybeWhen(
@@ -265,7 +265,7 @@ class FaultCardState extends State<FaultCard>
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: colors.onSurface,
-                      letterSpacing: -0.3,
+                      letterSpacing: 0.0,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

@@ -76,7 +76,7 @@ class MaintenanceHistorySectionState
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: colors.onSurface,
-                letterSpacing: -0.4,
+                letterSpacing: 0.0,
               ),
             ),
             Row(

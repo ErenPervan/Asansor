@@ -47,7 +47,7 @@ class _CustomerNoElevatorViewState
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primary,
-                        letterSpacing: -0.5,
+                        letterSpacing: 0.0,
                       ),
                     ),
                     TextButton.icon(
@@ -120,7 +120,7 @@ class _CustomerNoElevatorViewState
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: AppColors.onSurface,
-                  letterSpacing: -0.5,
+                  letterSpacing: 0.0,
                 ),
                 textAlign: TextAlign.center,
               ),

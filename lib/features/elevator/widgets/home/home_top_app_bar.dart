@@ -81,7 +81,7 @@ class TopAppBar extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colors.primary,
-                    letterSpacing: -0.3,
+                    letterSpacing: 0.0,
                   ),
                 ),
               ],

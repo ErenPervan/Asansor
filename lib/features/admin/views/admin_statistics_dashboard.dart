@@ -326,7 +326,7 @@ class _AdminStatisticsDashboardState
                         style: textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: colors.onPrimary,
-                          letterSpacing: -0.3,
+                          letterSpacing: 0.0,
                         ),
                       ),
                       Text(
@@ -474,7 +474,7 @@ class _KpiCard extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w800,
               color: data.color,
-              letterSpacing: -1.5,
+              
               height: 1,
             ),
           ),

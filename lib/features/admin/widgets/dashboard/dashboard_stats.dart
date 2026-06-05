@@ -30,7 +30,7 @@ class DashboardStatsGrid extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: AppThemeColors.of(context).onSurface,
-                  letterSpacing: -0.5,
+                  letterSpacing: 0.0,
                 ),
               ),
               const Spacer(),
@@ -245,7 +245,7 @@ class DashboardStatCard extends StatelessWidget {
                 textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: valueFg,
-                  letterSpacing: -1.5,
+                  
                   height: 1,
                 ) ??
                 const TextStyle(),

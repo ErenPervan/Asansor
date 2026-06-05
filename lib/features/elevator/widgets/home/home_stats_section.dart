@@ -232,7 +232,7 @@ class ElevatorsShortcutCard extends StatelessWidget {
                           style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: colors.onPrimary,
-                            letterSpacing: -0.3,
+                            letterSpacing: 0.0,
                           ),
                         ),
                         const SizedBox(height: 4),

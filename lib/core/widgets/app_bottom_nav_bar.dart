@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../enums/app_enums.dart';
 
+import '../../core/enums/app_capability.dart';
 import '../../core/theme/app_colors.dart';
 import '../../features/admin/providers/profile_providers.dart';
 
@@ -20,8 +20,8 @@ class AppBottomNavBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final role = ref.watch(roleProvider);
-    final isAdmin = role == UserRole.admin;
+    final profile = ref.watch(currentProfileProvider).valueOrNull;
+    final canViewSchedule = profile?.can(AppCapability.viewAdminCalendar) ?? false;
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 8,
@@ -49,7 +49,7 @@ class AppBottomNavBar extends ConsumerWidget {
               icon: Icons.event_note_outlined,
               label: 'Program',
               isActive: navigationShell.currentIndex == 2,
-              onPressed: isAdmin ? () => _goBranch(2) : null,
+              onPressed: canViewSchedule ? () => _goBranch(2) : null,
             ),
             _NavItem(
               icon: Icons.history,

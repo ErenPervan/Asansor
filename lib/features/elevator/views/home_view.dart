@@ -7,7 +7,7 @@ import '../../../core/providers/connectivity_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../admin/providers/admin_providers.dart';
 import '../../admin/providers/profile_providers.dart';
-import '../../../core/enums/app_enums.dart';
+import '../../../core/enums/app_capability.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../elevator/providers/elevator_providers.dart';
 import '../../fault/providers/fault_providers.dart';
@@ -52,10 +52,11 @@ class _HomeViewState extends State<HomeView> {
                 final authState = ref.watch(authControllerProvider);
                 final pendingCount = ref.watch(pendingSyncCountProvider);
                 final isOnline = ref.watch(isOnlineProvider);
-                final role = ref.watch(roleProvider);
-                final isAdmin = role == UserRole.admin;
+                final profile = ref.watch(currentProfileProvider).valueOrNull;
+                final canAccessAdmin = profile?.can(AppCapability.accessAdminPanel) ?? false;
+                final canViewAdminStats = profile?.can(AppCapability.viewAdminStats) ?? false;
 
-                final activeFaultCount = isAdmin
+                final activeFaultCount = canViewAdminStats
                     ? (ref
                               .watch(adminStatsProvider)
                               .valueOrNull
@@ -68,7 +69,7 @@ class _HomeViewState extends State<HomeView> {
                   userEmail: authState.valueOrNull?.email ?? '',
                   pendingSyncCount: pendingCount,
                   isOnline: isOnline,
-                  isAdmin: isAdmin,
+                  canAccessAdmin: canAccessAdmin,
                   activeFaultCount: activeFaultCount,
                   onSignOut: () =>
                       ref.read(authControllerProvider.notifier).signOut(),
@@ -106,10 +107,10 @@ class _HomeViewState extends State<HomeView> {
                     const SizedBox(height: AppSpacing.xl),
                     Consumer(
                       builder: (context, ref, _) {
-                        final role = ref.watch(roleProvider);
-                        final isAdmin = role == UserRole.admin;
+                        final profile = ref.watch(currentProfileProvider).valueOrNull;
+                        final canViewAdminStats = profile?.can(AppCapability.viewAdminStats) ?? false;
 
-                        final activeFaultCount = isAdmin
+                        final activeFaultCount = canViewAdminStats
                             ? (ref
                                       .watch(adminStatsProvider)
                                       .valueOrNull
@@ -121,7 +122,7 @@ class _HomeViewState extends State<HomeView> {
                                       ?.length ??
                                   0);
 
-                        final completedCount = isAdmin
+                        final completedCount = canViewAdminStats
                             ? (ref
                                       .watch(adminStatsProvider)
                                       .valueOrNull
@@ -135,7 +136,7 @@ class _HomeViewState extends State<HomeView> {
                         return StatsSection(
                           activeFaultCount: activeFaultCount,
                           completedCount: completedCount,
-                          completedLabel: isAdmin
+                          completedLabel: canViewAdminStats
                               ? 'BU AY TAMAMLANAN'
                               : 'TAMAMLANAN',
                         );

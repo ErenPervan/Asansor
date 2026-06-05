@@ -46,10 +46,10 @@ class TaskCompletedPayload extends NotificationPayload {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'task_completed',
-        'elevator_id': elevatorId,
-        'route': route,
-      };
+    'type': 'task_completed',
+    'elevator_id': elevatorId,
+    'route': route,
+  };
 }
 
 class ElevatorDetailPayload extends NotificationPayload {
@@ -83,15 +83,21 @@ class FallbackPayload extends NotificationPayload {
 }
 
 /// Rol bazlı hedeflenen yönlendirme rotasını belirler.
-String determineDestination(NotificationPayload payload, AuthStateModel? authState) {
-  final canViewAdminCalendar = authState?.can(AppCapability.viewAdminCalendar) ?? false;
+String determineDestination(
+  NotificationPayload payload,
+  AuthStateModel? authState,
+) {
+  final canViewAdminCalendar =
+      authState?.can(AppCapability.viewAdminCalendar) ?? false;
   return switch (payload) {
-    TaskAssignedPayload() => canViewAdminCalendar
-        ? '/admin/calendar' // Yönetici için takvim ekranı
-        : '/', // Teknisyen için ana sayfa (görev listesi)
-    TaskCompletedPayload(:final route) => canViewAdminCalendar
-        ? (route.isNotEmpty ? route : '/admin/master-calendar')
-        : '/',
+    TaskAssignedPayload() =>
+      canViewAdminCalendar
+          ? '/admin/calendar' // Yönetici için takvim ekranı
+          : '/', // Teknisyen için ana sayfa (görev listesi)
+    TaskCompletedPayload(:final route) =>
+      canViewAdminCalendar
+          ? (route.isNotEmpty ? route : '/admin/master-calendar')
+          : '/',
     ElevatorDetailPayload(:final elevatorId) => '/elevator/$elevatorId',
     FaultDetailPayload(:final faultId) => '/fault/$faultId',
     ExplicitRoutePayload(:final route) => route,

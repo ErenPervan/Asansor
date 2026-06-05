@@ -21,7 +21,8 @@ class AppBottomNavBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(currentProfileProvider).valueOrNull;
-    final canViewSchedule = profile?.can(AppCapability.viewAdminCalendar) ?? false;
+    final canViewSchedule =
+        profile?.can(AppCapability.viewAdminCalendar) ?? false;
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 8,

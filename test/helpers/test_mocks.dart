@@ -57,7 +57,8 @@ class MockPdfService extends Mock implements PdfService {}
 
 class FakeDateTime extends Fake implements DateTime {}
 
-class MockStatefulNavigationShell extends Mock implements StatefulNavigationShell {
+class MockStatefulNavigationShell extends Mock
+    implements StatefulNavigationShell {
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return super.toString();

@@ -273,7 +273,8 @@ class _CustomerTab extends ConsumerWidget {
     final colors = AppThemeColors.of(context);
     final profile = ref.watch(currentProfileProvider).valueOrNull;
     final canManageUsers = profile?.can(AppCapability.manageUsers) ?? false;
-    final canAssignElevators = profile?.can(AppCapability.manageElevators) ?? false;
+    final canAssignElevators =
+        profile?.can(AppCapability.manageElevators) ?? false;
     final profilesAsync = ref.watch(profilesByRoleProvider(UserRole.customer));
     final elevatorsAsync = ref.watch(elevatorsProvider);
 

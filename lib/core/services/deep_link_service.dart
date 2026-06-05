@@ -18,13 +18,10 @@ class DeepLinkService {
     }
 
     // Warm start (uygulama arka planda): stream dinle
-    _appLinks.uriLinkStream.listen(
-      (uri) {
-        debugPrint('[DeepLink] Warm start URI: $uri');
-        _handleUri(router, uri);
-      },
-      onError: (e) => debugPrint('[DeepLink] Stream error: $e'),
-    );
+    _appLinks.uriLinkStream.listen((uri) {
+      debugPrint('[DeepLink] Warm start URI: $uri');
+      _handleUri(router, uri);
+    }, onError: (e) => debugPrint('[DeepLink] Stream error: $e'));
   }
 
   void _handleUri(GoRouter router, Uri uri) {

@@ -138,7 +138,11 @@ Future<void> main() async {
 
   await initializeDateFormatting('tr_TR', null);
 
-  runApp(ProviderScope(child: AsansorApp(hiveRecoveryPerformed: hiveRecoveryPerformed)));
+  runApp(
+    ProviderScope(
+      child: AsansorApp(hiveRecoveryPerformed: hiveRecoveryPerformed),
+    ),
+  );
 }
 
 class AsansorApp extends ConsumerStatefulWidget {

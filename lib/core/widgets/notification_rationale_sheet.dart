@@ -17,7 +17,9 @@ class NotificationRationaleSheet extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.xl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.xl),
+        ),
       ),
       builder: (context) => const NotificationRationaleSheet(),
     );
@@ -39,17 +41,17 @@ class NotificationRationaleSheet extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               'Bildirimlere İzin Verin',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Size atanan yeni görevlerden, asansör arızalarından ve bakım güncellemelerinden anında haberdar olmak için bildirimlere izin vermeniz gerekmektedir.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppThemeColors.of(context).onSurfaceVariant,
-                  ),
+                color: AppThemeColors.of(context).onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xl),
@@ -74,7 +76,9 @@ class NotificationRationaleSheet extends StatelessWidget {
                 },
                 child: Text(
                   'Daha Sonra',
-                  style: TextStyle(color: AppThemeColors.of(context).onSurfaceVariant),
+                  style: TextStyle(
+                    color: AppThemeColors.of(context).onSurfaceVariant,
+                  ),
                 ),
               ),
             ),

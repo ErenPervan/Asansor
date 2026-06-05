@@ -8,10 +8,6 @@ Widget pumpWithTheme(Widget child) {
       scaffoldBackgroundColor: const Color(0xFFF9FAFB), // AppColors.background
     ),
     debugShowCheckedModeBanner: false,
-    home: Scaffold(
-      body: Center(
-        child: child,
-      ),
-    ),
+    home: Scaffold(body: Center(child: child)),
   );
 }

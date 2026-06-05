@@ -28,32 +28,35 @@ Future<void> _initHive(FlutterSecureStorage secureStorage) async {
   debugPrint('[Bootstrap] Initializing Hive...');
   await Hive.initFlutter();
   debugPrint('[Bootstrap] Hive initialized. Reading from secure storage...');
-  
-  final encryptionKeyString = await secureStorage.read(
-    key: 'hive_encryption_key',
-  ).timeout(
-    const Duration(seconds: 3),
-    onTimeout: () {
-      debugPrint('[Bootstrap] secureStorage.read TIMEOUT! Throwing exception...');
-      throw Exception('FlutterSecureStorage read timeout');
-    },
-  );
-  
+
+  final encryptionKeyString = await secureStorage
+      .read(key: 'hive_encryption_key')
+      .timeout(
+        const Duration(seconds: 3),
+        onTimeout: () {
+          debugPrint(
+            '[Bootstrap] secureStorage.read TIMEOUT! Throwing exception...',
+          );
+          throw Exception('FlutterSecureStorage read timeout');
+        },
+      );
+
   debugPrint('[Bootstrap] secureStorage.read completed.');
   late List<int> encryptionKeyUint8List;
   if (encryptionKeyString == null) {
     debugPrint('[Bootstrap] Generating new Hive secure key...');
     final key = Hive.generateSecureKey();
-    await secureStorage.write(
-      key: 'hive_encryption_key',
-      value: base64UrlEncode(key),
-    ).timeout(
-      const Duration(seconds: 3),
-      onTimeout: () {
-        debugPrint('[Bootstrap] secureStorage.write TIMEOUT! Throwing exception...');
-        throw Exception('FlutterSecureStorage write timeout');
-      },
-    );
+    await secureStorage
+        .write(key: 'hive_encryption_key', value: base64UrlEncode(key))
+        .timeout(
+          const Duration(seconds: 3),
+          onTimeout: () {
+            debugPrint(
+              '[Bootstrap] secureStorage.write TIMEOUT! Throwing exception...',
+            );
+            throw Exception('FlutterSecureStorage write timeout');
+          },
+        );
     encryptionKeyUint8List = key;
   } else {
     encryptionKeyUint8List = base64Url.decode(encryptionKeyString);
@@ -133,9 +136,7 @@ Future<void> main() async {
 
   // Initialise Hive and open all persistent boxes.
   const secureStorage = FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
   );
   bool hiveRecoveryPerformed = false;
 
@@ -230,7 +231,7 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
     // Keep the auto-sync listener alive for the entire app lifetime so it
     // fires regardless of which screen is currently shown.
     setupAutoSyncListener(ref);
-    
+
     final goRouter = ref.watch(appRouterProvider);
 
     return MaterialApp.router(

@@ -420,10 +420,11 @@ class ScheduleRepository implements IScheduleRepository {
     int? lookbackDays = 90,
   }) async {
     try {
-      // Step 1: fetch schedules + elevator info (safe FK join)
       var query = _client
           .from(_table)
-          .select('*, elevators:elevator_id(building_name, address)');
+          .select(
+            '*, elevators:elevator_id(building_name, address), profiles:technician_id(full_name)',
+          );
 
       if (lookbackDays != null) {
         final since = DateTime.now().toUtc().subtract(
@@ -433,39 +434,17 @@ class ScheduleRepository implements IScheduleRepository {
       }
 
       final response = await query.order('scheduled_date', ascending: false);
-      final rows = response as List;
 
-      // Step 2: collect unique non-null technician IDs and fetch their names
-      final techIds = rows
-          .map((r) => (r as Map<String, dynamic>)['technician_id'] as String?)
-          .where((id) => id != null && id.isNotEmpty)
-          .toSet()
-          .cast<String>();
-
-      final Map<String, String> techNames = {};
-      if (techIds.isNotEmpty) {
-        final profiles = await _client
-            .from('profiles')
-            .select('id, full_name')
-            .inFilter('id', techIds.toList());
-        for (final p in profiles as List) {
-          final m = p as Map<String, dynamic>;
-          final id = m['id'] as String?;
-          final name = m['full_name'] as String?;
-          if (id != null) techNames[id] = name ?? 'Teknisyen';
-        }
-      }
-
-      // Step 3: assemble ScheduleWithDetails
-      return rows.map((json) {
+      return (response as List).map((json) {
         final Map<String, dynamic> data = json as Map<String, dynamic>;
         final schedule = ScheduleModel.fromJson(data);
 
         final elevator = data['elevators'] as Map<String, dynamic>?;
+        final profile = data['profiles'] as Map<String, dynamic>?;
 
         final techName = schedule.isUnassigned
             ? 'Atanmamış'
-            : (techNames[schedule.technicianId] ?? 'Teknisyen');
+            : (profile?['full_name'] as String? ?? 'Teknisyen');
 
         return ScheduleWithDetails(
           schedule: schedule,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../elevator/models/elevator_model.dart';
-import '../../models/profile_model.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/admin/models/profile_model.dart';
 
 // ── ElevatorPickerDialog ─────────────────────────────────────────────────────
 

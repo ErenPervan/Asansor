@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/exceptions/app_exception.dart';
+import 'package:asansor/core/exceptions/app_exception.dart';
 
 /// Aggregated statistics shown on the Admin Dashboard.
 class AdminStats {

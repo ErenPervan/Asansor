@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../services/notification_service.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
+import 'package:asansor/core/services/notification_service.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 
 class NotificationRationaleSheet extends StatelessWidget {
   const NotificationRationaleSheet({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
-import 'shimmer_card.dart';
+import 'package:asansor/core/widgets/shimmer_card.dart';
 
 class LoadingState extends StatelessWidget {
   const LoadingState({

@@ -9,21 +9,21 @@ import 'package:go_router/go_router.dart';
 
 import 'package:latlong2/latlong.dart';
 
-import '../../elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
 
-import '../../elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 
-import '../../fault/models/fault_report_model.dart';
+import 'package:asansor/features/fault/models/fault_report_model.dart';
 
-import '../../fault/providers/fault_providers.dart';
+import 'package:asansor/features/fault/providers/fault_providers.dart';
 
-import '../models/schedule_model.dart';
+import 'package:asansor/features/admin/models/schedule_model.dart';
 
-import '../providers/admin_providers.dart';
+import 'package:asansor/features/admin/providers/admin_providers.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/enums/app_enums.dart';
-import '../../../core/widgets/loading_state.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/widgets/loading_state.dart';
 
 // Marker colours (match Google Maps palette for familiarity)
 const _colorFault = AppColors.error;

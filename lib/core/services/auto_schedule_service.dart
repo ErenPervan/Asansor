@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../features/elevator/repositories/elevator_repository.dart';
-import '../../features/admin/repositories/schedule_repository.dart';
+import 'package:asansor/features/elevator/repositories/elevator_repository.dart';
+import 'package:asansor/features/admin/repositories/schedule_repository.dart';
 
 /// Result returned by [AutoScheduleService.generateMonthlyMaintenances].
 class AutoScheduleResult {

@@ -7,18 +7,18 @@ import 'package:go_router/go_router.dart';
 
 import 'package:intl/intl.dart';
 
-import '../../elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 
-import '../models/fault_report_model.dart';
+import 'package:asansor/features/fault/models/fault_report_model.dart';
 
-import '../providers/fault_providers.dart';
+import 'package:asansor/features/fault/providers/fault_providers.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/widgets/info_card.dart';
-import '../../../core/widgets/loading_state.dart';
-import '../../../core/widgets/app_section_header.dart';
-import '../../../core/constants/app_durations.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
+import 'package:asansor/core/widgets/info_card.dart';
+import 'package:asansor/core/widgets/loading_state.dart';
+import 'package:asansor/core/widgets/app_section_header.dart';
+import 'package:asansor/core/constants/app_durations.dart';
 import 'package:confetti/confetti.dart';
 // ── Local colour tokens (matches global theme) ──────────────────────────────
 

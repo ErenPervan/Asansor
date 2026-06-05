@@ -7,21 +7,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
 
-import '../../elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
 
-import '../../elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 
-import '../models/profile_model.dart';
+import 'package:asansor/features/admin/models/profile_model.dart';
 
-import '../providers/admin_providers.dart';
-import '../providers/profile_providers.dart';
+import 'package:asansor/features/admin/providers/admin_providers.dart';
+import 'package:asansor/features/admin/providers/profile_providers.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/enums/app_enums.dart';
-import '../../../core/theme/input_decorations.dart';
-import '../../../core/widgets/app_form_field.dart';
-import '../../../core/widgets/app_section_header.dart';
-import '../../../core/constants/app_durations.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/theme/input_decorations.dart';
+import 'package:asansor/core/widgets/app_form_field.dart';
+import 'package:asansor/core/widgets/app_section_header.dart';
+import 'package:asansor/core/constants/app_durations.dart';
 // ── AssignView ────────────────────────────────────────────────────────────────
 
 /// Screen that allows a manager/admin to create a new maintenance schedule:

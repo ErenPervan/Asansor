@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 
-import '../../../core/widgets/loading_state.dart';
-import '../../../core/widgets/error_state.dart';
+import 'package:asansor/core/widgets/loading_state.dart';
+import 'package:asansor/core/widgets/error_state.dart';
 
-import 'admin_conflict_provider.dart';
-import 'admin_conflict_detail_dialog.dart';
+import 'package:asansor/features/admin/conflicts/admin_conflict_provider.dart';
+import 'package:asansor/features/admin/conflicts/admin_conflict_detail_dialog.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 

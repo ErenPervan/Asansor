@@ -1,12 +1,12 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/enums/app_enums.dart';
-import '../../../core/exceptions/app_exception.dart';
-import '../../../core/providers/connectivity_providers.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/exceptions/app_exception.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
 
-import '../models/schedule_model.dart';
-import '../models/schedule_with_details.dart';
+import 'package:asansor/features/admin/models/schedule_model.dart';
+import 'package:asansor/features/admin/models/schedule_with_details.dart';
 
 abstract interface class IScheduleRepository {
   Future<ScheduleModel> assignTask({

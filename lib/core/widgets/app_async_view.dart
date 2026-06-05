@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'error_state.dart';
-import 'loading_state.dart';
-import 'empty_state.dart';
+import 'package:asansor/core/widgets/error_state.dart';
+import 'package:asansor/core/widgets/loading_state.dart';
+import 'package:asansor/core/widgets/empty_state.dart';
 
 class AppAsyncView<T> extends StatelessWidget {
   const AppAsyncView({

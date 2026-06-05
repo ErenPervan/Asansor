@@ -1,4 +1,4 @@
-import 'app_enums.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
 /// Uygulamadaki her yetkilendirme kararını temsil eden merkezi enum.
 ///

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/widgets/app_async_view.dart';
-import '../../../core/widgets/empty_state.dart';
-import '../../../core/widgets/animations/fade_in_slide.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/enums/app_enums.dart';
-import '../../../core/widgets/app_card.dart';
-import '../../../core/widgets/app_status_chip.dart';
-import '../models/elevator_model.dart';
-import '../providers/elevator_providers.dart';
+import 'package:asansor/core/widgets/app_async_view.dart';
+import 'package:asansor/core/widgets/empty_state.dart';
+import 'package:asansor/core/widgets/animations/fade_in_slide.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/widgets/app_card.dart';
+import 'package:asansor/core/widgets/app_status_chip.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 
 // ── Status helpers ────────────────────────────────────────────────────────────
 

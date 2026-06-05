@@ -9,13 +9,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:intl/intl.dart';
-import '../../../core/enums/app_enums.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
-import '../models/technician_stats.dart';
+import 'package:asansor/features/admin/models/technician_stats.dart';
 
-import '../providers/admin_providers.dart';
+import 'package:asansor/features/admin/providers/admin_providers.dart';
 
-import '../../../core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 // ── Main view ─────────────────────────────────────────────────────────────────
 
 class TechnicianManagementView extends ConsumerWidget {

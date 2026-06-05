@@ -1,5 +1,5 @@
-import '../../../core/enums/app_enums.dart';
-import 'schedule_model.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/features/admin/models/schedule_model.dart';
 
 /// [ScheduleModel] enriched with human-readable elevator and technician
 /// display names, produced by [allSchedulesWithDetailsProvider].

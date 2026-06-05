@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/exceptions/app_exception.dart';
-import '../../../core/services/notification_service.dart';
+import 'package:asansor/core/exceptions/app_exception.dart';
+import 'package:asansor/core/services/notification_service.dart';
 
 abstract interface class IAuthRepository {
   Future<User> signInWithEmail({

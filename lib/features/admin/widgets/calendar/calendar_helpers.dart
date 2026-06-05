@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/enums/app_enums.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
 Color getPriorityColor(String p) {
   switch (p) {

@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'firebase_options.dart';
+import 'package:asansor/firebase_options.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,16 +11,16 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'l10n/app_localizations.dart';
+import 'package:asansor/l10n/app_localizations.dart';
 
-import 'core/constants/supabase_constants.dart';
-import 'core/providers/connectivity_providers.dart';
-import 'core/router/app_router.dart'; // also exports: appRouter, navigatorKey
-import 'core/services/deep_link_service.dart';
-import 'core/services/notification_service.dart';
-import 'core/services/read_cache_service.dart';
-import 'core/services/sync_queue_service.dart';
-import 'core/theme/app_colors.dart';
+import 'package:asansor/core/constants/supabase_constants.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/router/app_router.dart'; // also exports: appRouter, navigatorKey
+import 'package:asansor/core/services/deep_link_service.dart';
+import 'package:asansor/core/services/notification_service.dart';
+import 'package:asansor/core/services/read_cache_service.dart';
+import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 
 // ── Hive Initialization & Recovery Helpers ─────────────────────────────────────
 

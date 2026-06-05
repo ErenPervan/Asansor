@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/providers/connectivity_providers.dart';
-import '../models/checklist_item_model.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/features/admin/models/checklist_item_model.dart';
 
 class ChecklistNotifier
     extends AutoDisposeAsyncNotifier<List<ChecklistItemModel>> {

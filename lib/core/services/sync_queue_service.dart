@@ -6,9 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../features/maintenance/models/maintenance_log_model.dart';
-import '../exceptions/conflict_exception.dart';
-import 'pdf_service.dart';
+import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
+import 'package:asansor/core/exceptions/conflict_exception.dart';
+import 'package:asansor/core/services/pdf_service.dart';
 import 'package:uuid/uuid.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────

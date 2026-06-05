@@ -1,4 +1,4 @@
-import '../../features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
 
 ElevatorModel? findElevator(String id, List<ElevatorModel>? elevators) {
   if (elevators == null) return null;

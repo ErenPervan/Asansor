@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'app_bottom_nav_bar.dart';
-import '../../features/elevator/widgets/home/home_qr_fab.dart';
-import '../providers/sync_status_provider.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
+import 'package:asansor/core/widgets/app_bottom_nav_bar.dart';
+import 'package:asansor/features/elevator/widgets/home/home_qr_fab.dart';
+import 'package:asansor/core/providers/sync_status_provider.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 
 class ScaffoldWithNavBar extends ConsumerWidget {
   const ScaffoldWithNavBar({super.key, required this.navigationShell});

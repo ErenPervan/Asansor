@@ -4,19 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/empty_state.dart';
-import '../../../core/widgets/error_state.dart';
-import '../../../core/widgets/loading_state.dart';
-import '../../../core/widgets/offline_banner.dart';
-import '../../auth/providers/auth_providers.dart';
-import '../../../core/enums/app_enums.dart';
-import '../../elevator/models/elevator_model.dart';
-import '../../maintenance/models/maintenance_log_model.dart';
-import '../../elevator/widgets/detail/report_fault_sheet.dart';
-import '../../../core/constants/app_durations.dart';
-import '../providers/customer_portal_provider.dart';
-import '../../../core/widgets/notification_rationale_sheet.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/widgets/empty_state.dart';
+import 'package:asansor/core/widgets/error_state.dart';
+import 'package:asansor/core/widgets/loading_state.dart';
+import 'package:asansor/core/widgets/offline_banner.dart';
+import 'package:asansor/features/auth/providers/auth_providers.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
+import 'package:asansor/features/elevator/widgets/detail/report_fault_sheet.dart';
+import 'package:asansor/core/constants/app_durations.dart';
+import 'package:asansor/features/customer/providers/customer_portal_provider.dart';
+import 'package:asansor/core/widgets/notification_rationale_sheet.dart';
 
 class CustomerDashboardView extends ConsumerStatefulWidget {
   const CustomerDashboardView({super.key});

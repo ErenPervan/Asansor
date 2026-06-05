@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/enums/app_enums.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
-import '../../../core/providers/connectivity_providers.dart';
-import '../../auth/providers/auth_providers.dart';
-import '../models/profile_model.dart';
-import '../repositories/profile_repository.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/features/auth/providers/auth_providers.dart';
+import 'package:asansor/features/admin/models/profile_model.dart';
+import 'package:asansor/features/admin/repositories/profile_repository.dart';
 
 // ── Router role notifier removed (now handled by auth_providers.dart) ──
 

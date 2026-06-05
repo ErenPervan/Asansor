@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/status_tokens.dart';
-import '../../../../core/enums/app_enums.dart';
-import '../../models/elevator_model.dart';
-import '../../../../core/widgets/info_card.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/status_tokens.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/core/widgets/info_card.dart';
 
 class ElevatorDetailHeader extends StatelessWidget {
   const ElevatorDetailHeader({super.key, required this.elevator});

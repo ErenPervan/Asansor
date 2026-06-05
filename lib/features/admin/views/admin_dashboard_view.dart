@@ -3,17 +3,17 @@ import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../elevator/providers/elevator_providers.dart';
-import '../providers/admin_providers.dart';
-import '../../../core/providers/connectivity_providers.dart';
-import '../../../core/theme/app_colors.dart';
-import '../widgets/dashboard/dashboard_banners.dart';
-import '../widgets/dashboard/dashboard_stats.dart';
-import '../widgets/dashboard/dashboard_map_card.dart';
-import '../widgets/dashboard/dashboard_user_cards.dart';
-import '../widgets/dashboard/dashboard_calendar_cards.dart';
-import '../widgets/dashboard/dashboard_schedule.dart';
-import '../widgets/dashboard/dashboard_misc_cards.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/admin/providers/admin_providers.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/features/admin/widgets/dashboard/dashboard_banners.dart';
+import 'package:asansor/features/admin/widgets/dashboard/dashboard_stats.dart';
+import 'package:asansor/features/admin/widgets/dashboard/dashboard_map_card.dart';
+import 'package:asansor/features/admin/widgets/dashboard/dashboard_user_cards.dart';
+import 'package:asansor/features/admin/widgets/dashboard/dashboard_calendar_cards.dart';
+import 'package:asansor/features/admin/widgets/dashboard/dashboard_schedule.dart';
+import 'package:asansor/features/admin/widgets/dashboard/dashboard_misc_cards.dart';
 
 // ── AdminDashboardView ────────────────────────────────────────────────────────
 

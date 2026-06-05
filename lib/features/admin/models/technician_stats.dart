@@ -1,5 +1,5 @@
-import '../../../core/enums/app_enums.dart';
-import 'profile_model.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/features/admin/models/profile_model.dart';
 
 /// A single scheduled task enriched with elevator display info.
 /// Used in the Technician Management view's detail bottom sheet.

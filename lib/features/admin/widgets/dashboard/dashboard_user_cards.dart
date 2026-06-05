@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 
 // ── User Management Card ──────────────────────────────────────────────────────
 

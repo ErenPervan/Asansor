@@ -21,7 +21,7 @@
 /// ```
 library;
 
-import '../../../core/enums/app_enums.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
 class ScheduleModel {
   const ScheduleModel({

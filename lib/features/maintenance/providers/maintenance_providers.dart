@@ -6,12 +6,12 @@ import 'package:path/path.dart' as p;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/providers/connectivity_providers.dart';
-import '../../../core/services/notification_service.dart';
-import '../../../core/services/sync_queue_service.dart';
-import '../models/maintenance_log_model.dart';
-import '../repositories/maintenance_repository.dart';
-import '../../admin/repositories/schedule_repository.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/services/notification_service.dart';
+import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
+import 'package:asansor/features/maintenance/repositories/maintenance_repository.dart';
+import 'package:asansor/features/admin/repositories/schedule_repository.dart';
 
 Future<String?> copyToDocumentsDirectory(String? path) async {
   if (path == null) return null;

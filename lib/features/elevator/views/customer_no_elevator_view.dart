@@ -3,9 +3,9 @@ import 'package:asansor/core/theme/app_spacing.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../auth/providers/auth_providers.dart';
+import 'package:asansor/features/auth/providers/auth_providers.dart';
 
-import '../../../core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 // ── CustomerNoElevatorView ────────────────────────────────────────────────────
 
 /// Shown to customers who have the `customer` role but no `elevator_id`

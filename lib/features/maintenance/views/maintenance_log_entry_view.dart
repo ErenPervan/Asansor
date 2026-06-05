@@ -10,18 +10,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:signature/signature.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../l10n/app_localizations.dart';
-import '../../elevator/providers/elevator_providers.dart';
-import '../../admin/providers/checklist_provider.dart';
-import '../providers/maintenance_providers.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/widgets/loading_state.dart';
-import '../../../core/widgets/error_state.dart';
-import '../../../core/widgets/empty_state.dart';
-import '../../../core/widgets/app_form_field.dart';
-import '../../../core/widgets/app_section_header.dart';
-import '../../../core/constants/app_durations.dart';
+import 'package:asansor/l10n/app_localizations.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/admin/providers/checklist_provider.dart';
+import 'package:asansor/features/maintenance/providers/maintenance_providers.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
+import 'package:asansor/core/widgets/loading_state.dart';
+import 'package:asansor/core/widgets/error_state.dart';
+import 'package:asansor/core/widgets/empty_state.dart';
+import 'package:asansor/core/widgets/app_form_field.dart';
+import 'package:asansor/core/widgets/app_section_header.dart';
+import 'package:asansor/core/constants/app_durations.dart';
 
 class MaintenanceLogEntryView extends ConsumerStatefulWidget {
   const MaintenanceLogEntryView({super.key, required this.elevatorId});

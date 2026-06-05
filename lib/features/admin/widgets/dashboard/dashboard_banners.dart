@@ -1,6 +1,6 @@
 import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 
 // ── Conflict Banner ──────────────────────────────────────────────────────────
 

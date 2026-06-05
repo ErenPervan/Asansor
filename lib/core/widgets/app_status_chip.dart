@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/app_spacing.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 
 enum AppStatusChipSize { small, medium, large }
 

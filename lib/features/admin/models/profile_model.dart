@@ -44,8 +44,8 @@
 /// ```
 library;
 
-import '../../../core/enums/app_enums.dart';
-import '../../../core/enums/app_capability.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/enums/app_capability.dart';
 
 class ProfileModel {
   const ProfileModel({

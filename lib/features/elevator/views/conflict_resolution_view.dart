@@ -4,8 +4,8 @@ import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/providers/connectivity_providers.dart';
-import '../../../core/services/sync_queue_service.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/services/sync_queue_service.dart';
 
 class ConflictResolutionView extends ConsumerWidget {
   const ConflictResolutionView({super.key});

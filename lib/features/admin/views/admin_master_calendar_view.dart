@@ -10,13 +10,13 @@ import 'package:intl/intl.dart';
 
 import 'package:table_calendar/table_calendar.dart';
 
-import '../models/schedule_with_details.dart';
+import 'package:asansor/features/admin/models/schedule_with_details.dart';
 
-import '../providers/admin_providers.dart';
-import '../../../core/enums/app_enums.dart';
+import 'package:asansor/features/admin/providers/admin_providers.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_section_header.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/widgets/app_section_header.dart';
 
 // Dot colours for calendar markers.
 const _dotRed = AppColors.error;

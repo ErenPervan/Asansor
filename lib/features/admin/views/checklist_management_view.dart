@@ -93,6 +93,7 @@ class ChecklistManagementView extends ConsumerWidget {
             ),
             leading: IconButton(
               icon: Icon(Icons.arrow_back_rounded, color: colors.surface),
+              tooltip: 'Geri',
               onPressed: () => Navigator.of(context).pop(),
             ),
           ),

@@ -313,6 +313,7 @@ class _AdminStatisticsDashboardState
                     color: colors.onPrimary,
                     size: 20,
                   ),
+                  tooltip: 'Geri',
                   onPressed: () => context.pop(),
                 ),
                 const SizedBox(width: 4),

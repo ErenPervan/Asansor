@@ -730,6 +730,7 @@ class _TechnicianDetailSheet extends StatelessWidget {
                     ),
                     IconButton(
                       icon: Icon(Icons.close, color: colors.outline),
+                      tooltip: 'Kapat',
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],

@@ -43,6 +43,7 @@ class AdminConflictDetailDialog extends ConsumerWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
+                  tooltip: 'Kapat',
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],

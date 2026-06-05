@@ -181,6 +181,7 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                           size: 18,
                           color: AppThemeColors.of(context).outline,
                         ),
+                        tooltip: 'Aramayı Temizle',
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _query = '');

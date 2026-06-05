@@ -38,6 +38,7 @@ class ElevatorDetailView extends ConsumerWidget {
             Icons.arrow_back,
             color: AppThemeColors.of(context).primary,
           ),
+          tooltip: 'Geri',
           onPressed: () => context.pop(),
         ),
         title: Text(

@@ -233,4 +233,17 @@ class ReadCacheService {
     if (raw == null) return 0;
     return int.tryParse(raw) ?? 0;
   }
+
+  // ── Cache Cleanup ───────────────────────────────────────────────────────────
+
+  /// Tüm read-only önbellek kutularını temizler.
+  /// Sign-out sonrasında [RouterNotifier._clearUserData()] tarafından çağrılır.
+  /// Sync queue intentionally excluded — see [SyncQueueService].
+  Future<void> clearAll() async {
+    await _elevBox.clear();
+    await _tasksBox.clear();
+    await _checklistBox.clear();
+    await _pastLogsBox.clear();
+    await _faultsBox.clear();
+  }
 }

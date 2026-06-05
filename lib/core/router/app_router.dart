@@ -5,8 +5,13 @@ import '../enums/app_enums.dart';
 import '../services/notification_service.dart';
 
 import '../../features/auth/providers/auth_providers.dart';
-import '../widgets/scaffold_with_nav_bar.dart';
+import '../../features/elevator/providers/elevator_providers.dart';
+import '../../features/fault/providers/fault_providers.dart';
+import '../../features/admin/providers/admin_providers.dart';
 import '../../features/admin/providers/profile_providers.dart';
+import '../../features/admin/providers/admin_analytics_provider.dart';
+import '../providers/connectivity_providers.dart';
+import '../widgets/scaffold_with_nav_bar.dart';
 import '../../features/admin/views/admin_calendar_view.dart';
 import '../../features/admin/views/admin_dashboard_view.dart';
 import '../../features/admin/views/admin_master_calendar_view.dart';
@@ -30,6 +35,8 @@ import '../../features/elevator/views/scanner_view.dart';
 import '../../features/maintenance/views/maintenance_log_entry_view.dart';
 import '../../features/admin/conflicts/admin_conflict_management_view.dart';
 import '../../features/admin/views/admin_statistics_dashboard.dart';
+
+import '../views/not_found_view.dart';
 
 // ── App Auth State Machine ───────────────────────────────────────────────────
 
@@ -94,6 +101,12 @@ class RouterNotifier extends ChangeNotifier {
     _subscription = _ref.listen<AuthStateModel>(
       appAuthStateProvider,
       (previous, current) {
+        // Kullanıcı authorized'dan unauthenticated'a geçince tüm user verisi temizlenir
+        if (previous?.status == AuthStatus.authorized &&
+            current.status == AuthStatus.unauthenticated) {
+          _clearUserData();
+        }
+
         if (current.status == AuthStatus.authorized) {
           NotificationService.instance.isAuthorized = true;
           NotificationService.instance.userRole = current.role;
@@ -105,6 +118,28 @@ class RouterNotifier extends ChangeNotifier {
       },
       fireImmediately: true,
     );
+  }
+
+  /// Kullanıcı oturumu kapandığında tüm user-specific Riverpod provider'larını
+  /// ve Hive read cache'lerini sıfırlar.
+  void _clearUserData() {
+    debugPrint('[RouterNotifier] Sign-out detected — clearing user data...');
+
+    // Feature provider'ları sıfırla
+    _ref.invalidate(elevatorsProvider);
+    _ref.invalidate(activeFaultsProvider);
+    _ref.invalidate(allSchedulesProvider);
+    _ref.invalidate(myPendingSchedulesProvider);
+    _ref.invalidate(adminStatsProvider);
+    _ref.invalidate(adminAnalyticsProvider);
+    _ref.invalidate(allProfilesProvider);
+    _ref.invalidate(currentProfileProvider); // en son — appAuthStateProvider buna bağlı
+
+    // Hive read cache'lerini temizle
+    // (Sync queue kasıtlı olarak temizlenmez: offline kuyruktaki işlemler korunur)
+    _ref.read(readCacheServiceProvider).clearAll();
+
+    debugPrint('[RouterNotifier] User data cleared.');
   }
 
   @override
@@ -127,6 +162,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: navigatorKey,
     initialLocation: '/',
     refreshListenable: routerNotifier,
+    errorBuilder: (context, state) => const NotFoundView(),
     redirect: (BuildContext context, GoRouterState state) {
       final authState = ref.read(appAuthStateProvider);
       final loc = state.matchedLocation;

@@ -62,6 +62,7 @@ dependencies:
   shimmer: ^3.0.0
   confetti: ^0.8.0
   path: ^1.9.1
+  app_links: ^7.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

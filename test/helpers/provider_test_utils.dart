@@ -88,4 +88,8 @@ class FakeReadCacheService implements ReadCacheService {
   int loadCompletedTodayCount() => 0;
   @override
   Future<void> saveCompletedTodayCount(int count) async {}
+
+  // ── Cache Cleanup ───────────────────────────────────────────────────────────
+  @override
+  Future<void> clearAll() async {}
 }

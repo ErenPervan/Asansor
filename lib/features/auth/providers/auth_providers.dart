@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/enums/app_enums.dart';
-import '../../../core/enums/app_capability.dart';
-import '../../../core/providers/connectivity_providers.dart';
-import '../repositories/auth_repository.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/enums/app_capability.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/features/auth/repositories/auth_repository.dart';
 
 // ── Repository ──────────────────────────────────────────────────────────────
 

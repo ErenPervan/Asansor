@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../elevator/models/elevator_model.dart';
-import '../../elevator/providers/elevator_providers.dart';
-import '../../fault/providers/fault_providers.dart';
-import '../../maintenance/providers/maintenance_providers.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/error_state.dart';
-import '../../../core/widgets/loading_state.dart';
-import '../widgets/detail/elevator_detail_header.dart';
-import '../widgets/detail/elevator_detail_actions.dart';
-import '../widgets/detail/elevator_system_monitor.dart';
-import '../widgets/detail/elevator_maintenance_history.dart';
-import '../widgets/detail/report_fault_sheet.dart';
-import '../widgets/detail/log_maintenance_sheet.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/fault/providers/fault_providers.dart';
+import 'package:asansor/features/maintenance/providers/maintenance_providers.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/widgets/error_state.dart';
+import 'package:asansor/core/widgets/loading_state.dart';
+import 'package:asansor/features/elevator/widgets/detail/elevator_detail_header.dart';
+import 'package:asansor/features/elevator/widgets/detail/elevator_detail_actions.dart';
+import 'package:asansor/features/elevator/widgets/detail/elevator_system_monitor.dart';
+import 'package:asansor/features/elevator/widgets/detail/elevator_maintenance_history.dart';
+import 'package:asansor/features/elevator/widgets/detail/report_fault_sheet.dart';
+import 'package:asansor/features/elevator/widgets/detail/log_maintenance_sheet.dart';
 
 // ── ElevatorDetailView ────────────────────────────────────────────────────────
 

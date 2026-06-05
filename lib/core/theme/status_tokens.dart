@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
-import '../enums/app_enums.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
 abstract final class StatusTokens {
   static String scheduleLabel(ScheduleStatus status) {

@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/exceptions/app_exception.dart';
-import '../models/profile_model.dart';
+import 'package:asansor/core/exceptions/app_exception.dart';
+import 'package:asansor/features/admin/models/profile_model.dart';
 
 abstract interface class IProfileRepository {
   Future<ProfileModel?> getProfile(String userId);

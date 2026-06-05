@@ -5,22 +5,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:table_calendar/table_calendar.dart';
 
-import '../../elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
 
-import '../../elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 
-import '../models/profile_model.dart';
+import 'package:asansor/features/admin/models/profile_model.dart';
 
-import '../models/schedule_model.dart';
+import 'package:asansor/features/admin/models/schedule_model.dart';
 
-import '../providers/admin_providers.dart';
+import 'package:asansor/features/admin/providers/admin_providers.dart';
 
-import '../providers/profile_providers.dart';
+import 'package:asansor/features/admin/providers/profile_providers.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/enums/app_enums.dart';
-import '../widgets/calendar/calendar_task_card.dart';
-import '../widgets/calendar/calendar_assign_sheet.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/features/admin/widgets/calendar/calendar_task_card.dart';
+import 'package:asansor/features/admin/widgets/calendar/calendar_assign_sheet.dart';
 
 ElevatorModel? _findElevator(String id, List<ElevatorModel>? list) {
   if (list == null) return null;

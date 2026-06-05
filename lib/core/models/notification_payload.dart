@@ -1,5 +1,5 @@
-import '../enums/app_capability.dart';
-import '../../features/auth/providers/auth_providers.dart';
+import 'package:asansor/core/enums/app_capability.dart';
+import 'package:asansor/features/auth/providers/auth_providers.dart';
 
 sealed class NotificationPayload {
   const NotificationPayload();

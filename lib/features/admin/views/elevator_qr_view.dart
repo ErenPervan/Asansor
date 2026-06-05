@@ -19,12 +19,12 @@ import 'package:printing/printing.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../../elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
 
-import '../../elevator/providers/elevator_providers.dart';
-import '../../../core/enums/app_enums.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
-import '../../../core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 // ─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬─â‚¬
 
 class ElevatorQrView extends ConsumerWidget {

@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/exceptions/app_exception.dart';
-import '../models/elevator_model.dart';
+import 'package:asansor/core/exceptions/app_exception.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
 
 abstract interface class IElevatorRepository {
   Future<List<ElevatorModel>> getAllElevators();

@@ -1,4 +1,4 @@
-import '../../../core/enums/app_enums.dart';
+import 'package:asansor/core/enums/app_enums.dart';
 
 /// Maps to the `elevators` table in Supabase.
 ///

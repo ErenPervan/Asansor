@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/widgets/loading_state.dart';
+import 'package:asansor/core/widgets/loading_state.dart';
 
-import '../../elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
 
-import '../../elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 
-import '../models/profile_model.dart';
+import 'package:asansor/features/admin/models/profile_model.dart';
 
-import '../providers/profile_providers.dart';
+import 'package:asansor/features/admin/providers/profile_providers.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 // ── Role helpers ──────────────────────────────────────────────────────────────
 
-import '../../../core/enums/app_enums.dart';
-import '../../../core/enums/app_capability.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/enums/app_capability.dart';
 
 _RoleStyle _roleStyle(BuildContext context, UserRole role) {
   final colors = AppThemeColors.of(context);

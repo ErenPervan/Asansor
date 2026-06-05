@@ -4,15 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/widgets/empty_state.dart';
-import '../../../core/widgets/app_async_view.dart';
-import '../../../core/widgets/app_card.dart';
-import '../../../core/widgets/app_status_chip.dart';
-import '../../../core/theme/app_colors.dart';
+import 'package:asansor/core/widgets/empty_state.dart';
+import 'package:asansor/core/widgets/app_async_view.dart';
+import 'package:asansor/core/widgets/app_card.dart';
+import 'package:asansor/core/widgets/app_status_chip.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 
-import '../providers/fault_providers.dart';
-import '../models/fault_report_model.dart';
-import '../../elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/fault/providers/fault_providers.dart';
+import 'package:asansor/features/fault/models/fault_report_model.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 
 class FaultListView extends ConsumerStatefulWidget {
   const FaultListView({super.key});

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/enums/app_capability.dart';
-import '../../core/theme/app_colors.dart';
-import '../../features/admin/providers/profile_providers.dart';
+import 'package:asansor/core/enums/app_capability.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/features/admin/providers/profile_providers.dart';
 
 class AppBottomNavBar extends ConsumerWidget {
   const AppBottomNavBar({super.key, required this.navigationShell});

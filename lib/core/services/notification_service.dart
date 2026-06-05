@@ -8,10 +8,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../router/app_router.dart'; // exposes appRouter + navigatorKey
+import 'package:asansor/core/router/app_router.dart'; // exposes appRouter + navigatorKey
 import 'package:go_router/go_router.dart';
-import '../models/notification_payload.dart';
-import '../../features/auth/providers/auth_providers.dart';
+import 'package:asansor/core/models/notification_payload.dart';
+import 'package:asansor/features/auth/providers/auth_providers.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Background handler (MUST be a top-level function, not a class method)

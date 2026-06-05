@@ -3,20 +3,20 @@ import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/providers/connectivity_providers.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../admin/providers/admin_providers.dart';
-import '../../admin/providers/profile_providers.dart';
-import '../../../core/enums/app_capability.dart';
-import '../../auth/providers/auth_providers.dart';
-import '../../elevator/providers/elevator_providers.dart';
-import '../../fault/providers/fault_providers.dart';
-import '../../maintenance/providers/maintenance_providers.dart';
-import '../widgets/home/home_active_faults.dart';
-import '../widgets/home/home_daily_agenda.dart';
-import '../widgets/home/home_stats_section.dart';
-import '../widgets/home/home_top_app_bar.dart';
-import '../../../core/widgets/notification_rationale_sheet.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/features/admin/providers/admin_providers.dart';
+import 'package:asansor/features/admin/providers/profile_providers.dart';
+import 'package:asansor/core/enums/app_capability.dart';
+import 'package:asansor/features/auth/providers/auth_providers.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/fault/providers/fault_providers.dart';
+import 'package:asansor/features/maintenance/providers/maintenance_providers.dart';
+import 'package:asansor/features/elevator/widgets/home/home_active_faults.dart';
+import 'package:asansor/features/elevator/widgets/home/home_daily_agenda.dart';
+import 'package:asansor/features/elevator/widgets/home/home_stats_section.dart';
+import 'package:asansor/features/elevator/widgets/home/home_top_app_bar.dart';
+import 'package:asansor/core/widgets/notification_rationale_sheet.dart';
 
 // ── HomeView ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 

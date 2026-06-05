@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'connectivity_providers.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
 
 enum SyncState { online, offline, syncing, syncError }
 

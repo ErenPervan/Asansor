@@ -7,9 +7,9 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart';
 
-import '../enums/app_enums.dart';
-import '../../features/maintenance/models/maintenance_log_model.dart';
-import '../../features/elevator/models/elevator_model.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
 
 // Alias to match the requested parameter name
 typedef MaintenanceLog = MaintenanceLogModel;

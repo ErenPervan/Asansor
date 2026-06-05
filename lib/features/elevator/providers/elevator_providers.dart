@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/providers/connectivity_providers.dart';
-import '../../admin/repositories/schedule_repository.dart';
-import '../../fault/providers/fault_providers.dart';
-import '../models/elevator_model.dart';
-import '../repositories/elevator_repository.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/features/admin/repositories/schedule_repository.dart';
+import 'package:asansor/features/fault/providers/fault_providers.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/repositories/elevator_repository.dart';
 
 // ── Repository ──────────────────────────────────────────────────────────────
 

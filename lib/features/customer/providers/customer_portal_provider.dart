@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../elevator/models/elevator_model.dart';
-import '../../maintenance/models/maintenance_log_model.dart';
-import '../../admin/providers/profile_providers.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
+import 'package:asansor/features/admin/providers/profile_providers.dart';
 
 final customerElevatorProvider = FutureProvider.autoDispose<ElevatorModel?>((
   ref,

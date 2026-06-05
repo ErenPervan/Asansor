@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dart:async';
-import '../../../core/providers/connectivity_providers.dart';
-import '../../../core/services/sync_queue_service.dart';
-import '../models/fault_report_model.dart';
-import '../repositories/fault_repository.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/features/fault/models/fault_report_model.dart';
+import 'package:asansor/features/fault/repositories/fault_repository.dart';
 
 // ── Repository ──────────────────────────────────────────────────────────────
 

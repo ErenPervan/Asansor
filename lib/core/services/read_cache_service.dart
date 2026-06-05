@@ -3,11 +3,11 @@ import 'dart:convert';
 
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../../features/admin/models/schedule_model.dart';
-import '../../features/admin/models/checklist_item_model.dart';
-import '../../features/elevator/models/elevator_model.dart';
-import '../../features/fault/models/fault_report_model.dart';
-import '../../features/maintenance/models/maintenance_log_model.dart';
+import 'package:asansor/features/admin/models/schedule_model.dart';
+import 'package:asansor/features/admin/models/checklist_item_model.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/fault/models/fault_report_model.dart';
+import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 
 // ── Box names ─────────────────────────────────────────────────────────────────
 

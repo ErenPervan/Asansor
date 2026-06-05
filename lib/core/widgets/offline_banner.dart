@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/connectivity_providers.dart';
-import '../theme/app_colors.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 
 /// A slim amber banner that appears at the top of a screen whenever the device
 /// has no internet connection.

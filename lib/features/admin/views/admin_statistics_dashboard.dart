@@ -3,14 +3,14 @@ import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/admin_analytics_provider.dart';
+import 'package:asansor/features/admin/providers/admin_analytics_provider.dart';
 
 import 'package:go_router/go_router.dart';
-import '../../../core/widgets/error_state.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/animations/fade_in_slide.dart';
-import '../../../core/widgets/app_card.dart';
-import '../../../core/widgets/app_section_header.dart';
+import 'package:asansor/core/widgets/error_state.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/widgets/animations/fade_in_slide.dart';
+import 'package:asansor/core/widgets/app_card.dart';
+import 'package:asansor/core/widgets/app_section_header.dart';
 
 // ── Mock data ──────────────────────────────────────────────
 

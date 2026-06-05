@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/enums/app_enums.dart';
-import '../../../core/providers/connectivity_providers.dart';
-import '../../../core/services/auto_schedule_service.dart';
-import '../../auth/providers/auth_providers.dart';
-import '../../elevator/providers/elevator_providers.dart';
-import '../models/profile_model.dart';
-import '../models/schedule_model.dart';
-import '../models/schedule_with_details.dart';
-import '../models/technician_stats.dart';
-import '../repositories/admin_repository.dart';
-import '../repositories/schedule_repository.dart';
-import 'profile_providers.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/services/auto_schedule_service.dart';
+import 'package:asansor/features/auth/providers/auth_providers.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/admin/models/profile_model.dart';
+import 'package:asansor/features/admin/models/schedule_model.dart';
+import 'package:asansor/features/admin/models/schedule_with_details.dart';
+import 'package:asansor/features/admin/models/technician_stats.dart';
+import 'package:asansor/features/admin/repositories/admin_repository.dart';
+import 'package:asansor/features/admin/repositories/schedule_repository.dart';
+import 'package:asansor/features/admin/providers/profile_providers.dart';
 
 // ── Repository providers ──────────────────────────────────────────────────────
 

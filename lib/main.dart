@@ -280,7 +280,7 @@ ThemeData _buildTheme(Brightness brightness) {
         error: AppColors.error,
         onError: AppColors.onError,
         errorContainer: AppColors.errorContainer,
-        onErrorContainer: AppColors.primaryDark,
+        onErrorContainer: AppColors.onErrorContainer,
         surfaceContainerLowest: colors.surfaceContainerLowest,
         surfaceContainerLow: colors.surfaceContainerLow,
         surfaceContainer: colors.surfaceContainer,
@@ -302,13 +302,13 @@ ThemeData _buildTheme(Brightness brightness) {
       ),
       headlineLarge: TextStyle(
         color: colors.onSurface,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.25,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0.0,
       ),
       headlineMedium: TextStyle(
         color: colors.onSurface,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.15,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0.0,
       ),
       titleLarge: TextStyle(
         color: colors.onSurface,
@@ -349,7 +349,7 @@ ThemeData _buildTheme(Brightness brightness) {
       elevation: 0,
       color: colors.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(22),
         side: BorderSide(color: colors.outlineVariant, width: 0.8),
       ),
       margin: EdgeInsets.zero,
@@ -361,23 +361,23 @@ ThemeData _buildTheme(Brightness brightness) {
       fillColor: colors.surfaceContainerLow,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.outlineVariant),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.outlineVariant, width: 1),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: primaryColor, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: AppColors.error, width: 1),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: AppColors.error, width: 1.5),
       ),
       labelStyle: TextStyle(color: colors.onSurfaceVariant),
@@ -395,7 +395,7 @@ ThemeData _buildTheme(Brightness brightness) {
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         textStyle: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,
@@ -409,7 +409,7 @@ ThemeData _buildTheme(Brightness brightness) {
       style: OutlinedButton.styleFrom(
         foregroundColor: primaryColor,
         side: const BorderSide(color: primaryColor, width: 1.5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
       ),
     ),

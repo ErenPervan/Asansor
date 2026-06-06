@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:asansor/core/theme/app_spacing.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Pending(IoT): Re-enable daily trips mock or remove when telemetry is live
 final List<String> _monthsTr = [
   'Oca',
   'Şub',
@@ -21,7 +20,8 @@ final List<String> _monthsTr = [
 ];
 
 String _fmtDateCompact(DateTime dt) {
-  return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
+  final local = dt.toLocal();
+  return '${local.day} ${_monthsTr[local.month - 1]} ${local.year}';
 }
 
 class SystemMonitorSection extends ConsumerWidget {
@@ -31,113 +31,262 @@ class SystemMonitorSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
-
-    // ── Live data ──────────────────────────────────────────────────────────
     final latestFaultAsync = ref.watch(latestFaultDateProvider(elevatorId));
     final nextMaintenanceAsync = ref.watch(
       nextScheduledMaintenanceProvider(elevatorId),
     );
 
-    return Column(
-      children: [
-        // ── "Sistem İzleme" panel ──────────────────────────────────────────
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: colors.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 620;
+        final gauge = _HealthScoreCard(latestFaultAsync: latestFaultAsync);
+        final stats = _MonitorStatsColumn(
+          latestFaultAsync: latestFaultAsync,
+          nextMaintenanceAsync: nextMaintenanceAsync,
+        );
+
+        if (isWide) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Sistem İzleme',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: colors.onSurface,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              // Pending(IoT): Re-enable IoT connections and daily trip metrics when telemetry is live
-              // Stat chips
-              Row(
+              Expanded(child: gauge),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(child: stats),
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            gauge,
+            const SizedBox(height: AppSpacing.md),
+            stats,
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _HealthScoreCard extends StatelessWidget {
+  const _HealthScoreCard({required this.latestFaultAsync});
+
+  final AsyncValue<DateTime?> latestFaultAsync;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final score = latestFaultAsync.maybeWhen(
+      data: (date) {
+        if (date == null) return 96;
+        final days = DateTime.now().difference(date.toLocal()).inDays;
+        if (days <= 3) return 68;
+        if (days <= 14) return 82;
+        return 94;
+      },
+      orElse: () => 88,
+    );
+    final scoreColor = score < 75
+        ? colors.error
+        : score < 90
+            ? colors.warning
+            : colors.primaryDark;
+
+    return _PremiumPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Sistem Sağlık Puanı',
+            style: textTheme.labelLarge?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Center(
+            child: SizedBox(
+              width: 136,
+              height: 136,
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  // SON ARIZA: most recent fault_reports.reported_at for this elevator.
-                  Expanded(
-                    child: SystemStatChip(
-                      label: 'SON ARIZA',
-                      value: latestFaultAsync.when(
-                        loading: () => '…',
-                        error: (e, s) => '!',
-                        data: (dt) => dt != null ? _fmtDateCompact(dt) : '—',
-                      ),
-                      valueColor: colors.error,
+                  SizedBox(
+                    width: 132,
+                    height: 132,
+                    child: CircularProgressIndicator(
+                      value: score / 100,
+                      strokeWidth: 9,
+                      strokeCap: StrokeCap.round,
+                      backgroundColor: colors.surfaceContainerHigh,
+                      color: scoreColor,
                     ),
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '$score',
+                        style: textTheme.displaySmall?.copyWith(
+                          color: scoreColor,
+                          fontWeight: FontWeight.w900,
+                          height: 0.92,
+                        ),
+                      ),
+                      Text(
+                        '%',
+                        style: textTheme.labelLarge?.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Center(
+            child: Text(
+              score < 75 ? 'Müdahale Gerekli' : 'Optimum Performans',
+              style: textTheme.labelLarge?.copyWith(
+                color: colors.onSurface,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MonitorStatsColumn extends StatelessWidget {
+  const _MonitorStatsColumn({
+    required this.latestFaultAsync,
+    required this.nextMaintenanceAsync,
+  });
+
+  final AsyncValue<DateTime?> latestFaultAsync;
+  final AsyncValue<DateTime?> nextMaintenanceAsync;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Column(
+      children: [
+        ExpandedOrNatural(
+          child: MonitorInfoTile(
+            icon: Icons.event_available_rounded,
+            iconBg: colors.primaryFixed.withValues(alpha: 0.72),
+            iconColor: colors.primaryDark,
+            label: 'Yaklaşan Periyodik Bakım',
+            value: nextMaintenanceAsync.when(
+              loading: () => 'Yükleniyor',
+              error: (_, _) => 'Yüklenemedi',
+              data: (dt) => dt == null ? 'Planlanmadı' : _fmtDateCompact(dt),
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-
-        // ── "Sıradaki Bakım" panel ────────────────────────────────────────
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: colors.primaryDark,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Stack(
-            children: [
-              // Background icon
-              Positioned(
-                right: -16,
-                bottom: -16,
-                child: Icon(
-                  Icons.engineering_outlined,
-                  size: 100,
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
-              nextMaintenanceAsync.when(
-                loading: () => const Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                ),
-                error: (e, s) => const NextMaintenanceContent(
-                  dayLabel: '!',
-                  dateLabel: 'Yüklenemedi',
-                ),
-                data: (nextDate) {
-                  if (nextDate == null) {
-                    return const NextMaintenanceContent(
-                      dayLabel: '—',
-                      dateLabel: 'Planlanmadı',
-                    );
-                  }
-                  final local = nextDate.toLocal();
-                  final dayLabel = local.day.toString().padLeft(2, '0');
-                  final dateLabel =
-                      '${_monthsTr[local.month - 1]} ${local.year}';
-                  return NextMaintenanceContent(
-                    dayLabel: dayLabel,
-                    dateLabel: dateLabel,
-                  );
-                },
-              ),
-            ],
+        ExpandedOrNatural(
+          child: MonitorInfoTile(
+            icon: Icons.history_rounded,
+            iconBg: colors.surfaceContainerHigh,
+            iconColor: colors.onSurface,
+            label: 'Son Kayıtlı Arıza',
+            value: latestFaultAsync.when(
+              loading: () => 'Yükleniyor',
+              error: (_, _) => 'Yüklenemedi',
+              data: (dt) => dt == null ? 'Arıza kaydı yok' : _fmtDateCompact(dt),
+            ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class ExpandedOrNatural extends StatelessWidget {
+  const ExpandedOrNatural({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxHeight.isFinite && constraints.maxHeight > 0) {
+          return SizedBox(height: constraints.maxHeight, child: child);
+        }
+        return child;
+      },
+    );
+  }
+}
+
+class MonitorInfoTile extends StatelessWidget {
+  const MonitorInfoTile({
+    super.key,
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return _PremiumPanel(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+            child: Icon(icon, color: iconColor, size: 24),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label,
+                  style: textTheme.labelMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  value,
+                  style: textTheme.bodyLarge?.copyWith(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -155,66 +304,12 @@ class NextMaintenanceContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'SIRADAKİ BAKIM',
-          style: textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colors.primaryFixed.withValues(alpha: 0.8),
-            letterSpacing: 1.2,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          dayLabel,
-          style: textTheme.displaySmall?.copyWith(
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          dateLabel,
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Periyodik Genel Revizyon',
-          style: textTheme.bodySmall?.copyWith(
-            color: Colors.white.withValues(alpha: 0.7),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          alignment: Alignment.center,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.check_circle, color: Colors.white, size: 16),
-              SizedBox(width: AppSpacing.sm),
-              Text(
-                'Planlandı',
-                style: textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return MonitorInfoTile(
+      icon: Icons.event_available_rounded,
+      iconBg: colors.primaryFixed,
+      iconColor: colors.primaryDark,
+      label: 'Sıradaki Bakım',
+      value: '$dayLabel $dateLabel',
     );
   }
 }
@@ -232,8 +327,6 @@ class SystemStatusIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
-
     return Row(
       children: [
         Container(
@@ -244,10 +337,10 @@ class SystemStatusIndicator extends StatelessWidget {
         const SizedBox(width: AppSpacing.sm),
         Text(
           label,
-          style: textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w500,
-            color: colors.onSurface,
-          ),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colors.onSurface,
+              ),
         ),
       ],
     );
@@ -269,34 +362,64 @@ class SystemStatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
-
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: colors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: colors.outline,
-            ),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: colors.outline,
+                ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: valueColor,
-            ),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: valueColor,
+                ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PremiumPanel extends StatelessWidget {
+  const _PremiumPanel({
+    required this.child,
+    this.padding = const EdgeInsets.all(AppSpacing.lg),
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    return Container(
+      width: double.infinity,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.primary.withValues(alpha: 0.04),
+            blurRadius: 26,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: child,
     );
   }
 }

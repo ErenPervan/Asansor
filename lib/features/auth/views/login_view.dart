@@ -1,132 +1,14 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:go_router/go_router.dart';
-import 'package:asansor/l10n/app_localizations.dart';
 
-import 'package:asansor/features/auth/providers/auth_providers.dart';
-
-import 'package:asansor/core/theme/app_colors.dart';
-import 'package:asansor/core/widgets/app_form_field.dart';
 import 'package:asansor/core/constants/app_durations.dart';
-// ── Brand palette ──────────────────────────────────────────────────────────────
-
-// ── Industrial grid background painter ────────────────────────────────────────
-
-class _GridPainter extends CustomPainter {
-  const _GridPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.06)
-      ..strokeWidth = 1;
-
-    const step = 32.0;
-    for (double x = 0; x < size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (double y = 0; y < size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ── Diagonal stripe accent painter ────────────────────────────────────────────
-
-class _StripePainter extends CustomPainter {
-  const _StripePainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.04)
-      ..strokeWidth = 24
-      ..strokeCap = StrokeCap.square;
-
-    for (double i = -size.height; i < size.width + size.height; i += 60) {
-      canvas.drawLine(
-        Offset(i, 0),
-        Offset(i + size.height, size.height),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ── Rotating gear decoration ──────────────────────────────────────────────────
-
-class _GearDecoration extends StatefulWidget {
-  const _GearDecoration({required this.size, required this.opacity});
-  final double size;
-  final double opacity;
-
-  @override
-  State<_GearDecoration> createState() => _GearDecorationState();
-}
-
-class _GearDecorationState extends State<_GearDecoration>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 20),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final disableAnims = MediaQuery.disableAnimationsOf(context);
-    if (disableAnims && _ctrl.isAnimating) {
-      _ctrl.stop();
-    } else if (!disableAnims && !_ctrl.isAnimating) {
-      _ctrl.repeat();
-    }
-
-    if (disableAnims) {
-      return Icon(
-        Icons.settings_outlined,
-        size: widget.size,
-        color: Colors.white.withValues(alpha: widget.opacity),
-      );
-    }
-
-    return AnimatedBuilder(
-      animation: _ctrl,
-      builder: (context, child) => Transform.rotate(
-        angle: _ctrl.value * 2 * math.pi,
-        child: Icon(
-          Icons.settings_outlined,
-          size: widget.size,
-          color: Colors.white.withValues(alpha: widget.opacity),
-        ),
-      ),
-    );
-  }
-}
-
-// ── LoginView ──────────────────────────────────────────────────────────────────
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
+import 'package:asansor/core/widgets/app_form_field.dart';
+import 'package:asansor/features/auth/providers/auth_providers.dart';
+import 'package:asansor/l10n/app_localizations.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -140,31 +22,32 @@ class _LoginViewState extends ConsumerState<LoginView>
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _obscurePassword = true;
-  late final AnimationController _slideCtrl;
-  late final Animation<Offset> _slideAnim;
+  late final AnimationController _introCtrl;
   late final Animation<double> _fadeAnim;
+  late final Animation<Offset> _slideAnim;
 
   @override
   void initState() {
     super.initState();
-    _slideCtrl = AnimationController(
+    _introCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 600),
     );
+    _fadeAnim = CurvedAnimation(parent: _introCtrl, curve: Curves.easeOut);
     _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.15),
+      begin: const Offset(0, 0.08),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _slideCtrl, curve: Curves.easeOutCubic));
-    _fadeAnim = CurvedAnimation(parent: _slideCtrl, curve: Curves.easeOut);
-    _slideCtrl.forward();
+    ).animate(CurvedAnimation(parent: _introCtrl, curve: Curves.easeOutCubic));
+    _introCtrl.forward();
   }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _slideCtrl.dispose();
+    _introCtrl.dispose();
     super.dispose();
   }
 
@@ -201,303 +84,142 @@ class _LoginViewState extends ConsumerState<LoginView>
       );
     });
 
-    final disableAnims = MediaQuery.disableAnimationsOf(context);
-    if (disableAnims) {
-      _slideCtrl.value = 1.0;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _introCtrl.value = 1;
     }
 
-    final isLoading = ref.watch(authControllerProvider).isLoading;
-    final screenH = MediaQuery.sizeOf(context).height;
     final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context)!;
+    final isLoading = ref.watch(authControllerProvider).isLoading;
 
     return Scaffold(
-      backgroundColor: colors.primary,
-      body: Column(
-        children: [
-          // ── Crimson header (brand section) ──────────────────────────────
-          SizedBox(
-            height: (screenH * 0.38).clamp(220.0, 360.0),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Gradient background
-                Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppColors.primaryDark, AppColors.primary],
-                      stops: [0.0, 1.0],
-                    ),
-                  ),
-                ),
-                // Industrial grid texture
-                const CustomPaint(painter: _GridPainter()),
-                // Diagonal stripes
-                const CustomPaint(painter: _StripePainter()),
-                // Decorative gears (background)
-                Positioned(
-                  right: -28,
-                  top: -20,
-                  child: _GearDecoration(size: 140, opacity: 0.07),
-                ),
-                Positioned(
-                  left: -20,
-                  bottom: 10,
-                  child: _GearDecoration(size: 90, opacity: 0.06),
-                ),
-                // Top safe-area spacer
-                SafeArea(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Icon in white circle
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.3),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.elevator_outlined,
-                          size: 40,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'ASANSOR',
-                        style: Theme.of(context).textTheme.headlineLarge
-                            ?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: 4,
-                            ),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.25),
-                          ),
-                        ),
-                        child: Text(
-                          l10n.appSubTitle,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
+      backgroundColor: colors.background,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.lg,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: FadeTransition(
+                    opacity: _fadeAnim,
+                    child: SlideTransition(
+                      position: _slideAnim,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 420),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const _BrandMark(),
+                            const SizedBox(height: AppSpacing.lg),
+                            Text(
+                              'Asansor',
+                              style: textTheme.headlineMedium?.copyWith(
+                                color: colors.primaryDark,
+                                fontWeight: FontWeight.w800,
                               ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // ── White form card (slides up) ─────────────────────────────────
-          Expanded(
-            child: SlideTransition(
-              position: _slideAnim,
-              child: FadeTransition(
-                opacity: _fadeAnim,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(32),
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x28000000),
-                        blurRadius: 40,
-                        offset: Offset(0, -8),
-                      ),
-                    ],
-                  ),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(28, 36, 28, 24),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Card title
-                          Text(
-                            l10n.loginTitle,
-                            style: Theme.of(context).textTheme.headlineMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: colors.onSurface,
-                                  letterSpacing: 0.0,
-                                ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            l10n.loginSubTitle,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                  height: 1.4,
-                                ),
-                          ),
-                          const SizedBox(height: AppSpacing.xl),
-
-                          // ── E-posta ──────────────────────────────────────
-                          AppFormField(
-                            controller: _emailController,
-                            label: l10n.loginEmailLabel,
-                            hint: 'ornek@sirket.com',
-                            keyboardType: TextInputType.emailAddress,
-                            readOnly: isLoading,
-                            prefixIcon: const Icon(
-                              Icons.email_outlined,
-                              size: 18,
+                              textAlign: TextAlign.center,
                             ),
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return l10n.loginEmailValidationErrorEmpty;
-                              }
-                              if (!v.contains('@')) {
-                                return l10n.loginEmailValidationErrorInvalid;
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-
-                          // ── Şifre ────────────────────────────────────────
-                          AppFormField(
-                            controller: _passwordController,
-                            label: l10n.loginPasswordLabel,
-                            hint: '••••••••',
-                            obscureText: _obscurePassword,
-                            readOnly: isLoading,
-                            prefixIcon: const Icon(
-                              Icons.lock_outlined,
-                              size: 18,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                size: 18,
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              'OPERASYON\nYONETIMI',
+                              style: textTheme.labelSmall?.copyWith(
+                                color: colors.secondary.withValues(alpha: 0.7),
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.6,
+                                height: 1.35,
                               ),
-                              tooltip: _obscurePassword
-                                  ? 'Şifreyi Göster'
-                                  : 'Şifreyi Gizle',
-                              onPressed: () => setState(
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              'Hesabiniza giris yapin',
+                              style: textTheme.headlineMedium?.copyWith(
+                                color: colors.onSurface,
+                                fontWeight: FontWeight.w800,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              'Bakim gorevleri, ariza kayitlari ve asansor '
+                              'durumlarini guvenle yonetin.',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colors.onSurfaceVariant,
+                                height: 1.45,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppSpacing.xl),
+                            _LoginPanel(
+                              formKey: _formKey,
+                              emailController: _emailController,
+                              passwordController: _passwordController,
+                              obscurePassword: _obscurePassword,
+                              isLoading: isLoading,
+                              onSubmit: _submit,
+                              onTogglePassword: () => setState(
                                 () => _obscurePassword = !_obscurePassword,
                               ),
+                              l10n: l10n,
                             ),
-                            validator: (v) {
-                              if (v == null || v.isEmpty) {
-                                return l10n.loginPasswordValidationErrorEmpty;
-                              }
-                              if (v.length < 6) {
-                                return l10n.loginPasswordValidationErrorLength;
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: AppSpacing.xl),
-
-                          // ── Login button ──────────────────────────────────
-                          SizedBox(
-                            height: 52,
-                            child: FilledButton(
-                              onPressed: isLoading ? null : _submit,
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                                disabledBackgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.5),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: isLoading
-                                  ? SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: colors.onPrimary,
-                                      ),
-                                    )
-                                  : Text(
-                                      l10n.loginButton,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 0.3,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onPrimary,
-                                          ),
-                                    ),
+                            const SizedBox(height: AppSpacing.lg),
+                            _SecureConnectionNote(
+                              label: l10n.loginSecureConnection,
                             ),
-                          ),
-
-                          const SizedBox(height: 28),
-
-                          // ── Footer ────────────────────────────────────────
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 24,
-                                height: 1,
-                                color: colors.outlineVariant,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                l10n.loginSecureConnection,
-                                style: Theme.of(context).textTheme.labelSmall
-                                    ?.copyWith(
-                                      color: colors.onSurfaceVariant,
-                                      letterSpacing: 0.3,
-                                    ),
-                              ),
-                              const SizedBox(width: 5),
-                              Icon(
-                                Icons.lock_outlined,
-                                size: 11,
-                                color: colors.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 10),
-                              Container(
-                                width: 24,
-                                height: 1,
-                                color: colors.outlineVariant,
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _BrandMark extends StatelessWidget {
+  const _BrandMark();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Container(
+      width: 64,
+      height: 64,
+      decoration: BoxDecoration(
+        color: colors.primary,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: colors.primary.withValues(alpha: 0.18),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          const Icon(Icons.elevator_rounded, color: Colors.white, size: 34),
+          Positioned(
+            top: 14,
+            child: Container(
+              width: 12,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.accentGold,
+                borderRadius: BorderRadius.circular(99),
               ),
             ),
           ),
@@ -507,4 +229,171 @@ class _LoginViewState extends ConsumerState<LoginView>
   }
 }
 
-// ── Small helpers ──────────────────────────────────────────────────────────────
+class _LoginPanel extends StatelessWidget {
+  const _LoginPanel({
+    required this.formKey,
+    required this.emailController,
+    required this.passwordController,
+    required this.obscurePassword,
+    required this.isLoading,
+    required this.onSubmit,
+    required this.onTogglePassword,
+    required this.l10n,
+  });
+
+  final GlobalKey<FormState> formKey;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final bool obscurePassword;
+  final bool isLoading;
+  final VoidCallback onSubmit;
+  final VoidCallback onTogglePassword;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.35)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.primary.withValues(alpha: 0.06),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Form(
+          key: formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppFormField(
+                controller: emailController,
+                label: l10n.loginEmailLabel,
+                hint: 'ornek@sirket.com',
+                keyboardType: TextInputType.emailAddress,
+                readOnly: isLoading,
+                prefixIcon: const Icon(Icons.mail_outline_rounded),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) {
+                    return l10n.loginEmailValidationErrorEmpty;
+                  }
+                  if (!v.contains('@')) {
+                    return l10n.loginEmailValidationErrorInvalid;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: AppSpacing.md),
+              AppFormField(
+                controller: passwordController,
+                label: l10n.loginPasswordLabel,
+                hint: '••••••••',
+                obscureText: obscurePassword,
+                readOnly: isLoading,
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    obscurePassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                  ),
+                  tooltip: obscurePassword ? 'Sifreyi goster' : 'Sifreyi gizle',
+                  onPressed: isLoading ? null : onTogglePassword,
+                ),
+                validator: (v) {
+                  if (v == null || v.isEmpty) {
+                    return l10n.loginPasswordValidationErrorEmpty;
+                  }
+                  if (v.length < 6) {
+                    return l10n.loginPasswordValidationErrorLength;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              SizedBox(
+                height: 56,
+                child: FilledButton(
+                  onPressed: isLoading ? null : onSubmit,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colors.primary,
+                    disabledBackgroundColor: colors.primary.withValues(
+                      alpha: 0.55,
+                    ),
+                    foregroundColor: colors.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: isLoading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colors.onPrimary,
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              l10n.loginButton,
+                              style: textTheme.labelLarge?.copyWith(
+                                color: colors.onPrimary,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            const Icon(Icons.arrow_forward_rounded, size: 20),
+                          ],
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SecureConnectionNote extends StatelessWidget {
+  const _SecureConnectionNote({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.verified_user_outlined,
+          size: 16,
+          color: colors.onSurfaceVariant.withValues(alpha: 0.65),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: colors.onSurfaceVariant.withValues(alpha: 0.65),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+}

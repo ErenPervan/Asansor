@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase_flutter;
-import 'package:asansor/core/theme/app_colors.dart';
+
 import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 
 class TopAppBar extends StatelessWidget {
   const TopAppBar({
@@ -31,130 +32,170 @@ class TopAppBar extends StatelessWidget {
         ? userEmail.split('@').first
         : 'Teknisyen';
 
-    final String statusText;
-    if (!isOnline) {
-      statusText = 'DURUM: ÇEVRİMDIŞI';
-    } else if (pendingSyncCount > 0) {
-      statusText = 'DURUM: SENKRONİZE EDİLİYOR';
-    } else {
-      statusText = 'DURUM: AKTİF';
-    }
+    final (statusText, statusIcon, statusColor) = !isOnline
+        ? ('Cevrimdisi', Icons.cloud_off_rounded, colors.warning)
+        : pendingSyncCount > 0
+        ? ('Senkronize', Icons.sync_rounded, colors.primary)
+        : ('Senkronize', Icons.cloud_done_rounded, colors.primary);
 
-    return Container(
-      color: colors.background,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Row(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      child: Column(
         children: [
-          // Avatar circle
-          Container(
-            width: 40,
-            height: 40,
+          DecoratedBox(
             decoration: BoxDecoration(
-              color: colors.surfaceContainer,
-              shape: BoxShape.circle,
+              color: colors.surface.withValues(alpha: 0.86),
+              borderRadius: BorderRadius.circular(22),
               border: Border.all(
-                color: colors.primary.withValues(alpha: 0.12),
-                width: 2,
+                color: colors.outlineVariant.withValues(alpha: 0.35),
               ),
-            ),
-            child: Icon(Icons.person_outline, color: colors.primary, size: 20),
-          ),
-          const SizedBox(width: 12),
-          // Status + greeting
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  statusText,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colors.outline,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-                Text(
-                  canAccessAdmin
-                      ? 'Merhaba Admin — $activeFaultCount açık arıza'
-                      : 'Merhaba, $displayName',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colors.primary,
-                    letterSpacing: 0.0,
-                  ),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.primary.withValues(alpha: 0.06),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
-          ),
-          // Admin panel shortcut
-          if (canAccessAdmin)
-            Material(
-              color: colors.surfaceContainerLowest,
-              shape: const CircleBorder(),
-              elevation: 1,
-              shadowColor: colors.outline.withValues(alpha: 0.12),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () => context.push('/admin/dashboard'),
-                child: const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Icon(
-                    Icons.admin_panel_settings_outlined,
-                    color: AppColors.primary,
-                    size: 20,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: colors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(
+                      Icons.domain_rounded,
+                      color: colors.primary,
+                      size: 22,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Asansor',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: colors.primaryDark,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                  if (canAccessAdmin)
+                    _TopIconButton(
+                      icon: Icons.admin_panel_settings_outlined,
+                      tooltip: 'Admin paneli',
+                      onTap: () => context.push('/admin/dashboard'),
+                    ),
+                  if (canAccessAdmin) const SizedBox(width: AppSpacing.sm),
+                  SyncStatusButton(
+                    pendingCount: pendingSyncCount,
+                    isOnline: isOnline,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  _TopIconButton(
+                    icon: Icons.logout_outlined,
+                    tooltip: 'Cikis yap',
+                    onTap: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Cikis Yap'),
+                          content: const Text(
+                            'Oturumu kapatmak istediginize emin misiniz?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text('Iptal'),
+                            ),
+                            FilledButton(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: AppColors.error,
+                              ),
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text('Cikis Yap'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm == true) {
+                        onSignOut();
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
-          if (canAccessAdmin) const SizedBox(width: AppSpacing.sm),
-          // Cloud sync status indicator
-          SyncStatusButton(pendingCount: pendingSyncCount, isOnline: isOnline),
-          const SizedBox(width: AppSpacing.sm),
-          // Sign-out button
-          Material(
-            color: colors.surfaceContainerLowest,
-            shape: const CircleBorder(),
-            elevation: 1,
-            shadowColor: colors.outline.withValues(alpha: 0.12),
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Çıkış Yap'),
-                    content: const Text(
-                      'Oturumu kapatmak istediğinize emin misiniz?',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('İptal'),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Operasyon Ozeti',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
                       ),
-                      FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.error,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      canAccessAdmin
+                          ? 'Gunluk operasyon'
+                          : 'Merhaba, $displayName',
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: FontWeight.w800,
+                          ),
+                    ),
+                    if (canAccessAdmin && activeFaultCount > 0) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        '$activeFaultCount acik ariza takipte',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.error,
+                          fontWeight: FontWeight.w700,
                         ),
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text('Çıkış Yap'),
                       ),
                     ],
-                  ),
-                );
-                if (confirm == true) {
-                  onSignOut();
-                }
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(10),
-                child: Icon(
-                  Icons.logout_outlined,
-                  color: AppColors.primary,
-                  size: 20,
+                  ],
                 ),
               ),
-            ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(statusIcon, size: 16, color: statusColor),
+                    const SizedBox(width: 6),
+                    Text(
+                      statusText,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: statusColor,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -162,13 +203,39 @@ class TopAppBar extends StatelessWidget {
   }
 }
 
-// ── Sync status button ────────────────────────────────────────────────────────
+class _TopIconButton extends StatelessWidget {
+  const _TopIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
 
-/// Small button shown in the top bar to indicate cloud sync state.
-///
-/// - Green cloud-done icon  â†’ all data is synced.
-/// - Amber cloud-upload icon with a count badge â†’ items are queued offline.
-/// - No network icon (red)  â†’ device is currently offline.
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: colors.surfaceContainerLow,
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(9),
+            child: Icon(icon, color: colors.primary, size: 20),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SyncStatusButton extends ConsumerWidget {
   const SyncStatusButton({
     super.key,
@@ -181,6 +248,7 @@ class SyncStatusButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppThemeColors.of(context);
     final hasPending = pendingCount > 0;
 
     final IconData icon;
@@ -189,70 +257,54 @@ class SyncStatusButton extends ConsumerWidget {
 
     if (!isOnline) {
       icon = Icons.cloud_off_outlined;
-      color = AppThemeColors.of(context).warning;
-      tooltip = 'Çevrimdışı';
+      color = colors.warning;
+      tooltip = 'Cevrimdisi';
     } else if (hasPending) {
       icon = Icons.cloud_upload_outlined;
-      color = AppThemeColors.of(context).warning;
-      tooltip = '$pendingCount öğe senkronize bekleniyor';
+      color = colors.warning;
+      tooltip = '$pendingCount kayit senkronize bekliyor';
     } else {
       icon = Icons.cloud_done_outlined;
-      color = AppThemeColors.of(context).success;
-      tooltip = 'Tüm veriler senkronize';
+      color = colors.primary;
+      tooltip = 'Tum veriler senkronize';
     }
 
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: AppThemeColors.of(context).surfaceContainerLowest,
+        color: colors.surfaceContainerLow,
         shape: const CircleBorder(),
-        elevation: 1,
-        shadowColor: AppThemeColors.of(context).outline.withValues(alpha: 0.12),
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: () => _showSyncSheet(context, ref),
           child: Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(9),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: ScaleTransition(scale: animation, child: child),
-                    );
-                  },
-                  child: Icon(
-                    icon,
-                    key: ValueKey(icon),
-                    color: color,
-                    size: 20,
-                  ),
-                ),
+                Icon(icon, color: color, size: 20),
                 if (hasPending)
                   Positioned(
-                    right: -4,
-                    top: -4,
+                    right: -5,
+                    top: -5,
                     child: Container(
-                      padding: const EdgeInsets.all(2),
                       constraints: const BoxConstraints(
-                        minWidth: 14,
-                        minHeight: 14,
+                        minWidth: 15,
+                        minHeight: 15,
                       ),
+                      padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
-                        color: AppThemeColors.of(context).warning,
+                        color: colors.warning,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
                         '$pendingCount',
+                        textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           fontSize: 8,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
@@ -288,9 +340,8 @@ class SyncStatusButton extends ConsumerWidget {
                 SnackBar(
                   content: Text(
                     result.hasFailures
-                        ? '${result.synced} senkronize edildi, '
-                              '${result.failed} başarısız'
-                        : '${result.synced} öğe başarıyla senkronize edildi',
+                        ? '${result.synced} senkronize edildi, ${result.failed} basarisiz'
+                        : '${result.synced} kayit senkronize edildi',
                   ),
                   backgroundColor: result.hasFailures
                       ? AppThemeColors.of(context).error
@@ -305,7 +356,6 @@ class SyncStatusButton extends ConsumerWidget {
   }
 }
 
-/// Bottom sheet showing the current sync status with a manual sync button.
 class SyncSheet extends StatelessWidget {
   const SyncSheet({
     super.key,
@@ -320,60 +370,43 @@ class SyncSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasPending = pendingCount > 0;
     final colors = AppThemeColors.of(context);
+    final hasPending = pendingCount > 0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle
           Container(
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.outlineVariant,
+              color: colors.outlineVariant,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(height: 20),
-
-          // Icon
           Container(
             width: 56,
             height: 56,
             decoration: BoxDecoration(
               color: hasPending
                   ? colors.warningContainer
-                  : colors.successContainer,
+                  : colors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
-              transitionBuilder: (child, animation) {
-                return ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: child,
-                );
-              },
-              child: Icon(
-                hasPending
-                    ? Icons.cloud_upload_outlined
-                    : Icons.cloud_done_outlined,
-                key: ValueKey(hasPending),
-                size: 28,
-                color: hasPending ? colors.warning : colors.success,
-              ),
+            child: Icon(
+              hasPending
+                  ? Icons.cloud_upload_outlined
+                  : Icons.cloud_done_outlined,
+              size: 28,
+              color: hasPending ? colors.warning : colors.primary,
             ),
           ),
           const SizedBox(height: 14),
-
           Text(
-            hasPending ? 'Bekleyen Senkronizasyon' : 'Tüm Veriler Senkronize',
+            hasPending ? 'Bekleyen senkronizasyon' : 'Tum veriler senkronize',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w800,
               color: colors.onSurface,
@@ -382,35 +415,27 @@ class SyncSheet extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             hasPending
-                ? '$pendingCount kayıt çevrimdışı olarak saklandı.'
-                      '${isOnline ? ' Şimdi senkronize edebilirsiniz.' : ' İnternet bağlantısı gerekli.'}'
-                : 'Tüm bakım ve arıza kayıtları Supabase ile senkronize.',
+                ? '$pendingCount kayit cevrimdisi olarak saklandi.'
+                : 'Bakim ve ariza kayitlari sunucu ile guncel.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: colors.onSurfaceVariant,
               height: 1.5,
             ),
           ),
-
           const SizedBox(height: AppSpacing.lg),
-
           if (hasPending && isOnline)
             FilledButton.icon(
               icon: const Icon(Icons.sync_rounded),
-              label: const Text('Şimdi Senkronize Et'),
-              style: FilledButton.styleFrom(
-                backgroundColor: colors.success,
-                minimumSize: const Size(double.infinity, 50),
-              ),
+              label: const Text('Simdi senkronize et'),
               onPressed: onSync,
             ),
-
           if (!isOnline)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: colors.warningContainer,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
                 children: [
@@ -418,7 +443,7 @@ class SyncSheet extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'İnternet bağlantısı yok. Bağlantı kurulduğunda otomatik senkronize edilecek.',
+                      'Internet baglantisi yok. Baglanti kuruldugunda otomatik senkronize edilecek.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: colors.warning,
                         height: 1.4,

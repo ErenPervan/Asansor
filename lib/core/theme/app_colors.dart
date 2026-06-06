@@ -8,18 +8,19 @@ import 'package:flutter/material.dart';
 /// Naming convention follows Material Design 3 role names where possible.
 abstract final class AppColors {
   // ── Brand ─────────────────────────────────────────────────────────────────
-  static const primary = Color(0xFFB91C1C); // Red-700
-  static const primaryDark = Color(0xFF991B1B); // Red-800  (gradient)
-  static const secondary = Color(0xFFEF4444); // Red-500  (bright)
-  static const primaryFixed = Color(0xFFFFE4E4); // very light red tint
+  static const primary = Color(0xFF0F4C81);
+  static const primaryDark = Color(0xFF00355F);
+  static const secondary = Color(0xFF43617E);
+  static const primaryFixed = Color(0xFFD2E4FF);
+  static const accentGold = Color(0xFFC9A227);
 
   // ── Surfaces ──────────────────────────────────────────────────────────────
-  static const background = Color(0xFFF9FAFB); // Slate-50
+  static const background = Color(0xFFF7FAFD);
   static const surface = Colors.white;
   static const surfaceContainerLowest = Colors.white;
-  static const surfaceContainerLow = Color(0xFFF8FAFC);
-  static const surfaceContainer = Color(0xFFF1F5F9); // Slate-100
-  static const surfaceContainerHigh = Color(0xFFE2E8F0); // Slate-200
+  static const surfaceContainerLow = Color(0xFFF1F4F7);
+  static const surfaceContainer = Color(0xFFEBEEF1);
+  static const surfaceContainerHigh = Color(0xFFE5E8EB);
 
   // ── Dark surfaces ─────────────────────────────────────────────────────────
   static const backgroundDark = Color(0xFF0B0F14);
@@ -30,10 +31,10 @@ abstract final class AppColors {
   static const surfaceContainerHighDark = Color(0xFF374151);
 
   // ── Text / On-Surface ─────────────────────────────────────────────────────
-  static const onSurface = Color(0xFF0F172A); // Slate-900
-  static const onSurfaceVariant = Color(0xFF475569); // Slate-600
-  static const outline = Color(0xFF94A3B8); // Slate-400
-  static const outlineVariant = Color(0xFFE2E8F0); // Slate-200
+  static const onSurface = Color(0xFF181C1E);
+  static const onSurfaceVariant = Color(0xFF42474F);
+  static const outline = Color(0xFF727780);
+  static const outlineVariant = Color(0xFFC2C7D1);
 
   // ── Dark text / on-surface ────────────────────────────────────────────────
   static const onSurfaceDark = Color(0xFFE2E8F0);
@@ -42,10 +43,10 @@ abstract final class AppColors {
   static const outlineVariantDark = Color(0xFF334155);
 
   // ── Semantic — Error ──────────────────────────────────────────────────────
-  static const error = Color(0xFFDC2626); // Red-600
-  static const errorContainer = Color(0xFFFEE2E2); // Red-100
+  static const error = Color(0xFFBA1A1A);
+  static const errorContainer = Color(0xFFFFDAD6);
   static const errorContainerDark = Color(0xFF450A0A); // Red-950
-  static const onErrorContainer = Color(0xFF991B1B);
+  static const onErrorContainer = Color(0xFF93000A);
   static const onError = Colors.white;
 
   // ── Semantic — Success ────────────────────────────────────────────────────

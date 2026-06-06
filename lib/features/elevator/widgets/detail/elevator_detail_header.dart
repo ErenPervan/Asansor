@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:asansor/core/theme/app_spacing.dart';
-import 'package:asansor/core/theme/app_colors.dart';
-import 'package:asansor/core/theme/status_tokens.dart';
 import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
-import 'package:asansor/core/widgets/info_card.dart';
+import 'package:flutter/material.dart';
 
 class ElevatorDetailHeader extends StatelessWidget {
   const ElevatorDetailHeader({super.key, required this.elevator});
@@ -16,75 +14,62 @@ class ElevatorDetailHeader extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
-    return InfoCard(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      radius: 16,
-      backgroundColor: colors.surfaceContainerLowest,
-      borderColor: Colors.transparent,
-      boxShadow: [
-        BoxShadow(
-          color: colors.onSurface.withValues(alpha: 0.04),
-          blurRadius: 32,
-          offset: const Offset(0, 12),
-        ),
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.primary.withValues(alpha: 0.06),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Status badge — top right (Stack equivalent)
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Icon + name/address
-              Expanded(
-                child: Row(
+          _ElevatorCover(status: elevator.status),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Elevator icon
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: colors.primaryFixed,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.elevator_outlined,
-                        color: colors.primary,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 2),
-                          Material(
-                            color: Colors.transparent,
-                            child: Text(
-                              elevator.buildingName,
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: colors.onSurface,
-                                letterSpacing: 0.0,
-                              ),
+                          Text(
+                            elevator.buildingName,
+                            style: textTheme.headlineSmall?.copyWith(
+                              color: colors.onSurface,
+                              fontWeight: FontWeight.w800,
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppSpacing.sm),
                           Row(
                             children: [
                               Icon(
                                 Icons.location_on_outlined,
-                                size: 14,
+                                size: 17,
                                 color: colors.onSurfaceVariant,
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 5),
                               Expanded(
                                 child: Text(
-                                  elevator.address ?? 'Adres belirtilmemiş',
-                                  style: textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.w500,
+                                  elevator.address?.isNotEmpty == true
+                                      ? elevator.address!
+                                      : 'Adres belirtilmemiş',
+                                  style: textTheme.bodyMedium?.copyWith(
                                     color: colors.onSurfaceVariant,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -97,39 +82,98 @@ class ElevatorDetailHeader extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              // Dynamic status badge
-              DetailStatusBadge(status: elevator.status),
-            ],
-          ),
-
-          // Divider + static metadata grid
-          const SizedBox(height: 20),
-          Divider(
-            height: 1,
-            color: colors.outlineVariant.withValues(alpha: 0.15),
-          ),
-          const SizedBox(height: 20),
-
-          // Model + Capacity — read from DB columns added to elevators table
-          Row(
-            children: [
-              Expanded(
-                child: DetailMetaCell(
-                  label: 'MODEL',
-                  value: elevator.model ?? '—',
+                const SizedBox(height: AppSpacing.md),
+                Divider(color: colors.outlineVariant.withValues(alpha: 0.55)),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DetailMetaCell(
+                        label: 'Model',
+                        value: elevator.model?.isNotEmpty == true
+                            ? elevator.model!
+                            : 'Belirtilmedi',
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: DetailMetaCell(
+                        label: 'Kapasite',
+                        value: elevator.capacity != null
+                            ? '${elevator.capacity} kg'
+                            : 'Belirtilmedi',
+                      ),
+                    ),
+                  ],
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ElevatorCover extends StatelessWidget {
+  const _ElevatorCover({required this.status});
+
+  final ElevatorStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return SizedBox(
+      height: 134,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colors.primaryDark,
+                  colors.primary,
+                  colors.surfaceContainerHigh,
+                ],
+                stops: const [0.0, 0.58, 1.0],
               ),
-              Expanded(
-                child: DetailMetaCell(
-                  label: 'KAPASİTE',
-                  value: elevator.capacity != null
-                      ? '${elevator.capacity} Kg'
-                      : '—',
-                ),
+            ),
+          ),
+          Positioned(
+            right: -26,
+            bottom: -36,
+            child: Icon(
+              Icons.elevator_rounded,
+              size: 152,
+              color: Colors.white.withValues(alpha: 0.16),
+            ),
+          ),
+          Positioned(
+            left: 22,
+            top: 22,
+            child: Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
               ),
-            ],
+              child: const Icon(
+                Icons.apartment_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 18,
+            bottom: 14,
+            child: DetailStatusBadge(status: status),
           ),
         ],
       ),
@@ -154,26 +198,24 @@ class DetailMetaCell extends StatelessWidget {
         Text(
           label,
           style: textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colors.outline,
-            letterSpacing: 1.2,
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 5),
         Text(
           value,
-          style: textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
+          style: textTheme.bodyLarge?.copyWith(
             color: colors.onSurface,
+            fontWeight: FontWeight.w800,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
   }
 }
-
-// ── Status badge ──────────────────────────────────────────────────────────────
-// Stitch: <span class="bg-emerald-600 text-white ... rounded-full">DURUM: AKTİF</span>
 
 class DetailStatusBadge extends StatelessWidget {
   const DetailStatusBadge({super.key, required this.status});
@@ -182,29 +224,45 @@ class DetailStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = switch (status) {
-      ElevatorStatus.active => 'DURUM: AKTİF',
-      ElevatorStatus.faulty => 'DURUM: ARIZALI',
-      ElevatorStatus.underMaintenance => 'DURUM: BAKIMDA',
-      ElevatorStatus.inactive => 'DURUM: PASİF',
+    final colors = AppThemeColors.of(context);
+    final (label, dotColor) = switch (status) {
+      ElevatorStatus.active => ('Aktif & Stabil', colors.primaryDark),
+      ElevatorStatus.faulty => ('Arıza Tespit Edildi', colors.error),
+      ElevatorStatus.underMaintenance => ('Bakımda', colors.warning),
+      ElevatorStatus.inactive => ('Pasif', colors.outline),
     };
 
-    final bg = StatusTokens.elevatorBadgeBackgroundDynamic(context, status);
-    final fg = StatusTokens.elevatorBadgeForegroundDynamic(context, status);
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(999),
+        color: colors.surfaceContainerLowest.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.55)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.onSurface.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: fg,
-          letterSpacing: 0.8,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 7),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+        ],
       ),
     );
   }

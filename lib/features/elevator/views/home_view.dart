@@ -86,32 +86,10 @@ class _HomeViewState extends State<HomeView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: AppSpacing.md),
+                    const SizedBox(height: AppSpacing.lg),
                     Consumer(
                       builder: (context, ref, _) {
-                        return ActiveFaultsSection(
-                          activeFaults: ref.watch(activeFaultsProvider),
-                          elevators: ref.watch(elevatorsProvider).valueOrNull,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    Consumer(
-                      builder: (context, ref, _) {
-                        return DailyAgendaSection(
-                          mySchedules: ref.watch(
-                            technicianScheduleStreamProvider,
-                          ),
-                          elevators: ref.watch(elevatorsProvider).valueOrNull,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    Consumer(
-                      builder: (context, ref, _) {
-                        final profile = ref
-                            .watch(currentProfileProvider)
-                            .valueOrNull;
+                        final profile = ref.watch(currentProfileProvider).valueOrNull;
                         final canViewAdminStats =
                             profile?.can(AppCapability.viewAdminStats) ?? false;
 
@@ -144,6 +122,26 @@ class _HomeViewState extends State<HomeView> {
                           completedLabel: canViewAdminStats
                               ? 'BU AY TAMAMLANAN'
                               : 'TAMAMLANAN',
+                        );
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        return ActiveFaultsSection(
+                          activeFaults: ref.watch(activeFaultsProvider),
+                          elevators: ref.watch(elevatorsProvider).valueOrNull,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        return DailyAgendaSection(
+                          mySchedules: ref.watch(
+                            technicianScheduleStreamProvider,
+                          ),
+                          elevators: ref.watch(elevatorsProvider).valueOrNull,
                         );
                       },
                     ),

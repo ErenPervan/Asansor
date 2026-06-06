@@ -1,14 +1,13 @@
+import 'package:asansor/core/services/pdf_service.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
+import 'package:asansor/core/widgets/animations/fade_in_slide.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
+import 'package:asansor/features/maintenance/providers/maintenance_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:printing/printing.dart';
-import 'package:asansor/core/theme/app_colors.dart';
-import 'package:asansor/core/services/pdf_service.dart';
-import 'package:asansor/core/widgets/info_card.dart';
-import 'package:asansor/features/elevator/models/elevator_model.dart';
-import 'package:asansor/features/maintenance/providers/maintenance_providers.dart';
-import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
-import 'package:asansor/core/widgets/animations/fade_in_slide.dart';
 
 class MaintenanceHistorySection extends ConsumerStatefulWidget {
   const MaintenanceHistorySection({
@@ -64,135 +63,151 @@ class MaintenanceHistorySectionState
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section header
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Bakım Geçmişi',
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: colors.onSurface,
-                letterSpacing: 0.0,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.primary.withValues(alpha: 0.04),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: colors.primaryFixed.withValues(alpha: 0.72),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.timeline_rounded,
+                  color: colors.primaryDark,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'Servis Geçmişi',
+                  style: textTheme.titleLarge?.copyWith(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              Tooltip(
+                message: 'PDF Rapor Oluştur (Son 6 Ay)',
+                child: _generatingPdf
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: colors.primary,
+                        ),
+                      )
+                    : IconButton(
+                        icon: Icon(
+                          Icons.picture_as_pdf_outlined,
+                          color: colors.primaryDark,
+                        ),
+                        onPressed: _generateAndPreviewPdf,
+                      ),
+              ),
+              IconButton(
+                tooltip: 'Yenile',
+                icon: Icon(Icons.refresh_rounded, color: colors.outline),
+                onPressed: () =>
+                    ref.invalidate(logsByElevatorProvider(widget.elevatorId)),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          logsAsync.when(
+            loading: () => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: CircularProgressIndicator(color: colors.primary),
               ),
             ),
-            Row(
-              children: [
-                // ── PDF Report button ────────────────────────────────────────
-                Tooltip(
-                  message: 'PDF Rapor Oluştur (Son 6 Ay)',
-                  child: _generatingPdf
-                      ? SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: colors.primary,
-                          ),
-                        )
-                      : IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          icon: Icon(
-                            Icons.picture_as_pdf_outlined,
-                            size: 22,
-                            color: colors.primary,
-                          ),
-                          onPressed: _generateAndPreviewPdf,
-                        ),
+            error: (err, _) => Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: colors.errorContainer,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                err.toString().replaceFirst('Exception: ', ''),
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colors.onErrorContainer,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                IconButton(
-                  tooltip: 'Yenile',
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: Icon(Icons.refresh, size: 18, color: colors.outline),
-                  onPressed: () =>
-                      ref.invalidate(logsByElevatorProvider(widget.elevatorId)),
-                ),
-              ],
+              ),
             ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.md),
+            data: (logs) {
+              if (logs.isEmpty) {
+                return _EmptyTimeline();
+              }
 
-        // Timeline content
-        logsAsync.when(
-          loading: () => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: CircularProgressIndicator(color: colors.primary),
-            ),
-          ),
-          error: (err, _) => Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: colors.errorContainer,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              err.toString().replaceFirst('Exception: ', ''),
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: colors.onErrorContainer),
-            ),
-          ),
-          data: (logs) {
-            if (logs.isEmpty) {
-              return Container(
-                padding: const EdgeInsets.all(AppSpacing.xl),
-                decoration: BoxDecoration(
-                  color: colors.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Center(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.history,
-                        size: 40,
-                        color: colors.outlineVariant,
+              return Column(
+                children: [
+                  for (var i = 0; i < logs.length; i++)
+                    FadeInSlide(
+                      index: i,
+                      child: TimelineItem(
+                        log: logs[i],
+                        isLast: i == logs.length - 1,
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Henüz bakım kaydı yok.',
-                        style: textTheme.titleSmall?.copyWith(
-                          color: colors.outline,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                ],
               );
-            }
-
-            // Timeline list ── vertical line drawn as left-column Container
-            return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: logs.length,
-              itemBuilder: (context, i) {
-                return FadeInSlide(
-                  index: i,
-                  child: TimelineItem(
-                    log: logs[i],
-                    isLast: i == logs.length - 1,
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      ],
+            },
+          ),
+        ],
+      ),
     );
   }
 }
 
-// ── Timeline item ────────────────────────────────────────────────────────────
+class _EmptyTimeline extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.history_rounded, size: 42, color: colors.outlineVariant),
+          const SizedBox(height: 12),
+          Text(
+            'Henüz bakım kaydı yok.',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: colors.outline,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class TimelineItem extends StatelessWidget {
   const TimelineItem({super.key, required this.log, required this.isLast});
@@ -204,47 +219,50 @@ class TimelineItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
 
-    // IntrinsicHeight ensures the connecting line fills the full card height.
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Left column: dot + connector line ────────────────────────────────
           SizedBox(
-            width: 32,
+            width: 28,
             child: Column(
               children: [
-                const SizedBox(height: 6),
-                // Dot with ring effect (ring-4 ring-surface ──> white border)
+                const SizedBox(height: 5),
                 Container(
-                  width: 16,
-                  height: 16,
+                  width: 14,
+                  height: 14,
                   decoration: BoxDecoration(
-                    // Approved ──> primary dot; pending ──> outline-variant dot
                     color: log.isApproved
-                        ? colors.primary
+                        ? colors.primaryDark
                         : colors.outlineVariant,
                     shape: BoxShape.circle,
-                    border: Border.all(color: colors.background, width: 3),
+                    border: Border.all(
+                      color: colors.surfaceContainerLowest,
+                      width: 4,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.primary.withValues(alpha: 0.12),
+                        blurRadius: 8,
+                      ),
+                    ],
                   ),
                 ),
-                // Connector line (hidden on last item)
                 if (!isLast)
                   Expanded(
                     child: Container(
                       width: 2,
                       margin: const EdgeInsets.only(top: 4),
-                      color: colors.outlineVariant.withValues(alpha: 0.3),
+                      color: colors.outlineVariant.withValues(alpha: 0.55),
                     ),
                   ),
               ],
             ),
           ),
-
-          // ── Right column: card ────────────────────────────────────────────────
+          const SizedBox(width: 10),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(left: 16, bottom: isLast ? 0 : 24),
+              padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.lg),
               child: TimelineCard(log: log),
             ),
           ),
@@ -264,93 +282,56 @@ class TimelineCard extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final dateStr = _fmtDate(log.maintenanceDate);
+    final technician = log.technicianName ??
+        (log.technicianId.length > 8
+            ? log.technicianId.substring(0, 8)
+            : log.technicianId);
 
-    return InfoCard(
-      padding: const EdgeInsets.all(20),
-      radius: 12,
-      backgroundColor: colors.surfaceContainerLowest,
-      borderColor: Colors.transparent,
-      boxShadow: [
-        BoxShadow(
-          color: colors.onSurface.withValues(alpha: 0.04),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
-        ),
-      ],
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.32)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Date + technician row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                dateStr,
-                style: textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  // Approved uses primary colour, pending uses outline
-                  color: log.isApproved ? colors.primary : colors.outline,
-                  letterSpacing: 0.6,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                decoration: BoxDecoration(
-                  color: colors.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      size: 12,
-                      color: colors.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      log.technicianName ??
-                          (log.technicianId.length > 8
-                              ? log.technicianId.substring(0, 8)
-                              : log.technicianId),
-                      style: textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // Notes text (italic like the Stitch design)
           Text(
-            '"${log.notes ?? 'Not belirtilmemiş'}"',
-            style: textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: colors.onSurface,
-              fontStyle: FontStyle.italic,
-              height: 1.4,
+            dateStr,
+            style: textTheme.labelMedium?.copyWith(
+              color: log.isApproved ? colors.primaryDark : colors.outline,
+              fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 12),
-
-          // Chips row
-          Row(
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            log.notes?.isNotEmpty == true
+                ? log.notes!
+                : 'Bakım notu belirtilmemiş.',
+            style: textTheme.bodyMedium?.copyWith(
+              color: colors.onSurface,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
             children: [
               StatusChip(
-                label: log.isApproved ? 'ONAYLANDI' : 'BEKLİYOR',
+                label: log.isApproved ? 'Onaylandı' : 'Bekliyor',
                 bg: log.isApproved
-                    ? colors
-                          .errorContainer // secondary-container
-                    : colors.surfaceContainer,
-                fg: log.isApproved
-                    ? colors
-                          .onErrorContainer // on-secondary-container
-                    : colors.onSurfaceVariant,
+                    ? colors.primaryFixed.withValues(alpha: 0.72)
+                    : colors.surfaceContainerHigh,
+                fg: log.isApproved ? colors.primaryDark : colors.onSurfaceVariant,
+              ),
+              StatusChip(
+                label: 'Teknisyen: $technician',
+                bg: colors.surfaceContainer,
+                fg: colors.onSurfaceVariant,
               ),
             ],
           ),
@@ -375,18 +356,17 @@ class StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: fg,
-          letterSpacing: 0.4,
-        ),
+              fontWeight: FontWeight.w800,
+              color: fg,
+            ),
       ),
     );
   }

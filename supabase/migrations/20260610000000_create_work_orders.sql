@@ -91,9 +91,9 @@ CREATE POLICY "Customers can see work orders for their elevators" ON work_orders
   FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM elevators
-      WHERE elevators.id = work_orders.elevator_id
-      AND elevators.customer_id = auth.uid()
+      SELECT 1 FROM profiles
+      WHERE profiles.id = auth.uid()
+      AND profiles.role = 'customer'
+      AND profiles.elevator_id = work_orders.elevator_id
     )
-    AND EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'customer')
   );

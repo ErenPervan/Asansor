@@ -94,7 +94,7 @@ class _QrScaffold extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'ElevateOps Pro',
+          'QR Kodu',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: colors.primaryDark,
                 fontWeight: FontWeight.w900,
@@ -102,27 +102,12 @@ class _QrScaffold extends StatelessWidget {
         ),
         centerTitle: false,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.md),
-            child: Row(
-              children: [
-                Text(
-                  'Admin User',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: colors.primary,
-                  foregroundColor: colors.onPrimary,
-                  child: const Icon(Icons.person_rounded, size: 17),
-                ),
-              ],
-            ),
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline_rounded),
+            tooltip: 'Yeni Asansör Ekle',
+            onPressed: () => context.pushReplacement('/admin/add-elevator'),
           ),
+          const SizedBox(width: AppSpacing.sm),
         ],
       ),
       body: SafeArea(
@@ -132,26 +117,16 @@ class _QrScaffold extends StatelessWidget {
             AppSpacing.md,
             AppSpacing.lg,
             AppSpacing.md,
-            AppSpacing.xl,
+            110,
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560),
+              constraints: const BoxConstraints(maxWidth: 620),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      onPressed: () => context.pop(),
-                      icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                      label: const Text('Geri Dön'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
+                  _QrHeroHeader(elevator: elevator),
+                  const SizedBox(height: AppSpacing.lg),
                   _QrCard(elevator: elevator, onPrint: () => _printQr(context)),
                   const SizedBox(height: AppSpacing.lg),
                   TextButton.icon(
@@ -161,7 +136,7 @@ class _QrScaffold extends StatelessWidget {
                     style: TextButton.styleFrom(
                       foregroundColor: colors.secondary,
                       textStyle: Theme.of(context).textTheme.labelLarge
-                          ?.copyWith(fontWeight: FontWeight.w800),
+                          ?.copyWith(fontWeight: FontWeight.w900),
                     ),
                   ),
                 ],
@@ -321,6 +296,140 @@ class _QrScaffold extends StatelessWidget {
     );
 
     return doc.save();
+  }
+}
+
+class _QrHeroHeader extends StatelessWidget {
+  const _QrHeroHeader({required this.elevator});
+
+  final ElevatorModel elevator;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: colors.primaryDark,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: colors.primary.withValues(alpha: 0.16),
+            blurRadius: 34,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -42,
+            top: -54,
+            child: Icon(
+              Icons.qr_code_2_rounded,
+              size: 176,
+              color: colors.onPrimary.withValues(alpha: 0.06),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: colors.onPrimary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Icon(Icons.elevator_rounded, color: colors.onPrimary),
+                  ),
+                  const Spacer(),
+                  _StatusChip(status: elevator.status),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              Text(
+                elevator.buildingName,
+                style: textTheme.headlineMedium?.copyWith(
+                  color: colors.onPrimary,
+                  fontWeight: FontWeight.w900,
+                  height: 1.05,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                elevator.address?.isNotEmpty == true
+                    ? elevator.address!
+                    : 'Adres belirtilmemiş',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colors.onPrimary.withValues(alpha: 0.76),
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                children: [
+                  const _HeroPill(
+                    icon: Icons.qr_code_scanner_rounded,
+                    label: 'Saha taramasına hazır',
+                  ),
+                  if (elevator.maintenanceDay != null)
+                    _HeroPill(
+                      icon: Icons.event_repeat_rounded,
+                      label: 'Her ay ${elevator.maintenanceDay}. gün',
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroPill extends StatelessWidget {
+  const _HeroPill({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+      decoration: BoxDecoration(
+        color: colors.onPrimary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: AppColors.accentGold, size: 16),
+          const SizedBox(width: 7),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colors.onPrimary.withValues(alpha: 0.82),
+                  fontWeight: FontWeight.w900,
+                ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ElevateOps Pro - QR Kod Ekranı</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f7fafd",
+                        "secondary-fixed-dim": "#aacaeb",
+                        "primary-container": "#0f4c81",
+                        "tertiary-container": "#cea62c",
+                        "surface-container": "#ebeef1",
+                        "on-background": "#181c1e",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#beddff",
+                        "secondary": "#43617e",
+                        "tertiary": "#755b00",
+                        "tertiary-fixed": "#ffe08e",
+                        "on-tertiary-fixed-variant": "#584400",
+                        "on-primary-container": "#8ebdf9",
+                        "surface-tint": "#2d6197",
+                        "inverse-primary": "#a0c9ff",
+                        "background": "#f7fafd",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e0e3e6",
+                        "surface": "#f7fafd",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#001c37",
+                        "on-secondary-container": "#43627f",
+                        "surface-container-highest": "#e0e3e6",
+                        "surface-container-low": "#f1f4f7",
+                        "primary-fixed-dim": "#a0c9ff",
+                        "outline-variant": "#c2c7d1",
+                        "on-secondary-fixed": "#001d33",
+                        "tertiary-fixed-dim": "#ecc246",
+                        "surface-dim": "#d7dadd",
+                        "primary-fixed": "#d2e4ff",
+                        "error": "#ba1a1a",
+                        "outline": "#727780",
+                        "inverse-on-surface": "#eef1f4",
+                        "on-tertiary-fixed": "#241a00",
+                        "on-surface": "#181c1e",
+                        "on-tertiary-container": "#4f3d00",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#00355f",
+                        "on-secondary-fixed-variant": "#2a4965",
+                        "surface-container-high": "#e5e8eb",
+                        "secondary-fixed": "#cee5ff",
+                        "on-primary-fixed-variant": "#07497d",
+                        "inverse-surface": "#2d3133",
+                        "on-surface-variant": "#42474f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "20px",
+                        "stack-gap-sm": "8px",
+                        "stack-gap-md": "16px",
+                        "grid-gutter": "16px",
+                        "stack-gap-lg": "24px",
+                        "panel-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Nunito Sans"],
+                        "headline-sm": ["Nunito Sans"],
+                        "body-lg": ["Nunito Sans"],
+                        "label-sm": ["Nunito Sans"],
+                        "body-md": ["Nunito Sans"],
+                        "headline-lg-mobile": ["Nunito Sans"],
+                        "label-lg": ["Nunito Sans"],
+                        "headline-md": ["Nunito Sans"],
+                        "headline-lg": ["Nunito Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "800"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+        body {
+            background-color: #f7fafd; /* background */
+            color: #181c1e; /* on-background */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl docked full-width top-0 sticky border-b border-outline-variant/30 shadow-sm flex justify-between items-center w-full px-container-padding h-16 z-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" data-icon="domain">domain</span>
+<span class="font-headline-md text-headline-md font-extrabold text-primary dark:text-primary-fixed-dim tracking-tight">ElevateOps Pro</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center gap-6">
+<!-- Suppressed navigation as this is a focused task/detail page -->
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Admin User</span>
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- NavigationDrawer (Suppressed for focused task, but structure maintained if needed, hidden here) -->
+<aside class="hidden lg:flex flex-col py-panel-padding bg-surface dark:bg-surface-dim h-screen w-72 fixed left-0 top-0 border-r border-outline-variant/30 shadow-lg z-40 transform -translate-x-full transition-transform">
+<!-- Content -->
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-4xl mx-auto p-container-padding lg:py-stack-gap-lg flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
+<!-- Breadcrumb / Back Navigation -->
+<div class="w-full mb-stack-gap-lg flex items-center">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-body-md" onclick="history.back()">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_back">arrow_back</span>
+                    Geri Dön
+                </button>
+</div>
+<!-- QR Card Container (Glassmorphism/Premium) -->
+<div class="bg-surface-container-lowest rounded-[22px] border border-outline-variant/30 shadow-[0px_10px_30px_rgba(15,76,129,0.06)] w-full max-w-lg overflow-hidden flex flex-col">
+<!-- Card Header: Context & Status -->
+<div class="p-panel-padding border-b border-outline-variant/30 bg-surface-container-low/50">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h1 class="font-headline-md text-headline-md text-primary mb-1">Kule Plaza - Blok A</h1>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                Levent, Büyükdere Cd. No:195, Şişli/İstanbul
+                            </p>
+</div>
+<!-- Status Badge -->
+<div class="bg-tertiary-container/10 text-tertiary-container border border-tertiary-container/20 px-3 py-1 rounded-full flex items-center gap-1.5 whitespace-nowrap">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
+<span class="font-label-sm text-label-sm">Bakım Gerekli</span>
+</div>
+</div>
+</div>
+<!-- Card Body: The QR Code -->
+<div class="p-panel-padding flex flex-col items-center justify-center bg-white">
+<!-- Decorative Frame for QR -->
+<div class="relative p-4 border-2 border-dashed border-outline-variant/50 rounded-xl mb-6 bg-surface-bright group hover:border-primary-container/50 transition-colors">
+<!-- Corner Accents -->
+<div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-primary-container -translate-x-0.5 -translate-y-0.5 rounded-tl-lg"></div>
+<div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-primary-container translate-x-0.5 -translate-y-0.5 rounded-tr-lg"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-primary-container -translate-x-0.5 translate-y-0.5 rounded-bl-lg"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primary-container translate-x-0.5 translate-y-0.5 rounded-br-lg"></div>
+<!-- The QR Image -->
+<img alt="Elevator QR Code" class="w-48 h-48 md:w-56 md:h-56 object-contain mix-blend-multiply filter contrast-125" data-alt="A high-contrast, perfectly crisp QR code graphic designed for industrial printing. The QR code is rendered in deep navy blue on a pristine white background. It is framed within a subtle architectural border, emphasizing precision and reliability. The overall aesthetic is clean, professional, and optimized for quick scanning by technicians in an elevator maintenance context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdOakFFxROdp2mIGHUtnQQNDwhgiQjp9TXO_NteP2XL_5Q7NlCkWNBUrXHpNPkX9WIL_A93zYtoNRk-Vgjn76f5ofA_xwfoXmbXetXnbm_xrjWU790vzirInDzc0WVN1IwyupmuD4YbRIqhHdadpNA2IDF9J74Q4HaOiebk7rvrrTZ2DCVLJfa_Xnc7Kg7X9BBudUHciVCZ0OjDcux_FDWBhTG0K0-M676vcbBQCFgPcMg-Ik1iY6rQvoKfkr-DRsfC7-POWpGLg">
+</div>
+<!-- Elevator ID (Selectable) -->
+<div class="flex flex-col items-center text-center">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-widest mb-1">Asansör ID</span>
+<div class="bg-surface-container py-2 px-4 rounded-lg flex items-center gap-2 group cursor-pointer hover:bg-surface-container-high transition-colors" onclick="copyToClipboard('ELV-A-004')">
+<span class="font-headline-sm text-headline-sm text-primary tracking-wider select-all" id="elevator-id">ELV-A-004</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-sm" data-icon="content_copy">content_copy</span>
+</div>
+<div class="opacity-0 transition-opacity duration-300 font-label-sm text-label-sm text-tertiary-container mt-2" id="copy-toast">Kopyalandı!</div>
+</div>
+</div>
+<!-- Card Footer: Actions -->
+<div class="p-panel-padding border-t border-outline-variant/30 bg-surface-container-lowest flex flex-col sm:flex-row gap-stack-gap-md justify-center">
+<button class="flex-1 bg-primary-container hover:bg-primary text-on-primary-container font-label-lg text-label-lg py-3 px-6 rounded-[16px] shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 active:scale-95">
+<span class="material-symbols-outlined" data-icon="print">print</span>
+                        Yazdır / PDF
+                    </button>
+<button class="flex-1 bg-transparent border-2 border-primary-container text-primary-container hover:bg-primary-container/5 font-label-lg text-label-lg py-3 px-6 rounded-[16px] transition-all duration-200 flex items-center justify-center gap-2 active:scale-95">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+                        Detayına Git
+                    </button>
+</div>
+</div>
+<!-- Tertiary Action -->
+<div class="mt-stack-gap-lg">
+<button class="text-secondary font-label-lg text-label-lg flex items-center gap-2 hover:text-primary transition-colors py-2 px-4 rounded-lg hover:bg-surface-container-low active:scale-95">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                    Yeni Asansör Ekle
+                </button>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Suppressed due to focused intent) -->
+<script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                const toast = document.getElementById('copy-toast');
+                toast.classList.remove('opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('opacity-0');
+                }, 2000);
+            }, function(err) {
+                console.error('Async: Could not copy text: ', err);
+            });
+        }
+    </script>
+</body></html>

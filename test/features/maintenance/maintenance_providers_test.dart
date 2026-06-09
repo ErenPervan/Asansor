@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:asansor/core/providers/connectivity_providers.dart';
 import 'package:asansor/features/maintenance/providers/maintenance_providers.dart';
 
+
 import '../../helpers/provider_test_utils.dart';
 import '../../helpers/test_mocks.dart';
 import '../../helpers/test_factories.dart';
@@ -15,19 +16,26 @@ void main() {
 
   group('pendingMaintenanceProvider', () {
     late MockMaintenanceRepository mockRepo;
-    late FakeReadCacheService fakeCache;
+    late MockReadCacheService mockCache;
+    late MockSyncQueueService mockQueue;
 
     setUp(() {
       mockRepo = MockMaintenanceRepository();
-      fakeCache = FakeReadCacheService();
+      mockCache = MockReadCacheService();
+      mockQueue = MockSyncQueueService();
+      when(() => mockQueue.pendingItemsOfType(any())).thenReturn([]);
+      when(() => mockCache.loadPendingMaintenance()).thenReturn([]);
+      when(() => mockCache.savePendingMaintenance(any())).thenAnswer((_) async => {});
     });
 
     test('offline → cache boşsa boş liste döner', () async {
+      when(() => mockCache.loadPendingMaintenance()).thenReturn([]);
       final container = createContainer(
         overrides: [
           isOnlineProvider.overrideWithValue(false),
           maintenanceRepositoryProvider.overrideWithValue(mockRepo),
-          readCacheServiceProvider.overrideWithValue(fakeCache),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
         ],
       );
 
@@ -49,7 +57,8 @@ void main() {
           overrides: [
             isOnlineProvider.overrideWithValue(true),
             maintenanceRepositoryProvider.overrideWithValue(mockRepo),
-            readCacheServiceProvider.overrideWithValue(fakeCache),
+            readCacheServiceProvider.overrideWithValue(mockCache),
+            syncQueueServiceProvider.overrideWith((ref) => mockQueue),
           ],
         );
 
@@ -65,11 +74,14 @@ void main() {
         () => mockRepo.getAllPendingLogs(),
       ).thenThrow(Exception('Ağ bağlantısı kesildi'));
 
+      when(() => mockCache.loadPendingMaintenance()).thenReturn([]);
+
       final container = createContainer(
         overrides: [
           isOnlineProvider.overrideWithValue(true),
           maintenanceRepositoryProvider.overrideWithValue(mockRepo),
-          readCacheServiceProvider.overrideWithValue(fakeCache),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
         ],
       );
 
@@ -78,23 +90,51 @@ void main() {
         throwsA(isA<Exception>()),
       );
     });
+
+    test('online hata + cache dolu ise cache doner', () async {
+      final cachedLogs = [
+        TestFactories.createMaintenanceLog(id: 'c1', isApproved: false),
+      ];
+      when(() => mockRepo.getAllPendingLogs()).thenThrow(Exception('Ağ hatası'));
+      when(() => mockCache.loadPendingMaintenance()).thenReturn(cachedLogs);
+
+      final container = createContainer(
+        overrides: [
+          isOnlineProvider.overrideWithValue(true),
+          maintenanceRepositoryProvider.overrideWithValue(mockRepo),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
+        ],
+      );
+
+      final result = await container.read(pendingMaintenanceProvider.future);
+      expect(result.length, 1);
+      expect(result.every((f) => !f.isApproved), isTrue);
+      verify(() => mockRepo.getAllPendingLogs()).called(1);
+    });
   });
 
   group('completedTodayCountProvider', () {
     late MockMaintenanceRepository mockRepo;
-    late FakeReadCacheService fakeCache;
+    late MockReadCacheService mockCache;
+    late MockSyncQueueService mockQueue;
 
     setUp(() {
       mockRepo = MockMaintenanceRepository();
-      fakeCache = FakeReadCacheService();
+      mockCache = MockReadCacheService();
+      mockQueue = MockSyncQueueService();
+      when(() => mockCache.loadCompletedTodayCount()).thenReturn(0);
+      when(() => mockCache.saveCompletedTodayCount(any())).thenAnswer((_) async => {});
     });
 
     test('offline → cache boşsa 0 döner', () async {
+      when(() => mockCache.loadCompletedTodayCount()).thenReturn(0);
       final container = createContainer(
         overrides: [
           isOnlineProvider.overrideWithValue(false),
           maintenanceRepositoryProvider.overrideWithValue(mockRepo),
-          readCacheServiceProvider.overrideWithValue(fakeCache),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
         ],
       );
 
@@ -110,7 +150,8 @@ void main() {
         overrides: [
           isOnlineProvider.overrideWithValue(true),
           maintenanceRepositoryProvider.overrideWithValue(mockRepo),
-          readCacheServiceProvider.overrideWithValue(fakeCache),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
         ],
       );
 

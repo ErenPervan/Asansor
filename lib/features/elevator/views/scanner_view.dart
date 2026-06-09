@@ -1,13 +1,13 @@
+import 'package:asansor/core/constants/app_durations.dart';
+import 'package:asansor/core/theme/app_colors.dart';
+import 'package:asansor/core/theme/app_spacing.dart';
+import 'package:asansor/core/widgets/error_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:asansor/core/widgets/error_state.dart';
-
-import 'package:asansor/core/theme/app_colors.dart';
-import 'package:asansor/core/constants/app_durations.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class ScannerView extends ConsumerStatefulWidget {
   const ScannerView({super.key});
@@ -22,6 +22,7 @@ class _ScannerViewState extends ConsumerState<ScannerView>
   late final AnimationController _lineAnim;
 
   bool _isProcessing = false;
+  bool _torchOn = false;
 
   static const _uuidRegex =
       r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}'
@@ -35,11 +36,10 @@ class _ScannerViewState extends ConsumerState<ScannerView>
       facing: CameraFacing.back,
       torchEnabled: false,
     );
-    // Scan-line animation — sweeps top-to-bottom and repeats.
     _lineAnim = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..repeat(reverse: true);
+      duration: const Duration(milliseconds: 2200),
+    )..repeat();
   }
 
   @override
@@ -50,13 +50,11 @@ class _ScannerViewState extends ConsumerState<ScannerView>
   }
 
   Future<void> _onDetect(BarcodeCapture capture) async {
-    // Guard: ignore reads while one is already being processed.
     if (_isProcessing) return;
 
     final rawValue = capture.barcodes.firstOrNull?.rawValue?.trim();
     if (rawValue == null || rawValue.isEmpty) return;
 
-    // Stop the camera immediately so we don't get further reads.
     setState(() => _isProcessing = true);
     await _controller.stop();
 
@@ -70,31 +68,14 @@ class _ScannerViewState extends ConsumerState<ScannerView>
     if (isValidUuid) {
       await HapticFeedback.mediumImpact();
       if (!mounted) return;
-      // Route based on role:
-      // Since customers are guarded from reaching this view, only
-      // technicians and admins will scan QR codes to start maintenance.
       await context.push('/elevator/$rawValue/maintenance/new');
       if (mounted) {
         setState(() => _isProcessing = false);
         await _controller.start();
       }
     } else {
-      await HapticFeedback.heavyImpact();
+      await _showInvalidQr('Geçersiz QR kod. Lütfen bir asansör QR kodu tarayın.');
       if (!mounted) return;
-      final colors = AppThemeColors.of(context);
-      // Invalid payload — show feedback and resume scanning.
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Geçersiz QR kod. Lütfen bir asansör QR kodu tarayın.',
-            ),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: colors.error,
-            duration: AppDurations.snackBarError,
-          ),
-        );
       setState(() => _isProcessing = false);
       await _controller.start();
     }
@@ -113,19 +94,8 @@ class _ScannerViewState extends ConsumerState<ScannerView>
     final rawValue = capture?.barcodes.firstOrNull?.rawValue?.trim();
 
     if (rawValue == null || rawValue.isEmpty) {
-      if (!mounted) return;
-      final colors = AppThemeColors.of(context);
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: const Text('Bu görselde QR kod bulunamadı.'),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: colors.error,
-            duration: AppDurations.snackBarError,
-          ),
-        );
-      setState(() => _isProcessing = false);
+      await _showInvalidQr('Bu görselde QR kod bulunamadı.');
+      if (mounted) setState(() => _isProcessing = false);
       return;
     }
 
@@ -141,32 +111,42 @@ class _ScannerViewState extends ConsumerState<ScannerView>
       await context.push('/elevator/$rawValue/maintenance/new');
       if (mounted) setState(() => _isProcessing = false);
     } else {
-      await HapticFeedback.heavyImpact();
-      if (!mounted) return;
-      final colors = AppThemeColors.of(context);
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Geçersiz QR kod. Lütfen bir asansör QR kodu seçin.',
-            ),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: colors.error,
-            duration: AppDurations.snackBarError,
-          ),
-        );
-      setState(() => _isProcessing = false);
+      await _showInvalidQr('Geçersiz QR kod. Lütfen bir asansör QR kodu seçin.');
+      if (mounted) setState(() => _isProcessing = false);
     }
+  }
+
+  Future<void> _showInvalidQr(String message) async {
+    await HapticFeedback.heavyImpact();
+    if (!mounted) return;
+    final colors = AppThemeColors.of(context);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: colors.error,
+          duration: AppDurations.snackBarError,
+        ),
+      );
+  }
+
+  Future<void> _toggleTorch() async {
+    await _controller.toggleTorch();
+    if (!mounted) return;
+    setState(() => _torchOn = !_torchOn);
   }
 
   @override
   Widget build(BuildContext context) {
     final disableAnims = MediaQuery.disableAnimationsOf(context);
+    final colors = AppThemeColors.of(context);
+
     if (disableAnims && _lineAnim.isAnimating) {
       _lineAnim.stop();
     } else if (!disableAnims && !_lineAnim.isAnimating && !_isProcessing) {
-      _lineAnim.repeat(reverse: true);
+      _lineAnim.repeat();
     }
 
     return Scaffold(
@@ -174,7 +154,6 @@ class _ScannerViewState extends ConsumerState<ScannerView>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // ── Full-screen camera feed ──────────────────────────────────────
           MobileScanner(
             controller: _controller,
             onDetect: _onDetect,
@@ -184,14 +163,12 @@ class _ScannerViewState extends ConsumerState<ScannerView>
                 body: ErrorState(
                   message:
                       error.errorCode == MobileScannerErrorCode.permissionDenied
-                      ? "Kamera izni gerekli — Ayarlar'dan izin verin."
-                      : 'Kamera başlatılamadı: ${error.errorCode.name}',
+                          ? "Kamera izni gerekli. Ayarlar'dan izin verin."
+                          : 'Kamera başlatılamadı: ${error.errorCode.name}',
                 ),
               );
             },
           ),
-
-          // ── Animated overlay with transparent cutout ────────────────────
           AnimatedBuilder(
             animation: _lineAnim,
             builder: (context, child) => RepaintBoundary(
@@ -199,85 +176,137 @@ class _ScannerViewState extends ConsumerState<ScannerView>
                 painter: _ScanOverlayPainter(
                   scanLineProgress: _lineAnim.value,
                   isProcessing: _isProcessing,
-                  primaryColor: AppThemeColors.of(context).primary,
-                  successColor: AppThemeColors.of(context).success,
+                  primaryColor: colors.primary,
+                  successColor: colors.success,
                   showScanLine: !disableAnims,
                 ),
               ),
             ),
           ),
-
-          // ── Top controls: back + torch ───────────────────────────────────
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.sm,
+                AppSpacing.md,
+                0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _CircleIconButton(
-                    icon: Icons.arrow_back,
+                  _GlassCircleButton(
+                    icon: Icons.arrow_back_rounded,
                     tooltip: 'Geri',
                     onTap: () => context.pop(),
                   ),
-                  Row(
-                    children: [
-                      _CircleIconButton(
-                        icon: Icons.photo_library_outlined,
-                        tooltip: 'Galeriden Seç',
-                        onTap: _pickImage,
-                      ),
-                      const SizedBox(width: 12),
-                      _CircleIconButton(
-                        icon: Icons.flashlight_on_outlined,
-                        tooltip: 'Fener',
-                        onTap: () => _controller.toggleTorch(),
-                      ),
-                    ],
+                  _GlassCircleButton(
+                    icon: _torchOn
+                        ? Icons.flashlight_on_rounded
+                        : Icons.flashlight_off_rounded,
+                    tooltip: 'Fener',
+                    accent: _torchOn ? AppColors.accentGold : null,
+                    onTap: _toggleTorch,
                   ),
                 ],
               ),
             ),
           ),
-
-          // ── Instruction label below the cutout ──────────────────────────
           Align(
-            alignment: const Alignment(0, 0.52),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: _isProcessing
-                  ? _label('İşleniyor...', key: const ValueKey('proc'))
-                  : _label(
-                      'QR kodu kareye hizalayın',
-                      key: const ValueKey('idle'),
-                    ),
+            alignment: Alignment.bottomCenter,
+            child: _ScannerBottomPanel(
+              isProcessing: _isProcessing,
+              onPickImage: _pickImage,
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _label(String text, {required Key key}) {
-    return Container(
-      key: key,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.55),
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+class _ScannerBottomPanel extends StatelessWidget {
+  const _ScannerBottomPanel({
+    required this.isProcessing,
+    required this.onPickImage,
+  });
+
+  final bool isProcessing;
+  final VoidCallback onPickImage;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(24, 84, 24, 26),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.transparent,
+              Colors.black.withValues(alpha: 0.62),
+              Colors.black.withValues(alpha: 0.9),
+            ],
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: Column(
+                key: ValueKey(isProcessing),
+                children: [
+                  Text(
+                    isProcessing ? 'QR İşleniyor' : 'QR Kodu Taratın',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    isProcessing
+                        ? 'Asansör kaydı doğrulanıyor.'
+                        : 'Asansör etiketindeki karekodu çerçevenin içine hizalayın.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.72),
+                          fontWeight: FontWeight.w600,
+                          height: 1.35,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            OutlinedButton.icon(
+              onPressed: isProcessing ? null : onPickImage,
+              icon: const Icon(Icons.photo_library_outlined),
+              label: const Text('Galeriden Seç'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                disabledForegroundColor: Colors.white.withValues(alpha: 0.42),
+                backgroundColor: Colors.white.withValues(alpha: 0.1),
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.18)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
-// ── Scan overlay ─────────────────────────────────────────────────────────────
 
 class _ScanOverlayPainter extends CustomPainter {
   const _ScanOverlayPainter({
@@ -294,9 +323,9 @@ class _ScanOverlayPainter extends CustomPainter {
   final Color successColor;
   final bool showScanLine;
 
-  static const double _cutout = 280;
-  static const double _radius = 16;
-  static const double _bracketLen = 36;
+  static const double _cutout = 260;
+  static const double _radius = 18;
+  static const double _bracketLen = 40;
   static const double _bracketStroke = 4;
 
   @override
@@ -308,31 +337,42 @@ class _ScanOverlayPainter extends CustomPainter {
       height: _cutout,
     );
 
-    // ── Semi-transparent overlay, punched out in the centre ───────────────
     canvas.saveLayer(Offset.zero & size, Paint());
-
     canvas.drawRect(
       Offset.zero & size,
-      Paint()..color = Colors.black.withValues(alpha: 0.68),
+      Paint()..color = Colors.black.withValues(alpha: 0.82),
     );
-
     canvas.drawRRect(
       RRect.fromRectAndRadius(rect, const Radius.circular(_radius)),
       Paint()..blendMode = BlendMode.clear,
     );
-
     canvas.restore();
 
-    // ── Animated scan line (hidden while processing) ──────────────────────
+    final activeColor = isProcessing ? successColor : primaryColor;
+    final cornerPaint = Paint()
+      ..color = activeColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = _bracketStroke
+      ..strokeCap = StrokeCap.round;
+
+    _corner(canvas, cornerPaint, rect.left, rect.top, 1, 1);
+    _corner(canvas, cornerPaint, rect.right, rect.top, -1, 1);
+    _corner(canvas, cornerPaint, rect.left, rect.bottom, 1, -1);
+    _corner(canvas, cornerPaint, rect.right, rect.bottom, -1, -1);
+
     if (!isProcessing && showScanLine) {
       final lineY = rect.top + scanLineProgress * rect.height;
       final shader = LinearGradient(
-        colors: [Colors.transparent, primaryColor, Colors.transparent],
+        colors: [
+          Colors.transparent,
+          activeColor.withValues(alpha: 0.92),
+          Colors.transparent,
+        ],
       ).createShader(Rect.fromLTWH(rect.left, lineY - 1, rect.width, 2));
 
       canvas.drawLine(
-        Offset(rect.left + 12, lineY),
-        Offset(rect.right - 12, lineY),
+        Offset(rect.left + 14, lineY),
+        Offset(rect.right - 14, lineY),
         Paint()
           ..shader = shader
           ..strokeWidth = 2.5
@@ -340,23 +380,23 @@ class _ScanOverlayPainter extends CustomPainter {
       );
     }
 
-    // ── Corner brackets ───────────────────────────────────────────────────
-    final bracketColor = isProcessing ? successColor : primaryColor;
-
-    final paint = Paint()
-      ..color = bracketColor
+    final reticlePaint = Paint()
+      ..color = activeColor.withValues(alpha: 0.26)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = _bracketStroke
+      ..strokeWidth = 1.5
       ..strokeCap = StrokeCap.round;
-
-    _corner(canvas, paint, rect.left, rect.top, 1, 1);
-    _corner(canvas, paint, rect.right, rect.top, -1, 1);
-    _corner(canvas, paint, rect.left, rect.bottom, 1, -1);
-    _corner(canvas, paint, rect.right, rect.bottom, -1, -1);
+    canvas.drawLine(
+      Offset(center.dx - 12, center.dy),
+      Offset(center.dx + 12, center.dy),
+      reticlePaint,
+    );
+    canvas.drawLine(
+      Offset(center.dx, center.dy - 12),
+      Offset(center.dx, center.dy + 12),
+      reticlePaint,
+    );
   }
 
-  /// Draws an L-shaped corner bracket at ([x], [y]).
-  /// [hd] and [vd] are ±1 direction multipliers.
   void _corner(Canvas c, Paint p, double x, double y, double hd, double vd) {
     c.drawLine(Offset(x, y), Offset(x + hd * _bracketLen, y), p);
     c.drawLine(Offset(x, y), Offset(x, y + vd * _bracketLen), p);
@@ -365,21 +405,22 @@ class _ScanOverlayPainter extends CustomPainter {
   @override
   bool shouldRepaint(_ScanOverlayPainter old) =>
       old.scanLineProgress != scanLineProgress ||
-      old.isProcessing != isProcessing;
+      old.isProcessing != isProcessing ||
+      old.showScanLine != showScanLine;
 }
 
-// ── Shared button widget ──────────────────────────────────────────────────────
-
-class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({
+class _GlassCircleButton extends StatelessWidget {
+  const _GlassCircleButton({
     required this.icon,
     required this.onTap,
     required this.tooltip,
+    this.accent,
   });
 
   final IconData icon;
   final VoidCallback onTap;
   final String tooltip;
+  final Color? accent;
 
   @override
   Widget build(BuildContext context) {
@@ -389,14 +430,27 @@ class _CircleIconButton extends StatelessWidget {
       child: Tooltip(
         message: tooltip,
         child: Material(
-          color: Colors.black54,
+          color: Colors.white.withValues(alpha: 0.18),
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.all(13),
-              child: Icon(icon, color: Colors.white, size: 22),
+            child: Container(
+              width: 50,
+              height: 50,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Icon(icon, color: accent ?? Colors.white, size: 23),
             ),
           ),
         ),

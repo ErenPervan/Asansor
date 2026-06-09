@@ -36,7 +36,8 @@ class FaultRepository implements IFaultRepository {
       final response = await _client
           .from(_table)
           .select()
-          .order('reported_at', ascending: false);
+          .order('reported_at', ascending: false)
+          .limit(1000);
 
       return (response as List<dynamic>)
           .map(
@@ -198,7 +199,8 @@ class FaultRepository implements IFaultRepository {
           .from(_table)
           .select()
           .eq('is_resolved', false)
-          .order('reported_at', ascending: false);
+          .order('reported_at', ascending: false)
+          .limit(1000);
 
       return (response as List<dynamic>)
           .map(

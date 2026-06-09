@@ -1,0 +1,259 @@
+<!DOCTYPE html><html class="light" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ElevatePro - Asansör Filosu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#07497d",
+                        "on-background": "#181c1e",
+                        "primary-container": "#0f4c81",
+                        "background": "#f7fafd",
+                        "surface-dim": "#d7dadd",
+                        "on-tertiary-container": "#4f3d00",
+                        "inverse-surface": "#2d3133",
+                        "on-primary": "#ffffff",
+                        "outline": "#727780",
+                        "on-secondary-fixed": "#001d33",
+                        "on-secondary-fixed-variant": "#2a4965",
+                        "on-primary-container": "#8ebdf9",
+                        "inverse-on-surface": "#eef1f4",
+                        "secondary-fixed-dim": "#aacaeb",
+                        "on-surface": "#181c1e",
+                        "primary-fixed-dim": "#a0c9ff",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c2c7d1",
+                        "surface-tint": "#2d6197",
+                        "surface-container-highest": "#e0e3e6",
+                        "surface-container-low": "#f1f4f7",
+                        "surface-container-high": "#e5e8eb",
+                        "secondary": "#43617e",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#001c37",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f7fafd",
+                        "on-tertiary-fixed-variant": "#584400",
+                        "tertiary-container": "#cea62c",
+                        "inverse-primary": "#a0c9ff",
+                        "primary-fixed": "#d2e4ff",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ecc246",
+                        "secondary-fixed": "#cee5ff",
+                        "on-tertiary-fixed": "#241a00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#43627f",
+                        "primary": "#00355f",
+                        "surface": "#f7fafd",
+                        "tertiary": "#755b00",
+                        "tertiary-fixed": "#ffe08e",
+                        "surface-container": "#ebeef1",
+                        "surface-variant": "#e0e3e6",
+                        "on-surface-variant": "#42474f",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#beddff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-lg": "24px",
+                        "panel-padding": "24px",
+                        "stack-gap-sm": "8px",
+                        "grid-gutter": "16px",
+                        "stack-gap-md": "16px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Nunito Sans"],
+                        "headline-sm": ["Nunito Sans"],
+                        "label-sm": ["Nunito Sans"],
+                        "label-lg": ["Nunito Sans"],
+                        "display-lg": ["Nunito Sans"],
+                        "body-md": ["Nunito Sans"],
+                        "body-lg": ["Nunito Sans"],
+                        "headline-lg-mobile": ["Nunito Sans"],
+                        "headline-lg": ["Nunito Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "800" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg pb-[100px] antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-on-background/80 backdrop-blur-xl border-b border-outline-variant/30 dark:border-outline/20 shadow-sm flex justify-between items-center px-container-padding h-16 w-full">
+<button class="text-primary dark:text-primary-fixed-dim hover:bg-primary-container/10 transition-colors active:scale-95 duration-200 p-2 -ml-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">domain</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile text-primary dark:text-primary-fixed-dim tracking-tight">ElevatePro</h1>
+<button class="text-primary dark:text-primary-fixed-dim hover:bg-primary-container/10 transition-colors active:scale-95 duration-200 p-2 -mr-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</nav>
+<!-- Main Content -->
+<main class="pt-[88px] px-container-padding flex flex-col gap-stack-gap-lg max-w-3xl mx-auto">
+<!-- Header & Search Section -->
+<header class="flex flex-col gap-stack-gap-md">
+<div class="flex justify-between items-end">
+<div>
+<p class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider mb-1">Filo Yönetimi</p>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Tesis &amp; Asansörler</h2>
+</div>
+<div class="text-right">
+<span class="font-display-lg text-display-lg text-primary-container leading-none">124</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Toplam Ünite</p>
+</div>
+</div>
+<!-- Search Input -->
+<div class="relative group mt-2">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary-container transition-colors">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-[14px] py-4 pl-12 pr-4 font-body-md text-body-md text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary-container focus:bg-surface-container-lowest transition-all shadow-sm" placeholder="Bina, adres veya ünite no ara..." type="text">
+</div>
+</header>
+<!-- Filter Chips (Scrollable) -->
+<section class="flex gap-3 overflow-x-auto hide-scrollbar -mx-container-padding px-container-padding pb-2">
+<button class="whitespace-nowrap rounded-full px-5 py-2 font-label-lg text-label-lg bg-primary-container text-on-primary shadow-sm transition-transform active:scale-95">Tümü</button>
+<button class="whitespace-nowrap rounded-full px-5 py-2 font-label-lg text-label-lg bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-highest/80 transition-colors active:scale-95">Aktif (98)</button>
+<button class="whitespace-nowrap rounded-full px-5 py-2 font-label-lg text-label-lg bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-highest/80 transition-colors active:scale-95 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-error inline-block"></span> Arızalı (5)</button>
+<button class="whitespace-nowrap rounded-full px-5 py-2 font-label-lg text-label-lg bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-highest/80 transition-colors active:scale-95 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-tertiary inline-block"></span> Bakımda (12)</button>
+<button class="whitespace-nowrap rounded-full px-5 py-2 font-label-lg text-label-lg bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-highest/80 transition-colors active:scale-95">Pasif (9)</button>
+</section>
+<!-- Fleet Grid / List -->
+<section class="flex flex-col gap-stack-gap-md pb-8">
+<!-- Card 1: Active -->
+<article class="group bg-surface-container-lowest rounded-[22px] border border-outline-variant/30 shadow-[0px_10px_30px_rgba(15,76,129,0.06)] p-panel-padding flex flex-col gap-4 relative overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-300 hover:shadow-[0px_15px_40px_rgba(15,76,129,0.12)] hover:border-primary-container/30">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary-container transition-colors">Sapphire Plaza (A Blok)</h3>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span class="font-body-md text-body-md">Levent, Beşiktaş</span>
+</div>
+</div>
+<div class="bg-surface-container-low text-primary-container px-3 py-1 rounded-full flex items-center gap-1.5 border border-primary-container/10">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm">Aktif (4 Ünite)</span>
+</div>
+</div>
+<div class="w-full h-[1px] bg-outline-variant/20"></div>
+<div class="flex justify-between items-center mt-1">
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-body-md text-body-md text-sm">Son Bakım: 12 Eki 2023</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary-container group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- Card 2: Error -->
+<article class="group bg-surface-container-lowest rounded-[22px] border border-outline-variant/30 shadow-[0px_10px_30px_rgba(15,76,129,0.06)] p-panel-padding flex flex-col gap-4 relative overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-300 hover:shadow-[0px_15px_40px_rgba(15,76,129,0.12)] hover:border-error/30">
+<div class="absolute top-0 left-0 w-1 h-full bg-error rounded-l-[22px]"></div>
+<div class="flex justify-between items-start pl-2">
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary-container transition-colors">Metrocity İş Merkezi</h3>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span class="font-body-md text-body-md">Şişli, İstanbul</span>
+</div>
+</div>
+<div class="bg-error-container/50 text-on-error-container px-3 py-1 rounded-full flex items-center gap-1.5 border border-error/20">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+<span class="font-label-sm text-label-sm">Arıza Tespit Edildi</span>
+</div>
+</div>
+<div class="w-full h-[1px] bg-outline-variant/20 ml-2"></div>
+<div class="flex justify-between items-center mt-1 pl-2">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-error mb-0.5">Asansör #2 - Kabin Kapısı Sensörü</span>
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-body-md text-body-md text-sm">2 saat önce bildirildi</span>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary-container group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- Card 3: Maintenance -->
+<article class="group bg-surface-container-lowest rounded-[22px] border border-outline-variant/30 shadow-[0px_10px_30px_rgba(15,76,129,0.06)] p-panel-padding flex flex-col gap-4 relative overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-300 hover:shadow-[0px_15px_40px_rgba(15,76,129,0.12)] hover:border-tertiary/30">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary-container transition-colors">Akasya Konutları (C Blok)</h3>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span class="font-body-md text-body-md">Üsküdar, İstanbul</span>
+</div>
+</div>
+<div class="bg-tertiary-container/30 text-on-tertiary-container px-3 py-1 rounded-full flex items-center gap-1.5 border border-tertiary/20">
+<span class="material-symbols-outlined text-[14px]">build_circle</span>
+<span class="font-label-sm text-label-sm">Periyodik Bakım</span>
+</div>
+</div>
+<div class="w-full h-[1px] bg-outline-variant/20"></div>
+<div class="flex justify-between items-center mt-1">
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-[18px]">engineering</span>
+<span class="font-body-md text-body-md text-sm">Ekip sahada (Ahmet Y.)</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary-container group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</div>
+</article>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe bg-surface/80 dark:bg-on-background/80 shadow-[0px_-10px_30px_rgba(15,76,129,0.06)] z-50 rounded-t-xl backdrop-blur-xl md:hidden">
+<!-- Dashboard (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-2 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-90 duration-300 ease-out group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:animate-pulse" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<!-- Asansörler (Active - Semantic Match for Fleet/List) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-5 py-1.5 transition-all shadow-sm" href="#">
+<span class="material-symbols-outlined mb-0.5" style="font-variation-settings: 'FILL' 1;">elevator</span>
+<span class="font-label-sm text-label-sm">Asansörler</span>
+</a>
+<!-- Arızalar (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-2 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-90 duration-300 ease-out group" href="#">
+<div class="relative">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">build</span>
+<span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-error rounded-full border border-surface"></span>
+</div>
+<span class="font-label-sm text-label-sm">Arızalar</span>
+</a>
+<!-- Profil (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-2 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-90 duration-300 ease-out group" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm">Profil</span>
+</a>
+</nav>
+</body></html>

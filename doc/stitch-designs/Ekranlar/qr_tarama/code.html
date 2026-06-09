@@ -1,0 +1,212 @@
+<!DOCTYPE html><html lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ElevatePro - QR Scan</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@100..900&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#07497d",
+                      "on-background": "#181c1e",
+                      "primary-container": "#0f4c81",
+                      "background": "#f7fafd",
+                      "surface-dim": "#d7dadd",
+                      "on-tertiary-container": "#4f3d00",
+                      "inverse-surface": "#2d3133",
+                      "on-primary": "#ffffff",
+                      "outline": "#727780",
+                      "on-secondary-fixed": "#001d33",
+                      "on-secondary-fixed-variant": "#2a4965",
+                      "on-primary-container": "#8ebdf9",
+                      "inverse-on-surface": "#eef1f4",
+                      "secondary-fixed-dim": "#aacaeb",
+                      "on-surface": "#181c1e",
+                      "primary-fixed-dim": "#a0c9ff",
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c2c7d1",
+                      "surface-tint": "#2d6197",
+                      "surface-container-highest": "#e0e3e6",
+                      "surface-container-low": "#f1f4f7",
+                      "surface-container-high": "#e5e8eb",
+                      "secondary": "#43617e",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed": "#001c37",
+                      "error": "#ba1a1a",
+                      "surface-bright": "#f7fafd",
+                      "on-tertiary-fixed-variant": "#584400",
+                      "tertiary-container": "#cea62c",
+                      "inverse-primary": "#a0c9ff",
+                      "primary-fixed": "#d2e4ff",
+                      "on-tertiary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed-dim": "#ecc246",
+                      "secondary-fixed": "#cee5ff",
+                      "on-tertiary-fixed": "#241a00",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#43627f",
+                      "primary": "#00355f",
+                      "surface": "#f7fafd",
+                      "tertiary": "#755b00",
+                      "tertiary-fixed": "#ffe08e",
+                      "surface-container": "#ebeef1",
+                      "surface-variant": "#e0e3e6",
+                      "on-surface-variant": "#42474f",
+                      "on-secondary": "#ffffff",
+                      "secondary-container": "#beddff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-gap-lg": "24px",
+                      "panel-padding": "24px",
+                      "stack-gap-sm": "8px",
+                      "grid-gutter": "16px",
+                      "stack-gap-md": "16px",
+                      "container-padding": "20px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Nunito Sans"],
+                      "headline-sm": ["Nunito Sans"],
+                      "label-sm": ["Nunito Sans"],
+                      "label-lg": ["Nunito Sans"],
+                      "display-lg": ["Nunito Sans"],
+                      "body-md": ["Nunito Sans"],
+                      "body-lg": ["Nunito Sans"],
+                      "headline-lg-mobile": ["Nunito Sans"],
+                      "headline-lg": ["Nunito Sans"]
+              },
+              "fontSize": {
+                      "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "800" }],
+                      "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                      "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                      "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                      "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                      "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                      "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                      "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                      "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800" }]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Custom Animations & Shapes for Scanner */
+        @keyframes scanLine {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(240px); opacity: 0; } /* Matches scanner frame height approx */
+        }
+        
+        .animate-scan-line {
+            animation: scanLine 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        .scanner-corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-color: #0f4c81; /* primary-container */
+            border-style: solid;
+            transition: all 0.3s ease;
+        }
+
+        .corner-tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; border-top-left-radius: 16px; }
+        .corner-tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; border-top-right-radius: 16px; }
+        .corner-bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; border-bottom-left-radius: 16px; }
+        .corner-br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; border-bottom-right-radius: 16px; }
+
+        /* Pulse effect for corners to feel active */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(15, 76, 129, 0); }
+            50% { box-shadow: 0 0 15px 2px rgba(15, 76, 129, 0.4) inset; }
+        }
+        .pulse-active {
+            animation: pulse-glow 3s infinite;
+        }
+    </style>
+</head>
+<body class="bg-on-background m-0 p-0 overflow-hidden font-sans select-none antialiased text-on-surface">
+<!-- Main Container: Full Screen Camera View -->
+<main class="relative w-screen h-screen overflow-hidden flex flex-col">
+<!-- Camera Background Image Simulation -->
+<div class="absolute inset-0 w-full h-full bg-cover bg-center z-0" data-alt="A first-person view through a smartphone camera pointing at a modern, brushed metal elevator control panel. The lighting is slightly dim, emphasizing the metallic textures and industrial setting. The overall mood is technical, precise, and professional, aligning with a premium maintenance software interface. The color palette is dominated by cool greys, subtle navy shadows, and a clean, high-tech aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAg3wiZvax2a24eNi7mLCosFG_5AU1R3JMTrViS4NLf-Bc3vlNGocEQ0APxJKsXDg6njtzkJqJ4HJrMjfrkARtrC6bstp4Uk8fXLwIlPIi3kjPe0F2f7BKhxNH7d00XKeQ-M9D_1OLpNuJ3_GogQX5pvUKkyi34BsBRGG9AaLySv2Z8mBkcVHwAEVNNFQfjc6NXcvvBetu_Tv4Yb59zgSyzlpYgCTx_wyk859jW0M4PRoFHmHxTGXah811-C9bOUQkOtG55Fi22eA');">
+</div>
+<!-- Overlay & Cutout Area -->
+<!-- Using a massive box shadow to create the darkened area outside the clear scanning box -->
+<div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+<div class="relative w-[260px] h-[260px] rounded-[18px] shadow-[0_0_0_9999px_rgba(24,28,30,0.85)] pulse-active bg-transparent">
+<!-- Viewfinder Corners -->
+<div class="scanner-corner corner-tl"></div>
+<div class="scanner-corner corner-tr"></div>
+<div class="scanner-corner corner-bl"></div>
+<div class="scanner-corner corner-br"></div>
+<!-- Animated Scan Line -->
+<div class="absolute top-0 left-0 w-full h-[2px] bg-primary-container shadow-[0_0_8px_rgba(15,76,129,0.8)] animate-scan-line z-20"></div>
+<!-- Subtle targeting reticle inside -->
+<div class="absolute inset-0 flex items-center justify-center opacity-30">
+<span class="material-symbols-outlined text-primary-container text-4xl" style="font-variation-settings: 'wght' 200;">add</span>
+</div>
+</div>
+</div>
+<!-- Top Controls (Floating Header) -->
+<header class="relative z-50 w-full px-container-padding pt-12 pb-4 flex justify-between items-center">
+<!-- Back Button -->
+<button aria-label="Geri" class="w-12 h-12 rounded-full bg-surface/20 backdrop-blur-xl border border-surface/30 flex items-center justify-center text-on-primary shadow-lg active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<!-- Flashlight Toggle -->
+<button aria-label="Fener" class="w-12 h-12 rounded-full bg-surface/20 backdrop-blur-xl border border-surface/30 flex items-center justify-center text-on-primary shadow-lg active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-[24px]">flashlight_off</span>
+</button>
+</header>
+<!-- Spacer to push bottom controls down -->
+<div class="flex-grow"></div>
+<!-- Bottom Controls & Instructions -->
+<div class="relative z-50 w-full px-container-padding pb-12 flex flex-col items-center gap-stack-gap-lg bg-gradient-to-t from-on-background/90 to-transparent pt-16">
+<!-- Instruction Text -->
+<div class="text-center max-w-[280px]">
+<h2 class="font-headline-sm text-headline-sm text-on-primary mb-2">QR Kodu Taratın</h2>
+<p class="font-body-md text-body-md text-outline-variant">
+                    Asansör etiketindeki veya paneldeki karekodu çerçevenin içine hizalayın.
+                </p>
+</div>
+<!-- Gallery Action Button -->
+<button class="mt-4 flex items-center gap-2 px-6 py-3.5 rounded-full bg-surface/10 backdrop-blur-xl border border-surface/20 text-on-primary shadow-[0px_10px_30px_rgba(0,0,0,0.2)] hover:bg-surface/20 active:scale-95 transition-all duration-300 group">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">photo_library</span>
+<span class="font-label-lg text-label-lg">Galeriden Seç</span>
+</button>
+</div>
+</main>
+<script>
+        // Simple script to toggle flashlight icon visually for the prototype
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashlightBtn = document.querySelector('button[aria-label="Fener"]');
+            const icon = flashlightBtn.querySelector('.material-symbols-outlined');
+            
+            flashlightBtn.addEventListener('click', () => {
+                if (icon.textContent === 'flashlight_off') {
+                    icon.textContent = 'flashlight_on';
+                    icon.classList.add('text-tertiary-fixed'); // Add a yellowish tint when on
+                } else {
+                    icon.textContent = 'flashlight_off';
+                    icon.classList.remove('text-tertiary-fixed');
+                }
+            });
+        });
+    </script>
+</body></html>

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model
@@ -48,7 +49,7 @@ class ConflictReport {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
-  SupabaseClient get _client => Supabase.instance.client;
+  SupabaseClient get _client => ref.read(supabaseClientProvider);
 
   @override
   Future<List<ConflictReport>> build() => _fetchPending();

@@ -1,26 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:go_router/go_router.dart';
-
-import 'package:intl/intl.dart';
-
-import 'package:asansor/features/elevator/providers/elevator_providers.dart';
-
-import 'package:asansor/features/fault/models/fault_report_model.dart';
-
-import 'package:asansor/features/fault/providers/fault_providers.dart';
-
+import 'package:asansor/core/constants/app_durations.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
-import 'package:asansor/core/widgets/info_card.dart';
 import 'package:asansor/core/widgets/loading_state.dart';
-import 'package:asansor/core/widgets/app_section_header.dart';
-import 'package:asansor/core/constants/app_durations.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/fault/models/fault_report_model.dart';
+import 'package:asansor/features/fault/providers/fault_providers.dart';
 import 'package:confetti/confetti.dart';
-// ── Local colour tokens (matches global theme) ──────────────────────────────
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:asansor/features/fault/widgets/fault_detail/elevator_side_panel.dart';
+import 'package:asansor/features/fault/widgets/fault_detail/fault_action_bar.dart';
+import 'package:asansor/features/fault/widgets/fault_detail/fault_title_block.dart';
+import 'package:asansor/features/fault/widgets/fault_detail/main_fault_column.dart';
 
 class FaultDetailView extends ConsumerWidget {
   const FaultDetailView({super.key, required this.faultId});
@@ -32,98 +26,21 @@ class FaultDetailView extends ConsumerWidget {
     final faultAsync = ref.watch(faultByIdProvider(faultId));
 
     return faultAsync.when(
-      loading: () => Scaffold(
-        backgroundColor: AppThemeColors.of(context).background,
-        appBar: AppBar(
-          backgroundColor: AppThemeColors.of(context).background,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: AppThemeColors.of(context).primary,
-            ),
-            tooltip: 'Geri',
-            onPressed: () => context.pop(),
-          ),
-          title: Text(
-            'Arıza Detayı',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppThemeColors.of(context).onSurface,
-              letterSpacing: -0.2,
-            ),
-          ),
-          centerTitle: false,
-        ),
-        body: const Padding(
-          padding: EdgeInsets.all(AppSpacing.md),
-          child: LoadingState(isList: false),
-        ),
+      loading: () => _FaultShell(
+        title: 'Arıza Detayı',
+        child: const LoadingState(isList: false),
       ),
-      error: (e, _) => Scaffold(
-        backgroundColor: AppThemeColors.of(context).background,
-        appBar: AppBar(
-          backgroundColor: AppThemeColors.of(context).background,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: AppThemeColors.of(context).primary,
-            ),
-            tooltip: 'Geri',
-            onPressed: () => context.pop(),
-          ),
-          title: Text(
-            'Arıza Detayı',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppThemeColors.of(context).onSurface,
-              letterSpacing: -0.2,
-            ),
-          ),
-          centerTitle: false,
-        ),
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: AppThemeColors.of(context).primary,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Arıza yüklenemedi',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppThemeColors.of(context).onSurface,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                e.toString(),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppThemeColors.of(context).onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              FilledButton(
-                onPressed: () => ref.invalidate(faultByIdProvider(faultId)),
-                child: const Text('Tekrar Dene'),
-              ),
-            ],
-          ),
+      error: (e, _) => _FaultShell(
+        title: 'Arıza Detayı',
+        child: _FaultLoadError(
+          error: e.toString(),
+          onRetry: () => ref.invalidate(faultByIdProvider(faultId)),
         ),
       ),
       data: (fault) => _FaultDetailScaffold(fault: fault),
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _FaultDetailScaffold extends ConsumerStatefulWidget {
   const _FaultDetailScaffold({required this.fault});
@@ -137,7 +54,6 @@ class _FaultDetailScaffold extends ConsumerStatefulWidget {
 
 class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
   final _notesController = TextEditingController();
-  bool _notesExpanded = false;
   late final ConfettiController _confettiController;
 
   @override
@@ -146,6 +62,7 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     _confettiController = ConfettiController(
       duration: const Duration(seconds: 2),
     );
+    _notesController.text = widget.fault.resolutionNotes ?? '';
   }
 
   @override
@@ -160,331 +77,105 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     final fault = widget.fault;
     final elevatorAsync = ref.watch(elevatorByIdProvider(fault.elevatorId));
     final updateState = ref.watch(faultUpdateControllerProvider);
-
-    final elevatorName = elevatorAsync.valueOrNull?.buildingName ?? '—';
-    final elevatorAddress = elevatorAsync.valueOrNull?.address ?? '';
-
     final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
-    final baseHeight = (screenHeight * 0.22).clamp(180.0, 240.0);
-    final expandedHeight = (baseHeight * textScale).clamp(180.0, 320.0);
 
     return Scaffold(
       backgroundColor: colors.background,
+      appBar: AppBar(
+        backgroundColor: colors.surface.withValues(alpha: 0.92),
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, color: colors.onSurfaceVariant),
+          tooltip: 'Geri',
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          'Asansor',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: colors.primaryDark,
+                fontWeight: FontWeight.w800,
+              ),
+        ),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            child: Center(
+              child: Text(
+                'Operasyon',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
-          CustomScrollView(
-            slivers: [
-              // ── App bar with status gradient ─────────────────────────────
-              SliverAppBar(
-                expandedHeight: expandedHeight,
-                pinned: true,
-                backgroundColor: fault.isResolved
-                    ? colors.success
-                    : colors.primary,
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: colors.onPrimary),
-                  tooltip: 'Geri',
-                  onPressed: () => context.pop(),
-                ),
-                actions: [
-                  if (!fault.isResolved)
-                    IconButton(
-                      tooltip: 'Asansöre Git',
-                      icon: Icon(
-                        Icons.elevator_outlined,
-                        color: colors.onPrimary,
-                      ),
-                      onPressed: () =>
-                          context.push('/elevator/${fault.elevatorId}'),
-                    ),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  background: _StatusHeader(
-                    isResolved: fault.isResolved,
-                    reportedAt: fault.reportedAt,
-                    resolvedAt: fault.resolvedAt,
+          Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    AppSpacing.lg,
+                    AppSpacing.md,
+                    AppSpacing.lg,
                   ),
-                ),
-                title: Text(
-                  'Arıza Detayı',
-                  style: textTheme.titleMedium?.copyWith(
-                    color: colors.onPrimary,
-                    fontWeight: FontWeight.w700,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1120),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FaultTitleBlock(fault: fault),
+                          const SizedBox(height: AppSpacing.lg),
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final isWide = constraints.maxWidth >= 880;
+                              final main = MainFaultColumn(
+                                fault: fault,
+                                notesController: _notesController,
+                              );
+                              final side = ElevatorSidePanel(
+                                fault: fault,
+                                elevatorAsync: elevatorAsync,
+                              );
+
+                              if (isWide) {
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(flex: 2, child: main),
+                                    const SizedBox(width: AppSpacing.md),
+                                    Expanded(child: side),
+                                  ],
+                                );
+                              }
+
+                              return Column(
+                                children: [
+                                  main,
+                                  const SizedBox(height: AppSpacing.md),
+                                  side,
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: 20,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ── Elevator info card ────────────────────────────────
-                      InfoCard(
-                        child: elevatorAsync.when(
-                          loading: () => const _SkeletonRow(),
-                          error: (e, st) => const _ElevatorErrorRow(),
-                          data: (elevator) => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const AppSectionHeader(
-                                icon: Icons.elevator_outlined,
-                                title: 'ASANSÖR',
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                elevator.buildingName,
-                                style: textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: colors.onSurface,
-                                ),
-                              ),
-                              if (elevatorAddress.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.location_on_outlined,
-                                      size: 14,
-                                      color: colors.outline,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        elevatorAddress,
-                                        style: textTheme.labelLarge?.copyWith(
-                                          color: colors.onSurfaceVariant,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              const SizedBox(height: 12),
-                              _StatusBadge(isResolved: fault.isResolved),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // ── Fault description ─────────────────────────────────
-                      InfoCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const AppSectionHeader(
-                              icon: Icons.report_problem_outlined,
-                              title: 'ARIZA AÇIKLAMASI',
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              fault.description.isNotEmpty
-                                  ? fault.description
-                                  : 'Açıklama girilmedi.',
-                              style: textTheme.bodyLarge?.copyWith(
-                                color: colors.onSurface,
-                                height: 1.55,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // ── Photo ─────────────────────────────────────────────
-                      if (fault.photoUrl != null &&
-                          fault.photoUrl!.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        _PhotoCard(photoUrl: fault.photoUrl!),
-                      ],
-
-                      // ── Resolution notes (if resolved) ────────────────────
-                      if (fault.isResolved &&
-                          fault.resolutionNotes != null &&
-                          fault.resolutionNotes!.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        InfoCard(
-                          accentColor: colors.success,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              AppSectionHeader(
-                                icon: Icons.check_circle_outline,
-                                title: 'ÇÖZÜM NOTU',
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                fault.resolutionNotes!,
-                                style: textTheme.bodyLarge?.copyWith(
-                                  color: colors.onSurface,
-                                  height: 1.55,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-
-                      // ── Timestamps row ────────────────────────────────────
-                      const SizedBox(height: 12),
-                      InfoCard(
-                        child: Column(
-                          children: [
-                            _TimeRow(
-                              icon: Icons.access_time_rounded,
-                              label: 'Bildirim Tarihi',
-                              time: fault.reportedAt,
-                            ),
-                            if (fault.isResolved &&
-                                fault.resolvedAt != null) ...[
-                              Divider(height: 20, color: colors.outlineVariant),
-                              _TimeRow(
-                                icon: Icons.check_circle_outline,
-                                label: 'Onarım Tarihi',
-                                time: fault.resolvedAt!,
-                                color: colors.success,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-
-                      // ── Action area ───────────────────────────────────────
-                      const SizedBox(height: 20),
-                      if (!fault.isResolved) ...[
-                        // Notes toggle
-                        AnimatedCrossFade(
-                          duration: const Duration(milliseconds: 250),
-                          crossFadeState: _notesExpanded
-                              ? CrossFadeState.showSecond
-                              : CrossFadeState.showFirst,
-                          firstChild: OutlinedButton.icon(
-                            icon: const Icon(Icons.note_add_outlined),
-                            label: const Text('Çözüm notu ekle (isteğe bağlı)'),
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(double.infinity, 48),
-                              side: BorderSide(color: colors.outlineVariant),
-                              foregroundColor: colors.onSurfaceVariant,
-                            ),
-                            onPressed: () =>
-                                setState(() => _notesExpanded = true),
-                          ),
-                          secondChild: TextField(
-                            controller: _notesController,
-                            maxLines: 3,
-                            decoration: InputDecoration(
-                              labelText: 'Çözüm Notu',
-                              hintText: 'Yapılan işlemleri kısaca açıklayın…',
-                              alignLabelWithHint: true,
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.close),
-                                tooltip: 'Temizle ve Kapat',
-                                onPressed: () {
-                                  _notesController.clear();
-                                  setState(() => _notesExpanded = false);
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // Resolve button
-                        FilledButton.icon(
-                          icon: updateState.isLoading
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(Icons.check_circle_outline),
-                          label: Text(
-                            updateState.isLoading
-                                ? 'Kaydediliyor…'
-                                : 'Arızayı Onar',
-                          ),
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 52),
-                            backgroundColor: colors.success,
-                          ),
-                          onPressed: updateState.isLoading
-                              ? null
-                              : () => _showResolveDialog(context, fault.id),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-
-                        // Navigate to elevator
-                        OutlinedButton.icon(
-                          icon: const Icon(Icons.elevator_outlined),
-                          label: Text('$elevatorName Detayına Git'),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 48),
-                            side: BorderSide(color: colors.outlineVariant),
-                            foregroundColor: colors.onSurface,
-                          ),
-                          onPressed: () =>
-                              context.push('/elevator/${fault.elevatorId}'),
-                        ),
-                      ] else ...[
-                        // Reopen button
-                        OutlinedButton.icon(
-                          icon: updateState.isLoading
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.refresh),
-                          label: Text(
-                            updateState.isLoading
-                                ? 'İşleniyor…'
-                                : 'Arızayı Yeniden Aç',
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 48),
-                            side: BorderSide(
-                              color: updateState.isLoading
-                                  ? colors.outlineVariant
-                                  : colors.primary,
-                            ),
-                            foregroundColor: colors.primary,
-                          ),
-                          onPressed: updateState.isLoading
-                              ? null
-                              : () => _handleReopen(context, ref, fault.id),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        OutlinedButton.icon(
-                          icon: const Icon(Icons.elevator_outlined),
-                          label: Text('$elevatorName Detayına Git'),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 48),
-                            side: BorderSide(color: colors.outlineVariant),
-                            foregroundColor: colors.onSurface,
-                          ),
-                          onPressed: () =>
-                              context.push('/elevator/${fault.elevatorId}'),
-                        ),
-                      ],
-
-                      const SizedBox(height: 40),
-                    ],
-                  ),
-                ),
+              FaultActionBar(
+                fault: fault,
+                isLoading: updateState.isLoading,
+                onResolve: () => _showResolveDialog(context, fault.id),
+                onReopen: () => _handleReopen(context, ref, fault.id),
               ),
             ],
           ),
@@ -498,11 +189,11 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
               maxBlastForce: 20,
               minBlastForce: 8,
               colors: [
-                AppThemeColors.of(context).success,
-                AppThemeColors.of(context).primary,
-                AppThemeColors.of(context).error,
-                AppThemeColors.of(context).warning,
-                AppThemeColors.of(context).navy,
+                colors.success,
+                colors.primary,
+                colors.error,
+                colors.warning,
+                AppColors.accentGold,
               ],
             ),
           ),
@@ -560,7 +251,6 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
           duration: AppDurations.snackBarSuccess,
         ),
       );
-      // Refresh the fault data so the page re-renders to resolved state.
       ref.invalidate(faultByIdProvider(faultId));
     } else {
       await HapticFeedback.heavyImpact();
@@ -612,293 +302,77 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
   }
 }
 
-// ── Sub-widgets ───────────────────────────────────────────────────────────────
+class _FaultShell extends StatelessWidget {
+  const _FaultShell({required this.title, required this.child});
 
-class _StatusHeader extends StatelessWidget {
-  const _StatusHeader({
-    required this.isResolved,
-    required this.reportedAt,
-    this.resolvedAt,
-  });
-
-  final bool isResolved;
-  final DateTime reportedAt;
-  final DateTime? resolvedAt;
+  final String title;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
 
-    final gradient = isResolved
-        ? LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [colors.success, colors.success.withValues(alpha: 0.8)],
-          )
-        : LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [colors.error, colors.error.withValues(alpha: 0.8)],
-          );
-
-    final icon = isResolved
-        ? Icons.check_circle_rounded
-        : Icons.warning_rounded;
-    final label = isResolved ? 'ÇÖZÜLDÜ' : 'AÇIK ARIZA';
-    final sub = isResolved
-        ? 'Onarıldı: ${_fmt(resolvedAt ?? reportedAt)}'
-        : 'Bildirildi: ${_fmt(reportedAt)}';
-
-    return Container(
-      decoration: BoxDecoration(gradient: gradient),
-      child: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 12),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                transitionBuilder: (child, animation) {
-                  final curved = CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.elasticOut,
-                  );
-                  return FadeTransition(
-                    opacity: animation,
-                    child: ScaleTransition(scale: curved, child: child),
-                  );
-                },
-                child: Container(
-                  key: ValueKey<bool>(isResolved),
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: colors.onPrimary.withValues(alpha: 0.18),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: colors.onPrimary, size: 36),
-                ),
+    return Scaffold(
+      backgroundColor: colors.background,
+      appBar: AppBar(
+        backgroundColor: colors.surface.withValues(alpha: 0.92),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, color: colors.onSurfaceVariant),
+          tooltip: 'Geri',
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: colors.onSurface,
               ),
-              const SizedBox(height: 10),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: Column(
-                  key: ValueKey<bool>(isResolved),
-                  children: [
-                    Text(
-                      label,
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: colors.onPrimary,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      sub,
-                      style: textTheme.labelSmall?.copyWith(
-                        color: colors.onPrimary.withValues(alpha: 0.85),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
       ),
-    );
-  }
-
-  String _fmt(DateTime dt) {
-    final local = dt.toLocal();
-    return DateFormat('d MMM y – HH:mm', 'tr_TR').format(local);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _PhotoCard extends StatelessWidget {
-  const _PhotoCard({required this.photoUrl});
-
-  final String photoUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final photoHeight = (screenHeight * 0.25).clamp(200.0, 300.0);
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Image.network(
-        photoUrl,
-        width: double.infinity,
-        height: photoHeight,
-        fit: BoxFit.cover,
-        loadingBuilder: (_, child, progress) {
-          if (progress == null) return child;
-          return Container(
-            height: photoHeight,
-            color: colors.surfaceContainer,
-            child: const LoadingState(),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) => Container(
-          height: 120,
-          decoration: BoxDecoration(
-            color: colors.surfaceContainer,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Center(
-            child: Icon(
-              Icons.broken_image_outlined,
-              size: 40,
-              color: colors.outline,
-            ),
-          ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: child,
         ),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+class _FaultLoadError extends StatelessWidget {
+  const _FaultLoadError({required this.error, required this.onRetry});
 
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.isResolved});
-
-  final bool isResolved;
+  final String error;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: isResolved ? colors.successContainer : colors.errorContainer,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            isResolved
-                ? Icons.check_circle_outline
-                : Icons.radio_button_unchecked,
-            size: 13,
-            color: isResolved ? colors.success : colors.error,
-          ),
-          const SizedBox(width: 5),
-          Text(
-            isResolved ? 'Çözüldü' : 'Açık',
-            style: textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: isResolved ? colors.success : colors.error,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _TimeRow extends StatelessWidget {
-  const _TimeRow({
-    required this.icon,
-    required this.label,
-    required this.time,
-    this.color,
-  });
-
-  final IconData icon;
-  final String label;
-  final DateTime time;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
-
-    final c = color ?? colors.onSurfaceVariant;
-    final local = time.toLocal();
-    final formatted = DateFormat('d MMMM y, HH:mm', 'tr_TR').format(local);
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: c),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: textTheme.labelSmall?.copyWith(
-                  color: colors.outline,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              Text(
-                formatted,
-                style: textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: c,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _SkeletonRow extends StatelessWidget {
-  const _SkeletonRow();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Container(height: 14, width: 80, color: colors.outlineVariant),
-        const SizedBox(height: AppSpacing.sm),
-        Container(height: 20, width: 180, color: colors.outlineVariant),
-      ],
-    );
-  }
-}
-
-class _ElevatorErrorRow extends StatelessWidget {
-  const _ElevatorErrorRow();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-    return Row(
-      children: [
-        Icon(Icons.error_outline, size: 16, color: colors.outline),
-        const SizedBox(width: 6),
+        Icon(Icons.error_outline_rounded, size: 52, color: colors.error),
+        const SizedBox(height: AppSpacing.md),
         Text(
-          'Asansör bilgisi yüklenemedi',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: colors.outline),
+          'Arıza yüklenemedi',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: colors.onSurface,
+                fontWeight: FontWeight.w800,
+              ),
         ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          error,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        FilledButton(onPressed: onRetry, child: const Text('Tekrar Dene')),
       ],
     );
   }

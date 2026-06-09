@@ -29,15 +29,19 @@ class ActiveFaultsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Acil Mudahale Bekleyenler',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: colors.onSurface,
+            Expanded(
+              child: Text(
+                'Acil Mudahale Bekleyenler',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: colors.onSurface,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: AppSpacing.sm),
             TextButton(
               onPressed: () => context.push('/faults'),
               style: TextButton.styleFrom(

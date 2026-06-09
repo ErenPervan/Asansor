@@ -1,50 +1,26 @@
-import 'package:flutter/material.dart';
+import 'package:asansor/core/enums/app_enums.dart';
+import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
-
+import 'package:asansor/core/widgets/loading_state.dart';
+import 'package:asansor/features/admin/models/schedule_model.dart';
+import 'package:asansor/features/admin/providers/admin_providers.dart';
+import 'package:asansor/features/elevator/models/elevator_model.dart';
+import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:asansor/features/fault/models/fault_report_model.dart';
+import 'package:asansor/features/fault/providers/fault_providers.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:go_router/go_router.dart';
-
 import 'package:latlong2/latlong.dart';
 
-import 'package:asansor/features/elevator/models/elevator_model.dart';
-
-import 'package:asansor/features/elevator/providers/elevator_providers.dart';
-
-import 'package:asansor/features/fault/models/fault_report_model.dart';
-
-import 'package:asansor/features/fault/providers/fault_providers.dart';
-
-import 'package:asansor/features/admin/models/schedule_model.dart';
-
-import 'package:asansor/features/admin/providers/admin_providers.dart';
-
-import 'package:asansor/core/theme/app_colors.dart';
-import 'package:asansor/core/enums/app_enums.dart';
-import 'package:asansor/core/widgets/loading_state.dart';
-
-// Marker colours (match Google Maps palette for familiarity)
 const _colorFault = AppColors.error;
 const _colorMaintenance = AppColors.warningLight;
 const _colorHealthy = AppColors.successLight;
-
-// ── Marker status enum ────────────────────────────────────────────────────────
+const _panelLine = Color(0xFFE1E8F0);
 
 enum _MarkerStatus { fault, maintenance, healthy }
 
-// ── AdminMapView ──────────────────────────────────────────────────────────────
-
-/// Live Operation Map — powered by flutter_map + OpenStreetMap (no API key).
-///
-/// Marker colours:
-///  • RED    — elevator has at least one unresolved fault.
-///  • YELLOW — no fault, but a pending maintenance is scheduled for today.
-///  • GREEN  — healthy, no active issues.
-///
-/// Tapping a marker opens a bottom sheet with building info and a
-/// "Detayları Gör" button that navigates to `/elevator/:id`.
 class AdminMapView extends ConsumerStatefulWidget {
   const AdminMapView({super.key});
 
@@ -54,27 +30,19 @@ class AdminMapView extends ConsumerStatefulWidget {
 
 class _AdminMapViewState extends ConsumerState<AdminMapView> {
   final _mapController = MapController();
-
-  /// Istanbul — used when no elevator has coordinates yet.
   static const _defaultCenter = LatLng(41.0082, 28.9784);
-
-  /// Prevents the auto-fit from firing on every rebuild.
   bool _hasAutoFitted = false;
-
-  // ── Status derivation ─────────────────────────────────────────────────────
 
   _MarkerStatus _getStatus({
     required String elevatorId,
     required AsyncValue<List<FaultReportModel>> activeFaults,
     required AsyncValue<List<ScheduleModel>> allSchedules,
   }) {
-    // Priority 1 – any unresolved fault → RED
     final hasFault =
         activeFaults.valueOrNull?.any((f) => f.elevatorId == elevatorId) ??
         false;
     if (hasFault) return _MarkerStatus.fault;
 
-    // Priority 2 – pending maintenance scheduled for today → YELLOW
     final today = DateTime.now();
     final hasTodayMaintenance =
         allSchedules.valueOrNull?.any((s) {
@@ -94,16 +62,12 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
         : _MarkerStatus.healthy;
   }
 
-  // ── Camera fit ────────────────────────────────────────────────────────────
-
-  /// After the first data load, moves the camera to encompass all markers.
   void _autoFitCamera(List<ElevatorModel> elevators) {
     if (_hasAutoFitted) return;
     final located = elevators.where((e) => e.hasMappableLocation).toList();
     if (located.isEmpty) return;
 
     _hasAutoFitted = true;
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
@@ -118,39 +82,14 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
       final points = located
           .map((e) => LatLng(e.latitude!, e.longitude!))
           .toList();
-
       _mapController.fitCamera(
         CameraFit.bounds(
           bounds: LatLngBounds.fromPoints(points),
-          padding: const EdgeInsets.fromLTRB(48, 80, 48, 200),
+          padding: const EdgeInsets.fromLTRB(56, 120, 56, 190),
         ),
       );
     });
   }
-
-  // ── Bottom sheet ──────────────────────────────────────────────────────────
-
-  void _showElevatorSheet(
-    BuildContext context,
-    ElevatorModel elevator,
-    _MarkerStatus status,
-  ) {
-    showModalBottomSheet<void>(
-      context: context,
-      useRootNavigator: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _ElevatorSheet(
-        elevator: elevator,
-        status: status,
-        onViewDetails: () {
-          Navigator.of(context, rootNavigator: true).pop();
-          context.push('/elevator/${elevator.id}');
-        },
-      ),
-    );
-  }
-
-  // ── Marker building ───────────────────────────────────────────────────────
 
   List<Marker> _buildMarkers({
     required BuildContext context,
@@ -159,7 +98,6 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
     required AsyncValue<List<ScheduleModel>> allSchedules,
   }) {
     final markers = <Marker>[];
-
     for (final elevator in elevators) {
       if (!elevator.hasMappableLocation) continue;
 
@@ -172,8 +110,8 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
       markers.add(
         Marker(
           point: LatLng(elevator.latitude!, elevator.longitude!),
-          width: 48,
-          height: 48,
+          width: 58,
+          height: 58,
           child: GestureDetector(
             onTap: () => _showElevatorSheet(context, elevator, status),
             child: Center(child: _MarkerPin(status: status)),
@@ -181,42 +119,82 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
         ),
       );
     }
-
     return markers;
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
+  void _showElevatorSheet(
+    BuildContext context,
+    ElevatorModel elevator,
+    _MarkerStatus status,
+  ) {
+    showModalBottomSheet<void>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ElevatorSheet(
+        elevator: elevator,
+        status: status,
+        onViewDetails: () {
+          Navigator.of(context, rootNavigator: true).pop();
+          context.push('/elevator/${elevator.id}');
+        },
+      ),
+    );
+  }
+
+  void _refresh() {
+    _hasAutoFitted = false;
+    ref.invalidate(elevatorsProvider);
+    ref.invalidate(activeFaultsProvider);
+    ref.invalidate(allSchedulesProvider);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final elevatorsAsync = ref.watch(elevatorsProvider);
     final activeFaults = ref.watch(activeFaultsProvider);
     final allSchedules = ref.watch(allSchedulesProvider);
 
     return Scaffold(
-      backgroundColor: AppThemeColors.of(context).background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: AppThemeColors.of(context).primary,
-        foregroundColor: AppThemeColors.of(context).onPrimary,
-        elevation: 0,
-        title: Text(
-          'Canlı Operasyon Haritası',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.0,
-            color: AppThemeColors.of(context).onPrimary,
-          ),
+        titleSpacing: 20,
+        title: Row(
+          children: [
+            Icon(Icons.elevator_rounded, color: colors.primary),
+            const SizedBox(width: 10),
+            Text(
+              'Asansör',
+              style: textTheme.titleMedium?.copyWith(
+                color: colors.primary,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_outlined),
-            tooltip: 'Yenile',
-            onPressed: () {
-              _hasAutoFitted = false;
-              ref.invalidate(elevatorsProvider);
-              ref.invalidate(activeFaultsProvider);
-              ref.invalidate(allSchedulesProvider);
-            },
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Row(
+              children: [
+                Text(
+                  'Operasyon Yönetimi',
+                  style: textTheme.labelMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: _refresh,
+                  tooltip: 'Yenile',
+                  icon: const Icon(Icons.refresh_rounded),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -224,10 +202,7 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
         loading: () => const LoadingState(isList: false, height: 400),
         error: (e, _) => _ErrorBody(
           message: e.toString().replaceFirst('Exception: ', ''),
-          onRetry: () {
-            _hasAutoFitted = false;
-            ref.invalidate(elevatorsProvider);
-          },
+          onRetry: _refresh,
         ),
         data: (elevators) {
           _autoFitCamera(elevators);
@@ -238,15 +213,15 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
             activeFaults: activeFaults,
             allSchedules: allSchedules,
           );
-
           final locatedCount = elevators
               .where((e) => e.hasMappableLocation)
               .length;
           final unmappedCount = elevators.length - locatedCount;
+          final faultCount = activeFaults.valueOrNull?.length ?? 0;
+          final todayMaintenanceCount = _todayMaintenanceCount(allSchedules);
 
           return Stack(
             children: [
-              // ── Map ───────────────────────────────────────────────────────
               FlutterMap(
                 mapController: _mapController,
                 options: const MapOptions(
@@ -259,38 +234,58 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
                   TileLayer(
                     urlTemplate:
                         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    // OpenStreetMap tile usage policy requires identifying
-                    // the app. Use your real package name in production.
                     userAgentPackageName: 'com.example.asansor',
                     maxZoom: 19,
                   ),
                   MarkerLayer(markers: markers),
                 ],
               ),
-
-              // ── Stats overlay (top-left) ──────────────────────────────────
-              Positioned(
-                top: 12,
-                left: 12,
-                child: _StatsOverlay(
-                  locatedCount: locatedCount,
-                  totalCount: elevators.length,
-                  faultCount: activeFaults.valueOrNull?.length ?? 0,
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: colors.background.withValues(alpha: 0.08),
+                    ),
+                  ),
                 ),
               ),
-
-              // ── Legend sheet (bottom) ─────────────────────────────────────
               Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: _LegendSheet(unmappedCount: unmappedCount),
+                top: 16,
+                left: 16,
+                right: 16,
+                child: _MapHeaderOverlay(
+                  locatedCount: locatedCount,
+                  totalCount: elevators.length,
+                  faultCount: faultCount,
+                  maintenanceCount: todayMaintenanceCount,
+                  onRefresh: _refresh,
+                ),
+              ),
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 16,
+                child: _LegendPanel(unmappedCount: unmappedCount),
               ),
             ],
           );
         },
       ),
     );
+  }
+
+  int _todayMaintenanceCount(AsyncValue<List<ScheduleModel>> schedules) {
+    final today = DateTime.now();
+    return schedules.valueOrNull
+            ?.where((s) {
+              final d = s.scheduledDate.toLocal();
+              return s.status == ScheduleStatus.pending &&
+                  d.year == today.year &&
+                  d.month == today.month &&
+                  d.day == today.day;
+            })
+            .length ??
+        0;
   }
 
   @override
@@ -300,7 +295,216 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
   }
 }
 
-// ── Marker pin widget ─────────────────────────────────────────────────────────
+class _MapHeaderOverlay extends StatelessWidget {
+  const _MapHeaderOverlay({
+    required this.locatedCount,
+    required this.totalCount,
+    required this.faultCount,
+    required this.maintenanceCount,
+    required this.onRefresh,
+  });
+
+  final int locatedCount;
+  final int totalCount;
+  final int faultCount;
+  final int maintenanceCount;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 720;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colors.surface.withValues(alpha: 0.94),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: _panelLine),
+            boxShadow: [
+              BoxShadow(
+                color: colors.primary.withValues(alpha: 0.10),
+                blurRadius: 28,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _HeaderTitle(onRefresh: onRefresh),
+                    const SizedBox(height: AppSpacing.md),
+                    _MetricsWrap(
+                      locatedCount: locatedCount,
+                      totalCount: totalCount,
+                      faultCount: faultCount,
+                      maintenanceCount: maintenanceCount,
+                    ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: _HeaderTitle(onRefresh: onRefresh)),
+                    _MetricsWrap(
+                      locatedCount: locatedCount,
+                      totalCount: totalCount,
+                      faultCount: faultCount,
+                      maintenanceCount: maintenanceCount,
+                    ),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+}
+
+class _HeaderTitle extends StatelessWidget {
+  const _HeaderTitle({required this.onRefresh});
+
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return Row(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: colors.primary.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(Icons.map_rounded, color: colors.primary),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Canlı Operasyon Haritası',
+                style: textTheme.titleLarge?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Aktif arıza, bugünkü bakım ve sağlıklı asansör konumları',
+                style: textTheme.labelMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          onPressed: onRefresh,
+          tooltip: 'Yenile',
+          icon: Icon(Icons.refresh_rounded, color: colors.primary),
+        ),
+      ],
+    );
+  }
+}
+
+class _MetricsWrap extends StatelessWidget {
+  const _MetricsWrap({
+    required this.locatedCount,
+    required this.totalCount,
+    required this.faultCount,
+    required this.maintenanceCount,
+  });
+
+  final int locatedCount;
+  final int totalCount;
+  final int faultCount;
+  final int maintenanceCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.sm,
+      children: [
+        _MiniMetric(
+          label: 'Haritada',
+          value: '$locatedCount/$totalCount',
+          color: AppColors.primary,
+        ),
+        _MiniMetric(
+          label: 'Aktif Arıza',
+          value: '$faultCount',
+          color: _colorFault,
+        ),
+        _MiniMetric(
+          label: 'Bugün Bakım',
+          value: '$maintenanceCount',
+          color: _colorMaintenance,
+        ),
+      ],
+    );
+  }
+}
+
+class _MiniMetric extends StatelessWidget {
+  const _MiniMetric({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      width: 112,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value,
+            style: textTheme.titleMedium?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Text(
+            label,
+            style: textTheme.labelSmall?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _MarkerPin extends StatelessWidget {
   const _MarkerPin({required this.status});
@@ -309,33 +513,188 @@ class _MarkerPin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (color, icon) = switch (status) {
-      _MarkerStatus.fault => (_colorFault, Icons.warning_rounded),
-      _MarkerStatus.maintenance => (_colorMaintenance, Icons.build_rounded),
-      _MarkerStatus.healthy => (_colorHealthy, Icons.elevator_outlined),
+    final (color, icon, pulsing) = switch (status) {
+      _MarkerStatus.fault => (_colorFault, Icons.warning_rounded, true),
+      _MarkerStatus.maintenance => (
+        _colorMaintenance,
+        Icons.build_rounded,
+        false,
+      ),
+      _MarkerStatus.healthy => (_colorHealthy, Icons.elevator_outlined, false),
     };
 
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2.5),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.45),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return SizedBox(
+      width: 56,
+      height: 56,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          if (pulsing)
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.16),
+                shape: BoxShape.circle,
+              ),
+            ),
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2.5),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.45),
+                  blurRadius: 14,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: Colors.white, size: 18),
           ),
         ],
       ),
-      child: Icon(icon, color: Colors.white, size: 20),
     );
   }
 }
 
-// ── Elevator bottom sheet ─────────────────────────────────────────────────────
+class _LegendPanel extends StatelessWidget {
+  const _LegendPanel({required this.unmappedCount});
+
+  final int unmappedCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 620),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: colors.surface.withValues(alpha: 0.96),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: _panelLine),
+            boxShadow: [
+              BoxShadow(
+                color: colors.primary.withValues(alpha: 0.12),
+                blurRadius: 28,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Wrap(
+                spacing: AppSpacing.lg,
+                runSpacing: AppSpacing.sm,
+                alignment: WrapAlignment.center,
+                children: const [
+                  _LegendItem(
+                    color: _colorFault,
+                    icon: Icons.warning_rounded,
+                    label: 'Aktif Arıza',
+                  ),
+                  _LegendItem(
+                    color: _colorMaintenance,
+                    icon: Icons.build_rounded,
+                    label: 'Bugün Bakım',
+                  ),
+                  _LegendItem(
+                    color: _colorHealthy,
+                    icon: Icons.elevator_outlined,
+                    label: 'Normal',
+                  ),
+                ],
+              ),
+              if (unmappedCount > 0) ...[
+                const SizedBox(height: AppSpacing.md),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(11),
+                  decoration: BoxDecoration(
+                    color: colors.errorContainer.withValues(alpha: 0.34),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: colors.error.withValues(alpha: 0.10),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.location_off_rounded,
+                        size: 18,
+                        color: colors.error,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          'Koordinatı eksik $unmappedCount asansör haritada gösterilmiyor.',
+                          style: textTheme.labelMedium?.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  const _LegendItem({
+    required this.color,
+    required this.icon,
+    required this.label,
+  });
+
+  final Color color;
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+          child: Icon(icon, color: Colors.white, size: 13),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: textTheme.labelMedium?.copyWith(
+            color: colors.onSurface,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 class _ElevatorSheet extends StatelessWidget {
   const _ElevatorSheet({
@@ -352,363 +711,231 @@ class _ElevatorSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final (statusLabel, statusColor) = switch (status) {
-      _MarkerStatus.fault => ('Aktif Arıza', _colorFault),
-      _MarkerStatus.maintenance => ('Bugün Bakım', _colorMaintenance),
-      _MarkerStatus.healthy => ('Normal', _colorHealthy),
+    final (statusLabel, statusColor, statusIcon) = switch (status) {
+      _MarkerStatus.fault => ('Aktif Arıza', _colorFault, Icons.warning_rounded),
+      _MarkerStatus.maintenance => (
+        'Bugün Bakım',
+        _colorMaintenance,
+        Icons.build_rounded,
+      ),
+      _MarkerStatus.healthy => ('Normal', _colorHealthy, Icons.check_rounded),
     };
 
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _panelLine),
         boxShadow: [
           BoxShadow(
             color: colors.onSurface.withValues(alpha: 0.12),
-            blurRadius: 24,
-            offset: const Offset(0, -4),
+            blurRadius: 28,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Drag handle
-            Center(
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppThemeColors.of(context).outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 14, 22, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 42,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colors.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-
-            // Status badge + building name row
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    elevator.buildingName,
-                    style: textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppThemeColors.of(context).onSurface,
-                      letterSpacing: 0.0,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: statusColor.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Text(
-                    statusLabel,
-                    style: textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: statusColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            // Address
-            if (elevator.address != null) ...[
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacing.lg),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.location_on_outlined,
-                    size: 15,
-                    color: AppThemeColors.of(context).outline,
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(statusIcon, color: statusColor),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 14),
                   Expanded(
-                    child: Text(
-                      elevator.address!,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: AppThemeColors.of(context).outline,
-                        height: 1.4,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          elevator.buildingName,
+                          style: textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: colors.onSurface,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                        if (elevator.address != null &&
+                            elevator.address!.isNotEmpty) ...[
+                          const SizedBox(height: 5),
+                          Text(
+                            elevator.address!,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colors.onSurfaceVariant,
+                              height: 1.4,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
+                  const SizedBox(width: 10),
+                  _StatusChip(label: statusLabel, color: statusColor),
                 ],
               ),
-            ],
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // Action button
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: FilledButton.icon(
-                onPressed: onViewDetails,
-                icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                label: Text(
-                  'Detayları Gör',
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
+              const SizedBox(height: AppSpacing.lg),
+              _InfoStrip(elevator: elevator),
+              const SizedBox(height: AppSpacing.lg),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: FilledButton.icon(
+                  onPressed: onViewDetails,
+                  icon: const Icon(Icons.visibility_rounded, size: 19),
+                  label: Text(
+                    'Detaya Git',
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                ),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppThemeColors.of(context).primary,
-                  foregroundColor: AppThemeColors.of(context).onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colors.primary,
+                    foregroundColor: colors.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// ── Stats overlay ─────────────────────────────────────────────────────────────
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.label, required this.color});
 
-class _StatsOverlay extends StatelessWidget {
-  const _StatsOverlay({
-    required this.locatedCount,
-    required this.totalCount,
-    required this.faultCount,
-  });
-
-  final int locatedCount;
-  final int totalCount;
-  final int faultCount;
+  final String label;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.22)),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoStrip extends StatelessWidget {
+  const _InfoStrip({required this.elevator});
+
+  final ElevatorModel elevator;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.93),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AppThemeColors.of(context).onSurface.withValues(alpha: 0.10),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: colors.background,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _panelLine),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Wrap(
+        spacing: AppSpacing.lg,
+        runSpacing: AppSpacing.sm,
         children: [
-          Text(
-            '$locatedCount / $totalCount asansör haritada',
-            style: textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppThemeColors.of(context).onSurface,
-            ),
+          _InfoPair(
+            icon: Icons.precision_manufacturing_rounded,
+            label: 'Model',
+            value: elevator.model ?? 'Belirtilmedi',
           ),
-          if (faultCount > 0) ...[
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: _colorFault,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '$faultCount aktif arıza',
-                  style: textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: _colorFault,
-                  ),
-                ),
-              ],
-            ),
-          ],
+          _InfoPair(
+            icon: Icons.monitor_weight_rounded,
+            label: 'Kapasite',
+            value: elevator.capacity == null
+                ? 'Belirtilmedi'
+                : '${elevator.capacity} kg',
+          ),
+          _InfoPair(
+            icon: Icons.location_on_rounded,
+            label: 'Koordinat',
+            value:
+                '${elevator.latitude?.toStringAsFixed(4)}, ${elevator.longitude?.toStringAsFixed(4)}',
+          ),
         ],
       ),
     );
   }
 }
 
-// ── Legend ────────────────────────────────────────────────────────────────────
-
-class _LegendSheet extends StatelessWidget {
-  const _LegendSheet({required this.unmappedCount});
-
-  final int unmappedCount;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
-      decoration: BoxDecoration(
-        color: AppThemeColors.of(context).surfaceContainerLowest,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: AppThemeColors.of(context).onSurface.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Drag handle
-          Container(
-            width: 36,
-            height: 4,
-            margin: const EdgeInsets.only(bottom: 14),
-            decoration: BoxDecoration(
-              color: AppThemeColors.of(context).outlineVariant,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          // Legend row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
-              _LegendItem(
-                color: _colorFault,
-                icon: Icons.warning_rounded,
-                label: 'Arıza',
-                sublabel: 'Çözülmemiş',
-              ),
-              _LegendItem(
-                color: _colorMaintenance,
-                icon: Icons.build_rounded,
-                label: 'Bakım',
-                sublabel: 'Bugün',
-              ),
-              _LegendItem(
-                color: _colorHealthy,
-                icon: Icons.elevator_outlined,
-                label: 'Normal',
-                sublabel: 'Sorunsuz',
-              ),
-            ],
-          ),
-
-          // Unmapped note
-          if (unmappedCount > 0) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppThemeColors.of(context).background,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: AppThemeColors.of(
-                    context,
-                  ).outlineVariant.withValues(alpha: 0.5),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.location_off_outlined,
-                    size: 14,
-                    color: AppThemeColors.of(context).onSurfaceVariant,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      '$unmappedCount asansörün koordinatı eksik — haritada gösterilmiyor.',
-                      style: textTheme.labelSmall?.copyWith(
-                        color: AppThemeColors.of(context).onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _LegendItem extends StatelessWidget {
-  const _LegendItem({
-    required this.color,
+class _InfoPair extends StatelessWidget {
+  const _InfoPair({
     required this.icon,
     required this.label,
-    required this.sublabel,
+    required this.value,
   });
 
-  final Color color;
   final IconData icon;
   final String label;
-  final String sublabel;
+  final String value;
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.35),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Icon(icon, color: Colors.white, size: 13),
-        ),
-        const SizedBox(width: AppSpacing.sm),
+        Icon(icon, size: 18, color: colors.primary),
+        const SizedBox(width: 8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               label,
-              style: textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppThemeColors.of(context).onSurface,
+              style: textTheme.labelSmall?.copyWith(
+                color: colors.outline,
+                fontWeight: FontWeight.w800,
               ),
             ),
             Text(
-              sublabel,
-              style: textTheme.labelSmall?.copyWith(
-                color: AppThemeColors.of(context).outline,
+              value,
+              style: textTheme.labelMedium?.copyWith(
+                color: colors.onSurface,
+                fontWeight: FontWeight.w900,
               ),
             ),
           ],
@@ -718,8 +945,6 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
-// ── Error state ───────────────────────────────────────────────────────────────
-
 class _ErrorBody extends StatelessWidget {
   const _ErrorBody({required this.message, required this.onRetry});
 
@@ -728,6 +953,7 @@ class _ErrorBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Center(
@@ -739,12 +965,12 @@ class _ErrorBody extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppThemeColors.of(context).errorContainer,
-                shape: BoxShape.circle,
+                color: colors.errorContainer,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 Icons.location_off_outlined,
-                color: AppThemeColors.of(context).onErrorContainer,
+                color: colors.onErrorContainer,
                 size: 32,
               ),
             ),
@@ -753,18 +979,14 @@ class _ErrorBody extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: textTheme.bodyMedium?.copyWith(
-                color: AppThemeColors.of(context).onSurfaceVariant,
+                color: colors.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh_rounded),
               label: const Text('Tekrar Dene'),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppThemeColors.of(context).primary,
-                foregroundColor: AppThemeColors.of(context).onPrimary,
-              ),
             ),
           ],
         ),

@@ -148,16 +148,18 @@ class TopAppBar extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      canAccessAdmin
-                          ? 'Gunluk operasyon'
-                          : 'Merhaba, $displayName',
-                      style: Theme.of(context).textTheme.headlineSmall
+                      Text(
+                        canAccessAdmin
+                            ? 'Gunluk operasyon'
+                            : 'Merhaba, $displayName',
+                        style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
-                            color: colors.onSurface,
-                            fontWeight: FontWeight.w800,
-                          ),
-                    ),
+                             color: colors.onSurface,
+                             fontWeight: FontWeight.w800,
+                           ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     if (canAccessAdmin && activeFaultCount > 0) ...[
                       const SizedBox(height: 2),
                       Text(

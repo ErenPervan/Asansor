@@ -4,8 +4,7 @@ VALUES ('maintenance-reports', 'maintenance-reports', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Enable RLS for the objects table if not already enabled
--- (Commented out because it requires owner privileges and Supabase enables it by default)
--- ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 -- Allow authenticated users to upload files to the maintenance-reports bucket
 CREATE POLICY "Allow authenticated users to upload maintenance reports"

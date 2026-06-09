@@ -45,18 +45,24 @@ class AppBottomNavBar extends ConsumerWidget {
               isActive: navigationShell.currentIndex == 1,
               onPressed: () => _goBranch(1),
             ),
-            const SizedBox(width: 56), // spacer for the centre FAB
+            const SizedBox(width: 32), // spacer for the centre FAB
+            _NavItem(
+              icon: Icons.assignment_outlined,
+              label: 'İş Emirleri',
+              isActive: navigationShell.currentIndex == 2,
+              onPressed: () => _goBranch(2),
+            ),
             _NavItem(
               icon: Icons.event_note_outlined,
               label: 'Program',
-              isActive: navigationShell.currentIndex == 2,
-              onPressed: canViewSchedule ? () => _goBranch(2) : null,
+              isActive: navigationShell.currentIndex == 3,
+              onPressed: canViewSchedule ? () => _goBranch(3) : null,
             ),
             _NavItem(
               icon: Icons.history,
               label: 'Günlük',
-              isActive: navigationShell.currentIndex == 3,
-              onPressed: () => _goBranch(3),
+              isActive: navigationShell.currentIndex == 4,
+              onPressed: () => _goBranch(4),
             ),
           ],
         ),

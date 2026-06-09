@@ -29,23 +29,34 @@ class AdminDashboardView extends ConsumerWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.elevator_rounded, color: colors.primaryDark),
             const SizedBox(width: AppSpacing.sm),
-            Text(
-              'Asansor',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: colors.primaryDark,
-                    fontWeight: FontWeight.w900,
-                  ),
+            Flexible(
+              child: Text(
+                'Asansor',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: colors.primaryDark,
+                      fontWeight: FontWeight.w900,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () {},
+          Builder(
+            builder: (context) {
+              if (MediaQuery.sizeOf(context).width < 560) {
+                return const SizedBox.shrink();
+              }
+
+              return TextButton(
+                onPressed: () {},
             child: const Text('Operasyon Yönetimi'),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
@@ -61,17 +72,19 @@ class AdminDashboardView extends ConsumerWidget {
       body: RefreshIndicator(
         color: colors.primary,
         onRefresh: () async {
-          ref.invalidate(adminStatsProvider);
-          ref.invalidate(allSchedulesProvider);
-          ref.invalidate(elevatorsProvider);
+          await Future.wait([
+            ref.refresh(adminStatsProvider.future),
+            ref.refresh(allSchedulesProvider.future),
+            ref.refresh(elevatorsProvider.future),
+          ]);
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(
+          padding: EdgeInsets.fromLTRB(
             AppSpacing.md,
             AppSpacing.lg,
             AppSpacing.md,
-            110,
+            150 + MediaQuery.paddingOf(context).bottom,
           ),
           child: Center(
             child: ConstrainedBox(

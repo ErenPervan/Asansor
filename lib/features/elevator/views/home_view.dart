@@ -150,7 +150,7 @@ class _HomeViewState extends State<HomeView> {
                       onTap: () => context.go('/elevators'),
                     ),
                     // Bottom padding so content clears the FAB + nav bar.
-                    SizedBox(height: 100 + bottomInset),
+                    SizedBox(height: 140 + bottomInset),
                   ],
                 ),
               ),

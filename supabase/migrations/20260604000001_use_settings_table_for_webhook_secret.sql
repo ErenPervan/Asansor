@@ -27,7 +27,9 @@ BEGIN
   _anon_key := COALESCE(current_setting('app.settings.anon_key', true), '<YOUR_ANON_KEY>');
   
   SELECT value INTO _webhook_secret FROM public.app_settings WHERE key = 'webhook_secret';
-  _webhook_secret := COALESCE(_webhook_secret, 'local-dev-secret-key');
+  IF _webhook_secret IS NULL THEN
+    RAISE EXCEPTION 'Webhook secret not configured in app_settings table';
+  END IF;
 
   _payload := jsonb_build_object(
     'type',   'INSERT',
@@ -62,9 +64,14 @@ DECLARE
   v_payload jsonb;
   v_headers jsonb;
   v_webhook_secret text;
+  v_anon_key text;
 BEGIN
   SELECT value INTO v_webhook_secret FROM public.app_settings WHERE key = 'webhook_secret';
-  v_webhook_secret := COALESCE(v_webhook_secret, 'local-dev-secret-key');
+  IF v_webhook_secret IS NULL THEN
+    RAISE EXCEPTION 'Webhook secret not configured in app_settings table';
+  END IF;
+  
+  v_anon_key := COALESCE(current_setting('app.settings.anon_key', true), '<YOUR_ANON_KEY>');
   
   v_payload := json_build_object(
     'type', 'INSERT',
@@ -78,6 +85,7 @@ BEGIN
   
   v_headers := jsonb_build_object(
     'Content-Type', 'application/json',
+    'Authorization', 'Bearer ' || v_anon_key,
     'x-webhook-secret', v_webhook_secret
   );
 

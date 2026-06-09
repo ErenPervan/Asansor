@@ -328,27 +328,34 @@ class AgendaTaskCard extends ConsumerWidget {
                             color: pColor,
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            dateLabel,
-                            style: textTheme.labelMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: pColor,
+                          Expanded(
+                            child: Text(
+                              dateLabel,
+                              style: textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: pColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: pColor.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: _buildPriorityLabel(
-                              schedule.priority,
-                              pColor,
-                              textTheme,
+                          const SizedBox(width: AppSpacing.sm),
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 82),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: pColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: _buildPriorityLabel(
+                                schedule.priority,
+                                pColor,
+                                textTheme,
+                              ),
                             ),
                           ),
                         ],

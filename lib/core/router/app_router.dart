@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:asansor/core/enums/app_capability.dart';
-import 'package:asansor/core/services/notification_service.dart';
-
+import 'package:asansor/core/providers/notification_providers.dart';
 import 'package:asansor/features/auth/providers/auth_providers.dart';
 import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 import 'package:asansor/features/fault/providers/fault_providers.dart';
@@ -107,14 +106,6 @@ class RouterNotifier extends ChangeNotifier {
           current.status == AuthStatus.unauthenticated) {
         _clearUserData();
       }
-
-      if (current.status == AuthStatus.authorized) {
-        NotificationService.instance.isAuthorized = true;
-        NotificationService.instance.authState = current;
-      } else {
-        NotificationService.instance.isAuthorized = false;
-        NotificationService.instance.authState = null;
-      }
       notifyListeners();
     }, fireImmediately: true);
   }
@@ -186,9 +177,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return isOnLoadingPage ? null : '/loading';
 
         case AuthStatus.authorized:
-          final pendingRoute = NotificationService.instance
-              .consumePendingRoute();
+          final pendingRoute = ref.read(pendingNotificationRouteProvider);
           if (pendingRoute != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ref.read(pendingNotificationRouteProvider.notifier).state = null;
+            });
             return pendingRoute;
           }
 

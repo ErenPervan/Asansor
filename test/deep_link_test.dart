@@ -24,8 +24,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify that the title is "Hata"
-      expect(find.text('Hata'), findsOneWidget);
+      // Verify that the title is "Asansor"
+      expect(find.text('Asansor'), findsOneWidget);
 
       // Verify that the "Sayfa Bulunamadı" message exists
       expect(find.text('Sayfa Bulunamadı'), findsOneWidget);

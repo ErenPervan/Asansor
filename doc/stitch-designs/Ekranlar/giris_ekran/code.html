@@ -1,0 +1,219 @@
+<!DOCTYPE html><html class="light" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Asansor - Giriş Yap</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#43617e",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-container": "#4f3d00",
+                    "on-primary-fixed": "#001c37",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#07497d",
+                    "on-surface-variant": "#42474f",
+                    "surface-tint": "#2d6197",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#001d33",
+                    "surface-dim": "#d7dadd",
+                    "on-secondary-fixed-variant": "#2a4965",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffe08e",
+                    "surface-bright": "#f7fafd",
+                    "on-tertiary-fixed": "#241a00",
+                    "inverse-surface": "#2d3133",
+                    "primary-fixed": "#d2e4ff",
+                    "surface-container-low": "#f1f4f7",
+                    "outline": "#727780",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#ebeef1",
+                    "primary-fixed-dim": "#a0c9ff",
+                    "surface": "#f7fafd",
+                    "on-secondary-container": "#43627f",
+                    "tertiary-container": "#cea62c",
+                    "on-tertiary-fixed-variant": "#584400",
+                    "secondary-fixed": "#cee5ff",
+                    "background": "#f7fafd",
+                    "inverse-on-surface": "#eef1f4",
+                    "secondary-fixed-dim": "#aacaeb",
+                    "on-background": "#181c1e",
+                    "inverse-primary": "#a0c9ff",
+                    "primary": "#00355f",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#beddff",
+                    "primary-container": "#0f4c81",
+                    "on-surface": "#181c1e",
+                    "tertiary-fixed-dim": "#ecc246",
+                    "tertiary": "#755b00",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "outline-variant": "#c2c7d1",
+                    "on-primary-container": "#8ebdf9",
+                    "surface-container-highest": "#e0e3e6",
+                    "surface-variant": "#e0e3e6",
+                    "surface-container-high": "#e5e8eb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap-sm": "8px",
+                    "panel-padding": "24px",
+                    "container-padding": "20px",
+                    "stack-gap-md": "16px",
+                    "stack-gap-lg": "24px",
+                    "grid-gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"],
+                    "label-lg": ["Nunito Sans"],
+                    "headline-sm": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "800"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: #f4f7fa;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .premium-shadow {
+            box-shadow: 0px 10px 30px rgba(15, 76, 129, 0.06);
+        }
+        .glass-background {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .active-sink:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+            transition: all 200ms ease;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-on-surface">
+<!-- Top Navigation Shell Suppressed as per Linear/Transactional Rule -->
+<main class="flex-grow flex items-center justify-center px-container-padding py-stack-gap-lg">
+<div class="w-full max-w-md flex flex-col items-center">
+<!-- Top Brand Area -->
+<div class="mb-stack-gap-lg text-center">
+<div class="flex flex-col items-center gap-2">
+<img alt="Asansor Logo" class="w-16 h-16 rounded-xl premium-shadow mb-2" src="data:image/png;base64,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">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">Asansor</h1>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary/70">Operasyon Yönetimi</span>
+</div>
+</div>
+<!-- Identity Area -->
+<div class="w-full text-center mb-stack-gap-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Hesabınıza giriş yapın</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xs mx-auto">
+                    Bakım görevleri, arıza kayıtları ve asansör durumlarını güvenle yönetin.
+                </p>
+</div>
+<!-- Login Form Panel -->
+<div class="w-full bg-surface-container-lowest rounded-[22px] p-panel-padding premium-shadow border border-outline-variant/30">
+<form action="#" class="space-y-stack-gap-md" onsubmit="return false;">
+<!-- Email Input -->
+<div class="space-y-1.5">
+<label class="font-label-lg text-label-lg text-on-surface block px-1" for="email">E-posta</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">mail</span>
+<input class="w-full bg-surface-container-low border-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-[14px] pl-12 pr-4 py-3.5 font-body-lg text-body-lg text-on-surface placeholder:text-outline/60 transition-all outline-none" id="email" placeholder="ornek@sirket.com" type="email">
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-1.5">
+<div class="flex justify-between items-center px-1">
+<label class="font-label-lg text-label-lg text-on-surface" for="password">Şifre</label>
+<button class="text-primary font-label-sm text-label-sm active-sink" type="button">Şifremi Unuttum</button>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">lock</span>
+<input class="w-full bg-surface-container-low border-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-[14px] pl-12 pr-12 py-3.5 font-body-lg text-body-lg text-on-surface placeholder:text-outline/60 transition-all outline-none" id="password" placeholder="••••••••" type="password">
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary active-sink" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined" id="toggle-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Primary Button -->
+<div class="pt-2">
+<button class="w-full bg-primary-container text-on-primary-fixed-variant font-label-lg text-label-lg py-4 rounded-[16px] shadow-lg shadow-primary-container/20 hover:brightness-110 active-sink transition-all flex items-center justify-center gap-2">
+                            Giriş Yap
+                            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">arrow_forward</span>
+</button>
+</div>
+<!-- Secondary Option -->
+<div class="text-center pt-2">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                            Hesabınız yok mu? <a class="text-primary font-label-lg hover:underline transition-all" href="#">Destek Alın</a>
+</p>
+</div>
+</form>
+</div>
+<!-- Footer Area -->
+<div class="mt-stack-gap-lg flex items-center gap-2 opacity-60">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+<p class="font-label-sm text-label-sm">Kurumsal güvenli bağlantı</p>
+</div>
+</div>
+</main>
+<!-- Bottom Nav Suppressed (Login Page) -->
+<script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggle-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.innerText = 'visibility_off';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.innerText = 'visibility';
+            }
+        }
+
+        // Simple subtle animation on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const formPanel = document.querySelector('.bg-surface-container-lowest');
+            formPanel.style.opacity = '0';
+            formPanel.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                formPanel.style.transition = 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+                formPanel.style.opacity = '1';
+                formPanel.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body></html>

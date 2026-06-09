@@ -1,0 +1,384 @@
+<!DOCTYPE html><html class="light" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Görev Ata - Operasyon Yönetimi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e0e3e6",
+                        "surface": "#f7fafd",
+                        "on-primary-fixed": "#001c37",
+                        "secondary": "#43617e",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "tertiary-fixed": "#ffe08e",
+                        "on-primary-container": "#8ebdf9",
+                        "on-primary": "#ffffff",
+                        "background": "#f7fafd",
+                        "surface-bright": "#f7fafd",
+                        "on-background": "#181c1e",
+                        "surface-variant": "#e0e3e6",
+                        "secondary-fixed-dim": "#aacaeb",
+                        "surface-container": "#ebeef1",
+                        "on-surface-variant": "#42474f",
+                        "on-surface": "#181c1e",
+                        "primary-fixed-dim": "#a0c9ff",
+                        "secondary-container": "#beddff",
+                        "primary-fixed": "#d2e4ff",
+                        "on-tertiary-container": "#4f3d00",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#755b00",
+                        "primary-container": "#0f4c81",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#eef1f4",
+                        "surface-container-low": "#f1f4f7",
+                        "on-tertiary-fixed": "#241a00",
+                        "tertiary-fixed-dim": "#ecc246",
+                        "secondary-fixed": "#cee5ff",
+                        "surface-dim": "#d7dadd",
+                        "on-primary-fixed-variant": "#07497d",
+                        "surface-tint": "#2d6197",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e5e8eb",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#cea62c",
+                        "primary": "#00355f",
+                        "on-secondary-fixed": "#001d33",
+                        "on-secondary-container": "#43627f",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#a0c9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#727780",
+                        "on-secondary-fixed-variant": "#2a4965",
+                        "outline-variant": "#c2c7d1",
+                        "on-tertiary-fixed-variant": "#584400"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-lg": "24px",
+                        "stack-gap-md": "16px",
+                        "panel-padding": "24px",
+                        "stack-gap-sm": "8px",
+                        "grid-gutter": "16px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Nunito Sans"],
+                        "body-lg": ["Nunito Sans"],
+                        "display-lg": ["Nunito Sans"],
+                        "headline-lg": ["Nunito Sans"],
+                        "label-lg": ["Nunito Sans"],
+                        "headline-sm": ["Nunito Sans"],
+                        "label-sm": ["Nunito Sans"],
+                        "body-md": ["Nunito Sans"],
+                        "headline-md": ["Nunito Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #f7fafd;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .soft-shadow {
+            box-shadow: 0px 10px 30px rgba(15, 76, 129, 0.06);
+        }
+        
+        /* Custom Input Styles for Premium Feel */
+        .premium-input-group:focus-within .premium-icon {
+            color: #0f4c81;
+        }
+        .premium-input {
+            appearance: none;
+            background-image: none;
+        }
+        .premium-select-wrapper::after {
+            content: "expand_more";
+            font-family: 'Material Symbols Outlined';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #727780;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Loading Spinner */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin 1.5s linear infinite;
+        }
+    </style>
+</head>
+<body class="text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl docked full-width top-0 sticky shadow-sm z-50">
+<div class="flex justify-between items-center w-full px-container-padding py-stack-gap-sm max-w-7xl mx-auto border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="elevator">elevator</span>
+<h1 class="text-headline-md font-headline-md font-extrabold text-primary dark:text-primary-fixed">Asansor</h1>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant dark:text-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+<span>Operasyon Yönetimi</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-center justify-center p-container-padding md:p-stack-gap-lg">
+<!-- Task Assignment Form Container -->
+<div class="w-full max-w-2xl bg-surface-container-lowest rounded-xl soft-shadow border border-outline-variant/30 overflow-hidden transition-all duration-500 ease-in-out" id="form-container">
+<div class="p-panel-padding border-b border-outline-variant/30 bg-surface-bright">
+<h2 class="text-headline-sm font-headline-sm text-primary-container mb-1">Yeni Görev Ata</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Sahadaki teknisyenlere bakım veya arıza giderme görevleri planlayın.</p>
+</div>
+<form class="p-panel-padding flex flex-col gap-stack-gap-lg" id="task-form" novalidate="">
+<!-- Elevator Selection -->
+<div class="premium-input-group relative">
+<label class="text-label-lg font-label-lg text-on-surface-variant mb-2 block" for="elevator-select">Asansör Seçimi <span class="text-error">*</span></label>
+<div class="relative premium-select-wrapper flex items-center">
+<div class="absolute left-4 flex items-center justify-center w-6 h-6">
+<span class="material-symbols-outlined text-outline premium-icon transition-colors">elevator</span>
+</div>
+<select class="premium-input w-full bg-surface-container rounded-xl pl-12 pr-10 py-3.5 text-body-lg font-body-lg text-on-surface border border-transparent focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all outline-none cursor-pointer" id="elevator-select" required="">
+<option disabled="" selected="" value="">Hedef asansörü seçin</option>
+<option value="A1">Blok A - Yolcu Asansörü 1 (A1)</option>
+<option value="A2">Blok A - Yük Asansörü (A2)</option>
+<option value="B1">Blok B - Panoramik Asansör (B1)</option>
+<option value="C1">Otopark - Servis Asansörü (C1)</option>
+</select>
+</div>
+<span class="text-label-sm font-label-sm text-error hidden mt-1 absolute -bottom-5" id="elevator-error">Lütfen bir asansör seçiniz.</span>
+</div>
+<!-- Technician Selection -->
+<div class="premium-input-group relative mt-2">
+<label class="text-label-lg font-label-lg text-on-surface-variant mb-2 block" for="technician-select">Teknisyen <span class="text-error">*</span></label>
+<div class="relative premium-select-wrapper flex items-center">
+<div class="absolute left-4 flex items-center justify-center w-6 h-6">
+<span class="material-symbols-outlined text-outline premium-icon transition-colors">engineering</span>
+</div>
+<select class="premium-input w-full bg-surface-container rounded-xl pl-12 pr-10 py-3.5 text-body-lg font-body-lg text-on-surface border border-transparent focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all outline-none cursor-pointer" id="technician-select" required="">
+<option disabled="" selected="" value="">Görevlendirilecek teknisyeni seçin</option>
+<option value="T1">Ahmet Yılmaz (Kıdemli)</option>
+<option value="T2">Mehmet Demir</option>
+<option value="T3">Ayşe Kaya (Elektrik Uzmanı)</option>
+</select>
+</div>
+<span class="text-label-sm font-label-sm text-error hidden mt-1 absolute -bottom-5" id="tech-error">Lütfen bir teknisyen seçiniz.</span>
+</div>
+<!-- Date & Time Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-grid-gutter mt-2">
+<!-- Date Picker -->
+<div class="premium-input-group relative">
+<label class="text-label-lg font-label-lg text-on-surface-variant mb-2 block" for="task-date">Tarih <span class="text-error">*</span></label>
+<div class="relative flex items-center">
+<div class="absolute left-4 flex items-center justify-center w-6 h-6 pointer-events-none">
+<span class="material-symbols-outlined text-outline premium-icon transition-colors">calendar_today</span>
+</div>
+<input class="premium-input w-full bg-surface-container rounded-xl pl-12 pr-4 py-3.5 text-body-lg font-body-lg text-on-surface border border-transparent focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all outline-none" id="task-date" required="" type="date">
+</div>
+<span class="text-label-sm font-label-sm text-error hidden mt-1 absolute -bottom-5" id="date-error">Tarih gereklidir.</span>
+</div>
+<!-- Time Picker -->
+<div class="premium-input-group relative">
+<label class="text-label-lg font-label-lg text-on-surface-variant mb-2 block" for="task-time">Saat <span class="text-error">*</span></label>
+<div class="relative flex items-center">
+<div class="absolute left-4 flex items-center justify-center w-6 h-6 pointer-events-none">
+<span class="material-symbols-outlined text-outline premium-icon transition-colors">schedule</span>
+</div>
+<input class="premium-input w-full bg-surface-container rounded-xl pl-12 pr-4 py-3.5 text-body-lg font-body-lg text-on-surface border border-transparent focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all outline-none" id="task-time" required="" type="time">
+</div>
+<span class="text-label-sm font-label-sm text-error hidden mt-1 absolute -bottom-5" id="time-error">Saat gereklidir.</span>
+</div>
+</div>
+<!-- Optional Notes -->
+<div class="premium-input-group mt-2">
+<label class="text-label-lg font-label-lg text-on-surface-variant mb-2 block" for="task-notes">Notlar <span class="text-label-sm font-label-sm text-outline font-normal">(Opsiyonel)</span></label>
+<div class="relative flex items-start">
+<div class="absolute left-4 top-4 flex items-center justify-center w-6 h-6 pointer-events-none">
+<span class="material-symbols-outlined text-outline premium-icon transition-colors">notes</span>
+</div>
+<textarea class="w-full bg-surface-container rounded-xl pl-12 pr-4 py-3.5 text-body-lg font-body-lg text-on-surface border border-transparent focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all outline-none resize-none" id="task-notes" placeholder="Arıza detayı veya bakım talimatları..." rows="3"></textarea>
+</div>
+</div>
+<!-- Actions -->
+<div class="pt-stack-gap-sm mt-2 flex items-center justify-end gap-stack-gap-md border-t border-outline-variant/30 pt-panel-padding">
+<button class="text-primary-container text-label-lg font-label-lg px-6 py-3 rounded-xl hover:bg-primary-container/10 transition-colors" type="button">İptal</button>
+<button class="bg-primary-container text-on-primary text-label-lg font-label-lg px-8 py-3 rounded-xl shadow-md hover:shadow-lg hover:bg-[#0c3c66] transition-all flex items-center justify-center gap-2 relative overflow-hidden min-w-[160px]" id="submit-btn" type="submit">
+<span class="flex items-center gap-2" id="btn-text">
+<span class="material-symbols-outlined text-[20px]">assignment_add</span>
+                            Görev Ata
+                        </span>
+<span class="absolute inset-0 flex items-center justify-center hidden" id="btn-loader">
+<span class="material-symbols-outlined animate-spin-slow">progress_activity</span>
+</span>
+</button>
+</div>
+</form>
+</div>
+<!-- Success Feedback State (Hidden initially) -->
+<div class="hidden w-full max-w-lg bg-surface-container-lowest rounded-xl soft-shadow border border-outline-variant/30 p-panel-padding text-center flex flex-col items-center justify-center gap-stack-gap-md transform scale-95 opacity-0 transition-all duration-500" id="success-container">
+<div class="w-16 h-16 rounded-full bg-secondary-container text-primary-container flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-[32px]">check_circle</span>
+</div>
+<h2 class="text-headline-md font-headline-md text-primary-container">Görev Başarıyla Atandı</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Teknisyene bildirim gönderildi ve görev listesine eklendi.</p>
+<div class="w-full bg-surface-container rounded-xl p-4 mt-2 text-left space-y-2">
+<div class="flex justify-between items-center border-b border-outline-variant/30 pb-2">
+<span class="text-label-sm font-label-sm text-outline">Asansör</span>
+<span class="text-body-md font-body-md text-on-surface font-semibold" id="summary-elevator">-</span>
+</div>
+<div class="flex justify-between items-center border-b border-outline-variant/30 pb-2">
+<span class="text-label-sm font-label-sm text-outline">Teknisyen</span>
+<span class="text-body-md font-body-md text-on-surface font-semibold" id="summary-tech">-</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-label-sm font-label-sm text-outline">Planlanan Zaman</span>
+<span class="text-body-md font-body-md text-on-surface font-semibold" id="summary-datetime">-</span>
+</div>
+</div>
+<button class="mt-4 bg-surface text-primary-container border border-outline-variant/50 text-label-lg font-label-lg px-8 py-3 rounded-xl hover:bg-surface-container transition-colors w-full" onclick="resetForm()" type="button">
+                Yeni Görev Oluştur
+            </button>
+</div>
+</main>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('task-form');
+            const submitBtn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+            
+            const formContainer = document.getElementById('form-container');
+            const successContainer = document.getElementById('success-container');
+
+            // Today's date min limit for date picker
+            const dateInput = document.getElementById('task-date');
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.min = today;
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Basic Validation
+                let isValid = true;
+                const elevator = document.getElementById('elevator-select');
+                const tech = document.getElementById('technician-select');
+                const date = document.getElementById('task-date');
+                const time = document.getElementById('task-time');
+
+                const validateField = (element, errorId) => {
+                    if (!element.value) {
+                        element.classList.add('border-error', 'focus:border-error', 'focus:ring-error/10');
+                        element.classList.remove('border-transparent', 'focus:border-primary-container', 'focus:ring-primary-container/10');
+                        document.getElementById(errorId).classList.remove('hidden');
+                        isValid = false;
+                    } else {
+                        element.classList.remove('border-error', 'focus:border-error', 'focus:ring-error/10');
+                        element.classList.add('border-transparent', 'focus:border-primary-container', 'focus:ring-primary-container/10');
+                        document.getElementById(errorId).classList.add('hidden');
+                    }
+                };
+
+                validateField(elevator, 'elevator-error');
+                validateField(tech, 'tech-error');
+                validateField(date, 'date-error');
+                validateField(time, 'time-error');
+
+                if (isValid) {
+                    // Populate summary data
+                    document.getElementById('summary-elevator').textContent = elevator.options[elevator.selectedIndex].text;
+                    document.getElementById('summary-tech').textContent = tech.options[tech.selectedIndex].text;
+                    
+                    // Format date for display
+                    const dateObj = new Date(date.value);
+                    const formattedDate = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+                    document.getElementById('summary-datetime').textContent = `${formattedDate} - ${time.value}`;
+
+                    // Loading State
+                    form.classList.add('opacity-50', 'pointer-events-none');
+                    btnText.classList.add('invisible');
+                    btnLoader.classList.remove('hidden');
+
+                    // Simulate API Call
+                    setTimeout(() => {
+                        // Hide Form, Show Success
+                        formContainer.classList.add('hidden');
+                        
+                        successContainer.classList.remove('hidden');
+                        // Trigger reflow
+                        void successContainer.offsetWidth; 
+                        successContainer.classList.remove('scale-95', 'opacity-0');
+                        successContainer.classList.add('scale-100', 'opacity-100');
+
+                        // Reset loading state for next time
+                        form.classList.remove('opacity-50', 'pointer-events-none');
+                        btnText.classList.remove('invisible');
+                        btnLoader.classList.add('hidden');
+                        form.reset();
+
+                    }, 1500);
+                }
+            });
+
+            // Remove error styling on change
+            const inputs = form.querySelectorAll('select, input');
+            inputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    input.classList.remove('border-error', 'focus:border-error', 'focus:ring-error/10');
+                    input.classList.add('border-transparent', 'focus:border-primary-container', 'focus:ring-primary-container/10');
+                    const errorSpan = input.parentElement.parentElement.querySelector('.text-error.hidden, .text-error:not(.hidden)');
+                    if(errorSpan && input.id + '-error' === errorSpan.id) {
+                         errorSpan.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        function resetForm() {
+            const formContainer = document.getElementById('form-container');
+            const successContainer = document.getElementById('success-container');
+            
+            successContainer.classList.add('scale-95', 'opacity-0');
+            successContainer.classList.remove('scale-100', 'opacity-100');
+            
+            setTimeout(() => {
+                successContainer.classList.add('hidden');
+                formContainer.classList.remove('hidden');
+            }, 300); // match transition duration
+        }
+    </script>
+</body></html>

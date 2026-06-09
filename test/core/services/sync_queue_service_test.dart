@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/core/services/sync/queue/sync_item.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../helpers/test_mocks.dart';
+import 'package:mocktail/mocktail.dart';
 
 void main() {
   late SyncQueueService service;
@@ -140,4 +144,59 @@ void main() {
       });
     },
   );
+
+  group('SyncQueueService - Flush & Retry', () {
+    late MockSupabaseClient mockClient;
+    late MockSupabaseQueryBuilder mockQueryBuilder;
+
+    setUp(() {
+      mockClient = MockSupabaseClient();
+      mockQueryBuilder = MockSupabaseQueryBuilder();
+      when(() => mockClient.from(any())).thenAnswer((_) => mockQueryBuilder);
+    });
+
+    test('flush transient error increments attempt_count', () async {
+      when(() => mockQueryBuilder.upsert(any(), onConflict: any(named: 'onConflict')))
+          .thenThrow(Exception('Transient network error'));
+
+      await service.enqueue(
+        type: SyncItemType.faultReport,
+        payload: {'id': 'f1'},
+      );
+
+      final result = await service.flush(mockClient);
+      expect(result.failed, 1);
+      expect(result.synced, 0);
+
+      final keys = box.keys.toList();
+      final raw = box.get(keys.first);
+      final item = jsonDecode(raw!) as Map<String, dynamic>;
+      
+      expect(item['attempt_count'], 1);
+      expect(item['next_retry_at'], isNotNull);
+      expect(item['status'], 'pending');
+    });
+
+    test('flush terminal error sets status to dead_letter', () async {
+      // Simulate Postgres exception for terminal error (like invalid schema)
+      when(() => mockQueryBuilder.upsert(any(), onConflict: any(named: 'onConflict')))
+          .thenThrow(PostgrestException(message: 'Invalid column', code: '42703'));
+
+      await service.enqueue(
+        type: SyncItemType.faultReport,
+        payload: {'id': 'f2'},
+      );
+
+      final result = await service.flush(mockClient);
+      expect(result.failed, 1);
+      expect(result.synced, 0);
+
+      final keys = box.keys.toList();
+      final raw = box.get(keys.first);
+      final item = jsonDecode(raw!) as Map<String, dynamic>;
+      
+      expect(item['status'], syncStatusDeadLetter);
+      expect(item['error_details'], contains('Invalid column'));
+    });
+  });
 }

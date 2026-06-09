@@ -1,0 +1,341 @@
+<!DOCTYPE html><html class="light" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Veri Çakışmaları</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,500;6..12,600;6..12,700;6..12,800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e0e3e6",
+                        "background": "#f7fafd",
+                        "tertiary-fixed": "#ffe08e",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c2c7d1",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-fixed-variant": "#07497d",
+                        "on-secondary-container": "#43627f",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#2a4965",
+                        "secondary-container": "#beddff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#2d6197",
+                        "on-tertiary-fixed": "#241a00",
+                        "tertiary-fixed-dim": "#ecc246",
+                        "surface-container-high": "#e5e8eb",
+                        "surface-container-highest": "#e0e3e6",
+                        "on-background": "#181c1e",
+                        "inverse-primary": "#a0c9ff",
+                        "surface-bright": "#f7fafd",
+                        "secondary": "#43617e",
+                        "primary-fixed": "#d2e4ff",
+                        "surface": "#f7fafd",
+                        "primary": "#00355f",
+                        "tertiary-container": "#cea62c",
+                        "secondary-fixed-dim": "#aacaeb",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#001c37",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#181c1e",
+                        "surface-dim": "#d7dadd",
+                        "outline": "#727780",
+                        "tertiary": "#755b00",
+                        "surface-container": "#ebeef1",
+                        "on-surface-variant": "#42474f",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#eef1f4",
+                        "on-tertiary-container": "#4f3d00",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f1f4f7",
+                        "on-primary-container": "#8ebdf9",
+                        "secondary-fixed": "#cee5ff",
+                        "primary-container": "#0f4c81",
+                        "on-tertiary-fixed-variant": "#584400",
+                        "primary-fixed-dim": "#a0c9ff",
+                        "on-secondary-fixed": "#001d33"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "grid-gutter": "16px",
+                        "stack-gap-lg": "24px",
+                        "stack-gap-md": "16px",
+                        "panel-padding": "24px",
+                        "stack-gap-sm": "8px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Nunito Sans"],
+                        "headline-lg": ["Nunito Sans"],
+                        "display-lg": ["Nunito Sans"],
+                        "body-md": ["Nunito Sans"],
+                        "headline-lg-mobile": ["Nunito Sans"],
+                        "headline-sm": ["Nunito Sans"],
+                        "label-sm": ["Nunito Sans"],
+                        "headline-md": ["Nunito Sans"],
+                        "body-lg": ["Nunito Sans"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800" }],
+                        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "800" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Nunito Sans', sans-serif; background-color: #f7fafd; color: #181c1e; }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border: 1px solid #e0e3e6; }
+        .soft-shadow { box-shadow: 0px 10px 30px rgba(15, 76, 129, 0.06); }
+        .data-card { background-color: #ffffff; border-radius: 22px; border: 1px solid #E1E8F0; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex flex-col md:flex-row">
+<!-- Mobile Nav Header -->
+<header class="md:hidden glass-panel fixed top-0 w-full z-50 flex items-center justify-between px-container-padding h-16 shadow-sm border-b border-outline-variant/30">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+<span class="font-headline-md text-headline-md text-primary font-extrabold">Asansör Operasyon</span>
+</div>
+<div class="h-8 w-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-lg text-label-lg font-bold">KY</div>
+</header>
+<!-- Side Nav (Desktop) -->
+<nav class="hidden md:flex flex-col h-full w-80 rounded-r-xl bg-surface shadow-xl py-panel-padding fixed z-40 transition-all duration-300 ease-in-out">
+<div class="px-6 mb-8 flex flex-col items-start">
+<div class="flex items-center gap-4 mb-6">
+<div class="h-12 w-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-headline-sm text-headline-sm font-bold shadow-md">KY</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary">Kadir Yılmaz</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Operasyon Müdürü</p>
+<p class="text-[10px] text-outline">Sistem Yöneticisi</p>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-1 px-2">
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-lg text-label-lg">Gösterge Paneli</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 bg-primary text-on-primary rounded-lg mx-2 my-1 shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sync_problem</span>
+<span class="font-label-lg text-label-lg">Veri Çakışmaları</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 transition-colors" href="#">
+<span class="material-symbols-outlined">engineering</span>
+<span class="font-label-lg text-label-lg">Teknik Ekip</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-80 pt-20 md:pt-8 px-container-padding pb-32 md:pb-8 max-w-5xl mx-auto w-full">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-stack-gap-lg gap-4">
+<div>
+<h1 class="font-display-lg text-display-lg text-primary mb-2">Veri Çakışmaları</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Çevrimdışı senkronizasyon sırasında tespit edilen uyuşmazlıklar.</p>
+</div>
+<div class="glass-panel rounded-xl px-4 py-3 flex items-center gap-4 soft-shadow">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Durum</span>
+<span class="font-label-lg text-label-lg text-primary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span> Senkronizasyon Duraklatıldı
+                    </span>
+</div>
+<div class="h-8 w-px bg-outline-variant/30"></div>
+<div class="flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Bekleyen</span>
+<span class="font-headline-md text-headline-md text-error">2</span>
+</div>
+</div>
+</div>
+<!-- Conflicts List -->
+<div class="flex flex-col gap-stack-gap-md" id="conflict-list">
+<!-- Conflict Item 1 -->
+<div class="data-card soft-shadow p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer hover:border-primary-fixed-dim transition-colors" onclick="document.getElementById('conflict-dialog').classList.remove('hidden')">
+<div class="flex items-start gap-4">
+<div class="h-12 w-12 rounded-full bg-error-container text-error flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">elevator</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Asansör A Blok - #ELV-349</h3>
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-2 py-0.5 rounded-full">Kritik</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant font-body-md text-body-md">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">person</span> Ali Yılmaz (Teknisyen)</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 14 Eki, 10:30</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+<div class="flex-1 md:flex-none text-right md:text-left">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Çakışan Alan:</span>
+<span class="font-label-lg text-label-lg text-primary">Arıza Durumu</span>
+</div>
+<button class="h-10 w-10 rounded-full hover:bg-surface-container-high flex items-center justify-center text-primary transition-colors ml-2">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Conflict Item 2 -->
+<div class="data-card soft-shadow p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer hover:border-primary-fixed-dim transition-colors" onclick="document.getElementById('conflict-dialog').classList.remove('hidden')">
+<div class="flex items-start gap-4">
+<div class="h-12 w-12 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Asansör C Blok - #ELV-112</h3>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm px-2 py-0.5 rounded-full">Orta</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant font-body-md text-body-md">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">person</span> Veli Demir (Teknisyen)</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 14 Eki, 09:15</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+<div class="flex-1 md:flex-none text-right md:text-left">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Çakışan Alan:</span>
+<span class="font-label-lg text-label-lg text-primary">Son Bakım Notu</span>
+</div>
+<button class="h-10 w-10 rounded-full hover:bg-surface-container-high flex items-center justify-center text-primary transition-colors ml-2">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Empty State (Hidden by default) -->
+<div class="hidden flex flex-col items-center justify-center py-20" id="empty-state">
+<div class="h-24 w-24 rounded-full bg-primary-fixed flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[48px] text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Tüm veriler senkronize</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant text-center max-w-md">Bekleyen herhangi bir veri çakışması bulunmamaktadır. Sistem güncel.</p>
+</div>
+</div>
+</main>
+<!-- Conflict Resolution Dialog -->
+<div class="hidden fixed inset-0 z-[100] flex items-center justify-center px-4" id="conflict-dialog">
+<div class="absolute inset-0 bg-inverse-surface/40 backdrop-blur-sm" onclick="document.getElementById('conflict-dialog').classList.add('hidden')"></div>
+<div class="bg-surface-container-lowest rounded-[24px] w-full max-w-4xl max-h-[795px] flex flex-col relative z-10 shadow-2xl overflow-hidden border border-outline-variant/20">
+<!-- Dialog Header -->
+<div class="px-6 py-5 border-b border-outline-variant/30 flex items-center justify-between bg-surface/50">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Çakışma Detayı: Arıza Durumu</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Asansör A Blok - #ELV-349</p>
+</div>
+<button class="h-10 w-10 rounded-full hover:bg-surface-container-highest flex items-center justify-center text-on-surface-variant" onclick="document.getElementById('conflict-dialog').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Dialog Body - Comparison -->
+<div class="flex-1 overflow-y-auto p-6 bg-surface-container-low hide-scroll">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Local (Technician) Side -->
+<div class="data-card p-5 relative border-primary/20 hover:border-primary/50 transition-colors">
+<div class="absolute -top-3 left-4 bg-surface-container-lowest px-2 text-primary font-label-lg text-label-lg flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">smartphone</span> Yerel Değişiklik
+                        </div>
+<div class="mt-2 space-y-4">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Durum</span>
+<div class="bg-primary-fixed/30 px-3 py-2 rounded-lg font-body-md text-body-md text-on-surface border border-primary-fixed-dim/50">Çözüldü - Test Edildi</div>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Not</span>
+<p class="font-body-md text-body-md text-on-surface bg-surface-container px-3 py-2 rounded-lg">Kapı sensörü değiştirildi. Çalışma normal.</p>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm pt-2 border-t border-outline-variant/20">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 14 Eki, 10:30 (Çevrimdışı)
+                            </div>
+</div>
+</div>
+<!-- Remote (Server) Side -->
+<div class="data-card p-5 relative border-outline-variant/50">
+<div class="absolute -top-3 left-4 bg-surface-container-lowest px-2 text-secondary font-label-lg text-label-lg flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">cloud</span> Uzak Durum
+                        </div>
+<div class="mt-2 space-y-4">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Durum</span>
+<div class="bg-surface-container px-3 py-2 rounded-lg font-body-md text-body-md text-on-surface">Devam Ediyor - Parça Bekleniyor</div>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Not</span>
+<p class="font-body-md text-body-md text-on-surface bg-surface-container px-3 py-2 rounded-lg">Sensör siparişi geçildi.</p>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm pt-2 border-t border-outline-variant/20">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 14 Eki, 09:45 (Merkez)
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Dialog Actions -->
+<div class="px-6 py-4 border-t border-outline-variant/30 bg-surface-container-lowest flex justify-end gap-3">
+<button class="px-6 py-2.5 rounded-xl border-2 border-outline-variant text-on-surface font-label-lg text-label-lg hover:bg-surface-container-high transition-colors" onclick="document.getElementById('conflict-dialog').classList.add('hidden')">
+                    Sunucuyu Koru
+                </button>
+<button class="px-6 py-2.5 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary/90 shadow-md transition-all active:scale-95" onclick="resolveConflict()">
+                    Yereli Kabul Et
+                </button>
+</div>
+</div>
+</div>
+<!-- Mobile Bottom Nav -->
+<nav class="md:hidden glass-panel fixed bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/20 flex justify-around items-center h-20 px-2 pb-safe shadow-[0px_-4px_20px_rgba(15,76,129,0.08)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-16" href="#">
+<span class="material-symbols-outlined mb-1">analytics</span>
+<span class="font-label-sm text-label-sm">Operasyon</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-4 py-1.5 w-20" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">sync_problem</span>
+<span class="font-label-sm text-label-sm">Çakışmalar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-16" href="#">
+<span class="material-symbols-outlined mb-1">elevator</span>
+<span class="font-label-sm text-label-sm">Asansörler</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-16" href="#">
+<span class="material-symbols-outlined mb-1">settings</span>
+<span class="font-label-sm text-label-sm">Ayarlar</span>
+</a>
+</nav>
+<script>
+        function resolveConflict() {
+            // Demo purpose: hide dialog, remove first item, show empty state if needed
+            document.getElementById('conflict-dialog').classList.add('hidden');
+            const list = document.getElementById('conflict-list');
+            if(list.children.length > 1) {
+                list.removeChild(list.firstElementChild);
+            }
+            
+            // Check if only empty state remains
+            if(list.children.length === 1 && list.firstElementChild.id === 'empty-state') {
+                document.getElementById('empty-state').classList.remove('hidden');
+                document.getElementById('empty-state').classList.add('flex');
+            }
+        }
+    </script>
+</body></html>

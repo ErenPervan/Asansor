@@ -1,23 +1,31 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:asansor/main.dart' as app;
 
 void main() {
-  // Ensure that the integration test bindings are initialized
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('E2E App Test', () {
-    testWidgets('Uygulama başarıyla başlatılabiliyor mu?', (tester) async {
-      // Setup / Start app
+    testWidgets('Uygulama başarıyla başlatılabiliyor mu ve login ekranı görünüyor mu?', (tester) async {
       await app.main();
 
-      // Wait for app to load
-      await tester.pumpAndSettle(const Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 5));
 
-      // As an example, look for an expected widget on the initial screen.
-      // Depending on the authentication state, this might be a LoginView or HomeView.
-      // E.g., check if a TextField or a specific Text exists.
-      // expect(find.byType(MaterialApp), findsOneWidget);
+      // Asansor metnini ara (Login sayfasında 'Asansor' Text widget'ı var)
+      expect(find.text('Asansor'), findsWidgets);
+
+      // Email field ve Password field bulunmalı
+      final textFields = find.byType(TextField);
+      expect(textFields, findsWidgets);
+
+      // Giriş yap butonu bulunmalı (FilledButton)
+      final loginButton = find.byType(FilledButton);
+      expect(loginButton, findsOneWidget);
+      
+      // Boşken submit etmeyi deneyelim
+      await tester.tap(loginButton);
+      await tester.pumpAndSettle();
     });
   });
 }

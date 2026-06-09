@@ -217,7 +217,7 @@ class ScheduleRepository implements IScheduleRepository {
         query = query.gte('scheduled_date', since.toIso8601String());
       }
 
-      final response = await query.order('scheduled_date', ascending: false);
+      final response = await query.order('scheduled_date', ascending: false).limit(1000);
 
       return (response as List)
           .map((json) => ScheduleModel.fromJson(json as Map<String, dynamic>))
@@ -433,7 +433,7 @@ class ScheduleRepository implements IScheduleRepository {
         query = query.gte('scheduled_date', since.toIso8601String());
       }
 
-      final response = await query.order('scheduled_date', ascending: false);
+      final response = await query.order('scheduled_date', ascending: false).limit(1000);
 
       return (response as List).map((json) {
         final Map<String, dynamic> data = json as Map<String, dynamic>;

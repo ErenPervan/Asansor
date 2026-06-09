@@ -68,7 +68,7 @@ class ScheduleModel {
       technicianId: (json['technician_id'] as String?) ?? '',
       scheduledDate: json['scheduled_date'] != null
           ? DateTime.parse(json['scheduled_date'] as String)
-          : DateTime.fromMillisecondsSinceEpoch(0),
+          : throw const FormatException('scheduled_date is required for ScheduleModel'),
       status: ScheduleStatus.fromDb(json['status'] as String?),
       priority: (json['priority'] as String?) ?? 'normal',
       taskType: (json['task_type'] as String?) ?? 'manual',

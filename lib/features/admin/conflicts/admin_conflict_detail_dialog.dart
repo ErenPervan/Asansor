@@ -1,215 +1,410 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:asansor/features/admin/conflicts/admin_conflict_provider.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
+import 'package:asansor/features/admin/conflicts/admin_conflict_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AdminConflictDetailDialog extends ConsumerWidget {
   const AdminConflictDetailDialog({super.key, required this.report});
+
   final ConflictReport report;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppThemeColors.of(context);
     final isLoading = ref.watch(adminConflictProvider).isLoading;
     final notifier = ref.read(adminConflictProvider.notifier);
-    final colors = AppThemeColors.of(context);
-
-    // Get unique keys from both payloads
-    final allKeys = <String>{
-      ...report.localPayload.keys,
-      ...report.remotePayload.keys,
-    };
-    final excludedKeys = {'id', 'base_version', 'updated_at', 'version'};
-    final displayKeys = allKeys.where((k) => !excludedKeys.contains(k)).toList()
-      ..sort();
+    final displayKeys = _displayKeys(report);
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 800, maxHeight: 600),
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Çakışma Detayı: ${report.buildingName ?? report.elevatorId}',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: colors.onSurface,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  tooltip: 'Kapat',
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Teknisyen: ${report.technicianName ?? "Bilinmeyen Teknisyen"}',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: colors.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(AppSpacing.md),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 900, maxHeight: 760),
+        child: Container(
+          decoration: BoxDecoration(
+            color: colors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.28)),
+            boxShadow: [
+              BoxShadow(
+                color: colors.primary.withValues(alpha: 0.18),
+                blurRadius: 36,
+                offset: const Offset(0, 16),
               ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: _PayloadColumn(
-                      title: 'Yerel Değişiklik (Teknisyen)',
-                      payload: report.localPayload,
-                      keys: displayKeys,
-                      bgColor: colors.errorContainer,
-                      labelColor: colors.onErrorContainer,
-                    ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              _DialogHeader(report: report),
+              Expanded(
+                child: Container(
+                  color: colors.surfaceContainerLow,
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final local = _PayloadPanel(
+                        title: 'Yerel Değişiklik',
+                        subtitle: 'Teknisyen cihazından gelen kayıt',
+                        icon: Icons.smartphone_rounded,
+                        payload: report.localPayload,
+                        keys: displayKeys,
+                        accent: colors.primaryDark,
+                      );
+                      final remote = _PayloadPanel(
+                        title: 'Uzak Durum',
+                        subtitle: 'Sunucudaki mevcut kayıt',
+                        icon: Icons.cloud_rounded,
+                        payload: report.remotePayload,
+                        keys: displayKeys,
+                        accent: colors.secondary,
+                      );
+
+                      if (constraints.maxWidth < 700) {
+                        return ListView(
+                          children: [
+                            local,
+                            const SizedBox(height: AppSpacing.md),
+                            remote,
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(child: local),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(child: remote),
+                        ],
+                      );
+                    },
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: _PayloadColumn(
-                      title: 'Uzak Durum (Sunucu)',
-                      payload: report.remotePayload,
-                      keys: displayKeys,
-                      bgColor: colors.blueSoft,
-                      labelColor: colors.navyMid,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.cloud_done_outlined),
-                  label: const Text('Uzakı Koru (Yereli Yoksay)'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: colors.navyMid,
-                    side: BorderSide(color: colors.navyMid),
-                  ),
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                          await notifier.resolveDiscardLocal(report);
-                          if (context.mounted) Navigator.of(context).pop();
-                        },
-                ),
-                const SizedBox(width: AppSpacing.md),
-                FilledButton.icon(
-                  icon: isLoading
-                      ? SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: colors.onError,
-                          ),
-                        )
-                      : const Icon(Icons.warning_amber_rounded),
-                  label: const Text('Yereli Kabul Et (Zorla Güncelle)'),
-                  style: FilledButton.styleFrom(backgroundColor: colors.error),
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                          await notifier.resolveForceLocal(report);
-                          if (context.mounted) Navigator.of(context).pop();
-                        },
-                ),
-              ],
-            ),
-          ],
+              _DialogActions(
+                isLoading: isLoading,
+                onKeepRemote: () async {
+                  await notifier.resolveDiscardLocal(report);
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+                onAcceptLocal: () async {
+                  await notifier.resolveForceLocal(report);
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _PayloadColumn extends StatelessWidget {
-  const _PayloadColumn({
-    required this.title,
-    required this.payload,
-    required this.keys,
-    required this.bgColor,
-    required this.labelColor,
-  });
+class _DialogHeader extends StatelessWidget {
+  const _DialogHeader({required this.report});
 
-  final String title;
-  final Map<String, dynamic> payload;
-  final List<String> keys;
-  final Color bgColor;
-  final Color labelColor;
+  final ConflictReport report;
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
+    final title = report.buildingName ?? report.elevatorId;
+
     return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: labelColor.withValues(alpha: 0.2)),
+        color: colors.primaryDark,
+        border: Border(
+          bottom: BorderSide(color: colors.onPrimary.withValues(alpha: 0.1)),
+        ),
       ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: colors.onPrimary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Icon(Icons.sync_problem_rounded, color: colors.onPrimary),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Çakışma Detayı',
+                  style: textTheme.labelLarge?.copyWith(
+                    color: AppColors.accentGold,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  title,
+                  style: textTheme.titleLarge?.copyWith(
+                    color: colors.onPrimary,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  'Teknisyen: ${report.technicianName ?? "Bilinmeyen Teknisyen"}',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colors.onPrimary.withValues(alpha: 0.72),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.close_rounded, color: colors.onPrimary),
+            tooltip: 'Kapat',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PayloadPanel extends StatelessWidget {
+  const _PayloadPanel({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.payload,
+    required this.keys,
+    required this.accent,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Map<String, dynamic> payload;
+  final List<String> keys;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: accent.withValues(alpha: 0.18)),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.code, color: labelColor, size: 18),
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: accent, size: 21),
+              ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                title,
-                style: textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: labelColor,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          const Divider(height: 1, thickness: 1),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Expanded(
-            child: ListView.separated(
-              itemCount: keys.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final key = keys[index];
-                final value = payload[key]?.toString() ?? '—';
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      key.toUpperCase().replaceAll('_', ' '),
-                      style: textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: labelColor.withValues(alpha: 0.7),
-                        letterSpacing: 0.5,
+            child: keys.isEmpty
+                ? _NoFields(accent: accent)
+                : ListView.separated(
+                    itemCount: keys.length,
+                    separatorBuilder: (_, _) =>
+                        const SizedBox(height: AppSpacing.sm),
+                    itemBuilder: (context, index) {
+                      final key = keys[index];
+                      return _PayloadRow(
+                        label: key.toUpperCase().replaceAll('_', ' '),
+                        value: payload[key]?.toString() ?? '—',
+                        accent: accent,
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NoFields extends StatelessWidget {
+  const _NoFields({required this.accent});
+
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Center(
+      child: Text(
+        'Gösterilecek alan yok',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+            ),
+      ),
+    );
+  }
+}
+
+class _PayloadRow extends StatelessWidget {
+  const _PayloadRow({
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
+
+  final String label;
+  final String value;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: accent,
+                  fontWeight: FontWeight.w900,
+                ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DialogActions extends StatelessWidget {
+  const _DialogActions({
+    required this.isLoading,
+    required this.onKeepRemote,
+    required this.onAcceptLocal,
+  });
+
+  final bool isLoading;
+  final Future<void> Function() onKeepRemote;
+  final Future<void> Function() onAcceptLocal;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.cloud_done_rounded),
+              label: const Text('Sunucuyu Koru'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(0, 50),
+                foregroundColor: colors.primaryDark,
+                side: BorderSide(color: colors.primaryDark.withValues(alpha: 0.28)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: isLoading ? null : onKeepRemote,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: FilledButton.icon(
+              icon: isLoading
+                  ? SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: colors.onPrimary,
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      value,
-                      style: textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? AppThemeColors.dark.onSurface
-                            : AppThemeColors.light.onSurface,
-                      ),
-                    ),
-                  ],
-                );
-              },
+                    )
+                  : const Icon(Icons.offline_bolt_rounded),
+              label: const Text('Yereli Kabul Et'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 50),
+                backgroundColor: colors.primaryDark,
+                foregroundColor: colors.onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: isLoading ? null : onAcceptLocal,
             ),
           ),
         ],
       ),
     );
   }
+}
+
+List<String> _displayKeys(ConflictReport report) {
+  const excluded = {'id', 'base_version', 'updated_at', 'version'};
+  return <String>{
+    ...report.localPayload.keys,
+    ...report.remotePayload.keys,
+  }.where((key) => !excluded.contains(key)).toList()
+    ..sort();
 }

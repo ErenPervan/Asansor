@@ -147,7 +147,9 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
 
           return RefreshIndicator(
             color: colors.primary,
-            onRefresh: () async => ref.invalidate(elevatorsProvider),
+            onRefresh: () async {
+              final _ = await ref.refresh(elevatorsProvider.future);
+            },
             child: CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
@@ -607,7 +609,7 @@ class _ElevatorFleetCard extends StatelessWidget {
                       _StatusPill(style: style),
                     ],
                   ),
-                  const Spacer(),
+                  const SizedBox(height: AppSpacing.lg),
                   Divider(
                     color: colors.outlineVariant.withValues(alpha: 0.36),
                     height: AppSpacing.lg,

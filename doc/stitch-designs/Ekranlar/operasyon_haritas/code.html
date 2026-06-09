@@ -1,0 +1,302 @@
+<!DOCTYPE html><html lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Asansör Operasyon Haritası</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@100..900&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e0e3e6",
+                    "surface": "#f7fafd",
+                    "on-primary-fixed": "#001c37",
+                    "secondary": "#43617e",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#2d3133",
+                    "tertiary-fixed": "#ffe08e",
+                    "on-primary-container": "#8ebdf9",
+                    "on-primary": "#ffffff",
+                    "background": "#f7fafd",
+                    "surface-bright": "#f7fafd",
+                    "on-background": "#181c1e",
+                    "surface-variant": "#e0e3e6",
+                    "secondary-fixed-dim": "#aacaeb",
+                    "surface-container": "#ebeef1",
+                    "on-surface-variant": "#42474f",
+                    "on-surface": "#181c1e",
+                    "primary-fixed-dim": "#a0c9ff",
+                    "secondary-container": "#beddff",
+                    "primary-fixed": "#d2e4ff",
+                    "on-tertiary-container": "#4f3d00",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#755b00",
+                    "primary-container": "#0f4c81",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#eef1f4",
+                    "surface-container-low": "#f1f4f7",
+                    "on-tertiary-fixed": "#241a00",
+                    "tertiary-fixed-dim": "#ecc246",
+                    "secondary-fixed": "#cee5ff",
+                    "surface-dim": "#d7dadd",
+                    "on-primary-fixed-variant": "#07497d",
+                    "surface-tint": "#2d6197",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e5e8eb",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#cea62c",
+                    "primary": "#00355f",
+                    "on-secondary-fixed": "#001d33",
+                    "on-secondary-container": "#43627f",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#a0c9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#727780",
+                    "on-secondary-fixed-variant": "#2a4965",
+                    "outline-variant": "#c2c7d1",
+                    "on-tertiary-fixed-variant": "#584400"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap-lg": "24px",
+                    "stack-gap-md": "16px",
+                    "panel-padding": "24px",
+                    "stack-gap-sm": "8px",
+                    "grid-gutter": "16px",
+                    "container-padding": "20px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-lg": ["Nunito Sans"],
+                    "label-lg": ["Nunito Sans"],
+                    "headline-sm": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "800"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom Shadows as per styling guide */
+        .premium-shadow {
+            box-shadow: 0px 10px 30px rgba(15, 76, 129, 0.06);
+        }
+        .map-marker {
+            transform: translate(-50%, -50%);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .map-marker:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            z-index: 40;
+        }
+        .marker-pulse {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(2.4); opacity: 0; }
+        }
+        /* Hide scrollbar for bottom sheet content */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen w-screen overflow-hidden flex flex-col relative light">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky bg-surface/80 dark:bg-surface-dim/80 border-b border-outline-variant/30 shadow-sm backdrop-blur-xl z-40">
+<div class="flex justify-between items-center w-full px-container-padding py-stack-gap-sm max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="elevator">elevator</span>
+<h1 class="text-headline-md font-headline-md font-extrabold text-primary dark:text-primary-fixed">Asansor</h1>
+</div>
+<div class="flex items-center">
+<span class="text-label-sm font-label-sm text-on-surface-variant font-bold uppercase tracking-wider">Operasyon Yönetimi</span>
+</div>
+</div>
+</header>
+<!-- Map Canvas Area -->
+<main class="flex-1 relative w-full h-full bg-surface-container-low overflow-hidden">
+<!-- Map Background Simulation -->
+<img alt="City Map Background" class="absolute inset-0 w-full h-full object-cover opacity-60 grayscale-[30%] contrast-75" data-alt="A clean, minimalist vector-style map of a modern city infrastructure in a light mode aesthetic. The map features subtle roads, blocks, and geographic features rendered in soft grays, light blues, and pristine whites, matching a refined corporate UI design. The lighting is even and flat, creating a high-end, uncluttered digital canvas suitable for overlaying technical operational data." data-location="Istanbul" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPZYMo5lnxPD9Dlm4FM-rcdd32HK6TtBDKcQoeXy34Qu2eHa4IV98dRPiFdOkHnJaJC3BE__AxVk7GORuzmhkrTULpalTU6EymYZEvz4tiZ8Yi0hibSaYJIkvDFmro96TDW4NVkZyWmjSJE8TwLXs15xyVlt6Seup81zxBcU_LKYxAfXcrrWlOWArMTeuhIGJ0brlrrzAoB0IrvRSNYl6yUik_1Nwuo9UwVphGBuaz9GY-JlClQRboZhltYuxtgZxzAGZz303sfQ">
+<!-- Marker: Active Fault (Red) -->
+<button aria-label="Fault Marker" class="absolute top-[35%] left-[45%] map-marker group" onclick="openBottomSheet('Plaza İş Merkezi - A Blok', 'Levent Mah. Büyükdere Cad. No: 12', 'fault', 'Aktif Arıza: Kapı Sensörü')">
+<div class="relative w-8 h-8 flex items-center justify-center">
+<div class="absolute inset-0 bg-error rounded-full marker-pulse"></div>
+<div class="relative w-6 h-6 bg-error rounded-full border-2 border-surface flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-on-error text-[14px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+</div>
+</button>
+<!-- Marker: Maintenance Today (Yellow) -->
+<button aria-label="Maintenance Marker" class="absolute top-[55%] left-[60%] map-marker group" onclick="openBottomSheet('Teknopark Ofisleri', 'Sanayi Mah. Teknoloji Bulvarı No: 4', 'maintenance', 'Planlı Bakım: Bugün')">
+<div class="relative w-7 h-7 flex items-center justify-center">
+<div class="relative w-6 h-6 bg-tertiary rounded-full border-2 border-surface flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-on-tertiary text-[14px]" style="font-variation-settings: 'FILL' 1;">build</span>
+</div>
+</div>
+</button>
+<!-- Marker: Normal (Green - using inline style for strict adherence to user request while avoiding generic tailwind classes) -->
+<button aria-label="Normal Marker" class="absolute top-[40%] left-[75%] map-marker group" onclick="openBottomSheet('Vadi Konutları', 'Ayazağa Mah. Cendere Cad. No: 109', 'normal', 'Sistem Normal')">
+<div class="relative w-6 h-6 flex items-center justify-center">
+<div class="relative w-5 h-5 rounded-full border-2 border-surface shadow-md" style="background-color: #22c55e;"></div>
+</div>
+</button>
+<!-- Marker: Normal 2 -->
+<button aria-label="Normal Marker" class="absolute top-[65%] left-[30%] map-marker group" onclick="openBottomSheet('Merkez AVM', 'Şişli Merkez Mah. Halaskargazi Cad.', 'normal', 'Sistem Normal')">
+<div class="relative w-6 h-6 flex items-center justify-center">
+<div class="relative w-5 h-5 rounded-full border-2 border-surface shadow-md" style="background-color: #22c55e;"></div>
+</div>
+</button>
+<!-- Floating Legend Panel -->
+<div class="absolute bottom-[90px] md:bottom-[32px] left-1/2 transform -translate-x-1/2 w-[90%] max-w-md bg-surface/95 backdrop-blur-xl rounded-[22px] premium-shadow border border-outline-variant/20 p-4 z-30">
+<div class="flex flex-wrap gap-4 items-center justify-center mb-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-error relative"><div class="absolute inset-0 bg-error rounded-full animate-ping opacity-50"></div></div>
+<span class="text-label-sm font-label-sm text-on-surface">Aktif Arıza</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-tertiary"></div>
+<span class="text-label-sm font-label-sm text-on-surface">Bugün Bakım</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full" style="background-color: #22c55e;"></div>
+<span class="text-label-sm font-label-sm text-on-surface">Normal</span>
+</div>
+</div>
+<div class="bg-error-container/30 rounded-xl p-3 flex items-start gap-3 border border-error/10">
+<span class="material-symbols-outlined text-error text-[20px]" data-icon="location_off">location_off</span>
+<div class="flex-1">
+<p class="text-label-sm font-label-sm text-on-surface-variant leading-tight">Haritada gösterilemeyen, koordinatı eksik <strong class="text-on-surface">3 asansör</strong> bulunuyor.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Sheet Overlay -->
+<div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300" id="bottomSheetOverlay" onclick="closeBottomSheet()"></div>
+<!-- Bottom Sheet Panel -->
+<div class="fixed bottom-0 left-0 w-full bg-surface rounded-t-[24px] premium-shadow z-50 transform translate-y-full transition-transform duration-400 cubic-bezier(0.25, 1, 0.5, 1) flex flex-col max-h-[707px]" id="bottomSheet">
+<!-- Drag Handle -->
+<div class="w-full flex justify-center pt-4 pb-2 cursor-pointer" onclick="closeBottomSheet()">
+<div class="w-12 h-1.5 bg-outline-variant/50 rounded-full"></div>
+</div>
+<div class="px-panel-padding pb-8 pt-2 overflow-y-auto no-scrollbar">
+<!-- Dynamic Content Area -->
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface mb-1" id="bsBuildingName">Bina Adı</h2>
+<p class="text-body-md font-body-md text-on-surface-variant flex items-center gap-1" id="bsAddress">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span id="bsAddressText">Adres Detayı</span>
+</p>
+</div>
+<!-- Status Chip -->
+<div class="px-4 py-1.5 rounded-full flex items-center gap-2 border" id="bsStatusChip">
+<div class="w-2 h-2 rounded-full" id="bsStatusDot"></div>
+<span class="text-label-sm font-label-sm" id="bsStatusText">Durum</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-[16px] p-4 mb-6 border border-outline-variant/20 flex gap-4 items-center">
+<div class="w-12 h-12 rounded-full bg-surface flex items-center justify-center premium-shadow">
+<span class="material-symbols-outlined text-secondary text-[24px]">elevator</span>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mb-0.5">Asansör Tipi</p>
+<p class="text-body-md font-body-md text-on-surface font-bold">Yolcu (Kapasite: 10 Kişi)</p>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 rounded-[16px] premium-shadow flex justify-center items-center gap-2 hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+                Detaya Git
+            </button>
+</div>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-[45] flex justify-around items-center px-4 pb-4 pt-2 bg-surface/80 dark:bg-surface-dim/80 border-t border-outline-variant/30 shadow-lg rounded-t-xl backdrop-blur-xl md:hidden">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-6 py-1 hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="login">login</span>
+<span class="text-label-sm font-label-sm">Giriş</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-6 py-1 hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="support_agent">support_agent</span>
+<span class="text-label-sm font-label-sm">Destek</span>
+</button>
+</nav>
+<!-- Interactive Scripts -->
+<script>
+        const bottomSheet = document.getElementById('bottomSheet');
+        const overlay = document.getElementById('bottomSheetOverlay');
+        
+        // DOM Elements for dynamic update
+        const elName = document.getElementById('bsBuildingName');
+        const elAddress = document.getElementById('bsAddressText');
+        const elStatusChip = document.getElementById('bsStatusChip');
+        const elStatusDot = document.getElementById('bsStatusDot');
+        const elStatusText = document.getElementById('bsStatusText');
+
+        function openBottomSheet(name, address, type, statusMsg) {
+            // Update Content
+            elName.textContent = name;
+            elAddress.textContent = address;
+            elStatusText.textContent = statusMsg;
+
+            // Reset Classes
+            elStatusChip.className = 'px-4 py-1.5 rounded-full flex items-center gap-2 border';
+            elStatusDot.className = 'w-2 h-2 rounded-full';
+            elStatusDot.style.backgroundColor = '';
+
+            // Apply specific styles based on type
+            if(type === 'fault') {
+                elStatusChip.classList.add('bg-error-container', 'border-error/20', 'text-on-error-container');
+                elStatusDot.classList.add('bg-error', 'animate-pulse');
+            } else if (type === 'maintenance') {
+                elStatusChip.classList.add('bg-tertiary-container/30', 'border-tertiary/20', 'text-tertiary');
+                elStatusDot.classList.add('bg-tertiary');
+            } else if (type === 'normal') {
+                elStatusChip.classList.add('bg-surface-container-high', 'border-outline-variant/30', 'text-on-surface');
+                elStatusDot.style.backgroundColor = '#22c55e'; // Inline green
+            }
+
+            // Animate In
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            overlay.classList.add('opacity-100', 'pointer-events-auto');
+            bottomSheet.classList.remove('translate-y-full');
+            bottomSheet.classList.add('translate-y-0');
+        }
+
+        function closeBottomSheet() {
+            // Animate Out
+            overlay.classList.remove('opacity-100', 'pointer-events-auto');
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+            bottomSheet.classList.remove('translate-y-0');
+            bottomSheet.classList.add('translate-y-full');
+        }
+    </script>
+</body></html>

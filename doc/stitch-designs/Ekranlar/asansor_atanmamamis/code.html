@@ -1,0 +1,178 @@
+<!DOCTYPE html><html class="light" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Müşteri Bilgilendirme - Asansör Operasyon</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e0e3e6",
+                        "background": "#f7fafd",
+                        "tertiary-fixed": "#ffe08e",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c2c7d1",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-fixed-variant": "#07497d",
+                        "on-secondary-container": "#43627f",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#2a4965",
+                        "secondary-container": "#beddff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#2d6197",
+                        "on-tertiary-fixed": "#241a00",
+                        "tertiary-fixed-dim": "#ecc246",
+                        "surface-container-high": "#e5e8eb",
+                        "surface-container-highest": "#e0e3e6",
+                        "on-background": "#181c1e",
+                        "inverse-primary": "#a0c9ff",
+                        "surface-bright": "#f7fafd",
+                        "secondary": "#43617e",
+                        "primary-fixed": "#d2e4ff",
+                        "surface": "#f7fafd",
+                        "primary": "#00355f",
+                        "tertiary-container": "#cea62c",
+                        "secondary-fixed-dim": "#aacaeb",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#001c37",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#181c1e",
+                        "surface-dim": "#d7dadd",
+                        "outline": "#727780",
+                        "tertiary": "#755b00",
+                        "surface-container": "#ebeef1",
+                        "on-surface-variant": "#42474f",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#eef1f4",
+                        "on-tertiary-container": "#4f3d00",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f1f4f7",
+                        "on-primary-container": "#8ebdf9",
+                        "secondary-fixed": "#cee5ff",
+                        "primary-container": "#0f4c81",
+                        "on-tertiary-fixed-variant": "#584400",
+                        "primary-fixed-dim": "#a0c9ff",
+                        "on-secondary-fixed": "#001d33"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "grid-gutter": "16px",
+                        "stack-gap-lg": "24px",
+                        "stack-gap-md": "16px",
+                        "panel-padding": "24px",
+                        "stack-gap-sm": "8px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Nunito Sans"],
+                        "headline-lg": ["Nunito Sans"],
+                        "display-lg": ["Nunito Sans"],
+                        "body-md": ["Nunito Sans"],
+                        "headline-lg-mobile": ["Nunito Sans"],
+                        "headline-sm": ["Nunito Sans"],
+                        "label-sm": ["Nunito Sans"],
+                        "headline-md": ["Nunito Sans"],
+                        "body-lg": ["Nunito Sans"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800" }],
+                        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "800" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: #f7fafd; /* base canvas */
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .soft-shadow {
+            box-shadow: 0px 10px 30px rgba(15, 76, 129, 0.06);
+        }
+        .border-inner {
+            border: 1px solid #E1E8F0;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+<!-- Decorative Ambient Background Elements for Premium Feel -->
+<div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-fixed/20 blur-[100px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-secondary-fixed/20 blur-[120px]"></div>
+</div>
+<!-- Top App Bar (Simplified for Transactional/Dead-end Screen) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex items-center justify-between px-container-padding h-16 shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">elevator</span>
+<span class="font-headline-sm text-headline-sm text-primary font-extrabold tracking-tight">Asansör Operasyon</span>
+</div>
+<button class="text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 18px;">logout</span>
+<span class="hidden sm:inline">Çıkış</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-md px-container-padding mt-20 mb-8 z-10 flex flex-col items-center">
+<!-- Icon Area with Premium Glass/Glow Effect -->
+<div class="relative w-32 h-32 mb-8 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/5 rounded-full animate-pulse"></div>
+<div class="absolute inset-4 bg-primary/10 rounded-full"></div>
+<div class="relative z-10 w-20 h-20 bg-surface-container-lowest rounded-full soft-shadow border-inner flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 0; font-size: 40px;">elevator</span>
+</div>
+<!-- Notification Badge Style -->
+<div class="absolute top-4 right-4 w-6 h-6 bg-tertiary-container rounded-full flex items-center justify-center shadow-sm border-2 border-surface-container-lowest z-20">
+<span class="material-symbols-outlined text-on-tertiary-container" style="font-size: 14px; font-variation-settings: 'FILL' 1;">priority_high</span>
+</div>
+</div>
+<!-- Headline & Description -->
+<div class="text-center mb-stack-gap-lg">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-extrabold mb-stack-gap-sm md:font-headline-lg md:text-headline-lg">Asansör Atanmamış</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-sm mx-auto">
+                Hesabınıza bağlı bir asansör kaydı bulunamadı. Lütfen bina yöneticiniz veya sistem yetkilisi ile iletişime geçerek atama işleminin yapılmasını talep edin.
+            </p>
+</div>
+<!-- Information Card (Bento Style) -->
+<div class="w-full bg-surface-container-lowest rounded-[22px] p-panel-padding soft-shadow border-inner mb-stack-gap-lg flex items-start gap-4 transition-transform hover:-translate-y-1 duration-300">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">info</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface">
+                    Asansör atandıktan sonra bakım ve durum bilgilerinize otomatik erişebilirsiniz.
+                </p>
+</div>
+</div>
+<!-- Action Area -->
+<div class="w-full mt-auto pt-stack-gap-lg">
+<button class="w-full bg-primary text-on-primary font-label-lg text-label-lg py-4 rounded-[16px] shadow-[0px_8px_16px_rgba(15,76,129,0.15)] hover:shadow-[0px_4px_8px_rgba(15,76,129,0.1)] hover:bg-primary/90 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">logout</span>
+                Oturumu Kapat
+            </button>
+</div>
+</main>
+</body></html>

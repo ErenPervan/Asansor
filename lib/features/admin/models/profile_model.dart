@@ -155,6 +155,5 @@ class ProfileModel {
 
   @override
   String toString() =>
-      'ProfileModel(id: $id, role: ${role.name}, email: $email, '
-      'fullName: $fullName)';
+      'ProfileModel(id: $id, role: ${role.name}, elevatorId: $elevatorId)';
 }

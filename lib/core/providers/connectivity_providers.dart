@@ -1,9 +1,12 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:asansor/core/services/read_cache_service.dart';
 import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/core/services/reachability_service.dart';
 
 // ── Connectivity ──────────────────────────────────────────────────────────────
 
@@ -28,6 +31,41 @@ final isOnlineProvider = Provider<bool>((ref) {
         error: (e, st) => true,
       );
 });
+
+final reachabilityServiceProvider = Provider<ReachabilityService>((ref) {
+  return ReachabilityService();
+});
+
+final isReachableProvider = StateProvider<bool>((ref) => false);
+
+void setupReachabilityListener(WidgetRef ref) {
+  Timer? pingTimer;
+
+  void checkReachability() async {
+    final client = ref.read(supabaseClientProvider);
+    final restUrl = client.rest.url.toString();
+    final isReachable = await ref.read(reachabilityServiceProvider).checkSupabase(restUrl);
+    ref.read(isReachableProvider.notifier).state = isReachable;
+  }
+
+  ref.listen<AsyncValue<List<ConnectivityResult>>>(connectivityStreamProvider, (
+    previous,
+    next,
+  ) {
+    next.whenData((results) {
+      final hasConnection = results.any((r) => r != ConnectivityResult.none);
+      
+      pingTimer?.cancel();
+      
+      if (hasConnection) {
+        checkReachability();
+        pingTimer = Timer.periodic(const Duration(seconds: 30), (_) => checkReachability());
+      } else {
+        ref.read(isReachableProvider.notifier).state = false;
+      }
+    });
+  });
+}
 
 // ── Supabase Client ───────────────────────────────────────────────────────────
 
@@ -74,6 +112,16 @@ final pendingSyncCountProvider = Provider<int>((ref) {
   return ref.watch(syncQueueServiceProvider).pendingCount;
 });
 
+enum SyncHealth { ok, pending, conflict, deadLetter }
+
+final syncHealthProvider = Provider<SyncHealth>((ref) {
+  final queueService = ref.watch(syncQueueServiceProvider);
+  if (queueService.deadLetterCount > 0) return SyncHealth.deadLetter;
+  if (queueService.conflictCount > 0) return SyncHealth.conflict;
+  if (queueService.pendingCount > 0) return SyncHealth.pending;
+  return SyncHealth.ok;
+});
+
 // ── Auto-sync ─────────────────────────────────────────────────────────────────
 
 /// Watches the connectivity stream and automatically flushes the queue the
@@ -87,28 +135,25 @@ final pendingSyncCountProvider = Provider<int>((ref) {
 /// Kept alive at the app-root level (watched inside [AsansorApp]) so it runs
 /// for the full app lifetime regardless of which screen is visible.
 void setupAutoSyncListener(WidgetRef ref) {
-  ref.listen<AsyncValue<List<ConnectivityResult>>>(connectivityStreamProvider, (
-    previous,
-    next,
-  ) {
-    next.whenData((results) {
-      final isNowOnline = results.any((r) => r != ConnectivityResult.none);
-      if (!isNowOnline) return;
+  ref.listen<bool>(isReachableProvider, (previous, next) {
+    final isNowReachable = next;
+    if (!isNowReachable) return;
 
-      // `previous == null` → first connectivity event after cold start.
-      // Treat it the same as "was offline" so any items queued in a prior
-      // offline session are flushed immediately on startup.
-      final wasOffline =
-          previous == null ||
-          (previous.valueOrNull?.every((r) => r == ConnectivityResult.none) ??
-              true);
+    final wasUnreachable = previous == null || previous == false;
 
-      if (wasOffline) {
-        final queue = ref.read(syncQueueServiceProvider);
-        if (queue.hasPending) {
-          queue.flush(ref.read(supabaseClientProvider));
-        }
+    if (wasUnreachable) {
+      final queue = ref.read(syncQueueServiceProvider);
+      if (queue.hasPending) {
+        queue.flush(ref.read(supabaseClientProvider));
       }
-    });
+    }
+  });
+
+  // Trigger an initial check on startup
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final queue = ref.read(syncQueueServiceProvider);
+    if (queue.hasPending && ref.read(isReachableProvider)) {
+      queue.flush(ref.read(supabaseClientProvider));
+    }
   });
 }

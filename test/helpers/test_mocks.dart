@@ -11,6 +11,8 @@ import 'package:asansor/features/maintenance/repositories/maintenance_repository
 import 'package:asansor/features/fault/repositories/fault_repository.dart';
 import 'package:asansor/features/auth/repositories/auth_repository.dart';
 import 'package:asansor/core/services/pdf_service.dart';
+import 'package:asansor/core/services/read_cache_service.dart';
+import 'package:asansor/core/services/sync_queue_service.dart';
 
 // ── Supabase Mocks ────────────────────────────────────────────────────────────
 
@@ -52,6 +54,10 @@ class MockProfileRepository extends Mock implements IProfileRepository {}
 // ── Service Mocks ─────────────────────────────────────────────────────────────
 
 class MockPdfService extends Mock implements PdfService {}
+
+class MockReadCacheService extends Mock implements ReadCacheService {}
+
+class MockSyncQueueService extends Mock implements SyncQueueService {}
 
 // ── Fake Classes (mocktail fallbacks) ─────────────────────────────────────────
 

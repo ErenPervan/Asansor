@@ -73,7 +73,7 @@ class MaintenanceLogModel {
       // DateTime: parse only if non-null; use epoch as a safe sentinel.
       maintenanceDate: json['maintenance_date'] != null
           ? DateTime.parse(json['maintenance_date'] as String)
-          : DateTime.fromMillisecondsSinceEpoch(0),
+          : throw const FormatException('maintenance_date is required for MaintenanceLogModel'),
       pdfUrl: json['pdf_url'] as String?,
       technicianName: profilesData?['full_name'] as String?,
       checklist: json['checklist'] as Map<String, dynamic>?,
@@ -81,6 +81,10 @@ class MaintenanceLogModel {
       signatureUrl: json['signature_url'] as String?,
       customerSignatureUrl: json['customer_signature_url'] as String?,
     );
+  }
+
+  factory MaintenanceLogModel.fromOfflineQueue(Map<String, dynamic> json) {
+    return MaintenanceLogModel.fromJson(json).copyWith(isOfflineQueued: true);
   }
 
   Map<String, dynamic> toJson() {
@@ -136,6 +140,5 @@ class MaintenanceLogModel {
   @override
   String toString() =>
       'MaintenanceLogModel(id: $id, elevatorId: $elevatorId, '
-      'technicianId: $technicianId, technicianName: $technicianName, '
-      'isApproved: $isApproved, checklist: $checklist, photos: $photos)';
+      'technicianId: $technicianId, isApproved: $isApproved)';
 }

@@ -1,0 +1,249 @@
+<!DOCTYPE html><html class="light" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Arıza Detayı - Asansor</title>
+<!-- Google Fonts: Nunito Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from Style Guidance -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#ecc246",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#eef1f4",
+                    "error-container": "#ffdad6",
+                    "secondary": "#43617e",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f1f4f7",
+                    "tertiary-container": "#cea62c",
+                    "on-surface": "#181c1e",
+                    "on-secondary-fixed": "#001d33",
+                    "on-tertiary-fixed": "#241a00",
+                    "on-background": "#181c1e",
+                    "surface": "#f7fafd",
+                    "on-tertiary-fixed-variant": "#584400",
+                    "on-primary-fixed-variant": "#07497d",
+                    "secondary-fixed": "#cee5ff",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f7fafd",
+                    "background": "#f7fafd",
+                    "surface-container-highest": "#e0e3e6",
+                    "surface-dim": "#d7dadd",
+                    "primary-container": "#0f4c81",
+                    "on-primary-fixed": "#001c37",
+                    "outline-variant": "#c2c7d1",
+                    "on-secondary-container": "#43627f",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#727780",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#8ebdf9",
+                    "primary": "#00355f",
+                    "on-error-container": "#93000a",
+                    "surface-container-high": "#e5e8eb",
+                    "tertiary": "#755b00",
+                    "surface-variant": "#e0e3e6",
+                    "tertiary-fixed": "#ffe08e",
+                    "primary-fixed": "#d2e4ff",
+                    "secondary-fixed-dim": "#aacaeb",
+                    "secondary-container": "#beddff",
+                    "primary-fixed-dim": "#a0c9ff",
+                    "surface-tint": "#2d6197",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#4f3d00",
+                    "inverse-primary": "#a0c9ff",
+                    "on-surface-variant": "#42474f",
+                    "on-secondary-fixed-variant": "#2a4965",
+                    "surface-container": "#ebeef1",
+                    "inverse-surface": "#2d3133"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap-lg": "24px",
+                    "grid-gutter": "16px",
+                    "stack-gap-md": "16px",
+                    "stack-gap-sm": "8px",
+                    "panel-padding": "24px",
+                    "container-padding": "20px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Nunito Sans"],
+                    "headline-lg": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "label-lg": ["Nunito Sans"],
+                    "headline-sm": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "800"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom subtle shadow for premium glass-industrial feel */
+        .premium-shadow {
+            box-shadow: 0px 10px 30px rgba(15, 76, 129, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm z-40">
+<div class="flex justify-between items-center w-full px-container-padding py-stack-gap-sm max-w-7xl mx-auto">
+<!-- Leading Icon & Brand -->
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed text-[28px]" data-icon="elevator" data-weight="fill" style="font-variation-settings: 'FILL' 1;">elevator</span>
+<span class="text-headline-md font-headline-md font-extrabold text-primary dark:text-primary-fixed">Asansor</span>
+</div>
+<!-- Trailing Action -->
+<div class="hidden md:flex items-center">
+<span class="text-label-sm font-label-sm text-on-surface-variant bg-surface-container py-1.5 px-3 rounded-full border border-outline-variant/50">Operasyon Yönetimi</span>
+</div>
+<!-- Mobile Action Button (Hamburger/More) -->
+<button aria-label="Menu" class="md:hidden p-2 text-on-surface-variant hover:bg-primary-container/10 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<!-- Navigation suppression applied due to task-focused/detail screen nature -->
+<main class="flex-1 w-full max-w-7xl mx-auto px-container-padding py-stack-gap-lg md:py-8">
+<!-- Header Section: Badge & Title -->
+<div class="mb-stack-gap-lg flex flex-col items-start gap-2">
+<div class="inline-flex items-center gap-1.5 bg-error-container text-on-error-container px-3 py-1 rounded-full text-label-sm font-label-sm border border-error/20">
+<span class="material-symbols-outlined text-[16px]" data-icon="warning" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+                Kritik Arıza Bildirimi
+            </div>
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-on-surface mt-2">
+                Blok A - Yolcu Asansörü #4
+            </h1>
+<p class="text-body-md font-body-md text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="tag">tag</span>
+                ARZ-2023-0894
+            </p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-grid-gutter">
+<!-- Main Detail Column -->
+<div class="lg:col-span-2 flex flex-col gap-grid-gutter">
+<!-- Fault Description Card -->
+<div class="bg-surface-container-lowest rounded-xl premium-shadow border border-outline-variant/30 p-panel-padding relative overflow-hidden">
+<!-- Subtle accent line -->
+<div class="absolute top-0 left-0 w-1 h-full bg-error"></div>
+<div class="flex items-center gap-2 mb-4">
+<div class="w-8 h-8 rounded-full bg-error-container/50 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[20px]" data-icon="report">report</span>
+</div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Arıza Açıklaması</h2>
+</div>
+<div class="bg-surface p-4 rounded-lg border border-outline-variant/20 mb-6">
+<p class="text-body-lg font-body-lg text-on-surface leading-relaxed">
+                            Kabin 3. ve 4. katlar arasında takılı kaldı. Kapı mekanizmasından anormal sesler geliyor ve iç panel butonları yanıt vermiyor. Sensör hatası veya mekanik sıkışma şüphesi var.
+                        </p>
+</div>
+<!-- Timeline / Dates -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-4">
+<div>
+<span class="block text-label-sm font-label-sm text-on-surface-variant mb-1">Bildirim Tarihi</span>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[18px]" data-icon="calendar_today">calendar_today</span>
+<span class="text-body-md font-body-md">24 Eki 2023, 08:45</span>
+</div>
+</div>
+<div>
+<span class="block text-label-sm font-label-sm text-on-surface-variant mb-1">Hedeflenen Onarım</span>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-tertiary-container text-[18px]" data-icon="schedule">schedule</span>
+<span class="text-body-md font-body-md">24 Eki 2023, 12:00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Resolution Note Area -->
+<div class="bg-surface-container-lowest rounded-xl premium-shadow border border-outline-variant/30 p-panel-padding">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary text-[22px]" data-icon="edit_note">edit_note</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Çözüm Notu</h3>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mb-2">Müdahale detaylarını ve değiştirilen parçaları buraya giriniz.</p>
+<textarea class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg p-3 text-body-md font-body-md text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none h-32" placeholder="Örn: Kapı motoru kontrol edildi, sensör bağlantıları yenilendi..."></textarea>
+</div>
+</div>
+<!-- Sidebar Column -->
+<div class="flex flex-col gap-grid-gutter">
+<!-- Elevator Info Card -->
+<div class="bg-surface-container-lowest rounded-xl premium-shadow border border-outline-variant/30 p-panel-padding">
+<h3 class="text-label-lg font-label-lg text-on-surface-variant uppercase tracking-wider mb-4 border-b border-outline-variant/30 pb-2">Asansör Bilgisi</h3>
+<ul class="flex flex-col gap-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-[20px] mt-0.5" data-icon="location_on">location_on</span>
+<div>
+<span class="block text-label-sm font-label-sm text-on-surface-variant">Konum</span>
+<span class="block text-body-md font-body-md text-on-surface mt-0.5">Merkez Plaza, B Blok, Doğu Kanadı</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-[20px] mt-0.5" data-icon="precision_manufacturing">precision_manufacturing</span>
+<div>
+<span class="block text-label-sm font-label-sm text-on-surface-variant">Model / Kapasite</span>
+<span class="block text-body-md font-body-md text-on-surface mt-0.5">Otis Gen2 / 10 Kişi (800kg)</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-[20px] mt-0.5" data-icon="build_circle">build_circle</span>
+<div>
+<span class="block text-label-sm font-label-sm text-on-surface-variant">Son Bakım</span>
+<span class="block text-body-md font-body-md text-on-surface mt-0.5">12 Eki 2023 (Periyodik)</span>
+</div>
+</li>
+</ul>
+<button class="mt-6 w-full flex items-center justify-center gap-2 bg-secondary-container/30 hover:bg-secondary-container/50 text-on-secondary-container rounded-lg py-2.5 transition-colors text-label-lg font-label-lg">
+<span class="material-symbols-outlined text-[18px]" data-icon="info">info</span>
+                        Asansör Detayına Git
+                    </button>
+</div>
+</div>
+</div>
+<!-- Sticky Action Bar for Mobile / Fixed Bottom Row for Desktop -->
+<div class="mt-stack-gap-lg pt-4 border-t border-outline-variant/30 flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pb-8 md:pb-0">
+<button class="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-outline-variant text-on-surface hover:bg-surface-container hover:border-outline transition-colors text-label-lg font-label-lg flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="refresh">refresh</span>
+                Yeniden Aç
+            </button>
+<button class="w-full sm:w-auto px-8 py-3 rounded-xl bg-primary text-on-primary hover:bg-primary-container shadow-md hover:shadow-lg transition-all text-label-lg font-label-lg flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="check_circle">check_circle</span>
+                Onarıldı İşaretle
+            </button>
+</div>
+</main>
+</body></html>

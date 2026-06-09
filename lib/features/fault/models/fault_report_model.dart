@@ -61,12 +61,16 @@ class FaultReportModel {
       isResolved: (json['is_resolved'] as bool?) ?? false,
       reportedAt: json['reported_at'] != null
           ? DateTime.parse(json['reported_at'] as String)
-          : DateTime.fromMillisecondsSinceEpoch(0),
+          : throw const FormatException('reported_at is required for FaultReportModel'),
       resolvedAt: json['resolved_at'] != null
           ? DateTime.parse(json['resolved_at'] as String)
           : null,
       resolutionNotes: json['resolution_notes'] as String?,
     );
+  }
+
+  factory FaultReportModel.fromOfflineQueue(Map<String, dynamic> json) {
+    return FaultReportModel.fromJson(json).copyWith(isOfflineQueued: true);
   }
 
   Map<String, dynamic> toJson() {

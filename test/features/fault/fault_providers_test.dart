@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:asansor/core/providers/connectivity_providers.dart';
 import 'package:asansor/features/fault/providers/fault_providers.dart';
 
+
 import '../../helpers/provider_test_utils.dart';
 import '../../helpers/test_mocks.dart';
 import '../../helpers/test_factories.dart';
@@ -15,11 +16,16 @@ void main() {
 
   group('allFaultsProvider', () {
     late MockFaultRepository mockRepo;
-    late FakeReadCacheService fakeCache;
+    late MockReadCacheService mockCache;
+    late MockSyncQueueService mockQueue;
 
     setUp(() {
       mockRepo = MockFaultRepository();
-      fakeCache = FakeReadCacheService();
+      mockCache = MockReadCacheService();
+      mockQueue = MockSyncQueueService();
+      when(() => mockQueue.pendingItemsOfType(any())).thenReturn([]);
+      when(() => mockCache.loadAllFaults()).thenReturn([]);
+      when(() => mockCache.saveAllFaults(any())).thenAnswer((_) async => {});
     });
 
     test('offline → cache boşsa boş liste döner', () async {
@@ -27,7 +33,8 @@ void main() {
         overrides: [
           isOnlineProvider.overrideWithValue(false),
           faultRepositoryProvider.overrideWithValue(mockRepo),
-          readCacheServiceProvider.overrideWithValue(fakeCache),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
         ],
       );
 
@@ -51,7 +58,8 @@ void main() {
         overrides: [
           isOnlineProvider.overrideWithValue(true),
           faultRepositoryProvider.overrideWithValue(mockRepo),
-          readCacheServiceProvider.overrideWithValue(fakeCache),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
         ],
       );
 
@@ -64,11 +72,14 @@ void main() {
     test('online hata + cache boşsa exception rethrow olur', () async {
       when(() => mockRepo.getAllFaults()).thenThrow(Exception('Ağ hatası'));
 
+      when(() => mockCache.loadAllFaults()).thenReturn([]);
+
       final container = createContainer(
         overrides: [
           isOnlineProvider.overrideWithValue(true),
           faultRepositoryProvider.overrideWithValue(mockRepo),
-          readCacheServiceProvider.overrideWithValue(fakeCache),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
         ],
       );
 
@@ -77,23 +88,52 @@ void main() {
         throwsA(isA<Exception>()),
       );
     });
+
+    test('online hata + cache dolu ise cache doner', () async {
+      final cachedFaults = [
+        TestFactories.createFaultReport(id: 'c1', description: 'Cache Ariza 1'),
+      ];
+      when(() => mockRepo.getAllFaults()).thenThrow(Exception('Ağ hatası'));
+      when(() => mockCache.loadAllFaults()).thenReturn(cachedFaults);
+
+      final container = createContainer(
+        overrides: [
+          isOnlineProvider.overrideWithValue(true),
+          faultRepositoryProvider.overrideWithValue(mockRepo),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
+        ],
+      );
+
+      final result = await container.read(allFaultsProvider.future);
+      expect(result.length, 1);
+      expect(result.first.description, 'Cache Ariza 1');
+      verify(() => mockRepo.getAllFaults()).called(1);
+    });
   });
 
   group('activeFaultsProvider', () {
     late MockFaultRepository mockRepo;
-    late FakeReadCacheService fakeCache;
+    late MockReadCacheService mockCache;
+    late MockSyncQueueService mockQueue;
 
     setUp(() {
       mockRepo = MockFaultRepository();
-      fakeCache = FakeReadCacheService();
+      mockCache = MockReadCacheService();
+      mockQueue = MockSyncQueueService();
+      when(() => mockQueue.pendingItemsOfType(any())).thenReturn([]);
+      when(() => mockCache.loadActiveFaults()).thenReturn([]);
+      when(() => mockCache.saveActiveFaults(any())).thenAnswer((_) async => {});
     });
 
     test('offline → cache boşsa boş liste döner', () async {
+      when(() => mockCache.loadActiveFaults()).thenReturn([]);
       final container = createContainer(
         overrides: [
           isOnlineProvider.overrideWithValue(false),
           faultRepositoryProvider.overrideWithValue(mockRepo),
-          readCacheServiceProvider.overrideWithValue(fakeCache),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
         ],
       );
 
@@ -109,16 +149,41 @@ void main() {
       ];
       when(() => mockRepo.getAllActiveFaults()).thenAnswer((_) async => faults);
 
+      when(() => mockCache.loadActiveFaults()).thenReturn([]);
+
       final container = createContainer(
         overrides: [
           isOnlineProvider.overrideWithValue(true),
           faultRepositoryProvider.overrideWithValue(mockRepo),
-          readCacheServiceProvider.overrideWithValue(fakeCache),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
         ],
       );
 
       final result = await container.read(activeFaultsProvider.future);
       expect(result.length, 2);
+      expect(result.every((f) => !f.isResolved), isTrue);
+      verify(() => mockRepo.getAllActiveFaults()).called(1);
+    });
+
+    test('online hata + cache dolu ise cache doner', () async {
+      final cachedFaults = [
+        TestFactories.createFaultReport(id: 'c1', isResolved: false),
+      ];
+      when(() => mockRepo.getAllActiveFaults()).thenThrow(Exception('Ağ hatası'));
+      when(() => mockCache.loadActiveFaults()).thenReturn(cachedFaults);
+
+      final container = createContainer(
+        overrides: [
+          isOnlineProvider.overrideWithValue(true),
+          faultRepositoryProvider.overrideWithValue(mockRepo),
+          readCacheServiceProvider.overrideWithValue(mockCache),
+          syncQueueServiceProvider.overrideWith((ref) => mockQueue),
+        ],
+      );
+
+      final result = await container.read(activeFaultsProvider.future);
+      expect(result.length, 1);
       expect(result.every((f) => !f.isResolved), isTrue);
       verify(() => mockRepo.getAllActiveFaults()).called(1);
     });

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:asansor/core/widgets/error_state.dart';
@@ -7,6 +8,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:excel/excel.dart' hide Border, TextSpan;
+import 'package:path_provider/path_provider.dart';
 
 class AdminStatisticsDashboard extends ConsumerStatefulWidget {
   const AdminStatisticsDashboard({super.key});
@@ -114,10 +117,43 @@ class _StatisticsContent extends StatelessWidget {
                 onPieTouch: onPieTouch,
               ),
               const SizedBox(height: AppSpacing.lg),
-              _ActionStrip(onRefresh: onRefresh),
+              _TopPartsList(parts: data.topFailingParts),
+              const SizedBox(height: AppSpacing.lg),
+              _ActionStrip(onRefresh: onRefresh, data: data),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TopPartsList extends StatelessWidget {
+  final List<TopFailingPartData> parts;
+  const _TopPartsList({required this.parts});
+
+  @override
+  Widget build(BuildContext context) {
+    if (parts.isEmpty) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.28)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('En Çok Arızalanan Parçalar', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.md),
+          ...parts.map((p) => ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.build_circle_outlined),
+            title: Text(p.partName),
+            trailing: Text('${p.quantity} Adet', style: const TextStyle(fontWeight: FontWeight.bold)),
+          )),
+        ],
       ),
     );
   }
@@ -349,6 +385,14 @@ class _KpiBento extends StatelessWidget {
             group: 'Sistem',
             icon: Icons.elevator_rounded,
             tone: _KpiTone.navy,
+          ),
+          _KpiCard(
+            label: 'SLA Başarısı',
+            value: '%${data.slaComplianceRate.toStringAsFixed(1)}',
+            caption: 'Son 30 gün',
+            group: 'Performans',
+            icon: Icons.timer_outlined,
+            tone: _KpiTone.success,
           ),
         ];
 
@@ -904,9 +948,43 @@ class _PieChartCard extends StatelessWidget {
 }
 
 class _ActionStrip extends StatelessWidget {
-  const _ActionStrip({required this.onRefresh});
+  const _ActionStrip({required this.onRefresh, required this.data});
 
   final VoidCallback onRefresh;
+  final AdminAnalyticsState data;
+
+  Future<void> _exportToExcel(BuildContext context) async {
+    try {
+      var excel = Excel.createExcel();
+      Sheet sheetObject = excel['Analytics'];
+      excel.setDefaultSheet('Analytics');
+
+      sheetObject.appendRow([TextCellValue('Metrik'), TextCellValue('Değer')]);
+      sheetObject.appendRow([TextCellValue('Toplam Asansör'), TextCellValue('${data.totalElevators}')]);
+      sheetObject.appendRow([TextCellValue('Aktif Arızalar'), TextCellValue('${data.activeFaults}')]);
+      sheetObject.appendRow([TextCellValue('Bekleyen Bakımlar'), TextCellValue('${data.pendingMaintenances}')]);
+      sheetObject.appendRow([TextCellValue('Bu Ay Çözülen'), TextCellValue('${data.completedMaintenancesThisMonth}')]);
+      sheetObject.appendRow([TextCellValue('SLA Başarısı'), TextCellValue('%${data.slaComplianceRate.toStringAsFixed(1)}')]);
+
+      sheetObject.appendRow([TextCellValue('')]);
+      sheetObject.appendRow([TextCellValue('En Çok Arızalanan Parçalar'), TextCellValue('Adet')]);
+      for (var p in data.topFailingParts) {
+        sheetObject.appendRow([TextCellValue(p.partName), TextCellValue('${p.quantity}')]);
+      }
+
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/SLA_Report_${DateTime.now().millisecondsSinceEpoch}.xlsx');
+      await file.writeAsBytes(excel.save()!);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Rapor kaydedildi: ${file.path}')));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Dışa aktarma hatası: $e')));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -949,6 +1027,11 @@ class _ActionStrip extends StatelessWidget {
             label: 'Yenile',
             icon: Icons.refresh_rounded,
             onTap: onRefresh,
+          ),
+          _ActionItem(
+            label: 'Dışa Aktar',
+            icon: Icons.download_rounded,
+            onTap: () => _exportToExcel(context),
           ),
         ];
 

@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:asansor/firebase_options.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -13,8 +15,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:asansor/l10n/app_localizations.dart';
 
-import 'package:asansor/core/constants/supabase_constants.dart';
+import 'package:asansor/core/config/app_config.dart';
 import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/providers/notification_providers.dart';
 import 'package:asansor/core/router/app_router.dart'; // also exports: appRouter, navigatorKey
 import 'package:asansor/core/services/deep_link_service.dart';
 import 'package:asansor/core/services/notification_service.dart';
@@ -76,7 +79,8 @@ Future<void> _initHive(FlutterSecureStorage secureStorage) async {
 
 Future<void> _clearAndReinitHive(FlutterSecureStorage secureStorage) async {
   await Hive.close();
-  await Hive.deleteBoxFromDisk(syncQueueBoxName);
+  // syncQueueBoxName is explicitly NOT deleted here to prevent data loss of pending offline writes.
+  // A corrupted sync queue should be handled manually or sent to dead-letter, not silently wiped.
   await Hive.deleteBoxFromDisk(elevatorsCacheBoxName);
   await Hive.deleteBoxFromDisk(tasksCacheBoxName);
   await Hive.deleteBoxFromDisk(checklistCacheBoxName);
@@ -109,6 +113,22 @@ Future<void> main() async {
   // Firebase must be initialised before any Firebase service is used.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  // Initialize Crashlytics
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+  
+  // Disable crashlytics in debug mode
+  if (kDebugMode) {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+  } else {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  }
+
   // Register the background handler as early as possible — before any other
   // Firebase call.  NotificationService.initialize() also registers it as a
   // safety net, but registering here ensures it is set even before that runs.
@@ -117,21 +137,11 @@ Future<void> main() async {
   // Ensure FCM auto-init is enabled so token generation/refresh works reliably.
   await FirebaseMessaging.instance.setAutoInitEnabled(true);
 
-  // Print startup FCM token for quick verification in debug console.
-  try {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    if (kDebugMode) {
-      debugPrint('====================================================');
-      debugPrint("EREN'IN FCM TOKEN'I: $fcmToken");
-      debugPrint('====================================================');
-    }
-  } catch (e) {
-    debugPrint('Token alinirken hata olustu: $e');
-  }
+  // FCM token generation is handled by NotificationService.
 
   await Supabase.initialize(
-    url: SupabaseConstants.supabaseUrl,
-    anonKey: SupabaseConstants.supabaseAnonKey,
+    url: AppConfig.supabaseUrl,
+    anonKey: AppConfig.supabaseAnonKey,
   );
 
   // Initialise Hive and open all persistent boxes.
@@ -186,6 +196,9 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
   @override
   void initState() {
     super.initState();
+    // Start background listeners that should run app-wide
+    setupReachabilityListener(ref);
+    setupAutoSyncListener(ref);
 
     // State 1 — terminated: wait for the first frame so GoRouter has rendered
     // its initial route before we attempt to navigate.  At this point
@@ -231,6 +244,9 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
     // Keep the auto-sync listener alive for the entire app lifetime so it
     // fires regardless of which screen is currently shown.
     setupAutoSyncListener(ref);
+
+    // Watch the notification auth listener to keep NotificationService in sync
+    ref.watch(notificationAuthListenerProvider);
 
     final goRouter = ref.watch(appRouterProvider);
 

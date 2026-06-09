@@ -30,7 +30,8 @@ class ElevatorRepository implements IElevatorRepository {
       final response = await _client
           .from(_table)
           .select()
-          .order('building_name', ascending: true);
+          .order('building_name', ascending: true)
+          .limit(1000);
 
       return (response as List<dynamic>)
           .map((json) => ElevatorModel.fromJson(json as Map<String, dynamic>))

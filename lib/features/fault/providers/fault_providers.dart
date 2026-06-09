@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dart:async';
+import 'package:uuid/uuid.dart';
 import 'package:asansor/core/providers/connectivity_providers.dart';
 import 'package:asansor/core/services/sync_queue_service.dart';
 import 'package:asansor/features/fault/models/fault_report_model.dart';
@@ -17,54 +18,62 @@ final faultRepositoryProvider = Provider<IFaultRepository>((ref) {
 
 /// Fetches all fault reports (resolved and unresolved) across every elevator.
 final allFaultsProvider = FutureProvider<List<FaultReportModel>>((ref) async {
-  // Try network first if online
+  final queueService = ref.watch(syncQueueServiceProvider);
+  final pendingPayloads = queueService.pendingItemsOfType(SyncItemType.faultReport);
+  final pendingFaults = pendingPayloads.map((p) {
+    p['id'] = 'pending_${p['idempotency_key']}';
+    return FaultReportModel.fromOfflineQueue(p);
+  }).toList();
+
   final isOnline = ref.watch(isOnlineProvider);
   final cache = ref.read(readCacheServiceProvider);
 
+  List<FaultReportModel> remoteFaults = [];
   if (!isOnline) {
-    return cache.loadAllFaults();
+    remoteFaults = cache.loadAllFaults();
+  } else {
+    try {
+      final repo = ref.watch(faultRepositoryProvider);
+      remoteFaults = await repo.getAllFaults();
+      unawaited(cache.saveAllFaults(remoteFaults));
+    } catch (e) {
+      remoteFaults = cache.loadAllFaults().cast<FaultReportModel>();
+      if (remoteFaults.isEmpty) rethrow;
+    }
   }
 
-  try {
-    final repo = ref.watch(faultRepositoryProvider);
-    final data = await repo.getAllFaults();
-    // Cache the faults for offline use
-    unawaited(cache.saveAllFaults(data));
-    return data;
-  } catch (e) {
-    final cached = cache.loadAllFaults().cast<FaultReportModel>();
-    if (cached.isNotEmpty) return cached;
-    rethrow;
-  }
+  return [...pendingFaults, ...remoteFaults];
 });
 
 /// Fetches all unresolved fault reports across every elevator.
 final activeFaultsProvider = FutureProvider<List<FaultReportModel>>((
   ref,
 ) async {
-  final isOnline = ref.watch(isOnlineProvider);
-  // Assume readCacheServiceProvider is imported or accessible. If not, we will need to adjust.
-  // wait, I don't know the name of the provider. Let's just create an instance if needed.
-  // Wait, I should find readCacheServiceProvider import. I will use ReadCacheService() directly if not provided, or search for it.
-  // Actually, I can use ref.read(readCacheServiceProvider) if I know it exists. Let's look at it.
+  final queueService = ref.watch(syncQueueServiceProvider);
+  final pendingPayloads = queueService.pendingItemsOfType(SyncItemType.faultReport);
+  final pendingFaults = pendingPayloads.map((p) {
+    p['id'] = 'pending_${p['idempotency_key']}';
+    return FaultReportModel.fromOfflineQueue(p);
+  }).where((f) => !f.isResolved).toList();
 
-  // To be safe, I'll use the same cache provider we saw in elevator_providers.dart.
+  final isOnline = ref.watch(isOnlineProvider);
   final cache = ref.read(readCacheServiceProvider);
 
+  List<FaultReportModel> remoteFaults = [];
   if (!isOnline) {
-    return cache.loadActiveFaults();
+    remoteFaults = cache.loadActiveFaults();
+  } else {
+    try {
+      final repo = ref.watch(faultRepositoryProvider);
+      remoteFaults = await repo.getAllActiveFaults();
+      unawaited(cache.saveActiveFaults(remoteFaults));
+    } catch (e) {
+      remoteFaults = cache.loadActiveFaults().cast<FaultReportModel>();
+      if (remoteFaults.isEmpty) rethrow;
+    }
   }
 
-  try {
-    final repo = ref.watch(faultRepositoryProvider);
-    final data = await repo.getAllActiveFaults();
-    unawaited(cache.saveActiveFaults(data));
-    return data;
-  } catch (e) {
-    final cached = cache.loadActiveFaults().cast<FaultReportModel>();
-    if (cached.isNotEmpty) return cached;
-    rethrow;
-  }
+  return [...pendingFaults, ...remoteFaults];
 });
 
 /// Fetches all fault reports for a given elevator [id].
@@ -73,8 +82,19 @@ final faultsByElevatorProvider =
       ref,
       elevatorId,
     ) async {
+      final queueService = ref.watch(syncQueueServiceProvider);
+      final pendingPayloads = queueService.pendingItemsOfType(SyncItemType.faultReport);
+      final pendingFaults = pendingPayloads
+          .where((p) => p['elevator_id'] == elevatorId)
+          .map((p) {
+            p['id'] = 'pending_${p['idempotency_key']}';
+            return FaultReportModel.fromOfflineQueue(p);
+          }).toList();
+
       final repo = ref.watch(faultRepositoryProvider);
-      return repo.getFaultsByElevatorId(elevatorId);
+      final remoteFaults = await repo.getFaultsByElevatorId(elevatorId);
+      
+      return [...pendingFaults, ...remoteFaults];
     });
 
 /// Fetches a single fault report by its [id].
@@ -101,46 +121,37 @@ class FaultController extends AutoDisposeAsyncNotifier<FaultReportModel?> {
     state = const AsyncLoading();
 
     final isOnline = ref.read(isOnlineProvider);
+    final idempotencyKey = const Uuid().v4();
 
-    if (!isOnline) {
-      // ── Offline path ──────────────────────────────────────────────────────
-      // Note: photo uploads require connectivity and cannot be queued.
-      await ref
-          .read(syncQueueServiceProvider)
-          .enqueue(
-            type: SyncItemType.faultReport,
-            payload: {
-              'elevator_id': elevatorId,
-              'description': description,
-              'is_resolved': false,
-              'reported_at': DateTime.now().toUtc().toIso8601String(),
-              // photo_url intentionally omitted – upload requires network
-            },
-          );
+    // ── Queue First (Always write to local queue) ───────────────────────────
+    await ref.read(syncQueueServiceProvider).enqueue(
+          type: SyncItemType.faultReport,
+          payload: {
+            'idempotency_key': idempotencyKey,
+            'elevator_id': elevatorId,
+            'description': description,
+            'is_resolved': false,
+            'reported_at': DateTime.now().toUtc().toIso8601String(),
+            'photo_url': ?photoUrl,
+          },
+        );
 
-      state = AsyncData(
-        FaultReportModel(
-          id: 'offline_${DateTime.now().millisecondsSinceEpoch}',
-          elevatorId: elevatorId,
-          description: description,
-          isResolved: false,
-          reportedAt: DateTime.now(),
-          isOfflineQueued: true,
-        ),
-      );
-      return;
+    // ── Attempt Sync if Online ──────────────────────────────────────────────
+    if (isOnline) {
+      // The flush command handles its own errors silently, preserving the queue
+      await ref.read(syncQueueServiceProvider).flush(ref.read(supabaseClientProvider));
     }
 
-    // ── Online path ───────────────────────────────────────────────────────
-    state = await AsyncValue.guard(() {
-      return ref
-          .read(faultRepositoryProvider)
-          .reportFault(
-            elevatorId: elevatorId,
-            description: description,
-            photoUrl: photoUrl,
-          );
-    });
+    state = AsyncData(
+      FaultReportModel(
+        id: 'queued_${DateTime.now().millisecondsSinceEpoch}',
+        elevatorId: elevatorId,
+        description: description,
+        isResolved: false,
+        reportedAt: DateTime.now(),
+        isOfflineQueued: true,
+      ),
+    );
 
     if (!state.hasError) {
       ref.invalidate(activeFaultsProvider);

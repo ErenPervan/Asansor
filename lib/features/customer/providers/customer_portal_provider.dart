@@ -1,29 +1,45 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 import 'package:asansor/features/admin/providers/profile_providers.dart';
-
+import 'package:asansor/core/providers/connectivity_providers.dart';
 final customerElevatorProvider = FutureProvider.autoDispose<ElevatorModel?>((
   ref,
 ) async {
-  // Get the customer's specific elevator ID from their profile
   final profile = await ref.watch(currentProfileProvider.future);
   final elevatorId = profile?.elevatorId;
 
   if (elevatorId == null || elevatorId.isEmpty) {
-    return null; // The user has no assigned elevator
+    return null;
   }
 
-  // Fetch the specific elevator
-  final response = await Supabase.instance.client
-      .from('elevators')
-      .select()
-      .eq('id', elevatorId)
-      .maybeSingle();
+  final isOnline = ref.watch(isOnlineProvider);
+  final cache = ref.read(readCacheServiceProvider);
 
-  if (response == null) return null;
-  return ElevatorModel.fromJson(response);
+  if (!isOnline) {
+    final cachedElevators = cache.loadElevators();
+    return cachedElevators.where((e) => e.id == elevatorId).firstOrNull;
+  }
+
+  try {
+    final response = await ref.read(supabaseClientProvider)
+        .from('elevators')
+        .select()
+        .eq('id', elevatorId)
+        .maybeSingle();
+
+    if (response == null) return null;
+    final model = ElevatorModel.fromJson(response);
+    
+    final existing = cache.loadElevators();
+    final updated = existing.where((e) => e.id != elevatorId).toList()..add(model);
+    await cache.saveElevators(updated);
+
+    return model;
+  } catch (e) {
+    final cachedElevators = cache.loadElevators();
+    return cachedElevators.where((e) => e.id == elevatorId).firstOrNull;
+  }
 });
 
 final customerMaintenanceLogsProvider =
@@ -35,15 +51,29 @@ final customerMaintenanceLogsProvider =
         return [];
       }
 
-      // Fetch recent maintenance logs for this elevator
-      final response = await Supabase.instance.client
-          .from('maintenance_logs')
-          .select()
-          .eq('elevator_id', elevatorId)
-          .order('maintenance_date', ascending: false)
-          .limit(10);
+      final isOnline = ref.watch(isOnlineProvider);
+      final cache = ref.read(readCacheServiceProvider);
 
-      return response
-          .map((json) => MaintenanceLogModel.fromJson(json))
-          .toList();
+      if (!isOnline) {
+        return cache.loadPastLogs(elevatorId);
+      }
+
+      try {
+        final response = await ref.read(supabaseClientProvider)
+            .from('maintenance_logs')
+            .select()
+            .eq('elevator_id', elevatorId)
+            .order('maintenance_date', ascending: false)
+            .limit(10);
+
+        final logs = response
+            .map((json) => MaintenanceLogModel.fromJson(json))
+            .toList();
+
+        await cache.savePastLogs(elevatorId, logs);
+
+        return logs;
+      } catch (e) {
+        return cache.loadPastLogs(elevatorId);
+      }
     });

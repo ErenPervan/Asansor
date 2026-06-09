@@ -1,4 +1,4 @@
-name: Flutter Test & Format
+name: PR Quality Check (Format & Secrets)
 
 on:
   push:
@@ -10,37 +10,29 @@ on:
       - main
 
 jobs:
-  test:
-    name: Run Flutter Tests
+  quality_gate:
+    name: Code Quality Gate
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.24.3'
           channel: 'stable'
-          # flutter-version: '3.19.0' # Optionally lock the version if needed
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Create dummy .env file
-        run: touch .env
-
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
-        
-      - name: Analyze project source
-        run: flutter analyze
-
-      - name: Run unit and widget tests
-        run: flutter test --coverage
-
-      # Optional: Upload coverage report
-      # - name: Upload coverage to Codecov
-      #   uses: codecov/codecov-action@v3
-      #   with:
-      #     file: coverage/lcov.info

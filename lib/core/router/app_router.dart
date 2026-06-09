@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:asansor/core/enums/app_capability.dart';
-import 'package:asansor/core/services/notification_service.dart';
-
+import 'package:asansor/core/providers/notification_providers.dart';
 import 'package:asansor/features/auth/providers/auth_providers.dart';
 import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 import 'package:asansor/features/fault/providers/fault_providers.dart';
@@ -35,6 +34,8 @@ import 'package:asansor/features/elevator/views/scanner_view.dart';
 import 'package:asansor/features/maintenance/views/maintenance_log_entry_view.dart';
 import 'package:asansor/features/admin/conflicts/admin_conflict_management_view.dart';
 import 'package:asansor/features/admin/views/admin_statistics_dashboard.dart';
+import 'package:asansor/features/work_order/views/work_order_list_view.dart';
+import 'package:asansor/features/work_order/views/work_order_detail_view.dart';
 
 import 'package:asansor/core/views/not_found_view.dart';
 
@@ -107,14 +108,6 @@ class RouterNotifier extends ChangeNotifier {
           current.status == AuthStatus.unauthenticated) {
         _clearUserData();
       }
-
-      if (current.status == AuthStatus.authorized) {
-        NotificationService.instance.isAuthorized = true;
-        NotificationService.instance.authState = current;
-      } else {
-        NotificationService.instance.isAuthorized = false;
-        NotificationService.instance.authState = null;
-      }
       notifyListeners();
     }, fireImmediately: true);
   }
@@ -186,9 +179,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return isOnLoadingPage ? null : '/loading';
 
         case AuthStatus.authorized:
-          final pendingRoute = NotificationService.instance
-              .consumePendingRoute();
+          final pendingRoute = ref.read(pendingNotificationRouteProvider);
           if (pendingRoute != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ref.read(pendingNotificationRouteProvider.notifier).state = null;
+            });
             return pendingRoute;
           }
 
@@ -263,6 +258,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: '/work-orders',
+                builder: (context, _) => const WorkOrderListView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: '/admin/master-calendar',
                 builder: (context, _) => const AdminMasterCalendarView(),
               ),
@@ -292,6 +295,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, state) {
           final elevatorId = state.pathParameters['id'] ?? '';
           return MaintenanceLogEntryView(elevatorId: elevatorId);
+        },
+      ),
+
+      GoRoute(
+        path: '/work-orders/:id',
+        builder: (_, state) {
+          final orderId = state.pathParameters['id'] ?? '';
+          return WorkOrderDetailView(orderId: orderId);
         },
       ),
 

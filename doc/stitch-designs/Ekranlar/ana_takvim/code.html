@@ -1,0 +1,361 @@
+<!DOCTYPE html><html lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Ana Takvim - ElevateOps Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f7fafd",
+                        "secondary-fixed-dim": "#aacaeb",
+                        "primary-container": "#0f4c81",
+                        "tertiary-container": "#cea62c",
+                        "surface-container": "#ebeef1",
+                        "on-background": "#181c1e",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#beddff",
+                        "secondary": "#43617e",
+                        "tertiary": "#755b00",
+                        "tertiary-fixed": "#ffe08e",
+                        "on-tertiary-fixed-variant": "#584400",
+                        "on-primary-container": "#8ebdf9",
+                        "surface-tint": "#2d6197",
+                        "inverse-primary": "#a0c9ff",
+                        "background": "#f7fafd",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e0e3e6",
+                        "surface": "#f7fafd",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#001c37",
+                        "on-secondary-container": "#43627f",
+                        "surface-container-highest": "#e0e3e6",
+                        "surface-container-low": "#f1f4f7",
+                        "primary-fixed-dim": "#a0c9ff",
+                        "outline-variant": "#c2c7d1",
+                        "on-secondary-fixed": "#001d33",
+                        "tertiary-fixed-dim": "#ecc246",
+                        "surface-dim": "#d7dadd",
+                        "primary-fixed": "#d2e4ff",
+                        "error": "#ba1a1a",
+                        "outline": "#727780",
+                        "inverse-on-surface": "#eef1f4",
+                        "on-tertiary-fixed": "#241a00",
+                        "on-surface": "#181c1e",
+                        "on-tertiary-container": "#4f3d00",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#00355f",
+                        "on-secondary-fixed-variant": "#2a4965",
+                        "surface-container-high": "#e5e8eb",
+                        "secondary-fixed": "#cee5ff",
+                        "on-primary-fixed-variant": "#07497d",
+                        "inverse-surface": "#2d3133",
+                        "on-surface-variant": "#42474f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "20px",
+                        "stack-gap-sm": "8px",
+                        "stack-gap-md": "16px",
+                        "grid-gutter": "16px",
+                        "stack-gap-lg": "24px",
+                        "panel-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Nunito Sans"],
+                        "headline-sm": ["Nunito Sans"],
+                        "body-lg": ["Nunito Sans"],
+                        "label-sm": ["Nunito Sans"],
+                        "body-md": ["Nunito Sans"],
+                        "headline-lg-mobile": ["Nunito Sans"],
+                        "label-lg": ["Nunito Sans"],
+                        "headline-md": ["Nunito Sans"],
+                        "headline-lg": ["Nunito Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "800" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Nunito Sans', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .soft-shadow {
+            box-shadow: 0px 10px 30px rgba(15, 76, 129, 0.06);
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #E1E8F0;
+            border: 1px solid #E1E8F0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .calendar-cell {
+            background-color: #FFFFFF;
+            min-height: 100px;
+            padding: 8px;
+            position: relative;
+        }
+        .calendar-cell.inactive {
+            background-color: #f7fafd;
+            color: #727780;
+        }
+        .calendar-cell.selected {
+            background-color: #f0f6fc;
+            box-shadow: inset 0 0 0 2px #0f4c81;
+        }
+        .task-marker {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 2px;
+        }
+        .task-marker.urgent { background-color: #ba1a1a; }
+        .task-marker.pending { background-color: #0f4c81; }
+        .task-marker.completed { background-color: #1b5e20; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row">
+<!-- NavigationDrawer (Web) -->
+<nav class="bg-surface dark:bg-surface-dim h-screen w-72 fixed left-0 top-0 border-r border-outline-variant/30 shadow-lg hidden lg:flex flex-col py-panel-padding z-40">
+<div class="px-container-padding mb-8">
+<h1 class="font-headline-sm text-headline-sm text-primary">ElevateOps Pro</h1>
+</div>
+<div class="flex items-center gap-4 px-container-padding mb-8 left_align">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg">
+                SA
+            </div>
+<div>
+<div class="font-label-lg text-label-lg text-on-surface">System Architect</div>
+<div class="text-xs text-on-surface-variant">Fleet Operations</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-2">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl mx-2 hover:bg-surface-container-highest transition-all duration-200 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-lg text-label-lg">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl mx-2 font-bold hover:bg-surface-container-highest transition-all duration-200 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="checklist">checklist</span>
+<span class="font-label-lg text-label-lg">Maintenance</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl mx-2 hover:bg-surface-container-highest transition-all duration-200 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="error_outline">error_outline</span>
+<span class="font-label-lg text-label-lg">Faults</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl mx-2 hover:bg-surface-container-highest transition-all duration-200 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="elevator">elevator</span>
+<span class="font-label-lg text-label-lg">Elevators</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl mx-2 hover:bg-surface-container-highest transition-all duration-200 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-lg text-label-lg">Reports</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-72 flex flex-col min-h-screen pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm docked full-width top-0 sticky flex justify-between items-center w-full px-container-padding h-16 z-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" data-icon="domain">domain</span>
+<h1 class="font-headline-md text-headline-md font-extrabold text-primary dark:text-primary-fixed-dim tracking-tight">ElevateOps Pro</h1>
+</div>
+<div class="flex items-center gap-4">
+<div aria-label="Admin User" class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm">
+                    AU
+                </div>
+</div>
+</header>
+<div class="p-container-padding flex-1 max-w-7xl mx-auto w-full">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-stack-gap-lg gap-4">
+<h2 class="font-display-lg text-display-lg text-on-surface">Ana Takvim</h2>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface text-primary border border-outline-variant/30 rounded-lg hover:bg-primary/5 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="refresh">refresh</span>
+<span class="font-label-lg text-label-lg">Yenile</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface text-primary border border-outline-variant/30 rounded-lg hover:bg-primary/5 transition-colors shadow-sm relative">
+<span class="material-symbols-outlined text-[20px]" data-icon="filter_list">filter_list</span>
+<span class="font-label-lg text-label-lg">Filtrele</span>
+<span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-tertiary-container"></span>
+</span>
+</button>
+</div>
+</div>
+<!-- Legend -->
+<div class="flex items-center gap-6 mb-stack-gap-md bg-surface p-4 rounded-[22px] border border-[#E1E8F0] shadow-[0px_10px_30px_rgba(15,76,129,0.06)]">
+<div class="flex items-center gap-2">
+<span class="task-marker urgent"></span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Acil</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="task-marker pending"></span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Bekliyor</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="task-marker completed"></span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Tamamlandı</span>
+</div>
+</div>
+<!-- Calendar Area -->
+<div class="bg-surface rounded-[22px] border border-[#E1E8F0] shadow-[0px_10px_30px_rgba(15,76,129,0.06)] p-stack-gap-lg mb-stack-gap-lg">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Ekim 2023</h3>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg hover:bg-surface-container transition-colors"><span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span></button>
+<button class="p-2 rounded-lg hover:bg-surface-container transition-colors"><span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-1 mb-2">
+<div class="text-center font-label-lg text-label-lg text-on-surface-variant py-2">Pzt</div>
+<div class="text-center font-label-lg text-label-lg text-on-surface-variant py-2">Sal</div>
+<div class="text-center font-label-lg text-label-lg text-on-surface-variant py-2">Çar</div>
+<div class="text-center font-label-lg text-label-lg text-on-surface-variant py-2">Per</div>
+<div class="text-center font-label-lg text-label-lg text-on-surface-variant py-2">Cum</div>
+<div class="text-center font-label-lg text-label-lg text-on-surface-variant py-2">Cmt</div>
+<div class="text-center font-label-lg text-label-lg text-on-surface-variant py-2">Paz</div>
+</div>
+<div class="calendar-grid">
+<!-- Week 1 -->
+<div class="calendar-cell inactive"><div class="font-label-sm text-label-sm mb-1">25</div></div>
+<div class="calendar-cell inactive"><div class="font-label-sm text-label-sm mb-1">26</div></div>
+<div class="calendar-cell inactive"><div class="font-label-sm text-label-sm mb-1">27</div></div>
+<div class="calendar-cell inactive"><div class="font-label-sm text-label-sm mb-1">28</div></div>
+<div class="calendar-cell inactive"><div class="font-label-sm text-label-sm mb-1">29</div></div>
+<div class="calendar-cell inactive"><div class="font-label-sm text-label-sm mb-1">30</div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">1</div></div>
+<!-- Week 2 -->
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">2</div><div class="mt-1"><span class="task-marker pending"></span><span class="task-marker pending"></span></div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">3</div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">4</div><div class="mt-1"><span class="task-marker completed"></span></div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">5</div></div>
+<div class="calendar-cell selected"><div class="font-label-sm text-label-sm mb-1 text-primary font-bold">6</div><div class="mt-1"><span class="task-marker urgent"></span><span class="task-marker pending"></span><span class="task-marker completed"></span></div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">7</div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">8</div></div>
+<!-- Simulating rest of month simply for visual completeness -->
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">9</div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">10</div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">11</div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">12</div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">13</div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">14</div></div>
+<div class="calendar-cell"><div class="font-label-sm text-label-sm mb-1 text-on-surface">15</div></div>
+</div>
+</div>
+<!-- Task List for Selected Day -->
+<div class="bg-surface rounded-[22px] border border-[#E1E8F0] shadow-[0px_10px_30px_rgba(15,76,129,0.06)] p-stack-gap-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-stack-gap-md border-b border-[#E1E8F0] pb-2">6 Ekim Görevleri</h3>
+<div class="space-y-4">
+<!-- Task 1 -->
+<div class="flex items-center justify-between p-4 bg-surface-bright rounded-xl border border-[#E1E8F0] hover:shadow-md transition-shadow">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="warning">warning</span>
+</div>
+<div>
+<h4 class="font-body-lg text-body-lg text-on-surface">Tower A - Yolcu Asansörü 3</h4>
+<div class="flex items-center gap-3 mt-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="person">person</span> Ahmet Y.</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span> 09:00</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-3 py-1 bg-error-container text-on-error-container rounded-full font-label-sm text-label-sm">Acil</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant rounded-full font-label-sm text-label-sm">Atandı</span>
+</div>
+</div>
+<!-- Task 2 -->
+<div class="flex items-center justify-between p-4 bg-surface-bright rounded-xl border border-[#E1E8F0] hover:shadow-md transition-shadow">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+</div>
+<div>
+<h4 class="font-body-lg text-body-lg text-on-surface">Plaza B - Yük Asansörü 1</h4>
+<div class="flex items-center gap-3 mt-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="person">person</span> Mehmet K.</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span> 13:30</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-sm text-label-sm">Rutin Bakım</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant rounded-full font-label-sm text-label-sm">Bekliyor</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 md:bottom-8 md:right-8 bg-primary-container text-on-primary-container p-4 rounded-2xl shadow-[0px_10px_30px_rgba(15,76,129,0.2)] flex items-center gap-2 hover:bg-primary transition-colors active:scale-95 z-50">
+<span class="material-symbols-outlined" data-icon="edit_calendar">edit_calendar</span>
+<span class="font-label-lg text-label-lg hidden md:inline">Bu Ayı Planla</span>
+</button>
+<!-- BottomNavBar (Mobile) -->
+<nav class="bg-surface/90 dark:bg-surface-dim/90 backdrop-blur-md border-t border-outline-variant/20 shadow-[0px_-4px_16px_rgba(15,76,129,0.08)] fixed bottom-0 w-full rounded-t-xl z-50 lg:hidden flex justify-around items-center px-4 pb-safe h-16">
+<a class="flex flex-col items-center justify-center text-on-surface-variant/70 py-2 hover:bg-primary/5 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm-mobile">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim py-2 scale-110 hover:bg-primary/5 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span class="font-label-sm text-label-sm-mobile">Checklist</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/70 py-2 hover:bg-primary/5 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span class="font-label-sm text-label-sm-mobile">Alerts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/70 py-2 hover:bg-primary/5 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-sm text-label-sm-mobile">Settings</span>
+</a>
+</nav>
+</body></html>

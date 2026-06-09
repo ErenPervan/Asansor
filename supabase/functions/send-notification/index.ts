@@ -63,7 +63,15 @@ serve(async (req: Request) => {
       
       // Verify Webhook Secret
       const secretHeader = req.headers.get("x-webhook-secret");
-      const expectedSecret = Deno.env.get("WEBHOOK_SECRET") || "local-dev-secret-key";
+      const expectedSecret = Deno.env.get("WEBHOOK_SECRET");
+      
+      if (!expectedSecret) {
+        return new Response(
+          JSON.stringify({ error: "Server Configuration Error: WEBHOOK_SECRET is not set." }),
+          { status: 500, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
+
       if (secretHeader !== expectedSecret) {
         return new Response(
           JSON.stringify({ error: "Unauthorized: Invalid webhook secret." }),
@@ -138,6 +146,20 @@ serve(async (req: Request) => {
         );
       }
 
+      // Fetch caller profile to enforce authorization
+      const { data: callerProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError || !callerProfile) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized: Caller profile not found." }),
+          { status: 401, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
+
       // It's a direct API call from the app
       title = reqBody.title;
       bodyText = reqBody.body;
@@ -149,6 +171,13 @@ serve(async (req: Request) => {
       );
 
       if (reqBody.to_role) {
+        if (callerProfile.role !== "admin") {
+          return new Response(
+            JSON.stringify({ error: "Forbidden: Only admins can broadcast notifications by role." }),
+            { status: 403, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+          );
+        }
+
         const { data: profiles, error } = await supabase
           .from("profiles")
           .select("fcm_token")

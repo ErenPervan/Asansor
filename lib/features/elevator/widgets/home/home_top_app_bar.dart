@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as supabase_flutter;
 
 import 'package:asansor/core/providers/connectivity_providers.dart';
 import 'package:asansor/core/theme/app_colors.dart';
@@ -318,9 +317,6 @@ class SyncStatusButton extends ConsumerWidget {
     );
   }
 
-  static supabase_flutter.SupabaseClient get _supabaseClient =>
-      supabase_flutter.Supabase.instance.client;
-
   void _showSyncSheet(BuildContext context, WidgetRef ref) {
     final queue = ref.read(syncQueueServiceProvider);
     final count = queue.pendingCount;
@@ -336,7 +332,7 @@ class SyncStatusButton extends ConsumerWidget {
         isOnline: isOnline,
         onSync: () {
           Navigator.pop(context);
-          queue.flush(_supabaseClient).then((result) {
+          queue.flush(ref.read(supabaseClientProvider)).then((result) {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

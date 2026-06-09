@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:asansor/core/providers/connectivity_providers.dart';
 import 'package:asansor/features/admin/models/checklist_item_model.dart';
 
@@ -19,7 +18,7 @@ class ChecklistNotifier
     }
 
     try {
-      final response = await Supabase.instance.client
+      final response = await ref.read(supabaseClientProvider)
           .from('checklist_items')
           .select()
           .order('label', ascending: true);
@@ -40,7 +39,7 @@ class ChecklistNotifier
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      await Supabase.instance.client.from('checklist_items').insert({
+      await ref.read(supabaseClientProvider).from('checklist_items').insert({
         'label': label,
         'description': description,
         'is_active': true,
@@ -52,7 +51,7 @@ class ChecklistNotifier
   Future<void> updateItem(String id, String label, String description) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await Supabase.instance.client
+      await ref.read(supabaseClientProvider)
           .from('checklist_items')
           .update({'label': label, 'description': description})
           .eq('id', id);
@@ -63,7 +62,7 @@ class ChecklistNotifier
   Future<void> toggleActiveStatus(String id, bool isActive) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await Supabase.instance.client
+      await ref.read(supabaseClientProvider)
           .from('checklist_items')
           .update({'is_active': isActive})
           .eq('id', id);
@@ -74,7 +73,7 @@ class ChecklistNotifier
   Future<void> deleteItem(String id) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await Supabase.instance.client
+      await ref.read(supabaseClientProvider)
           .from('checklist_items')
           .delete()
           .eq('id', id);

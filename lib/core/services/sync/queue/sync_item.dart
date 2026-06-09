@@ -2,6 +2,7 @@ abstract final class SyncItemType {
   static const maintenanceLog = 'maintenance_log';
   static const faultReport = 'fault_report';
   static const elevatorUpdate = 'elevator_update';
+  static const genericUpsert = 'generic_upsert';
 }
 
 const syncQueueBoxName = 'pending_sync';

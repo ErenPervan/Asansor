@@ -161,6 +161,11 @@ class SyncCoordinator {
       case SyncItemType.elevatorUpdate:
         await _syncElevatorUpdate(client, payload);
         break;
+      case SyncItemType.genericUpsert:
+        final table = payload['table'] as String;
+        final data = payload['data'] as Map<String, dynamic>;
+        await client.from(table).upsert(data);
+        break;
       default:
         throw UnsupportedError('Unknown sync type: $type');
     }

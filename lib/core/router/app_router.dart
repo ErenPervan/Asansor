@@ -34,6 +34,8 @@ import 'package:asansor/features/elevator/views/scanner_view.dart';
 import 'package:asansor/features/maintenance/views/maintenance_log_entry_view.dart';
 import 'package:asansor/features/admin/conflicts/admin_conflict_management_view.dart';
 import 'package:asansor/features/admin/views/admin_statistics_dashboard.dart';
+import 'package:asansor/features/work_order/views/work_order_list_view.dart';
+import 'package:asansor/features/work_order/views/work_order_detail_view.dart';
 
 import 'package:asansor/core/views/not_found_view.dart';
 
@@ -256,6 +258,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: '/work-orders',
+                builder: (context, _) => const WorkOrderListView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: '/admin/master-calendar',
                 builder: (context, _) => const AdminMasterCalendarView(),
               ),
@@ -285,6 +295,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, state) {
           final elevatorId = state.pathParameters['id'] ?? '';
           return MaintenanceLogEntryView(elevatorId: elevatorId);
+        },
+      ),
+
+      GoRoute(
+        path: '/work-orders/:id',
+        builder: (_, state) {
+          final orderId = state.pathParameters['id'] ?? '';
+          return WorkOrderDetailView(orderId: orderId);
         },
       ),
 

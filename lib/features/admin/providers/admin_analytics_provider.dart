@@ -16,6 +16,8 @@ class AdminAnalyticsState {
     required this.pendingMaintenances,
     required this.monthlyFaults,
     required this.faultCategories,
+    required this.slaComplianceRate,
+    required this.topFailingParts,
   });
 
   final int activeFaults;
@@ -24,6 +26,14 @@ class AdminAnalyticsState {
   final int pendingMaintenances;
   final List<MonthlyFaultData> monthlyFaults;
   final List<FaultCategoryData> faultCategories;
+  final double slaComplianceRate;
+  final List<TopFailingPartData> topFailingParts;
+}
+
+class TopFailingPartData {
+  const TopFailingPartData({required this.partName, required this.quantity});
+  final String partName;
+  final int quantity;
 }
 
 class MonthlyFaultData {
@@ -63,7 +73,7 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
   final startOfMonth = DateTime(now.year, now.month, 1);
 
   // ── 1–4. KPI counts — single parallel round-trip ─────────────────────────
-  final kpiResults = await Future.wait([
+  final kpiResults = await Future.wait<dynamic>([
     supabase
         .from('fault_reports')
         .select('id')
@@ -80,12 +90,26 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
         .select('id')
         .eq('status', 'pending')
         .count(CountOption.exact),
+    supabase.rpc('get_sla_compliance_report', params: {
+      'start_date': DateTime(now.year, now.month - 1, 1).toIso8601String(),
+      'end_date': now.toIso8601String(),
+    }),
+    supabase.rpc('get_top_failing_parts', params: {'limit_num': 5}),
   ]);
 
   final activeFaults = (kpiResults[0] as dynamic).count as int;
   final completedThisMonth = (kpiResults[1] as dynamic).count as int;
   final totalElevators = (kpiResults[2] as dynamic).count as int;
   final pendingMaintenances = (kpiResults[3] as dynamic).count as int;
+  
+  final slaRows = kpiResults[4] as List<dynamic>;
+  final slaComplianceRate = slaRows.isNotEmpty ? (slaRows.first['compliance_rate'] as num).toDouble() : 100.0;
+  
+  final partsRows = kpiResults[5] as List<dynamic>;
+  final topFailingParts = partsRows.map((e) => TopFailingPartData(
+    partName: e['part_name'] as String,
+    quantity: (e['total_quantity'] as num).toInt(),
+  )).toList();
 
   // ── 5. Monthly trend — server-side aggregation via RPC ────────────────────
   // Returns: [{year, month, count}]
@@ -164,5 +188,7 @@ final adminAnalyticsProvider = FutureProvider.autoDispose<AdminAnalyticsState>((
             ),
           ]
         : faultCategories,
+    slaComplianceRate: slaComplianceRate,
+    topFailingParts: topFailingParts,
   );
 });

@@ -59,7 +59,7 @@ class TechnicianManagementView extends ConsumerWidget {
       ),
       body: dataAsync.when(
         loading: () => const LoadingState(),
-        error: (e, st) => ErrorBody(
+        error: (e, st) => _ErrorBody(
           error: e,
           onRetry: () => ref.invalidate(technicianManagementProvider),
         ),
@@ -1289,7 +1289,6 @@ class _SheetEmptyView extends StatelessWidget {
               ),
             ),
           ],
->>>>>>> origin/main
         ),
       ),
     );

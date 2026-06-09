@@ -24,7 +24,7 @@ DECLARE
   _payload           JSONB;
 BEGIN
   _edge_function_url := 'https://fuwmrhahwvsouhcxycyr.supabase.co/functions/v1/send-notification';
-  _anon_key := COALESCE(current_setting('app.settings.anon_key', true), 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1d21yaGFod3Zzb3VoY3h5Y3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTEzMjQsImV4cCI6MjA5MTMyNzMyNH0.ylkeV283PxJhF8C_683njSN7SyONrB-WJrC9xs1c-dA');
+  _anon_key := COALESCE(current_setting('app.settings.anon_key', true), '<YOUR_ANON_KEY>');
   
   SELECT value INTO _webhook_secret FROM public.app_settings WHERE key = 'webhook_secret';
   IF _webhook_secret IS NULL THEN
@@ -71,7 +71,7 @@ BEGIN
     RAISE EXCEPTION 'Webhook secret not configured in app_settings table';
   END IF;
   
-  v_anon_key := COALESCE(current_setting('app.settings.anon_key', true), 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1d21yaGFod3Zzb3VoY3h5Y3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTEzMjQsImV4cCI6MjA5MTMyNzMyNH0.ylkeV283PxJhF8C_683njSN7SyONrB-WJrC9xs1c-dA');
+  v_anon_key := COALESCE(current_setting('app.settings.anon_key', true), '<YOUR_ANON_KEY>');
   
   v_payload := json_build_object(
     'type', 'INSERT',

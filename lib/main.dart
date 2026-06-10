@@ -65,18 +65,33 @@ Future<void> _initHive(FlutterSecureStorage secureStorage) async {
   debugPrint('[Bootstrap] Opening Hive boxes...');
   final cipher = HiveAesCipher(encryptionKeyUint8List);
 
-  await Hive.openBox<String>(syncQueueBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(elevatorsCacheBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(tasksCacheBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(checklistCacheBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(pastLogsCacheBoxName, encryptionCipher: cipher);
-  await Hive.openBox<String>(faultsCacheBoxName, encryptionCipher: cipher);
+  Future<void> openBoxSafe(String boxName, {bool isSyncQueue = false}) async {
+    try {
+      await Hive.openBox<String>(boxName, encryptionCipher: cipher);
+    } catch (e) {
+      debugPrint('[Bootstrap] Box $boxName failed to open: $e');
+      await Hive.close(); // Close any partially opened boxes
+      if (isSyncQueue) {
+        debugPrint('[Bootstrap] WARNING: Sync queue corrupted and will be deleted.');
+      }
+      await Hive.deleteBoxFromDisk(boxName);
+      throw HiveError('Box $boxName corrupted');
+    }
+  }
+
+  await openBoxSafe(syncQueueBoxName, isSyncQueue: true);
+  await openBoxSafe(elevatorsCacheBoxName);
+  await openBoxSafe(tasksCacheBoxName);
+  await openBoxSafe(checklistCacheBoxName);
+  await openBoxSafe(pastLogsCacheBoxName);
+  await openBoxSafe(faultsCacheBoxName);
   debugPrint('[Bootstrap] All Hive boxes opened successfully.');
 }
 
 Future<void> _clearAndReinitHive(FlutterSecureStorage secureStorage) async {
   await Hive.close();
-  await Hive.deleteBoxFromDisk(syncQueueBoxName);
+  // DO NOT delete syncQueueBoxName here to prevent data loss.
+  // It has already been deleted by openBoxSafe if it was the corrupted one.
   await Hive.deleteBoxFromDisk(elevatorsCacheBoxName);
   await Hive.deleteBoxFromDisk(tasksCacheBoxName);
   await Hive.deleteBoxFromDisk(checklistCacheBoxName);

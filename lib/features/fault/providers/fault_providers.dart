@@ -102,49 +102,36 @@ class FaultController extends AutoDisposeAsyncNotifier<FaultReportModel?> {
 
     final isOnline = ref.read(isOnlineProvider);
 
-    if (!isOnline) {
-      // ── Offline path ──────────────────────────────────────────────────────
-      // Note: photo uploads require connectivity and cannot be queued.
-      await ref
-          .read(syncQueueServiceProvider)
-          .enqueue(
-            type: SyncItemType.faultReport,
-            payload: {
-              'elevator_id': elevatorId,
-              'description': description,
-              'is_resolved': false,
-              'reported_at': DateTime.now().toUtc().toIso8601String(),
-              // photo_url intentionally omitted – upload requires network
-            },
+    await ref
+        .read(syncQueueServiceProvider)
+        .enqueue(
+          type: SyncItemType.faultReport,
+          payload: {
+            'elevator_id': elevatorId,
+            'description': description,
+            'is_resolved': false,
+            'reported_at': DateTime.now().toUtc().toIso8601String(),
+            if (photoUrl != null) 'photo_url': photoUrl,
+          },
+        );
+
+    if (isOnline) {
+      await ref.read(syncQueueServiceProvider).flush(
+            ref.read(supabaseClientProvider),
           );
-
-      state = AsyncData(
-        FaultReportModel(
-          id: 'offline_${DateTime.now().millisecondsSinceEpoch}',
-          elevatorId: elevatorId,
-          description: description,
-          isResolved: false,
-          reportedAt: DateTime.now(),
-          isOfflineQueued: true,
-        ),
-      );
-      return;
-    }
-
-    // ── Online path ───────────────────────────────────────────────────────
-    state = await AsyncValue.guard(() {
-      return ref
-          .read(faultRepositoryProvider)
-          .reportFault(
-            elevatorId: elevatorId,
-            description: description,
-            photoUrl: photoUrl,
-          );
-    });
-
-    if (!state.hasError) {
       ref.invalidate(activeFaultsProvider);
     }
+
+    state = AsyncData(
+      FaultReportModel(
+        id: 'offline_${DateTime.now().millisecondsSinceEpoch}',
+        elevatorId: elevatorId,
+        description: description,
+        isResolved: false,
+        reportedAt: DateTime.now(),
+        isOfflineQueued: !isOnline, // If online, flush might have succeeded
+      ),
+    );
   }
 }
 
@@ -165,32 +152,55 @@ class FaultUpdateController extends AutoDisposeAsyncNotifier<void> {
 
   Future<bool> resolve(String faultId, {String? resolutionNotes}) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      await ref
-          .read(faultRepositoryProvider)
-          .resolveFault(faultId, resolutionNotes: resolutionNotes);
-    });
+    final isOnline = ref.read(isOnlineProvider);
 
-    if (!state.hasError) {
-      ref.invalidate(activeFaultsProvider);
-      ref.invalidate(faultByIdProvider(faultId));
-      return true;
+    await ref
+        .read(syncQueueServiceProvider)
+        .enqueue(
+          type: SyncItemType.faultResolve,
+          payload: {
+            'fault_id': faultId,
+            'resolved_at': DateTime.now().toUtc().toIso8601String(),
+            if (resolutionNotes != null && resolutionNotes.isNotEmpty)
+              'resolution_notes': resolutionNotes,
+          },
+        );
+
+    if (isOnline) {
+      await ref.read(syncQueueServiceProvider).flush(
+            ref.read(supabaseClientProvider),
+          );
     }
-    return false;
+
+    state = const AsyncData(null);
+    ref.invalidate(activeFaultsProvider);
+    ref.invalidate(faultByIdProvider(faultId));
+    return true;
   }
 
   Future<bool> reopen(String faultId) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      await ref.read(faultRepositoryProvider).reopenFault(faultId);
-    });
+    final isOnline = ref.read(isOnlineProvider);
 
-    if (!state.hasError) {
-      ref.invalidate(activeFaultsProvider);
-      ref.invalidate(faultByIdProvider(faultId));
-      return true;
+    await ref
+        .read(syncQueueServiceProvider)
+        .enqueue(
+          type: SyncItemType.faultReopen,
+          payload: {
+            'fault_id': faultId,
+          },
+        );
+
+    if (isOnline) {
+      await ref.read(syncQueueServiceProvider).flush(
+            ref.read(supabaseClientProvider),
+          );
     }
-    return false;
+
+    state = const AsyncData(null);
+    ref.invalidate(activeFaultsProvider);
+    ref.invalidate(faultByIdProvider(faultId));
+    return true;
   }
 }
 

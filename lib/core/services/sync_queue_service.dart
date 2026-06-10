@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 import 'package:asansor/core/exceptions/conflict_exception.dart';
 import 'package:asansor/core/services/pdf_service.dart';
+import 'package:asansor/core/services/notification_service.dart';
 import 'package:uuid/uuid.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -44,6 +45,8 @@ abstract final class SyncItemType {
   static const maintenanceLog = 'maintenance_log';
   static const faultReport = 'fault_report';
   static const elevatorUpdate = 'elevator_update';
+  static const faultResolve = 'fault_resolve';
+  static const faultReopen = 'fault_reopen';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -256,10 +259,16 @@ class SyncQueueService extends ChangeNotifier {
         await _syncMaintenanceLog(client, payload, item, key);
         break;
       case SyncItemType.faultReport:
-        await _syncFaultReport(client, payload);
+        await _syncFaultReport(client, payload, item['id']);
         break;
       case SyncItemType.elevatorUpdate:
         await _syncElevatorUpdate(client, payload);
+        break;
+      case SyncItemType.faultResolve:
+        await _syncFaultResolve(client, payload);
+        break;
+      case SyncItemType.faultReopen:
+        await _syncFaultReopen(client, payload);
         break;
       default:
         throw UnsupportedError('Unknown sync type: $type');
@@ -350,6 +359,8 @@ class SyncQueueService extends ChangeNotifier {
       );
       row['customer_signature_url'] = url;
     }
+
+    row['idempotency_key'] = queueItem['id'];
 
     final response = await client
         .from('maintenance_logs')
@@ -484,6 +495,21 @@ class SyncQueueService extends ChangeNotifier {
         debugPrint(
           '[SyncQueue] Customer notification failed (non-fatal): $notifErr',
         );
+      }
+
+      try {
+        await NotificationService.instance.notifyAllAdmins(
+          client: client,
+          title: 'Bakım Tamamlandı',
+          body: 'Bir teknisyen bakım görevini tamamladı.',
+          data: {
+            'type': 'task_completed',
+            'route': '/admin/master-calendar',
+            'elevator_id': logModel.elevatorId,
+          },
+        );
+      } catch (e) {
+        debugPrint('[SyncQueue] Admin notification failed (non-fatal): $e');
       }
     } catch (e) {
       debugPrint('[SyncQueue] Failed to generate or upload PDF report: $e');
@@ -623,14 +649,61 @@ class SyncQueueService extends ChangeNotifier {
   Future<void> _syncFaultReport(
     SupabaseClient client,
     Map<String, dynamic> payload,
+    String idempotencyKey,
   ) async {
+    final row = Map<String, dynamic>.from(payload);
+    row['idempotency_key'] = idempotencyKey;
+
     await client
         .from('fault_reports')
-        .insert(payload)
+        .insert(row)
         .timeout(
           _dbWriteTimeout,
           onTimeout: () => throw TimeoutException(
             '[SyncQueue] Fault report insert timed out after ${_dbWriteTimeout.inSeconds}s',
+          ),
+        );
+  }
+
+  Future<void> _syncFaultResolve(
+    SupabaseClient client,
+    Map<String, dynamic> payload,
+  ) async {
+    final faultId = payload['fault_id'] as String;
+    final resolutionNotes = payload['resolution_notes'] as String?;
+    final resolvedAt = payload['resolved_at'] as String;
+
+    await client
+        .from('fault_reports')
+        .update({
+          'is_resolved': true,
+          'resolved_at': resolvedAt,
+          if (resolutionNotes != null && resolutionNotes.isNotEmpty)
+            'resolution_notes': resolutionNotes,
+        })
+        .eq('id', faultId)
+        .timeout(
+          _dbWriteTimeout,
+          onTimeout: () => throw TimeoutException(
+            '[SyncQueue] Fault resolve update timed out after ${_dbWriteTimeout.inSeconds}s',
+          ),
+        );
+  }
+
+  Future<void> _syncFaultReopen(
+    SupabaseClient client,
+    Map<String, dynamic> payload,
+  ) async {
+    final faultId = payload['fault_id'] as String;
+
+    await client
+        .from('fault_reports')
+        .update({'is_resolved': false, 'resolved_at': null})
+        .eq('id', faultId)
+        .timeout(
+          _dbWriteTimeout,
+          onTimeout: () => throw TimeoutException(
+            '[SyncQueue] Fault reopen update timed out after ${_dbWriteTimeout.inSeconds}s',
           ),
         );
   }

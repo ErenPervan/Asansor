@@ -4,14 +4,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'package:asansor/core/providers/connectivity_providers.dart';
-import 'package:asansor/core/services/notification_service.dart';
 import 'package:asansor/core/services/sync_queue_service.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 import 'package:asansor/features/maintenance/repositories/maintenance_repository.dart';
-import 'package:asansor/features/admin/repositories/schedule_repository.dart';
 
 Future<String?> copyToDocumentsDirectory(String? path) async {
   if (path == null) return null;
@@ -130,38 +126,7 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
   @override
   Future<MaintenanceLogModel?> build() async => null;
 
-  Future<List<String>> _uploadPhotos({
-    required SupabaseClient client,
-    required List<String> photoPaths,
-    required String elevatorId,
-    required String technicianId,
-  }) async {
-    final storage = client.storage.from(_maintenancePhotosBucket);
-    final uploadedUrls = <String>[];
-    var index = 0;
-
-    for (final path in photoPaths) {
-      if (_isRemoteUrl(path)) {
-        uploadedUrls.add(path);
-        continue;
-      }
-
-      final file = File(path);
-      if (!await file.exists()) {
-        continue;
-      }
-
-      final extension = _safeExtension(path);
-      final fileName =
-          'maintenance_logs/$elevatorId/${technicianId}_${DateTime.now().millisecondsSinceEpoch}_$index.$extension';
-      index++;
-
-      await storage.upload(fileName, file);
-      uploadedUrls.add(storage.getPublicUrl(fileName));
-    }
-
-    return uploadedUrls;
-  }
+  // `_uploadPhotos` was removed in favor of queue-first sync.
 
   Future<void> _enqueueOfflineLog({
     required String elevatorId,
@@ -231,102 +196,29 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
 
     final isOnline = ref.read(isOnlineProvider);
 
-    if (!isOnline) {
-      await _enqueueOfflineLog(
-        elevatorId: elevatorId,
-        technicianId: technicianId,
-        notes: notes,
-        maintenanceDate: maintenanceDate,
-        checklist: checklist,
-        photos: photos,
-        signaturePath: signaturePath,
-        customerSignaturePath: customerSignaturePath,
-      );
-      return;
-    }
+    await _enqueueOfflineLog(
+      elevatorId: elevatorId,
+      technicianId: technicianId,
+      notes: notes,
+      maintenanceDate: maintenanceDate,
+      checklist: checklist,
+      photos: photos,
+      signaturePath: signaturePath,
+      customerSignaturePath: customerSignaturePath,
+    );
 
-    List<String>? photoUrls;
-    String? sigUrlStr;
-    String? custSigUrlStr;
-
-    try {
-      if (photos != null && photos.isNotEmpty) {
-        photoUrls = await _uploadPhotos(
-          client: ref.read(supabaseClientProvider),
-          photoPaths: photos,
-          elevatorId: elevatorId,
-          technicianId: technicianId,
-        );
-      }
-      if (signaturePath != null) {
-        final res = await _uploadPhotos(
-          client: ref.read(supabaseClientProvider),
-          photoPaths: [signaturePath],
-          elevatorId: elevatorId,
-          technicianId: technicianId,
-        );
-        if (res.isNotEmpty) sigUrlStr = res.first;
-      }
-      if (customerSignaturePath != null) {
-        final res = await _uploadPhotos(
-          client: ref.read(supabaseClientProvider),
-          photoPaths: [customerSignaturePath],
-          elevatorId: elevatorId,
-          technicianId: technicianId,
-        );
-        if (res.isNotEmpty) custSigUrlStr = res.first;
-      }
-    } catch (e) {
-      await _enqueueOfflineLog(
-        elevatorId: elevatorId,
-        technicianId: technicianId,
-        notes: notes,
-        maintenanceDate: maintenanceDate,
-        checklist: checklist,
-        photos: photos,
-        signaturePath: signaturePath,
-        customerSignaturePath: customerSignaturePath,
-      );
-      return;
-    }
-
-    // ── Online path: write directly to Supabase ───────────────────────────
-    state = await AsyncValue.guard(() {
-      return ref
-          .read(maintenanceRepositoryProvider)
-          .addLog(
-            elevatorId: elevatorId,
-            technicianId: technicianId,
-            notes: notes,
-            maintenanceDate: maintenanceDate,
-            checklist: checklist,
-            photos: photoUrls,
-            signatureUrl: sigUrlStr,
-            customerSignatureUrl: custSigUrlStr,
-          );
-    });
-
-    // After a successful log, auto-complete any matching scheduled task
-    // for the same elevator+technician on today's date.
-    if (!state.hasError && state.value != null) {
-      await ref
-          .read(scheduleRepositoryProvider)
-          .completeMatchingSchedule(
-            elevatorId: elevatorId,
-            technicianId: technicianId,
+    if (isOnline) {
+      // Offline queue will handle photo uploads, insertion, PDF generation,
+      // schedule completion, and notifications during flush.
+      await ref.read(syncQueueServiceProvider).flush(
+            ref.read(supabaseClientProvider),
           );
 
-      // Notify all admins that a maintenance job has been completed.
-      await NotificationService.instance.notifyAllAdmins(
-        client: ref.read(supabaseClientProvider),
-        title: 'Bakım Tamamlandı',
-        body: 'Bir teknisyen bakım görevini tamamladı.',
-        data: {
-          'type': 'task_completed',
-          'route': '/admin/master-calendar',
-          'elevator_id': elevatorId,
-        },
-      );
+      // We don't check for errors here because flush swallows them, 
+      // but if it failed, it stays in the queue. We just invalidate.
+      ref.invalidate(pendingMaintenanceProvider);
+      ref.invalidate(completedTodayCountProvider);
+      ref.invalidate(logsByElevatorProvider(elevatorId));
     }
   }
 }
@@ -336,22 +228,4 @@ final maintenanceControllerProvider =
       MaintenanceController.new,
     );
 
-const _maintenancePhotosBucket = 'maintenance-photos';
 
-bool _isRemoteUrl(String path) {
-  return path.startsWith('http://') || path.startsWith('https://');
-}
-
-String _safeExtension(String path) {
-  final dotIndex = path.lastIndexOf('.');
-  if (dotIndex == -1 || dotIndex == path.length - 1) {
-    return 'jpg';
-  }
-
-  final extension = path.substring(dotIndex + 1).toLowerCase();
-  if (extension.length > 5) {
-    return 'jpg';
-  }
-
-  return extension;
-}

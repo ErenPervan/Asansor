@@ -227,7 +227,7 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
         photos: photos,
         signatureUrl: signaturePath,
         customerSignatureUrl: customerSignaturePath,
-        isOfflineQueued: true,
+        isOfflineQueued: !ref.read(isOnlineProvider),
       ),
     );
   }

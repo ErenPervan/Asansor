@@ -38,7 +38,7 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-serve(async (req: Request) => {
+export const handler = async (req: Request) => {
   // Handle CORS pre-flight
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: CORS_HEADERS });
@@ -316,4 +316,6 @@ serve(async (req: Request) => {
       }
     );
   }
-});
+};
+
+serve(handler);

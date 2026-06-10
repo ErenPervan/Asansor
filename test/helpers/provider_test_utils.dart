@@ -174,3 +174,30 @@ class FakeSyncQueueService extends ChangeNotifier implements SyncQueueService {
   @override
   Future<void> resolveDiscard(SupabaseClient client, String key) async {}
 }
+
+// ── SpySyncQueueService ───────────────────────────────────────────────────────
+
+/// A spy implementation of [SyncQueueService] that records calls to `enqueue`
+/// and `flush`. Useful for testing controller write paths.
+class SpySyncQueueService extends FakeSyncQueueService {
+  final List<Map<String, dynamic>> enqueuedItems = [];
+  int flushCallCount = 0;
+  bool shouldThrowOnFlush = false;
+
+  @override
+  Future<void> enqueue({
+    required String type,
+    required Map<String, dynamic> payload,
+  }) async {
+    enqueuedItems.add({'type': type, 'payload': payload});
+  }
+
+  @override
+  Future<SyncResult> flush(SupabaseClient client) async {
+    flushCallCount++;
+    if (shouldThrowOnFlush) {
+      throw Exception('Mock flush error');
+    }
+    return const SyncResult(synced: 1, failed: 0);
+  }
+}

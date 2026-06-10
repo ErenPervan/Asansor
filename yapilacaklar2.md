@@ -250,29 +250,29 @@
 
 ### TEST
 
-- [ ] **29. Fake Supabase client ile deterministic queue testleri yaz**
+- [x] **29. Fake Supabase client ile deterministic queue testleri yaz**
   - Ne: Mevcut testler `flush()` gerçek davranışını test etmiyor
   - Yapılacak: Mocktail/fake ile remote failure + retry + conflict senaryoları yaz
   - Dosya: `test/core/services/sync_queue_service_test.dart`
   - Efor: **Medium**
 
-- [ ] **30. Online failure → queue fallback için provider testleri yaz**
+- [x] **30. Online failure → queue fallback için provider testleri yaz**
   - Ne: Fault/maintenance provider testleri online hata durumunda queue'ya düşme senaryosunu kapsamamış
   - Dosya: `test/features/fault/`, `test/features/maintenance/`
   - Efor: **Medium**
 
-- [ ] **31. RLS migration testleri yaz**
+- [x] **31. RLS migration testleri yaz**
   - Ne: RLS policy doğruluğu otomatik test edilmiyor
   - Yapılacak: Supabase local + pgTAP ile her role için RLS senaryosu
   - Dosya: `supabase/migrations/`
   - Efor: **Medium**
 
-- [ ] **32. Edge Function authorization testleri yaz**
+- [x] **32. Edge Function authorization testleri yaz**
   - Ne: `send-notification` caller role kontrolü test edilmiyor
   - Dosya: `supabase/functions/send-notification/`
   - Efor: **Medium**
 
-- [ ] **33. Integration test'e gerçek assertion ekle**
+- [x] **33. Integration test'e gerçek assertion ekle**
   - Ne: `app_test.dart` sadece uygulama başlatıyor, hiçbir şey assert etmiyor
   - Yapılacak: Login ekranı → login → dashboard visible senaryosu yaz
   - Dosya: `integration_test/app_test.dart`

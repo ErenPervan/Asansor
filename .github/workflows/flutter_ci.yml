@@ -71,3 +71,11 @@ jobs:
 
       - name: Run tests
         run: flutter test
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v2.x
+
+      - name: Edge Function Tests (Deno)
+        run: deno test --allow-all supabase/functions/send-notification/index.test.ts

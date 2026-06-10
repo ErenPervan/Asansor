@@ -218,5 +218,90 @@ void main() {
       expect(item['next_retry_at'], isNotNull);
       expect(item['status'], 'pending'); // Still pending, just delayed
     });
+
+    test('flush successful for faultReport removes item', () async {
+      await service.enqueue(
+        type: SyncItemType.faultReport,
+        payload: {'id': 'f1', 'description': 'test fault'},
+      );
+
+      when(
+        () => mockRemoteWriter.syncFaultReport(any(), any()),
+      ).thenAnswer((_) async {});
+
+      final result = await service.flush(mockClient);
+
+      expect(result.synced, 1);
+      expect(result.failed, 0);
+      expect(service.pendingCount, 0);
+      expect(box.length, 0);
+    });
+
+    test('flush failure for faultReport keeps item pending', () async {
+      await service.enqueue(
+        type: SyncItemType.faultReport,
+        payload: {'id': 'f1', 'description': 'test fault'},
+      );
+
+      when(
+        () => mockRemoteWriter.syncFaultReport(any(), any()),
+      ).thenThrow(Exception('Network error'));
+      when(() => mockRemoteWriter.isTerminalError(any())).thenReturn(false);
+
+      final result = await service.flush(mockClient);
+
+      expect(result.synced, 0);
+      expect(result.failed, 1);
+      expect(box.length, 1);
+
+      final item = jsonDecode(box.getAt(0)!);
+      expect(item['status'], 'pending');
+      expect(item['retry_count'], 1);
+    });
+
+    test('flush successful for maintenanceLog removes item', () async {
+      await service.enqueue(
+        type: SyncItemType.maintenanceLog,
+        payload: {'id': 'm1', 'elevator_id': 'e1'},
+      );
+
+      when(
+        () => mockRemoteWriter.syncMaintenanceLog(any(), any(), any()),
+      ).thenAnswer((_) async {});
+
+      final result = await service.flush(mockClient);
+
+      expect(result.synced, 1);
+      expect(result.failed, 0);
+      expect(service.pendingCount, 0);
+      expect(box.length, 0);
+    });
+
+    test(
+      'flush terminal error for maintenanceLog sets status to failed',
+      () async {
+        await service.enqueue(
+          type: SyncItemType.maintenanceLog,
+          payload: {'id': 'm1', 'elevator_id': 'e1'},
+        );
+
+        when(
+          () => mockRemoteWriter.syncMaintenanceLog(any(), any(), any()),
+        ).thenThrow(Exception('Terminal error'));
+        // simulate terminal error
+        when(() => mockRemoteWriter.isTerminalError(any())).thenReturn(true);
+
+        final result = await service.flush(mockClient);
+
+        expect(result.synced, 0);
+        expect(result.failed, 1);
+        expect(service.pendingCount, 0);
+        expect(service.failedCount, 1);
+        expect(box.length, 1);
+
+        final item = jsonDecode(box.getAt(0)!);
+        expect(item['status'], 'dead_letter');
+      },
+    );
   });
 }

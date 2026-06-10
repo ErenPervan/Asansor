@@ -15,6 +15,8 @@ on:
 jobs:
   flutter_ci:
     runs-on: ubuntu-latest
+    env:
+      FLUTTER_SUPPRESS_ANALYTICS: true
 
     steps:
       - name: Checkout Code

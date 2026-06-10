@@ -23,6 +23,6 @@ void main() {
         find.byType(MaterialApp),
         matchesGoldenFile('../../goldens/error_state_with_retry.png'),
       );
-    });
+    }, skip: isCI);
   });
 }

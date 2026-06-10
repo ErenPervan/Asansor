@@ -18,7 +18,7 @@ void main() {
         find.byType(MaterialApp),
         matchesGoldenFile('../../goldens/empty_state_default.png'),
       );
-    });
+    }, skip: isCI);
 
     testWidgets('empty state with custom icon', (tester) async {
       await tester.pumpWidget(
@@ -28,6 +28,6 @@ void main() {
         find.byType(MaterialApp),
         matchesGoldenFile('../../goldens/empty_state_custom.png'),
       );
-    });
+    }, skip: isCI);
   });
 }

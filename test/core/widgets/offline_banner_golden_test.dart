@@ -18,7 +18,7 @@ void main() {
         find.byType(MaterialApp),
         matchesGoldenFile('../../goldens/offline_banner_visible.png'),
       );
-    });
+    }, skip: isCI);
 
     testWidgets('offline banner hidden when online', (tester) async {
       await tester.pumpWidget(

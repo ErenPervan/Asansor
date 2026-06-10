@@ -72,7 +72,9 @@ Future<void> _initHive(FlutterSecureStorage secureStorage) async {
       debugPrint('[Bootstrap] Box $boxName failed to open: $e');
       await Hive.close(); // Close any partially opened boxes
       if (isSyncQueue) {
-        debugPrint('[Bootstrap] WARNING: Sync queue corrupted and will be deleted.');
+        debugPrint(
+          '[Bootstrap] WARNING: Sync queue corrupted and will be deleted.',
+        );
       }
       await Hive.deleteBoxFromDisk(boxName);
       throw HiveError('Box $boxName corrupted');

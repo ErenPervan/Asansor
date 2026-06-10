@@ -116,9 +116,9 @@ class FaultController extends AutoDisposeAsyncNotifier<FaultReportModel?> {
         );
 
     if (isOnline) {
-      await ref.read(syncQueueServiceProvider).flush(
-            ref.read(supabaseClientProvider),
-          );
+      await ref
+          .read(syncQueueServiceProvider)
+          .flush(ref.read(supabaseClientProvider));
       ref.invalidate(activeFaultsProvider);
     }
 
@@ -167,9 +167,9 @@ class FaultUpdateController extends AutoDisposeAsyncNotifier<void> {
         );
 
     if (isOnline) {
-      await ref.read(syncQueueServiceProvider).flush(
-            ref.read(supabaseClientProvider),
-          );
+      await ref
+          .read(syncQueueServiceProvider)
+          .flush(ref.read(supabaseClientProvider));
     }
 
     state = const AsyncData(null);
@@ -186,15 +186,13 @@ class FaultUpdateController extends AutoDisposeAsyncNotifier<void> {
         .read(syncQueueServiceProvider)
         .enqueue(
           type: SyncItemType.faultReopen,
-          payload: {
-            'fault_id': faultId,
-          },
+          payload: {'fault_id': faultId},
         );
 
     if (isOnline) {
-      await ref.read(syncQueueServiceProvider).flush(
-            ref.read(supabaseClientProvider),
-          );
+      await ref
+          .read(syncQueueServiceProvider)
+          .flush(ref.read(supabaseClientProvider));
     }
 
     state = const AsyncData(null);

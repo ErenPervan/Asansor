@@ -210,11 +210,11 @@ class MaintenanceController extends AsyncNotifier<MaintenanceLogModel?> {
     if (isOnline) {
       // Offline queue will handle photo uploads, insertion, PDF generation,
       // schedule completion, and notifications during flush.
-      await ref.read(syncQueueServiceProvider).flush(
-            ref.read(supabaseClientProvider),
-          );
+      await ref
+          .read(syncQueueServiceProvider)
+          .flush(ref.read(supabaseClientProvider));
 
-      // We don't check for errors here because flush swallows them, 
+      // We don't check for errors here because flush swallows them,
       // but if it failed, it stays in the queue. We just invalidate.
       ref.invalidate(pendingMaintenanceProvider);
       ref.invalidate(completedTodayCountProvider);
@@ -227,5 +227,3 @@ final maintenanceControllerProvider =
     AsyncNotifierProvider<MaintenanceController, MaintenanceLogModel?>(
       MaintenanceController.new,
     );
-
-

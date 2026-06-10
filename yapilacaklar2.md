@@ -139,7 +139,7 @@
   - Dosya: `lib/core/services/sync_queue_service.dart`
   - Efor: **Large**
 
-- [ ] **18. Global `Supabase.instance.client` kullanımlarını kaldır (8 adet)**
+- [x] **18. Global `Supabase.instance.client` kullanımlarını kaldır (8 adet)**
   - Ne: 3 provider'da 8 ayrı direkt çağrı; test edilemez, DI bypass ediyor
   - Yapılacak: Hepsini `ref.read(supabaseClientProvider)` ile değiştir
   - Dosya:
@@ -225,7 +225,7 @@
 
 ### VERİ KATMANI
 
-- [ ] **26. Unbounded query'lere pagination ekle**
+- [x] **26. Unbounded query'lere pagination ekle**
   - Ne: `getAllElevators`, `getAllFaults`, `getAllActiveFaults`, schedule listesi limit yok
   - Yapılacak: `.range()` veya cursor-based pagination ekle
   - Dosya:
@@ -234,13 +234,13 @@
     - `lib/features/admin/repositories/schedule_repository.dart:211-220`
   - Efor: **Medium**
 
-- [ ] **27. Model parsing'e domain validation ekle**
+- [x] **27. Model parsing'e domain validation ekle**
   - Ne: Eksik tarihler `DateTime.fromMillisecondsSinceEpoch(0)` (1970-01-01) döndürüyor — silent corruption
   - Yapılacak: Repository sınırında required field validation; parse hatası açık exception fırlatsın
   - Dosya: `schedule_model.dart:69-71`, `maintenance_log_model.dart:74-76`, `fault_report_model.dart:62-64`
   - Efor: **Small**
 
-- [ ] **28. `toString()` metodlarından hassas alanları kaldır**
+- [x] **28. `toString()` metodlarından hassas alanları kaldır**
   - Ne: Log'lara email, fullName, checklist, photos yazılıyor
   - Yapılacak: ID ve rol gibi non-sensitive alanları bırak, geri kalanı çıkar
   - Dosya: `lib/features/maintenance/models/maintenance_log_model.dart:137-140`, `lib/features/admin/models/profile_model.dart:157-159`
@@ -282,7 +282,7 @@
 
 ### DEVOPs
 
-- [ ] **34. Flutter SDK sürümünü pin'le**
+- [x] **34. Flutter SDK sürümünü pin'le**
   - Ne: `channel: 'stable'` floating — beklenmedik breaking change riski
   - Yapılacak: `flutter-version: '3.x.x'` ile exact version pin
   - Dosya: `.github/workflows/test.yml:24`, `.github/workflows/flutter_ci.yml:32`
@@ -308,23 +308,23 @@
 
 ### KOD KALİTESİ
 
-- [ ] **38. AI reasoning yorum satırlarını temizle**
+- [x] **38. AI reasoning yorum satırlarını temizle**
   - Ne: `fault_providers.dart:47-52`'de `"wait, I don't know..."` production kodunda kalmış
   - Dosya: `lib/features/fault/providers/fault_providers.dart:47-52`
   - Efor: **Trivial**
 
-- [ ] **39. Dead code + suppressed lint uyarısını kaldır**
+- [x] **39. Dead code + suppressed lint uyarısını kaldır**
   - Ne: `sync_queue_service.dart:373-376` — `// ignore: unnecessary_null_comparison` + hiçbir zaman false olmayan if
   - Dosya: `lib/core/services/sync_queue_service.dart:373-376`
   - Efor: **Trivial**
 
-- [ ] **40. `AnimatedPressButton`'a erişilebilirlik desteği ekle**
+- [x] **40. `AnimatedPressButton`'a erişilebilirlik desteği ekle**
   - Ne: Pointer-only listener — klavye/focus/semantics desteği yok
   - Yapılacak: `Semantics` widget'ı + `FocusNode` + `onKeyEvent` ekle
   - Dosya: `lib/core/widgets/animations/animated_press_button.dart:45-72`
   - Efor: **Small**
 
-- [ ] **41. CI workflow tekrarını gider**
+- [x] **41. CI workflow tekrarını gider**
   - Ne: `test.yml` ve `flutter_ci.yml` aynı analyze/test sorumluluklarını çoğaltıyor
   - Yapılacak: Tek reusable workflow yap veya birini kaldır
   - Dosya: `.github/workflows/`

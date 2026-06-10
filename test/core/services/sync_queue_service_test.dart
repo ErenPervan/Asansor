@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:asansor/core/services/sync/sync_coordinator.dart';
 import 'package:asansor/core/exceptions/conflict_exception.dart';
 import '../../helpers/test_mocks.dart';

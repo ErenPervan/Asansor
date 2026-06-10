@@ -16,12 +16,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 const _panelLine = Color(0xFFE1E8F0);
 
 class CustomerDashboardView extends ConsumerStatefulWidget {
   const CustomerDashboardView({super.key});
-
   @override
   ConsumerState<CustomerDashboardView> createState() =>
       _CustomerDashboardViewState();
@@ -731,17 +731,29 @@ class _MaintenanceLogTile extends StatelessWidget {
     );
   }
 
-  Future<void> _openPdf(BuildContext context, String url) async {
+  Future<void> _openPdf(BuildContext context, String pathOrUrl) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Rapor açılıyor...'),
         duration: AppDurations.snackBarInfo,
       ),
     );
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-      return;
+    try {
+      final String url;
+      if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
+        url = pathOrUrl;
+      } else {
+        url = await Supabase.instance.client.storage
+            .from('maintenance-reports')
+            .createSignedUrl(pathOrUrl, 60 * 60);
+      }
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    } catch (e) {
+      debugPrint('Error opening PDF: $e');
     }
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

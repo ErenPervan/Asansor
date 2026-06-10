@@ -111,7 +111,7 @@ class FaultController extends AutoDisposeAsyncNotifier<FaultReportModel?> {
             'description': description,
             'is_resolved': false,
             'reported_at': DateTime.now().toUtc().toIso8601String(),
-            if (photoUrl != null) 'photo_url': photoUrl,
+            'photo_url': ?photoUrl,
           },
         );
 

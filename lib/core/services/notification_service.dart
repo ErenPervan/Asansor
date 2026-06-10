@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart' as scheduler;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -230,7 +231,9 @@ class NotificationService {
       debugPrint('[FCM] Permission status: ${settings.authorizationStatus}');
 
       final token = await _messaging.getToken();
-      debugPrint('[FCM] Token: $token');
+      if (kDebugMode) {
+        debugPrint('[FCM] Token: $token');
+      }
 
       if (token != null) {
         await _updateToken(client, token);
@@ -245,7 +248,9 @@ class NotificationService {
       // so we always act on the currently authenticated session.
       await _tokenRefreshSub?.cancel();
       _tokenRefreshSub = _messaging.onTokenRefresh.listen((newToken) {
-        debugPrint('[FCM] Token refreshed: $newToken');
+        if (kDebugMode) {
+          debugPrint('[FCM] Token refreshed: $newToken');
+        }
         // Guard: if the user has already signed out in the race window,
         // currentUser will be null — _updateToken will bail out safely.
         final currentClient = Supabase.instance.client;

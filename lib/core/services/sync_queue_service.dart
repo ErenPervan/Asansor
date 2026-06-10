@@ -439,7 +439,7 @@ class SyncQueueService extends ChangeNotifier {
           );
 
       final fileName =
-          'report_${logModel.elevatorId}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+          'reports/${logModel.elevatorId}/${DateTime.now().millisecondsSinceEpoch}.pdf';
       await client.storage
           .from(_maintenanceReportsBucket)
           .upload(fileName, pdfFile)
@@ -450,12 +450,9 @@ class SyncQueueService extends ChangeNotifier {
             ),
           );
 
-      final publicUrl = client.storage
-          .from(_maintenanceReportsBucket)
-          .getPublicUrl(fileName);
       await client
           .from('maintenance_logs')
-          .update({'pdf_url': publicUrl})
+          .update({'pdf_url': fileName})
           .eq('id', logModel.id)
           .timeout(
             _dbWriteTimeout,
@@ -463,7 +460,7 @@ class SyncQueueService extends ChangeNotifier {
               '[SyncQueue] DB pdf_url update timed out after ${_dbWriteTimeout.inSeconds}s for log ${logModel.id}',
             ),
           );
-      debugPrint('[SyncQueue] PDF uploaded & linked: $publicUrl');
+      debugPrint('[SyncQueue] PDF uploaded & linked path: $fileName');
 
       try {
         final customerData = await client
@@ -482,7 +479,7 @@ class SyncQueueService extends ChangeNotifier {
               'title': 'Bakım Tamamlandı ✓',
               'body':
                   'Asansörünüzün periyodik bakımı tamamlandı. Rapora göz atabilirsiniz.',
-              'data': {'route': '/customer', 'pdf_url': publicUrl},
+              'data': {'route': '/customer', 'pdf_url': fileName},
             },
           );
           debugPrint('[SyncQueue] Customer notification sent to: $customerId');

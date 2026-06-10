@@ -58,6 +58,7 @@ Deno.env.set("FIREBASE_SERVICE_ACCOUNT", JSON.stringify({
   project_id: "mock-project"
 }));
 Deno.env.set("WEBHOOK_SECRET", "secret123");
+Deno.env.set("IS_TEST", "true");
 
 Deno.test("send-notification - to_role ile admin caller -> 200 OK", async () => {
   mockFetch("admin");

@@ -148,9 +148,9 @@ class SyncCoordinator extends ChangeNotifier {
     await _conflictResolver!.resolveFlagDisputed(key);
   }
 
-  Future<void> resolveDiscard(String key) async {
+  Future<void> resolveDiscard(SupabaseClient client, String key) async {
     _conflictResolver ??= SyncConflictResolver(
-      Supabase.instance.client, // Dummy, not used for discard
+      client,
       _storage, 
       () async {}
     );

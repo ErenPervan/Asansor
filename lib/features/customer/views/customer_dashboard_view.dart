@@ -660,13 +660,13 @@ class _MaintenanceSection extends StatelessWidget {
   }
 }
 
-class _MaintenanceLogTile extends StatelessWidget {
+class _MaintenanceLogTile extends ConsumerWidget {
   const _MaintenanceLogTile({required this.log});
 
   final MaintenanceLogModel log;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final dateStr = DateFormat(
@@ -725,13 +725,13 @@ class _MaintenanceLogTile extends StatelessWidget {
           ? IconButton(
               tooltip: 'Raporu İndir',
               icon: Icon(Icons.picture_as_pdf_rounded, color: colors.error),
-              onPressed: () => _openPdf(context, log.pdfUrl!),
+              onPressed: () => _openPdf(context, ref, log.pdfUrl!),
             )
           : null,
     );
   }
 
-  Future<void> _openPdf(BuildContext context, String pathOrUrl) async {
+  Future<void> _openPdf(BuildContext context, WidgetRef ref, String pathOrUrl) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Rapor açılıyor...'),
@@ -743,7 +743,7 @@ class _MaintenanceLogTile extends StatelessWidget {
       if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
         url = pathOrUrl;
       } else {
-        url = await Supabase.instance.client.storage
+        url = await ref.read(supabaseClientProvider).storage
             .from('maintenance-reports')
             .createSignedUrl(pathOrUrl, 60 * 60);
       }

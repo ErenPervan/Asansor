@@ -31,14 +31,14 @@ class ConflictResolutionView extends ConsumerWidget {
   }
 }
 
-class _ConflictCard extends StatelessWidget {
+class _ConflictCard extends ConsumerWidget {
   const _ConflictCard({required this.item, required this.syncQueue});
 
   final Map<String, dynamic> item;
   final SyncQueueService syncQueue;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final key = item['key'] as String;
     final payload = item['payload'] as Map<String, dynamic>;
     final remoteState = item['remote_state'] as Map<String, dynamic>? ?? {};
@@ -108,7 +108,7 @@ class _ConflictCard extends StatelessWidget {
                   onPressed: () async {
                     try {
                       await syncQueue.resolveForceUpdate(
-                        Supabase.instance.client,
+                        ref.read(supabaseClientProvider),
                         key,
                       );
                       if (context.mounted) {
@@ -133,7 +133,7 @@ class _ConflictCard extends StatelessWidget {
                   onPressed: () async {
                     try {
                       await syncQueue.resolveFlagDisputed(
-                        Supabase.instance.client,
+                        ref.read(supabaseClientProvider),
                         key,
                       );
                       if (context.mounted) {
@@ -158,7 +158,7 @@ class _ConflictCard extends StatelessWidget {
                 ),
                 TextButton.icon(
                   onPressed: () async {
-                    await syncQueue.resolveDiscard(key);
+                    await syncQueue.resolveDiscard(ref.read(supabaseClientProvider), key);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

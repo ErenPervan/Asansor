@@ -6,6 +6,7 @@ import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:asansor/core/widgets/error_state.dart';
 import 'package:asansor/core/widgets/loading_state.dart';
+import 'package:asansor/core/providers/connectivity_providers.dart';
 import 'package:asansor/features/admin/providers/checklist_provider.dart';
 import 'package:asansor/features/elevator/providers/elevator_providers.dart';
 import 'package:asansor/features/maintenance/providers/maintenance_providers.dart';
@@ -206,7 +207,7 @@ class _MaintenanceLogEntryViewState
     if (!_formKey.currentState!.validate()) return;
     final l10n = AppLocalizations.of(context)!;
 
-    final userId = Supabase.instance.client.auth.currentUser?.id;
+    final userId = ref.read(supabaseClientProvider).auth.currentUser?.id;
     if (userId == null) {
       await HapticFeedback.heavyImpact();
       if (!mounted) return;

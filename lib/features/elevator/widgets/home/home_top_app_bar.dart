@@ -318,8 +318,6 @@ class SyncStatusButton extends ConsumerWidget {
     );
   }
 
-  static supabase_flutter.SupabaseClient get _supabaseClient =>
-      supabase_flutter.Supabase.instance.client;
 
   void _showSyncSheet(BuildContext context, WidgetRef ref) {
     final queue = ref.read(syncQueueServiceProvider);
@@ -336,7 +334,7 @@ class SyncStatusButton extends ConsumerWidget {
         isOnline: isOnline,
         onSync: () {
           Navigator.pop(context);
-          queue.flush(_supabaseClient).then((result) {
+          queue.flush(ref.read(supabaseClientProvider)).then((result) {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

@@ -144,4 +144,42 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get generalCancel => 'İptal';
+
+  @override
+  String get navBarFleet => 'Filo';
+
+  @override
+  String get navBarFaults => 'Arızalar';
+
+  @override
+  String get navBarSchedule => 'Program';
+
+  @override
+  String get navBarLog => 'Günlük';
+
+  @override
+  String get navBarAdminOnlyTooltip => 'Yalnızca yöneticiler erişebilir';
+
+  @override
+  String get faultDetailResolveButton => 'Arızayı Onar';
+
+  @override
+  String get faultDetailConfirmResolveButton => 'Evet, Onar';
+
+  @override
+  String get faultDetailResolveSuccess =>
+      'Arıza başarıyla onarıldı olarak işaretlendi.';
+
+  @override
+  String get faultDetailReopenSuccess => 'Arıza yeniden açıldı.';
+
+  @override
+  String get faultListRefresh => 'Yenile';
+
+  @override
+  String get faultSidePanelGoToElevator => 'Asansör Detayına Git';
+
+  @override
+  String get mainHiveRecoveryMessage =>
+      'Yerel veri önbelleği bozulmuştu. Veriler sıfırlandı, uygulamanız güvenle çalışmaya devam ediyor.';
 }

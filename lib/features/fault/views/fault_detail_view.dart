@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:asansor/l10n/app_localizations.dart';
 
 class FaultDetailView extends ConsumerWidget {
   const FaultDetailView({super.key, required this.faultId});
@@ -208,21 +209,23 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Arızayı Onar'),
+        title: Text(AppLocalizations.of(ctx)!.faultDetailResolveButton),
         content: const Text(
           'Bu arızayı onarıldı olarak işaretlemek istediğinize emin misiniz?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
+            child: Text(AppLocalizations.of(ctx)!.generalCancel),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
               _handleResolve(context, ref, faultId);
             },
-            child: const Text('Evet, Onar'),
+            child: Text(
+              AppLocalizations.of(ctx)!.faultDetailConfirmResolveButton,
+            ),
           ),
         ],
       ),
@@ -247,7 +250,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Arıza başarıyla onarıldı olarak işaretlendi.'),
+          content: Text(
+            AppLocalizations.of(context)!.faultDetailResolveSuccess,
+          ),
           backgroundColor: AppThemeColors.of(context).success,
           behavior: SnackBarBehavior.floating,
           duration: AppDurations.snackBarSuccess,
@@ -260,7 +265,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
       final err = ref.read(faultUpdateControllerProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Hata: $err'),
+          content: Text(
+            AppLocalizations.of(context)!.generalError(err.toString()),
+          ),
           backgroundColor: AppThemeColors.of(context).error,
           behavior: SnackBarBehavior.floating,
           duration: AppDurations.snackBarError,
@@ -281,8 +288,8 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
       await HapticFeedback.lightImpact();
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Arıza yeniden açıldı.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.faultDetailReopenSuccess),
           behavior: SnackBarBehavior.floating,
           duration: AppDurations.snackBarSuccess,
         ),
@@ -294,7 +301,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
       final err = ref.read(faultUpdateControllerProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Hata: $err'),
+          content: Text(
+            AppLocalizations.of(context)!.generalError(err.toString()),
+          ),
           backgroundColor: AppThemeColors.of(context).error,
           behavior: SnackBarBehavior.floating,
           duration: AppDurations.snackBarError,

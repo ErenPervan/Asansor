@@ -83,16 +83,15 @@ void main() {
       expect(model.customerSignatureUrl, isNull);
     });
 
-    test('maintenance_date null ise epoch sentinel döner', () {
+    test('throws ArgumentError if maintenance_date is missing', () {
       final json = {
         'id': 'log-3',
-        'elevator_id': 'elev-1',
-        'technician_id': 'tech-1',
-        'maintenance_date': null,
+        'elevator_id': 'elev-3',
+        'technician_id': 'tech-3',
+        // 'maintenance_date' is missing
       };
 
-      final model = MaintenanceLogModel.fromJson(json);
-      expect(model.maintenanceDate, DateTime.fromMillisecondsSinceEpoch(0));
+      expect(() => MaintenanceLogModel.fromJson(json), throwsArgumentError);
     });
 
     test('toJson: isteğe bağlı alanlar null ise eksik olur', () {

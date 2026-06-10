@@ -70,10 +70,7 @@ class MaintenanceLogModel {
       notes: json['notes'] as String?,
       // Boolean columns: guard against null with a sensible default.
       isApproved: (json['is_approved'] as bool?) ?? false,
-      // DateTime: parse only if non-null; use epoch as a safe sentinel.
-      maintenanceDate: json['maintenance_date'] != null
-          ? DateTime.parse(json['maintenance_date'] as String)
-          : DateTime.fromMillisecondsSinceEpoch(0),
+      maintenanceDate: _parseRequiredDate(json, 'maintenance_date'),
       pdfUrl: json['pdf_url'] as String?,
       technicianName: profilesData?['full_name'] as String?,
       checklist: json['checklist'] as Map<String, dynamic>?,
@@ -136,6 +133,18 @@ class MaintenanceLogModel {
   @override
   String toString() =>
       'MaintenanceLogModel(id: $id, elevatorId: $elevatorId, '
-      'technicianId: $technicianId, technicianName: $technicianName, '
-      'isApproved: $isApproved, checklist: $checklist, photos: $photos)';
+      'technicianId: $technicianId, '
+      'isApproved: $isApproved, maintenanceDate: $maintenanceDate, '
+      'photoCount: ${photos?.length ?? 0}, '
+      'isOfflineQueued: $isOfflineQueued)';
+
+  static DateTime _parseRequiredDate(Map<String, dynamic> json, String key) {
+    final raw = json[key];
+    if (raw == null) {
+      throw ArgumentError(
+        'MaintenanceLogModel: required field "$key" is null. Row id=${json["id"]}',
+      );
+    }
+    return DateTime.parse(raw as String);
+  }
 }

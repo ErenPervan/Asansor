@@ -76,5 +76,17 @@
     }
   },
   "generalRetry": "Retry",
-  "generalCancel": "Cancel"
+  "generalCancel": "Cancel",
+  "navBarFleet": "Fleet",
+  "navBarFaults": "Faults",
+  "navBarSchedule": "Schedule",
+  "navBarLog": "Log",
+  "navBarAdminOnlyTooltip": "Only admins can access",
+  "faultDetailResolveButton": "Resolve Fault",
+  "faultDetailConfirmResolveButton": "Yes, Resolve",
+  "faultDetailResolveSuccess": "Fault successfully marked as resolved.",
+  "faultDetailReopenSuccess": "Fault reopened.",
+  "faultListRefresh": "Refresh",
+  "faultSidePanelGoToElevator": "Go to Elevator Detail",
+  "mainHiveRecoveryMessage": "Local data cache was corrupted. Data has been reset, your app continues to run safely."
 }

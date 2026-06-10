@@ -21,7 +21,11 @@ abstract interface class IScheduleRepository {
   Future<Set<String>> getScheduledElevatorIdsForMonth(DateTime month);
   Future<List<ScheduleModel>> getTechnicianTasks(String technicianId);
   Future<List<ScheduleModel>> getTechnicianPendingTasks(String technicianId);
-  Future<List<ScheduleModel>> getAllSchedules({int? lookbackDays = 90});
+  Future<List<ScheduleModel>> getAllSchedules({
+    int? lookbackDays = 90,
+    int limit = 200,
+    int offset = 0,
+  });
   Future<List<ScheduleModel>> getSchedulesForDate(DateTime date);
   Stream<List<ScheduleModel>> getMyTasksStream(String technicianId);
   Future<List<ScheduleModel>> getTodayAllSchedules();
@@ -36,6 +40,8 @@ abstract interface class IScheduleRepository {
   });
   Future<List<ScheduleWithDetails>> getAllSchedulesWithDetails({
     int? lookbackDays = 90,
+    int limit = 200,
+    int offset = 0,
   });
   Future<List<ScheduleModel>> getSchedulesForDateRange(
     DateTime start,
@@ -206,7 +212,11 @@ class ScheduleRepository implements IScheduleRepository {
   /// Returns all schedules across all technicians (admin view) within the last
   /// [lookbackDays] days. Pass null to fetch all history without limit.
   @override
-  Future<List<ScheduleModel>> getAllSchedules({int? lookbackDays = 90}) async {
+  Future<List<ScheduleModel>> getAllSchedules({
+    int? lookbackDays = 90,
+    int limit = 200,
+    int offset = 0,
+  }) async {
     try {
       var query = _client.from(_table).select();
 
@@ -217,7 +227,9 @@ class ScheduleRepository implements IScheduleRepository {
         query = query.gte('scheduled_date', since.toIso8601String());
       }
 
-      final response = await query.order('scheduled_date', ascending: false);
+      final response = await query
+          .order('scheduled_date', ascending: false)
+          .range(offset, offset + limit - 1);
 
       return (response as List)
           .map((json) => ScheduleModel.fromJson(json as Map<String, dynamic>))
@@ -418,6 +430,8 @@ class ScheduleRepository implements IScheduleRepository {
   @override
   Future<List<ScheduleWithDetails>> getAllSchedulesWithDetails({
     int? lookbackDays = 90,
+    int limit = 200,
+    int offset = 0,
   }) async {
     try {
       var query = _client
@@ -433,7 +447,9 @@ class ScheduleRepository implements IScheduleRepository {
         query = query.gte('scheduled_date', since.toIso8601String());
       }
 
-      final response = await query.order('scheduled_date', ascending: false);
+      final response = await query
+          .order('scheduled_date', ascending: false)
+          .range(offset, offset + limit - 1);
 
       return (response as List).map((json) {
         final Map<String, dynamic> data = json as Map<String, dynamic>;

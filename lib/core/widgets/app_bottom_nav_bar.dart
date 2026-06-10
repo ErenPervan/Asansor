@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:asansor/core/enums/app_capability.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/features/admin/providers/profile_providers.dart';
+import 'package:asansor/l10n/app_localizations.dart';
 
 class AppBottomNavBar extends ConsumerWidget {
   const AppBottomNavBar({super.key, required this.navigationShell});
@@ -23,6 +24,7 @@ class AppBottomNavBar extends ConsumerWidget {
     final profile = ref.watch(currentProfileProvider).valueOrNull;
     final canViewSchedule =
         profile?.can(AppCapability.viewAdminCalendar) ?? false;
+    final l10n = AppLocalizations.of(context)!;
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 8,
@@ -35,26 +37,27 @@ class AppBottomNavBar extends ConsumerWidget {
           children: [
             _NavItem(
               icon: Icons.domain_outlined,
-              label: 'Filo',
+              label: l10n.navBarFleet,
               isActive: navigationShell.currentIndex == 0,
               onPressed: () => _goBranch(0),
             ),
             _NavItem(
               icon: Icons.error_outline,
-              label: 'Arızalar',
+              label: l10n.navBarFaults,
               isActive: navigationShell.currentIndex == 1,
               onPressed: () => _goBranch(1),
             ),
             const SizedBox(width: 56), // spacer for the centre FAB
-            _NavItem(
-              icon: Icons.event_note_outlined,
-              label: 'Program',
-              isActive: navigationShell.currentIndex == 2,
-              onPressed: canViewSchedule ? () => _goBranch(2) : null,
-            ),
+            if (canViewSchedule)
+              _NavItem(
+                icon: Icons.event_note_outlined,
+                label: l10n.navBarSchedule,
+                isActive: navigationShell.currentIndex == 2,
+                onPressed: () => _goBranch(2),
+              ),
             _NavItem(
               icon: Icons.history,
-              label: 'Günlük',
+              label: l10n.navBarLog,
               isActive: navigationShell.currentIndex == 3,
               onPressed: () => _goBranch(3),
             ),
@@ -101,8 +104,9 @@ class _NavItem extends StatelessWidget {
     );
 
     if (isDisabled) {
+      final l10n = AppLocalizations.of(context)!;
       return Tooltip(
-        message: 'Yalnızca yöneticiler erişebilir',
+        message: l10n.navBarAdminOnlyTooltip,
         child: Opacity(
           opacity: 0.4,
           child: Padding(

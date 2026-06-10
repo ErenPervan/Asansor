@@ -345,6 +345,78 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'İptal'**
   String get generalCancel;
+
+  /// No description provided for @navBarFleet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Filo'**
+  String get navBarFleet;
+
+  /// No description provided for @navBarFaults.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arızalar'**
+  String get navBarFaults;
+
+  /// No description provided for @navBarSchedule.
+  ///
+  /// In tr, this message translates to:
+  /// **'Program'**
+  String get navBarSchedule;
+
+  /// No description provided for @navBarLog.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük'**
+  String get navBarLog;
+
+  /// No description provided for @navBarAdminOnlyTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yalnızca yöneticiler erişebilir'**
+  String get navBarAdminOnlyTooltip;
+
+  /// No description provided for @faultDetailResolveButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arızayı Onar'**
+  String get faultDetailResolveButton;
+
+  /// No description provided for @faultDetailConfirmResolveButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet, Onar'**
+  String get faultDetailConfirmResolveButton;
+
+  /// No description provided for @faultDetailResolveSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arıza başarıyla onarıldı olarak işaretlendi.'**
+  String get faultDetailResolveSuccess;
+
+  /// No description provided for @faultDetailReopenSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arıza yeniden açıldı.'**
+  String get faultDetailReopenSuccess;
+
+  /// No description provided for @faultListRefresh.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yenile'**
+  String get faultListRefresh;
+
+  /// No description provided for @faultSidePanelGoToElevator.
+  ///
+  /// In tr, this message translates to:
+  /// **'Asansör Detayına Git'**
+  String get faultSidePanelGoToElevator;
+
+  /// No description provided for @mainHiveRecoveryMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yerel veri önbelleği bozulmuştu. Veriler sıfırlandı, uygulamanız güvenle çalışmaya devam ediyor.'**
+  String get mainHiveRecoveryMessage;
 }
 
 class _AppLocalizationsDelegate

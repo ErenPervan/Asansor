@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:asansor/core/services/read_cache_service.dart';
+import 'package:asansor/core/services/reachability_service.dart';
 import 'package:asansor/core/services/sync/sync_coordinator.dart';
 
 // ── Connectivity ──────────────────────────────────────────────────────────────
@@ -15,15 +17,41 @@ final connectivityStreamProvider = StreamProvider<List<ConnectivityResult>>((
   return Connectivity().onConnectivityChanged;
 });
 
-/// `true` when at least one non-`none` connectivity result is present.
+/// Periodically tests true internet reachability.
+final reachabilityStreamProvider = StreamProvider<ReachabilityStatus>((
+  ref,
+) async* {
+  final connectivity = ref.watch(connectivityStreamProvider);
+  final isHardwareOnline = connectivity.when(
+    data: (results) => results.any((r) => r != ConnectivityResult.none),
+    loading: () => true, // Assume true while loading
+    error: (_, _) => false,
+  );
+
+  if (!isHardwareOnline) {
+    yield ReachabilityStatus.offline;
+    return;
+  }
+
+  // Initial check
+  yield await ReachabilityService.instance.checkReachability();
+
+  // Periodic check
+  final timer = Stream.periodic(const Duration(seconds: 30));
+  await for (final _ in timer) {
+    yield await ReachabilityService.instance.checkReachability();
+  }
+});
+
+/// `true` only when the device has a network connection AND can reach Supabase.
 ///
 /// Defaults to `true` while the stream is loading to avoid false "offline"
 /// flickers on cold start.
 final isOnlineProvider = Provider<bool>((ref) {
   return ref
-      .watch(connectivityStreamProvider)
+      .watch(reachabilityStreamProvider)
       .when(
-        data: (results) => results.any((r) => r != ConnectivityResult.none),
+        data: (status) => status == ReachabilityStatus.online,
         loading: () => true,
         error: (e, st) => true,
       );
@@ -76,10 +104,10 @@ final pendingSyncCountProvider = Provider<int>((ref) {
 
 // ── Auto-sync ─────────────────────────────────────────────────────────────────
 
-/// Watches the connectivity stream and automatically flushes the queue the
+/// Watches the reachability stream and automatically flushes the queue the
 /// moment the device comes back online.
 ///
-/// Also flushes on the very first connectivity event (cold start / app resume)
+/// Also flushes on the very first reachability event (cold start / app resume)
 /// so items queued during a previous offline session are synced as soon as the
 /// app launches with an active connection — not only on offline→online
 /// transitions.
@@ -87,21 +115,19 @@ final pendingSyncCountProvider = Provider<int>((ref) {
 /// Kept alive at the app-root level (watched inside [AsansorApp]) so it runs
 /// for the full app lifetime regardless of which screen is visible.
 void setupAutoSyncListener(WidgetRef ref) {
-  ref.listen<AsyncValue<List<ConnectivityResult>>>(connectivityStreamProvider, (
+  ref.listen<AsyncValue<ReachabilityStatus>>(reachabilityStreamProvider, (
     previous,
     next,
   ) {
-    next.whenData((results) {
-      final isNowOnline = results.any((r) => r != ConnectivityResult.none);
+    next.whenData((status) {
+      final isNowOnline = status == ReachabilityStatus.online;
       if (!isNowOnline) return;
 
       // `previous == null` → first connectivity event after cold start.
       // Treat it the same as "was offline" so any items queued in a prior
       // offline session are flushed immediately on startup.
       final wasOffline =
-          previous == null ||
-          (previous.valueOrNull?.every((r) => r == ConnectivityResult.none) ??
-              true);
+          previous == null || previous.valueOrNull != ReachabilityStatus.online;
 
       if (wasOffline) {
         final queue = ref.read(syncQueueServiceProvider);
@@ -112,3 +138,15 @@ void setupAutoSyncListener(WidgetRef ref) {
     });
   });
 }
+
+// ── Added Sync UI Metrics ───────────────────────────────────────────────────
+
+/// Exposes the number of items that have failed persistently (dead letters).
+final failedSyncCountProvider = Provider<int>((ref) {
+  return ref.watch(syncQueueServiceProvider).failedCount;
+});
+
+/// Exposes the number of items that are in a conflicted state.
+final conflictSyncCountProvider = Provider<int>((ref) {
+  return ref.watch(syncQueueServiceProvider).conflictCount;
+});

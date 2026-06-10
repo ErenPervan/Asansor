@@ -4,7 +4,10 @@ import 'package:asansor/core/exceptions/app_exception.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
 
 abstract interface class IElevatorRepository {
-  Future<List<ElevatorModel>> getAllElevators();
+  Future<List<ElevatorModel>> getAllElevators({
+    int limit = 100,
+    int offset = 0,
+  });
   Future<ElevatorModel> createElevator({
     required String buildingName,
     String? address,
@@ -25,12 +28,16 @@ class ElevatorRepository implements IElevatorRepository {
 
   /// Returns every elevator record ordered by building name.
   @override
-  Future<List<ElevatorModel>> getAllElevators() async {
+  Future<List<ElevatorModel>> getAllElevators({
+    int limit = 100,
+    int offset = 0,
+  }) async {
     try {
       final response = await _client
           .from(_table)
           .select()
-          .order('building_name', ascending: true);
+          .order('building_name', ascending: true)
+          .range(offset, offset + limit - 1);
 
       return (response as List<dynamic>)
           .map((json) => ElevatorModel.fromJson(json as Map<String, dynamic>))

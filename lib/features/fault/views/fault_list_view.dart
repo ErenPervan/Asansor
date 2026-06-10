@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:asansor/l10n/app_localizations.dart';
 
 const _panelLine = Color(0xFFE1E8F0);
 
@@ -231,7 +232,7 @@ class _PageHeader extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: onRefresh,
                   icon: const Icon(Icons.refresh_rounded, size: 19),
-                  label: const Text('Yenile'),
+                  label: Text(AppLocalizations.of(context)!.faultListRefresh),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: colors.primary,
                     backgroundColor: colors.surface,
@@ -847,7 +848,7 @@ class _ErrorBody extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Tekrar Dene'),
+              label: Text(AppLocalizations.of(context)!.generalRetry),
             ),
           ],
         ),

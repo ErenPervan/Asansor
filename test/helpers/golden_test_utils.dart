@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:asansor/l10n/app_localizations.dart';
 
 final bool isCI =
     Platform.environment.containsKey('CI') ||
@@ -9,6 +10,9 @@ final bool isCI =
 /// Provides a default ThemeData and a Scaffold.
 Widget pumpWithTheme(Widget child) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('tr'),
     theme: ThemeData.light(useMaterial3: true).copyWith(
       scaffoldBackgroundColor: const Color(0xFFF9FAFB), // AppColors.background
     ),

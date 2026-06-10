@@ -4,7 +4,10 @@ import 'package:asansor/core/exceptions/app_exception.dart';
 import 'package:asansor/features/fault/models/fault_report_model.dart';
 
 abstract interface class IFaultRepository {
-  Future<List<FaultReportModel>> getAllFaults();
+  Future<List<FaultReportModel>> getAllFaults({
+    int limit = 100,
+    int offset = 0,
+  });
   Future<DateTime?> getLatestFaultDate(String elevatorId);
   Future<FaultReportModel> reportFault({
     required String elevatorId,
@@ -17,7 +20,10 @@ abstract interface class IFaultRepository {
   });
   Future<FaultReportModel> reopenFault(String faultId);
   Future<FaultReportModel> getFaultById(String id);
-  Future<List<FaultReportModel>> getAllActiveFaults();
+  Future<List<FaultReportModel>> getAllActiveFaults({
+    int limit = 100,
+    int offset = 0,
+  });
   Future<List<FaultReportModel>> getFaultsByElevatorId(String elevatorId);
 }
 
@@ -31,12 +37,16 @@ class FaultRepository implements IFaultRepository {
   // ── Read ───────────────────────────────────────────────────────────────────
 
   @override
-  Future<List<FaultReportModel>> getAllFaults() async {
+  Future<List<FaultReportModel>> getAllFaults({
+    int limit = 100,
+    int offset = 0,
+  }) async {
     try {
       final response = await _client
           .from(_table)
           .select()
-          .order('reported_at', ascending: false);
+          .order('reported_at', ascending: false)
+          .range(offset, offset + limit - 1);
 
       return (response as List<dynamic>)
           .map(
@@ -192,13 +202,17 @@ class FaultRepository implements IFaultRepository {
 
   /// Returns all unresolved fault reports across every elevator, newest first.
   @override
-  Future<List<FaultReportModel>> getAllActiveFaults() async {
+  Future<List<FaultReportModel>> getAllActiveFaults({
+    int limit = 100,
+    int offset = 0,
+  }) async {
     try {
       final response = await _client
           .from(_table)
           .select()
           .eq('is_resolved', false)
-          .order('reported_at', ascending: false);
+          .order('reported_at', ascending: false)
+          .range(offset, offset + limit - 1);
 
       return (response as List<dynamic>)
           .map(

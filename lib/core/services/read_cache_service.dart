@@ -198,6 +198,21 @@ class ReadCacheService {
     }
   }
 
+  /// Returns cached faults for a specific elevator.
+  List<FaultReportModel> loadFaultsByElevatorId(String elevatorId) {
+    return loadAllFaults().where((f) => f.elevatorId == elevatorId).toList();
+  }
+
+  /// Returns a specific cached fault by its ID.
+  FaultReportModel? loadFaultById(String faultId) {
+    final all = loadAllFaults();
+    try {
+      return all.firstWhere((f) => f.id == faultId);
+    } catch (_) {
+      return null;
+    }
+  }
+
   // ── Pending Maintenance Logs ────────────────────────────────────────────────
 
   /// Persists pending maintenance logs. Overwrites any previous value.

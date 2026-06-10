@@ -64,7 +64,7 @@ void main() {
       expect(opacityFinder, findsNothing);
     });
 
-    testWidgets('technician sees program tab disabled', (tester) async {
+    testWidgets('technician does not see program tab', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -83,28 +83,10 @@ void main() {
       );
 
       final programIcon = find.text('Program'.toUpperCase());
-      expect(programIcon, findsOneWidget);
-
-      // Verify Tooltip is present
-      final tooltipFinder = find.ancestor(
-        of: programIcon,
-        matching: find.byType(Tooltip),
-      );
-      expect(tooltipFinder, findsOneWidget);
-      final Tooltip tooltip = tester.widget(tooltipFinder);
-      expect(tooltip.message, 'Yalnızca yöneticiler erişebilir');
-
-      // Verify Opacity is present
-      final opacityFinder = find.ancestor(
-        of: programIcon,
-        matching: find.byType(Opacity),
-      );
-      expect(opacityFinder, findsOneWidget);
-      final Opacity opacity = tester.widget(opacityFinder);
-      expect(opacity.opacity, 0.4);
+      expect(programIcon, findsNothing);
     });
 
-    testWidgets('customer sees program tab disabled', (tester) async {
+    testWidgets('customer does not see program tab', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -123,14 +105,7 @@ void main() {
       );
 
       final programIcon = find.text('Program'.toUpperCase());
-      expect(programIcon, findsOneWidget);
-
-      // Verify Tooltip is present
-      final tooltipFinder = find.ancestor(
-        of: programIcon,
-        matching: find.byType(Tooltip),
-      );
-      expect(tooltipFinder, findsOneWidget);
+      expect(programIcon, findsNothing);
     });
 
     testWidgets('active tab color is primary', (tester) async {

@@ -36,8 +36,22 @@ void main() {
       expect(model.isOfflineQueued, isFalse); // Default
     });
 
+    test('throws ArgumentError if reported_at is missing', () {
+      final json = {
+        'id': 'f2',
+        // 'reported_at' is missing
+      };
+
+      expect(() => FaultReportModel.fromJson(json), throwsArgumentError);
+    });
+
     test('fromJson handles nulls with defaults', () {
-      final json = {'id': 'f2', 'elevator_id': 'e2', 'description': 'Stuck'};
+      final json = {
+        'id': 'f2',
+        'elevator_id': 'e2',
+        'description': 'Stuck',
+        'reported_at': DateTime.fromMillisecondsSinceEpoch(0).toIso8601String(),
+      };
 
       final model = FaultReportModel.fromJson(json);
 

@@ -154,7 +154,5 @@ class ProfileModel {
       capabilityMatrix[role]?.contains(capability) ?? false;
 
   @override
-  String toString() =>
-      'ProfileModel(id: $id, role: ${role.name}, email: $email, '
-      'fullName: $fullName)';
+  String toString() => 'ProfileModel(id: $id, role: ${role.name})';
 }

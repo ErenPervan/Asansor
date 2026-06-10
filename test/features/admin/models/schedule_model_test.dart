@@ -36,24 +36,13 @@ void main() {
       expect(model.createdAt, createdAt);
     });
 
-    test('fromJson handles nulls with defaults', () {
-      final json = {'id': 's2', 'elevator_id': 'e2'};
+    test('handles nulls by throwing ArgumentError', () {
+      final json = {
+        'id': 's2',
+        // 'scheduled_date' is missing
+      };
 
-      final model = ScheduleModel.fromJson(json);
-
-      expect(model.id, 's2');
-      expect(model.elevatorId, 'e2');
-      expect(model.technicianId, '');
-      expect(
-        model.scheduledDate,
-        DateTime.fromMillisecondsSinceEpoch(0),
-      ); // Default when null
-      expect(model.status, ScheduleStatus.pending); // Default
-      expect(model.priority, 'normal'); // Default
-      expect(model.taskType, 'manual'); // Default
-      expect(model.notes, isNull);
-      expect(model.createdBy, isNull);
-      expect(model.createdAt, isNull);
+      expect(() => ScheduleModel.fromJson(json), throwsArgumentError);
     });
 
     test('toJson conditionally includes technicianId', () {

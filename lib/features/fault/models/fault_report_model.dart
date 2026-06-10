@@ -59,9 +59,7 @@ class FaultReportModel {
       faultType: json['fault_type'] as String?,
       priority: json['priority'] as String?,
       isResolved: (json['is_resolved'] as bool?) ?? false,
-      reportedAt: json['reported_at'] != null
-          ? DateTime.parse(json['reported_at'] as String)
-          : DateTime.fromMillisecondsSinceEpoch(0),
+      reportedAt: _parseRequiredDate(json, 'reported_at'),
       resolvedAt: json['resolved_at'] != null
           ? DateTime.parse(json['resolved_at'] as String)
           : null,
@@ -116,4 +114,14 @@ class FaultReportModel {
   String toString() =>
       'FaultReportModel(id: $id, elevatorId: $elevatorId, '
       'isResolved: $isResolved, reportedAt: $reportedAt)';
+
+  static DateTime _parseRequiredDate(Map<String, dynamic> json, String key) {
+    final raw = json[key];
+    if (raw == null) {
+      throw ArgumentError(
+        'FaultReportModel: required field "$key" is null. Row id=${json["id"]}',
+      );
+    }
+    return DateTime.parse(raw as String);
+  }
 }

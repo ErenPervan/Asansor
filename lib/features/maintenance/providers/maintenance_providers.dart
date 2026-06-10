@@ -34,6 +34,46 @@ final maintenanceRepositoryProvider = Provider<IMaintenanceRepository>((ref) {
   return MaintenanceRepository(ref.watch(supabaseClientProvider));
 });
 
+// ── Pending Overlay Helper ───────────────────────────────────────────────────
+
+List<MaintenanceLogModel> _applyPendingModifications(
+  Ref ref,
+  List<MaintenanceLogModel> logs, {
+  String? elevatorId,
+}) {
+  final queue = ref.watch(syncQueueServiceProvider);
+  final pending = queue.pendingItems;
+
+  final Map<String, MaintenanceLogModel> logMap = {
+    for (final l in logs) l.id: l,
+  };
+
+  for (final item in pending) {
+    if (item['type'] == SyncItemType.maintenanceLog) {
+      final payload = item['payload'] as Map<String, dynamic>;
+      final newLog = MaintenanceLogModel(
+        id: item['id'] as String,
+        elevatorId: payload['elevator_id'] as String,
+        technicianId: payload['technician_id'] as String,
+        notes: payload['notes'] as String,
+        isApproved: payload['is_approved'] as bool? ?? false,
+        maintenanceDate: DateTime.parse(payload['maintenance_date'] as String),
+        checklist: payload['checklist'] as Map<String, dynamic>?,
+        photos: (payload['photos'] as List<dynamic>?)?.cast<String>(),
+        signatureUrl: payload['signature_url'] as String?,
+        customerSignatureUrl: payload['customer_signature_url'] as String?,
+        isOfflineQueued: true,
+      );
+      logMap[newLog.id] = newLog;
+    }
+  }
+
+  return logMap.values
+      .where((l) => elevatorId == null || l.elevatorId == elevatorId)
+      .toList()
+    ..sort((a, b) => b.maintenanceDate.compareTo(a.maintenanceDate));
+}
+
 // ── Data Providers ───────────────────────────────────────────────────────────
 
 /// Fetches all pending (unapproved) maintenance logs across every elevator.
@@ -47,7 +87,8 @@ final pendingMaintenanceProvider = FutureProvider<List<MaintenanceLogModel>>((
 
   // ── Offline path ───────────────────────────────────────────────────────────
   if (!isOnline) {
-    return cache.loadPendingMaintenance();
+    final cached = cache.loadPendingMaintenance();
+    return _applyPendingModifications(ref, cached);
   }
 
   // ── Online path ────────────────────────────────────────────────────────────
@@ -56,11 +97,11 @@ final pendingMaintenanceProvider = FutureProvider<List<MaintenanceLogModel>>((
     final data = await repo.getAllPendingLogs();
     // Update the cache in the background — don't await so the UI isn't blocked.
     unawaited(cache.savePendingMaintenance(data));
-    return data;
+    return _applyPendingModifications(ref, data);
   } catch (e) {
     // Network or Supabase error: serve stale cache so the screen doesn't crash.
     final cached = cache.loadPendingMaintenance();
-    if (cached.isNotEmpty) return cached;
+    if (cached.isNotEmpty) return _applyPendingModifications(ref, cached);
     rethrow;
   }
 });
@@ -100,19 +141,28 @@ final logsByElevatorProvider =
       final cache = ref.read(readCacheServiceProvider);
 
       if (!isOnline) {
-        return cache.loadPastLogs(elevatorId).cast<MaintenanceLogModel>();
+        final cached = cache
+            .loadPastLogs(elevatorId)
+            .cast<MaintenanceLogModel>();
+        return _applyPendingModifications(ref, cached, elevatorId: elevatorId);
       }
 
       try {
         final repo = ref.watch(maintenanceRepositoryProvider);
         final data = await repo.getLogsByElevatorId(elevatorId);
         await cache.savePastLogs(elevatorId, data);
-        return data;
+        return _applyPendingModifications(ref, data, elevatorId: elevatorId);
       } catch (e) {
         final cached = cache
             .loadPastLogs(elevatorId)
             .cast<MaintenanceLogModel>();
-        if (cached.isNotEmpty) return cached;
+        if (cached.isNotEmpty) {
+          return _applyPendingModifications(
+            ref,
+            cached,
+            elevatorId: elevatorId,
+          );
+        }
         rethrow;
       }
     });

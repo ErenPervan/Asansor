@@ -9,6 +9,7 @@ const statusPending = 'pending';
 const statusPdfPending = 'pdf_pending';
 const statusSchedulePending = 'schedule_pending';
 const statusConflictDetected = 'conflict_detected';
+const statusResolving = 'resolving';
 const statusDeadLetter = 'dead_letter';
 
 abstract final class SyncItemType {
@@ -37,7 +38,17 @@ class SyncQueueStorage extends ChangeNotifier {
   int get conflictCount => _box.values.where((raw) {
     try {
       final item = jsonDecode(raw) as Map<String, dynamic>;
-      return item['status'] == statusConflictDetected;
+      return item['status'] == statusConflictDetected ||
+          item['status'] == statusResolving;
+    } catch (_) {
+      return false;
+    }
+  }).length;
+
+  int get failedCount => _box.values.where((raw) {
+    try {
+      final item = jsonDecode(raw) as Map<String, dynamic>;
+      return item['status'] == statusDeadLetter;
     } catch (_) {
       return false;
     }
@@ -52,7 +63,26 @@ class SyncQueueStorage extends ChangeNotifier {
           if (raw == null) return null;
           try {
             final item = jsonDecode(raw) as Map<String, dynamic>;
-            if (item['status'] == statusConflictDetected) {
+            if (item['status'] == statusConflictDetected ||
+                item['status'] == statusResolving) {
+              return {'key': key, ...item};
+            }
+          } catch (_) {}
+          return null;
+        })
+        .whereType<Map<String, dynamic>>()
+        .toList();
+  }
+
+  List<Map<String, dynamic>> get pendingItems {
+    return _box.keys
+        .map((key) {
+          final raw = _box.get(key);
+          if (raw == null) return null;
+          try {
+            final item = jsonDecode(raw) as Map<String, dynamic>;
+            if (item['status'] == statusPending ||
+                item['status'] == statusDeadLetter) {
               return {'key': key, ...item};
             }
           } catch (_) {}
@@ -73,6 +103,8 @@ class SyncQueueStorage extends ChangeNotifier {
       'payload': payload,
       'queued_at': DateTime.now().toIso8601String(),
       'status': statusPending,
+      'retry_count': 0,
+      'next_retry_at': null,
     });
     await _box.put(id, item);
     notifyListeners();

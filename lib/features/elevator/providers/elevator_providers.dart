@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:asansor/core/enums/app_enums.dart';
 import 'package:asansor/core/providers/connectivity_providers.dart';
+import 'package:asansor/core/services/sync/sync_coordinator.dart';
 import 'package:asansor/features/admin/repositories/schedule_repository.dart';
 import 'package:asansor/features/fault/providers/fault_providers.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
@@ -52,6 +54,43 @@ final nextScheduledMaintenanceProvider =
       return repo.getNextScheduledMaintenanceDate(elevatorId);
     });
 
+// ── Pending Overlay Helper ───────────────────────────────────────────────────
+
+List<ElevatorModel> _applyPendingModifications(
+  Ref ref,
+  List<ElevatorModel> elevators,
+) {
+  final queue = ref.watch(syncQueueServiceProvider);
+  final pending = queue.pendingItems;
+
+  final Map<String, ElevatorModel> map = {for (final e in elevators) e.id: e};
+
+  for (final item in pending) {
+    if (item['type'] == SyncItemType.elevatorUpdate) {
+      final payload = item['payload'] as Map<String, dynamic>;
+      final id = payload['id'] as String;
+      if (map.containsKey(id)) {
+        map[id] = map[id]!.copyWith(
+          buildingName: payload['building_name'] as String?,
+          address: payload['address'] as String?,
+          status: payload.containsKey('status')
+              ? ElevatorStatus.fromDb(payload['status'] as String?)
+              : null,
+          latitude: payload['latitude'] != null
+              ? (payload['latitude'] as num).toDouble()
+              : null,
+          longitude: payload['longitude'] != null
+              ? (payload['longitude'] as num).toDouble()
+              : null,
+          maintenanceDay: payload['maintenance_day'] as int?,
+        );
+      }
+    }
+  }
+
+  return map.values.toList();
+}
+
 // ── Data Providers ───────────────────────────────────────────────────────────
 
 /// Fetches the full list of elevators from Supabase.
@@ -69,7 +108,8 @@ final elevatorsProvider = FutureProvider<List<ElevatorModel>>((ref) async {
 
   // ── Offline path ───────────────────────────────────────────────────────────
   if (!isOnline) {
-    return cache.loadElevators();
+    final cached = cache.loadElevators();
+    return _applyPendingModifications(ref, cached);
   }
 
   // ── Online path ────────────────────────────────────────────────────────────
@@ -78,11 +118,11 @@ final elevatorsProvider = FutureProvider<List<ElevatorModel>>((ref) async {
     final data = await repo.getAllElevators();
     // Update the cache in the background — don't await so the UI isn't blocked.
     unawaited(cache.saveElevators(data));
-    return data;
+    return _applyPendingModifications(ref, data);
   } catch (e) {
     // Network or Supabase error: serve stale cache so the screen doesn't crash.
     final cached = cache.loadElevators();
-    if (cached.isNotEmpty) return cached;
+    if (cached.isNotEmpty) return _applyPendingModifications(ref, cached);
     rethrow;
   }
 });
@@ -99,19 +139,21 @@ final elevatorByIdProvider = FutureProvider.family<ElevatorModel, String>((
 
   if (!isOnline) {
     final cachedElevators = cache.loadElevators();
-    return cachedElevators.firstWhere(
+    final cached = cachedElevators.firstWhere(
       (e) => e.id == id,
       orElse: () => throw Exception('Elevator not found in offline cache.'),
     );
+    return _applyPendingModifications(ref, [cached]).first;
   }
 
   try {
     final repo = ref.watch(elevatorRepositoryProvider);
-    return await repo.getElevatorById(id);
+    final data = await repo.getElevatorById(id);
+    return _applyPendingModifications(ref, [data]).first;
   } catch (e) {
     final cachedElevators = cache.loadElevators();
     final cached = cachedElevators.where((e) => e.id == id).firstOrNull;
-    if (cached != null) return cached;
+    if (cached != null) return _applyPendingModifications(ref, [cached]).first;
     rethrow;
   }
 });

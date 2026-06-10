@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:asansor/core/services/read_cache_service.dart';
+import 'package:asansor/core/services/sync/sync_coordinator.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
 import 'package:asansor/features/fault/models/fault_report_model.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
@@ -76,6 +79,10 @@ class FakeReadCacheService implements ReadCacheService {
   List<FaultReportModel> loadAllFaults() => [];
   @override
   Future<void> saveAllFaults(List<FaultReportModel> faults) async {}
+  @override
+  List<FaultReportModel> loadFaultsByElevatorId(String elevatorId) => [];
+  @override
+  FaultReportModel? loadFaultById(String faultId) => null;
 
   // ── Pending Maintenance ─────────────────────────────────────────────────────
   @override
@@ -92,4 +99,48 @@ class FakeReadCacheService implements ReadCacheService {
   // ── Cache Cleanup ───────────────────────────────────────────────────────────
   @override
   Future<void> clearAll() async {}
+}
+
+// ── FakeSyncQueueService ──────────────────────────────────────────────────────
+
+/// A no-op implementation of [SyncQueueService] that returns empty / zero
+/// values without requiring Hive boxes to be opened.
+class FakeSyncQueueService extends ChangeNotifier implements SyncQueueService {
+  @override
+  int get pendingCount => 0;
+
+  @override
+  int get conflictCount => 0;
+
+  @override
+  int get failedCount => 0;
+
+  @override
+  bool get hasPending => false;
+
+  @override
+  List<Map<String, dynamic>> get conflictedItems => [];
+
+  @override
+  List<Map<String, dynamic>> get pendingItems => [];
+
+  @override
+  Future<void> enqueue({
+    required String type,
+    required Map<String, dynamic> payload,
+  }) async {}
+
+  @override
+  Future<SyncResult> flush(SupabaseClient client) async {
+    return const SyncResult(synced: 0, failed: 0);
+  }
+
+  @override
+  Future<void> resolveForceUpdate(SupabaseClient client, String key) async {}
+
+  @override
+  Future<void> resolveFlagDisputed(SupabaseClient client, String key) async {}
+
+  @override
+  Future<void> resolveDiscard(SupabaseClient client, String key) async {}
 }

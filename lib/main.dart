@@ -231,12 +231,10 @@ class _AsansorAppState extends ConsumerState<AsansorApp> {
   void _showHiveRecoverySnackbar() {
     final ctx = navigatorKey.currentContext;
     if (ctx == null) return;
+    final l10n = AppLocalizations.of(ctx)!;
     ScaffoldMessenger.of(ctx).showSnackBar(
       SnackBar(
-        content: const Text(
-          'Yerel veri önbelleği bozulmuştu. Veriler sıfırlandı, '
-          'uygulamanız güvenle çalışmaya devam ediyor.',
-        ),
+        content: Text(l10n.mainHiveRecoveryMessage),
         duration: const Duration(seconds: 6),
         backgroundColor: AppColors.warning,
       ),

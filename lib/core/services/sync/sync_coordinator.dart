@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -42,8 +43,10 @@ class SyncCoordinator extends ChangeNotifier {
 
   int get pendingCount => _storage.pendingCount;
   int get conflictCount => _storage.conflictCount;
+  int get failedCount => _storage.failedCount;
   bool get hasPending => _storage.hasPending;
   List<Map<String, dynamic>> get conflictedItems => _storage.conflictedItems;
+  List<Map<String, dynamic>> get pendingItems => _storage.pendingItems;
 
   Future<void> enqueue({
     required String type,
@@ -79,9 +82,20 @@ class SyncCoordinator extends ChangeNotifier {
           final item = jsonDecode(raw) as Map<String, dynamic>;
 
           if (item['status'] == statusConflictDetected ||
-              item['status'] == statusDeadLetter) {
+              item['status'] == statusDeadLetter ||
+              item['status'] == statusResolving) {
             failed++;
             continue;
+          }
+
+          if (item['next_retry_at'] != null) {
+            final nextRetryAt = DateTime.tryParse(
+              item['next_retry_at'] as String,
+            );
+            if (nextRetryAt != null && nextRetryAt.isAfter(DateTime.now())) {
+              failed++; // Count as failed for this flush so UI knows it's pending/failed
+              continue;
+            }
           }
 
           final type = item['type'] as String;
@@ -123,19 +137,35 @@ class SyncCoordinator extends ChangeNotifier {
           failed++;
         } catch (e, s) {
           debugPrint('[SyncCoordinator] Unexpected error in flush: $e\n$s');
+          final item = jsonDecode(raw) as Map<String, dynamic>;
+
           if (_remoteWriter!.isTerminalError(e)) {
-            final item = jsonDecode(raw) as Map<String, dynamic>;
             item['status'] = statusDeadLetter;
             item['error_details'] = e.toString();
-            await _storage.put(key, jsonEncode(item));
+          } else {
+            // Transient error: apply exponential backoff
+            final retryCount = (item['retry_count'] as int?) ?? 0;
+            if (retryCount >= 5) {
+              item['status'] = statusDeadLetter;
+              item['error_details'] =
+                  'Max retries exceeded (5). Last error: $e';
+            } else {
+              item['retry_count'] = retryCount + 1;
+              final delaySeconds = (pow(2, retryCount) * 5).toInt();
+              final jitter = Random().nextInt(5);
+              final maxDelay = min(delaySeconds + jitter, 1800); // Max 30 mins
+              final nextRetry = DateTime.now().add(Duration(seconds: maxDelay));
+              item['next_retry_at'] = nextRetry.toIso8601String();
+            }
           }
+          await _storage.put(key, jsonEncode(item));
           failed++;
         }
       }
 
-      if (synced > 0 || failed == 0) {
-        _storage.triggerNotify();
-      }
+      // Always notify listeners after a flush attempt so the UI updates
+      // its conflict/failed badges.
+      _storage.triggerNotify();
 
       return SyncResult(synced: synced, failed: failed);
     } finally {

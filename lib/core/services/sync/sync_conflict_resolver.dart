@@ -47,16 +47,31 @@ class SyncConflictResolver {
       throw StateError('User not authenticated during conflict resolution.');
     }
 
-    await _client.from('conflict_reports').insert({
-      'elevator_id': id,
-      'technician_id': userId,
-      'local_payload': payload,
-      'remote_payload': remoteState,
-      'status': statusPending,
-    });
-
-    await _storage.delete(key);
+    // 1. Mark as resolving
+    item['status'] = statusResolving;
+    await _storage.put(key, jsonEncode(item));
     _storage.triggerNotify();
+
+    try {
+      // 2. Insert report
+      await _client.from('conflict_reports').insert({
+        'elevator_id': id,
+        'technician_id': userId,
+        'local_payload': payload,
+        'remote_payload': remoteState,
+        'status': statusPending,
+      });
+
+      // 3. Delete upon success
+      await _storage.delete(key);
+      _storage.triggerNotify();
+    } catch (e) {
+      // 4. Revert status upon failure
+      item['status'] = statusConflictDetected;
+      await _storage.put(key, jsonEncode(item));
+      _storage.triggerNotify();
+      rethrow;
+    }
   }
 
   Future<void> resolveDiscard(String key) async {

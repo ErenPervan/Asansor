@@ -51,6 +51,8 @@ class _HomeViewState extends State<HomeView> {
               builder: (context, ref, _) {
                 final authState = ref.watch(authControllerProvider);
                 final pendingCount = ref.watch(pendingSyncCountProvider);
+                final conflictCount = ref.watch(conflictSyncCountProvider);
+                final failedCount = ref.watch(failedSyncCountProvider);
                 final isOnline = ref.watch(isOnlineProvider);
                 final profile = ref.watch(currentProfileProvider).valueOrNull;
                 final canAccessAdmin =
@@ -70,6 +72,8 @@ class _HomeViewState extends State<HomeView> {
                 return TopAppBar(
                   userEmail: authState.valueOrNull?.email ?? '',
                   pendingSyncCount: pendingCount,
+                  conflictSyncCount: conflictCount,
+                  failedSyncCount: failedCount,
                   isOnline: isOnline,
                   canAccessAdmin: canAccessAdmin,
                   activeFaultCount: activeFaultCount,

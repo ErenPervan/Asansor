@@ -7,6 +7,7 @@ import 'package:asansor/core/widgets/loading_state.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
 import 'package:asansor/features/fault/models/fault_report_model.dart';
 import 'package:asansor/features/fault/views/widgets/fault_premium_panel.dart';
+import 'package:asansor/l10n/app_localizations.dart';
 
 class FaultSidePanel extends StatelessWidget {
   const FaultSidePanel({
@@ -88,7 +89,7 @@ class _ElevatorInfoContent extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: () => context.push('/elevator/${fault.elevatorId}'),
           icon: const Icon(Icons.info_outline_rounded),
-          label: const Text('Asansör Detayına Git'),
+          label: Text(AppLocalizations.of(context)!.faultSidePanelGoToElevator),
           style: OutlinedButton.styleFrom(
             foregroundColor: colors.primaryDark,
             backgroundColor: colors.primaryFixed.withValues(alpha: 0.22),

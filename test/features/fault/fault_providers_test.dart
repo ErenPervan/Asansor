@@ -28,6 +28,9 @@ void main() {
           isOnlineProvider.overrideWithValue(false),
           faultRepositoryProvider.overrideWithValue(mockRepo),
           readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
         ],
       );
 
@@ -52,6 +55,9 @@ void main() {
           isOnlineProvider.overrideWithValue(true),
           faultRepositoryProvider.overrideWithValue(mockRepo),
           readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
         ],
       );
 
@@ -69,6 +75,9 @@ void main() {
           isOnlineProvider.overrideWithValue(true),
           faultRepositoryProvider.overrideWithValue(mockRepo),
           readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
         ],
       );
 
@@ -94,6 +103,9 @@ void main() {
           isOnlineProvider.overrideWithValue(false),
           faultRepositoryProvider.overrideWithValue(mockRepo),
           readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
         ],
       );
 
@@ -114,6 +126,9 @@ void main() {
           isOnlineProvider.overrideWithValue(true),
           faultRepositoryProvider.overrideWithValue(mockRepo),
           readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
         ],
       );
 

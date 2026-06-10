@@ -76,5 +76,17 @@
     }
   },
   "generalRetry": "Erneut versuchen",
-  "generalCancel": "Abbrechen"
+  "generalCancel": "Abbrechen",
+  "navBarFleet": "Flotte",
+  "navBarFaults": "Störungen",
+  "navBarSchedule": "Zeitplan",
+  "navBarLog": "Protokoll",
+  "navBarAdminOnlyTooltip": "Nur Administratoren haben Zugriff",
+  "faultDetailResolveButton": "Störung beheben",
+  "faultDetailConfirmResolveButton": "Ja, beheben",
+  "faultDetailResolveSuccess": "Störung erfolgreich als behoben markiert.",
+  "faultDetailReopenSuccess": "Störung wiedereröffnet.",
+  "faultListRefresh": "Aktualisieren",
+  "faultSidePanelGoToElevator": "Zum Aufzug-Detail gehen",
+  "mainHiveRecoveryMessage": "Lokaler Datencache war beschädigt. Daten wurden zurückgesetzt, Ihre App läuft sicher weiter."
 }

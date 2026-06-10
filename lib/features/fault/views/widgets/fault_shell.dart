@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
+import 'package:asansor/l10n/app_localizations.dart';
 
 class FaultShell extends StatelessWidget {
   const FaultShell({super.key, required this.title, required this.child});
@@ -73,7 +74,10 @@ class FaultLoadError extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.lg),
-        FilledButton(onPressed: onRetry, child: const Text('Tekrar Dene')),
+        FilledButton(
+          onPressed: onRetry,
+          child: Text(AppLocalizations.of(context)!.generalRetry),
+        ),
       ],
     );
   }

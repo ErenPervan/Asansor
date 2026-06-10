@@ -145,4 +145,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get generalCancel => 'Cancel';
+
+  @override
+  String get navBarFleet => 'Fleet';
+
+  @override
+  String get navBarFaults => 'Faults';
+
+  @override
+  String get navBarSchedule => 'Schedule';
+
+  @override
+  String get navBarLog => 'Log';
+
+  @override
+  String get navBarAdminOnlyTooltip => 'Only admins can access';
+
+  @override
+  String get faultDetailResolveButton => 'Resolve Fault';
+
+  @override
+  String get faultDetailConfirmResolveButton => 'Yes, Resolve';
+
+  @override
+  String get faultDetailResolveSuccess =>
+      'Fault successfully marked as resolved.';
+
+  @override
+  String get faultDetailReopenSuccess => 'Fault reopened.';
+
+  @override
+  String get faultListRefresh => 'Refresh';
+
+  @override
+  String get faultSidePanelGoToElevator => 'Go to Elevator Detail';
+
+  @override
+  String get mainHiveRecoveryMessage =>
+      'Local data cache was corrupted. Data has been reset, your app continues to run safely.';
 }

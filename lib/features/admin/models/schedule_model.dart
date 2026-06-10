@@ -66,9 +66,7 @@ class ScheduleModel {
       id: json['id'] as String,
       elevatorId: (json['elevator_id'] as String?) ?? '',
       technicianId: (json['technician_id'] as String?) ?? '',
-      scheduledDate: json['scheduled_date'] != null
-          ? DateTime.parse(json['scheduled_date'] as String)
-          : DateTime.fromMillisecondsSinceEpoch(0),
+      scheduledDate: _parseRequiredDate(json, 'scheduled_date'),
       status: ScheduleStatus.fromDb(json['status'] as String?),
       priority: (json['priority'] as String?) ?? 'normal',
       taskType: (json['task_type'] as String?) ?? 'manual',
@@ -123,4 +121,14 @@ class ScheduleModel {
       'ScheduleModel(id: $id, elevatorId: $elevatorId, '
       'technicianId: $technicianId, status: ${status.name}, priority: $priority, '
       'taskType: $taskType, scheduledDate: $scheduledDate)';
+
+  static DateTime _parseRequiredDate(Map<String, dynamic> json, String key) {
+    final raw = json[key];
+    if (raw == null) {
+      throw ArgumentError(
+        'ScheduleModel: required field "$key" is null. Row id=${json["id"]}',
+      );
+    }
+    return DateTime.parse(raw as String);
+  }
 }

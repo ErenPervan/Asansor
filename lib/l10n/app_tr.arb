@@ -76,5 +76,17 @@
     }
   },
   "generalRetry": "Tekrar Dene",
-  "generalCancel": "İptal"
+  "generalCancel": "İptal",
+  "navBarFleet": "Filo",
+  "navBarFaults": "Arızalar",
+  "navBarSchedule": "Program",
+  "navBarLog": "Günlük",
+  "navBarAdminOnlyTooltip": "Yalnızca yöneticiler erişebilir",
+  "faultDetailResolveButton": "Arızayı Onar",
+  "faultDetailConfirmResolveButton": "Evet, Onar",
+  "faultDetailResolveSuccess": "Arıza başarıyla onarıldı olarak işaretlendi.",
+  "faultDetailReopenSuccess": "Arıza yeniden açıldı.",
+  "faultListRefresh": "Yenile",
+  "faultSidePanelGoToElevator": "Asansör Detayına Git",
+  "mainHiveRecoveryMessage": "Yerel veri önbelleği bozulmuştu. Veriler sıfırlandı, uygulamanız güvenle çalışmaya devam ediyor."
 }

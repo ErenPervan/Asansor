@@ -11,6 +11,8 @@ class TopAppBar extends StatelessWidget {
     super.key,
     required this.userEmail,
     required this.pendingSyncCount,
+    required this.conflictSyncCount,
+    required this.failedSyncCount,
     required this.isOnline,
     required this.canAccessAdmin,
     required this.activeFaultCount,
@@ -19,6 +21,8 @@ class TopAppBar extends StatelessWidget {
 
   final String userEmail;
   final int pendingSyncCount;
+  final int conflictSyncCount;
+  final int failedSyncCount;
   final bool isOnline;
   final bool canAccessAdmin;
   final int activeFaultCount;
@@ -33,6 +37,10 @@ class TopAppBar extends StatelessWidget {
 
     final (statusText, statusIcon, statusColor) = !isOnline
         ? ('Cevrimdisi', Icons.cloud_off_rounded, colors.warning)
+        : failedSyncCount > 0
+        ? ('Hata', Icons.error_outline_rounded, colors.error)
+        : conflictSyncCount > 0
+        ? ('Cakisma', Icons.warning_amber_rounded, colors.warning)
         : pendingSyncCount > 0
         ? ('Senkronize', Icons.sync_rounded, colors.primary)
         : ('Senkronize', Icons.cloud_done_rounded, colors.primary);
@@ -93,6 +101,8 @@ class TopAppBar extends StatelessWidget {
                   if (canAccessAdmin) const SizedBox(width: AppSpacing.sm),
                   SyncStatusButton(
                     pendingCount: pendingSyncCount,
+                    conflictCount: conflictSyncCount,
+                    failedCount: failedSyncCount,
                     isOnline: isOnline,
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -241,16 +251,22 @@ class SyncStatusButton extends ConsumerWidget {
   const SyncStatusButton({
     super.key,
     required this.pendingCount,
+    required this.conflictCount,
+    required this.failedCount,
     required this.isOnline,
   });
 
   final int pendingCount;
+  final int conflictCount;
+  final int failedCount;
   final bool isOnline;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = AppThemeColors.of(context);
     final hasPending = pendingCount > 0;
+    final hasFailed = failedCount > 0;
+    final hasConflict = conflictCount > 0;
 
     final IconData icon;
     final Color color;
@@ -260,6 +276,14 @@ class SyncStatusButton extends ConsumerWidget {
       icon = Icons.cloud_off_outlined;
       color = colors.warning;
       tooltip = 'Cevrimdisi';
+    } else if (hasFailed) {
+      icon = Icons.error_outline_rounded;
+      color = colors.error;
+      tooltip = '$failedCount kayit basarisiz oldu';
+    } else if (hasConflict) {
+      icon = Icons.warning_amber_rounded;
+      color = colors.warning;
+      tooltip = '$conflictCount cakisma var';
     } else if (hasPending) {
       icon = Icons.cloud_upload_outlined;
       color = colors.warning;
@@ -295,11 +319,15 @@ class SyncStatusButton extends ConsumerWidget {
                       ),
                       padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
-                        color: colors.warning,
+                        color: hasFailed ? colors.error : colors.warning,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
-                        '$pendingCount',
+                        hasFailed
+                            ? '$failedCount'
+                            : hasConflict
+                            ? '$conflictCount'
+                            : '$pendingCount',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           fontSize: 8,

@@ -148,4 +148,42 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get generalCancel => 'Abbrechen';
+
+  @override
+  String get navBarFleet => 'Flotte';
+
+  @override
+  String get navBarFaults => 'Störungen';
+
+  @override
+  String get navBarSchedule => 'Zeitplan';
+
+  @override
+  String get navBarLog => 'Protokoll';
+
+  @override
+  String get navBarAdminOnlyTooltip => 'Nur Administratoren haben Zugriff';
+
+  @override
+  String get faultDetailResolveButton => 'Störung beheben';
+
+  @override
+  String get faultDetailConfirmResolveButton => 'Ja, beheben';
+
+  @override
+  String get faultDetailResolveSuccess =>
+      'Störung erfolgreich als behoben markiert.';
+
+  @override
+  String get faultDetailReopenSuccess => 'Störung wiedereröffnet.';
+
+  @override
+  String get faultListRefresh => 'Aktualisieren';
+
+  @override
+  String get faultSidePanelGoToElevator => 'Zum Aufzug-Detail gehen';
+
+  @override
+  String get mainHiveRecoveryMessage =>
+      'Lokaler Datencache war beschädigt. Daten wurden zurückgesetzt, Ihre App läuft sicher weiter.';
 }

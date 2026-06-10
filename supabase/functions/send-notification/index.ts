@@ -63,7 +63,14 @@ serve(async (req: Request) => {
       
       // Verify Webhook Secret
       const secretHeader = req.headers.get("x-webhook-secret");
-      const expectedSecret = Deno.env.get("WEBHOOK_SECRET") || "local-dev-secret-key";
+      const expectedSecret = Deno.env.get("WEBHOOK_SECRET");
+      if (!expectedSecret) {
+        console.error("WEBHOOK_SECRET environment variable is not configured.");
+        return new Response(
+          JSON.stringify({ error: "Server misconfiguration: webhook secret not set." }),
+          { status: 500, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
       if (secretHeader !== expectedSecret) {
         return new Response(
           JSON.stringify({ error: "Unauthorized: Invalid webhook secret." }),
@@ -135,6 +142,39 @@ serve(async (req: Request) => {
         return new Response(
           JSON.stringify({ error: "Unauthorized: Invalid token." }),
           { status: 401, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
+
+      // ── Caller Role Check ─────────────────────────────────────────────────
+      const { data: callerProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError || !callerProfile) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized: Caller profile not found." }),
+          { status: 403, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
+
+      const callerRole = callerProfile.role;
+
+      // to_role ile toplu bildirim sadece admin gönderebilir
+      if (reqBody.to_role && callerRole !== "admin") {
+        return new Response(
+          JSON.stringify({ error: "Forbidden: Only admins can send role-targeted notifications." }),
+          { status: 403, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
+
+      // to_user_id ile bireysel bildirim: admin her zaman gönderebilir,
+      // teknisyen sadece kendi müşterilerine (veya adminlere) gönderebilir
+      if (reqBody.to_user_id && callerRole === "customer") {
+        return new Response(
+          JSON.stringify({ error: "Forbidden: Customers cannot send direct notifications." }),
+          { status: 403, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
         );
       }
 

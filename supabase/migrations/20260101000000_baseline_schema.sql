@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id uuid PRIMARY KEY,
   full_name text,
   role text,
-  fcm_token text
+  fcm_token text,
+  elevator_id uuid
 );
 
 CREATE TABLE IF NOT EXISTS public.elevators (
@@ -21,13 +22,16 @@ CREATE TABLE IF NOT EXISTS public.fault_reports (
   elevator_id uuid REFERENCES public.elevators(id),
   reported_by uuid REFERENCES public.profiles(id),
   description text,
-  is_resolved boolean DEFAULT false
+  fault_type text,
+  is_resolved boolean DEFAULT false,
+  reported_at timestamptz DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS public.maintenance_schedules (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   technician_id uuid REFERENCES public.profiles(id),
-  scheduled_date date
+  scheduled_date date,
+  status text DEFAULT 'pending'
 );
 
 CREATE TABLE IF NOT EXISTS public.maintenance_logs (

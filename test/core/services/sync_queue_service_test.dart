@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:asansor/core/services/sync/sync_coordinator.dart';
+import '../../helpers/test_mocks.dart';
 
 void main() {
   late SyncQueueService service;
@@ -97,7 +98,7 @@ void main() {
       // Reset notification flag
       notified = false;
 
-      await service.resolveDiscard(key);
+      await service.resolveDiscard(MockSupabaseClient(), key);
 
       expect(box.length, 0);
       expect(service.pendingCount, 0);

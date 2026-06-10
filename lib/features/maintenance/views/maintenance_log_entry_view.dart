@@ -24,7 +24,6 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:signature/signature.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MaintenanceLogEntryView extends ConsumerStatefulWidget {
   const MaintenanceLogEntryView({super.key, required this.elevatorId});

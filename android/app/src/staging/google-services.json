@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "203437631230",
+    "project_id": "asansor-efaed",
+    "storage_bucket": "asansor-efaed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203437631230:android:403f6ce3a7ef607d7467af",
+        "android_client_info": {
+          "package_name": "com.asansor.asansor.staging"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOy1JNS148QgB--mVOg7n2n-AbQUWdwrM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

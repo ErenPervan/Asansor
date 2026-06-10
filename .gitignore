@@ -43,9 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+android/app/*.jks
+android/key.properties
+key.properties
 
 # Environment secrets — never commit real credentials
 .env
+.env.*
+!.env.*.example
 # .env.example is intentionally NOT ignored (safe reference file)
 
 # Firebase service account files

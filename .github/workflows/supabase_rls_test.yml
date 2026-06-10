@@ -11,10 +11,13 @@ on:
       - main
       - master
       - develop
+  workflow_dispatch:
 
 jobs:
-  rls-tests:
+  migration-and-rls-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -22,12 +25,36 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.98.2
 
-      - name: Start Supabase Local
+      - name: Check forbidden secret placeholders
+        run: |
+          if git grep -n -E "local-dev-secret-key|<YOUR_ANON_KEY>" -- supabase/functions; then
+            echo "Forbidden webhook fallback or placeholder found in Edge Functions."
+            exit 1
+          fi
+
+          for file in supabase/migrations/*.sql; do
+            case "$file" in
+              *20260531000002_database_webhook_setup.sql|\
+              *20260603000001_secure_webhooks_and_rls.sql|\
+              *20260604000001_use_settings_table_for_webhook_secret.sql|\
+              *20260610000001_remove_webhook_fallback_secrets.sql)
+                continue
+                ;;
+            esac
+
+            if grep -n -E "local-dev-secret-key|<YOUR_ANON_KEY>" "$file"; then
+              echo "Forbidden webhook fallback or placeholder found in $file."
+              exit 1
+            fi
+          done
+
+      - name: Start Supabase local stack
         run: supabase start
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Run DB Tests (pgTAP)
+      - name: Validate migrations on clean local database
+        run: supabase db reset
+
+      - name: Run DB tests (pgTAP/RLS)
         run: supabase test db

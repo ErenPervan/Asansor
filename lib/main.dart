@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:asansor/firebase_options.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
+import 'dart:io';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -23,6 +25,35 @@ import 'package:asansor/core/services/sync/sync_coordinator.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 
 // ── Hive Initialization & Recovery Helpers ─────────────────────────────────────
+
+Future<String> _quarantineHiveBox(String boxName) async {
+  final appDir = await getApplicationDocumentsDirectory();
+  final timestamp = DateTime.now().toUtc().toIso8601String().replaceAll(
+    ':',
+    '-',
+  );
+  final quarantineDir = Directory(
+    p.join(appDir.path, 'hive_quarantine', '${boxName}_$timestamp'),
+  );
+  await quarantineDir.create(recursive: true);
+
+  var movedCount = 0;
+  await for (final entity in appDir.list(followLinks: false)) {
+    final name = p.basename(entity.path);
+    if (name == boxName || name.startsWith('$boxName.')) {
+      await entity.rename(p.join(quarantineDir.path, name));
+      movedCount++;
+    }
+  }
+
+  debugPrint(
+    movedCount == 0
+        ? '[Bootstrap] No Hive files found to quarantine for box $boxName.'
+        : '[Bootstrap] Quarantined $movedCount Hive file(s) for $boxName at ${quarantineDir.path}.',
+  );
+
+  return quarantineDir.path;
+}
 
 Future<void> _initHive(FlutterSecureStorage secureStorage) async {
   debugPrint('[Bootstrap] Initializing Hive...');
@@ -72,9 +103,12 @@ Future<void> _initHive(FlutterSecureStorage secureStorage) async {
       debugPrint('[Bootstrap] Box $boxName failed to open: $e');
       await Hive.close(); // Close any partially opened boxes
       if (isSyncQueue) {
+        final quarantinePath = await _quarantineHiveBox(boxName);
         debugPrint(
-          '[Bootstrap] WARNING: Sync queue corrupted and will be deleted.',
+          '[Bootstrap] Sync queue was quarantined instead of deleted: $quarantinePath',
         );
+        await Hive.openBox<String>(boxName, encryptionCipher: cipher);
+        return;
       }
       await Hive.deleteBoxFromDisk(boxName);
       throw HiveError('Box $boxName corrupted');
@@ -90,16 +124,23 @@ Future<void> _initHive(FlutterSecureStorage secureStorage) async {
   debugPrint('[Bootstrap] All Hive boxes opened successfully.');
 }
 
-Future<void> _clearAndReinitHive(FlutterSecureStorage secureStorage) async {
+Future<void> _clearAndReinitHive(
+  FlutterSecureStorage secureStorage, {
+  bool resetEncryptionKey = false,
+  bool quarantineSyncQueue = false,
+}) async {
   await Hive.close();
-  // DO NOT delete syncQueueBoxName here to prevent data loss.
-  // It has already been deleted by openBoxSafe if it was the corrupted one.
+  if (quarantineSyncQueue) {
+    await _quarantineHiveBox(syncQueueBoxName);
+  }
   await Hive.deleteBoxFromDisk(elevatorsCacheBoxName);
   await Hive.deleteBoxFromDisk(tasksCacheBoxName);
   await Hive.deleteBoxFromDisk(checklistCacheBoxName);
   await Hive.deleteBoxFromDisk(pastLogsCacheBoxName);
   await Hive.deleteBoxFromDisk(faultsCacheBoxName);
-  await secureStorage.delete(key: 'hive_encryption_key');
+  if (resetEncryptionKey) {
+    await secureStorage.delete(key: 'hive_encryption_key');
+  }
   await _initHive(secureStorage);
 }
 
@@ -135,18 +176,6 @@ Future<void> main() async {
   // Ensure FCM auto-init is enabled so token generation/refresh works reliably.
   await FirebaseMessaging.instance.setAutoInitEnabled(true);
 
-  // Print startup FCM token for quick verification in debug console.
-  try {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    if (kDebugMode) {
-      debugPrint('====================================================');
-      debugPrint("EREN'IN FCM TOKEN'I: $fcmToken");
-      debugPrint('====================================================');
-    }
-  } catch (e) {
-    debugPrint('Token alinirken hata olustu: $e');
-  }
-
   await Supabase.initialize(
     url: SupabaseConstants.supabaseUrl,
     anonKey: SupabaseConstants.supabaseAnonKey,
@@ -167,7 +196,11 @@ Future<void> main() async {
   } on FormatException catch (e) {
     debugPrint('[Hive] Base64 decode hatası: $e — önbellek temizleniyor...');
     hiveRecoveryPerformed = true;
-    await _clearAndReinitHive(secureStorage);
+    await _clearAndReinitHive(
+      secureStorage,
+      resetEncryptionKey: true,
+      quarantineSyncQueue: true,
+    );
   } catch (e) {
     debugPrint('[Hive] Beklenmeyen hata: $e — önbellek temizleniyor...');
     hiveRecoveryPerformed = true;

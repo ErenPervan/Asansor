@@ -29,6 +29,11 @@ jobs:
 
       - name: Check forbidden secret placeholders
         run: |
+          if git ls-files --error-unmatch supabase/.env.local >/dev/null 2>&1; then
+            echo "supabase/.env.local must not be tracked."
+            exit 1
+          fi
+
           if git grep -n -E "local-dev-secret-key|<YOUR_ANON_KEY>" -- supabase/functions; then
             echo "Forbidden webhook fallback or placeholder found in Edge Functions."
             exit 1
@@ -49,6 +54,12 @@ jobs:
               exit 1
             fi
           done
+
+          final_webhook_migration="supabase/migrations/20260610000001_remove_webhook_fallback_secrets.sql"
+          if grep -n -E "COALESCE\(.*(local-dev-secret-key|<YOUR_ANON_KEY>)" "$final_webhook_migration"; then
+            echo "Final webhook migration must not reintroduce fallback secrets."
+            exit 1
+          fi
 
       - name: Start Supabase local stack
         run: supabase start

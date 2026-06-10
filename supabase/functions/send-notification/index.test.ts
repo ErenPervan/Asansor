@@ -175,3 +175,24 @@ Deno.test("send-notification - Webhook trigger invalid secret -> 401 Unauthorize
   assertEquals(res.status, 401);
   restoreFetch();
 });
+
+Deno.test("send-notification - Webhook secret missing in environment -> 500 fail closed", async () => {
+  mockFetch("admin");
+  Deno.env.delete("WEBHOOK_SECRET");
+
+  const req = new Request("http://localhost/send-notification", {
+    method: "POST",
+    headers: { "x-webhook-secret": "secret123", "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: "INSERT",
+      table: "fault_reports",
+      record: { id: "f1", description: "Test" }
+    })
+  });
+
+  const res = await handler(req);
+  assertEquals(res.status, 500);
+
+  Deno.env.set("WEBHOOK_SECRET", "secret123");
+  restoreFetch();
+});

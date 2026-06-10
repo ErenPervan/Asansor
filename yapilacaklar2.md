@@ -12,6 +12,7 @@
 
 - [ ] **1. Firebase service account key rotation ve git temizliği**
   - Ne: `supabase/.env.local` .gitignore'da olmasına rağmen hâlâ git tracked. İçindeki tam RSA private key + `project_id: asansor-efaed` sızdırılmış durumda
+  - Durum: Repo içinde `supabase/.env.local` artık tracked değil; Firebase Console key revoke, yeni Supabase secret yükleme ve git history purge manuel operasyon olarak bekliyor
   - Yapılacak:
     1. Acil: `git rm --cached supabase/.env.local` çalıştırılarak index'ten silinmeli
     2. Firebase Console → Service Accounts → mevcut key'i revoke et
@@ -20,31 +21,31 @@
   - Dosya: `supabase/.env.local`, `supabase/functions/send-notification/index.ts`
   - Efor: **Medium**
 
-- [ ] **2. Webhook fallback secret'ını kaldır**
+- [x] **2. Webhook fallback secret'ını kaldır**
   - Ne: `'local-dev-secret-key'` fallback'i 3 ayrı yerde mevcut — Edge Function ve 2 migration trigger
   - Yapılacak: `COALESCE(..., 'local-dev-secret-key')` satırlarını fail-closed hale getir; secret yoksa exception fırlat
   - Dosya: `supabase/functions/send-notification/index.ts:66`, `supabase/migrations/20260604000001_use_settings_table_for_webhook_secret.sql:30,67`
   - Efor: **Small**
 
-- [ ] **3. `<YOUR_ANON_KEY>` placeholder'ını değiştir**
+- [x] **3. `<YOUR_ANON_KEY>` placeholder'ını değiştir**
   - Ne: `notify_technician_on_assignment` trigger'ında anon key için placeholder var — değiştirilmemiş olabilir
   - Yapılacak: Migration'ı güncelle veya `app.settings.anon_key` Supabase parametresini set et
   - Dosya: `supabase/migrations/20260604000001_use_settings_table_for_webhook_secret.sql:27`
   - Efor: **Trivial**
 
-- [ ] **4. Webhook trigger Authorization header tutarsızlığını düzelt**
+- [x] **4. Webhook trigger Authorization header tutarsızlığını düzelt**
   - Ne: `notify_technician_on_assignment` Authorization header gönderiyor ama `notify_fault_report` göndermiyor
   - Yapılacak: `notify_fault_report` trigger'ına aynı Authorization header ekle
   - Dosya: `supabase/migrations/20260604000001_use_settings_table_for_webhook_secret.sql:79-82`
   - Efor: **Small**
 
-- [ ] **5. CI'a secret scanning ekle**
+- [x] **5. CI'a secret scanning ekle**
   - Ne: Sızdırılmış key bir daha commit edilmesin
   - Yapılacak: `gitleaks` veya GitHub Advanced Security secret scanning aktif et
   - Dosya: `.github/workflows/test.yml`
   - Efor: **Small**
 
-- [ ] **6. Edge Function notification authorization'ı sıkılaştır**
+- [x] **6. Edge Function notification authorization'ı sıkılaştır**
   - Ne: Herhangi bir authenticated user `to_role: 'admin'` ile tüm adminlere bildirim gönderebilir
   - Yapılacak: Edge Function'da caller'ın rolünü kontrol et; sadece admin veya sistem tetikleyicileri `to_role` kullanabilsin
   - Dosya: `supabase/functions/send-notification/index.ts:121-180`
@@ -54,37 +55,37 @@
 
 ### VERİ KAYBI — OFFLİNE
 
-- [ ] **7. Hive recovery'de sync queue silimini engelle**
+- [x] **7. Hive recovery'de sync queue silimini engelle**
   - Ne: `_clearAndReinitHive` HiveError/FormatException sonrası `syncQueueBoxName` dahil her box'ı siliyor
   - Yapılacak: Sync queue box'ını asla otomatik silme. Box bazında migration/quarantine uygula. Kullanıcıya recovery seçeneği sun
   - Dosya: `lib/main.dart:77-86`
   - Efor: **Medium**
 
-- [ ] **8. Fault raporlamayı ve statü güncellemelerini queue-first yap**
+- [x] **8. Fault raporlamayı ve statü güncellemelerini queue-first yap**
   - Ne: Online iken Supabase write başarısız olursa arıza raporu kaybolabiliyor. Ayrıca `FaultUpdateController.resolve()` ve `reopen()` metodlarında offline desteği hiç yok, direkt Supabase çağırıyor.
   - Yapılacak: Raporlama, resolve ve reopen işlemlerini lokal queue'ya yaz, sonra remote'a gönder. Hata durumunda queue'da kalsın
   - Dosya: `lib/features/fault/providers/fault_providers.dart`
   - Efor: **Medium**
 
-- [ ] **9. Maintenance submission'ı queue-first yap**
+- [x] **9. Maintenance submission'ı queue-first yap**
   - Ne: Upload başarılı + insert başarısız = log kaybı. Online path'te durable fallback yok
   - Yapılacak: Online path'te de local persist → remote sync akışına geç
   - Dosya: `lib/features/maintenance/providers/maintenance_providers.dart:294-307`
   - Efor: **Medium**
 
-- [ ] **10. Tüm syncable write'lara idempotency key ekle**
+- [x] **10. Tüm syncable write'lara idempotency key ekle**
   - Ne: Retry durumunda duplicate kayıt oluşabilir
   - Yapılacak: Fault, maintenance log, photo upload, PDF, schedule için deterministic UUID key kullan. DB'de unique constraint ekle
   - Dosya: `lib/core/services/sync_queue_service.dart`, fault/maintenance providers
   - Efor: **Medium**
 
-- [ ] **11. Online photo upload'a timeout guard ekle**
+- [x] **11. Online photo upload'a timeout guard ekle**
   - Ne: `_uploadPhotos` online path'te timeout yok; `SyncQueueService`'te 45s timeout var ama provider'da yok
   - Yapılacak: Storage upload çağrısına `.timeout(Duration(seconds: 45))` ekle; timeout'da offline queue'ya düş
   - Dosya: `lib/features/maintenance/providers/maintenance_providers.dart:159`
   - Efor: **Small**
 
-- [ ] **12. Customer portal'a offline cache desteği ekle**
+- [x] **12. Customer portal'a offline cache desteği ekle**
   - Ne: `customer_portal_provider.dart` `isOnlineProvider` veya `readCacheServiceProvider` kullanmıyor; offline'da boş ekran
   - Yapılacak: Diğer provider'larla tutarlı şekilde offline cache fallback ekle
   - Dosya: `lib/features/customer/providers/customer_portal_provider.dart`
@@ -114,13 +115,13 @@
 
 ### KÜÇÜK DÜZELTMELER
 
-- [ ] **15. Maintenance report storage path'ini düzelt**
+- [x] **15. Maintenance report storage path'ini düzelt**
   - Ne: Flutter root-level dosya yüklerken migration `maintenance-reports` bucket'ını private+scoped yapmış
   - Yapılacak: `reports/{elevatorId}/...` path'ine geç; public URL yerine signed URL kullan
   - Dosya: `lib/core/services/sync_queue_service.dart:401-444`, ilgili Supabase migration
   - Efor: **Medium-Large**
 
-- [ ] **16. FCM token debug logging temizle**
+- [x] **16. FCM token debug logging temizle**
   - Ne: `notification_service.dart` L233 ve L248'de `debugPrint` hâlâ `kDebugMode` guard'ı olmadan kullanılıyor.
   - Yapılacak: `kDebugMode` guard'ı ekle veya token loglamayı tamamen kaldır
   - Dosya: `lib/core/services/notification_service.dart:233,248`
@@ -133,7 +134,7 @@
 
 ### MİMARİ
 
-- [ ] **17. `SyncCoordinator` yaz — `SyncQueueService`'i böl**
+- [x] **17. `SyncCoordinator` yaz — `SyncQueueService`'i böl**
   - Ne: Tek servis; queue yönetimi + conflict + upload + PDF + schedule + remote write yapıyor
   - Yapılacak: Queue, Retry/Backoff, ConflictResolver, MediaUploader, RemoteWriter olarak ayır
   - Dosya: `lib/core/services/sync_queue_service.dart`
@@ -169,31 +170,31 @@
 
 ### OFFLINE-FIRST
 
-- [ ] **21. Connectivity reachability katmanı ekle**
+- [x] **21. Connectivity reachability katmanı ekle**
   - Ne: `isOnlineProvider` sadece `ConnectivityResult.none` kontrol ediyor; captive portal, DNS hatası, zayıf sinyal kör nokta
   - Yapılacak: Periyodik Supabase ping + hata sınıflandırması (transient/auth/server) ekle
   - Dosya: `lib/core/providers/connectivity_providers.dart`
   - Efor: **Medium**
 
-- [ ] **22. Sync failure/conflict UI ekle**
+- [x] **22. Sync failure/conflict UI ekle**
   - Ne: `flush()` yalnızca başarıda `notifyListeners()` çağırıyor; başarısız/conflict item'lar UI'da görünmüyor
   - Yapılacak: Her queue state mutasyonunda notify et; pending/syncing/failed/conflict/dead-letter badge göster
   - Dosya: `lib/core/services/sync_queue_service.dart:166-215`, ilgili UI
   - Efor: **Medium**
 
-- [ ] **23. `resolveFlagDisputed`'ı atomik hale getir**
+- [x] **23. `resolveFlagDisputed`'ı atomik hale getir**
   - Ne: Insert başarılı + local delete başarısız = duplicate conflict report
   - Yapılacak: Local item'ı önce `resolving` olarak işaretle, remote confirm sonrası sil; ya da DB unique constraint ekle
   - Dosya: `lib/core/services/sync_queue_service.dart:737-760`
   - Efor: **Small**
 
-- [ ] **24. Retry/backoff policy ekle**
+- [x] **24. Retry/backoff policy ekle**
   - Ne: Sync queue'da retry policy, max attempt, dead-letter mekanizması yok
   - Yapılacak: Exponential backoff + jitter + max retry + dead-letter state ekle
   - Dosya: `lib/core/services/sync_queue_service.dart`
   - Efor: **Medium**
 
-- [ ] **25. Pending-write overlay'i read provider'lara ekle**
+- [x] **25. Pending-write overlay'i read provider'lara ekle**
   - Ne: Offline'da oluşturulan kayıtlar listede hemen görünmüyor
   - Yapılacak: Queue'daki pending item'ları ilgili read provider'larla merge et
   - Dosya: Fault/maintenance/elevator provider'lar
@@ -208,7 +209,7 @@
   - Yapılacak: Tüm stringleri `app_tr.arb` dosyasına taşı ve yerelleştirme (l10n) kullan
   - Efor: **Medium**
 
-- [ ] **27. iOS orientation tutarsızlığını düzelt**
+- [x] **27. iOS orientation tutarsızlığını düzelt**
   - Ne: Flutter bootstrap portrait zorluyor ama Info.plist çoklu orientation tanımlıyor
   - Yapılacak: Info.plist dosyasını güncelleyerek orientation tutarsızlığını gider
   - Efor: **Trivial**
@@ -218,7 +219,7 @@
   - Yapılacak: Admin olmayan kullanıcılar için schedule sekmesini bottom navigation'dan tamamen kaldır
   - Efor: **Small**
 
-- [ ] **29. faultsByElevatorProvider ve faultByIdProvider offline cache fallback eksik**
+- [x] **29. faultsByElevatorProvider ve faultByIdProvider offline cache fallback eksik**
   - Ne: Arıza listeleri ve detayları network olmadığında önbelleği (cache) kullanmıyor
   - Yapılacak: Bu provider'lara `isOnlineProvider` ve `readCacheServiceProvider` fallback'leri ekle
   - Efor: **Small**
@@ -288,18 +289,19 @@
   - Dosya: `.github/workflows/test.yml:24`, `.github/workflows/flutter_ci.yml:32`
   - Efor: **Trivial**
 
-- [ ] **35. CI'a Android/iOS build job ekle**
+- [x] **35. CI'a Android/iOS build job ekle**
   - Ne: CI sadece test/analyze çalıştırıyor; production build doğrulaması yok
   - Yapılacak: `flutter build apk --release` ve `flutter build ipa` adımları ekle
   - Dosya: `.github/workflows/`
   - Efor: **Small**
 
 - [ ] **36. Build flavor'ları ekle (dev/staging/prod)**
-  - Ne: Tek environment config var — staging testi imkansız
-  - Yapılacak: Flutter flavor + Supabase URL/key per-environment
+  - Durum: Flutter `APP_ENV` ve Android dev/staging/prod flavor'ları tamamlandı; iOS Xcode scheme flavor'ları ayrı macOS/Xcode doğrulamalı iş olarak açık
+  - Ne: iOS tarafında henüz gerçek dev/staging/prod Xcode scheme ayrımı yok
+  - Yapılacak: macOS/Xcode ortamında iOS scheme/configuration + bundle identifier ayrımını ekle
   - Efor: **Medium**
 
-- [ ] **37. Supabase migration validation ekle**
+- [x] **37. Supabase migration validation ekle**
   - Ne: CI migration bütünlüğünü kontrol etmiyor
   - Yapılacak: `supabase db push --dry-run` veya migration diff kontrolü CI'a ekle
   - Efor: **Small**

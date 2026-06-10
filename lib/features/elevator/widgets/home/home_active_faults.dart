@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:asansor/core/extensions/l10n_extension.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:asansor/core/utils/elevator_utils.dart';
@@ -32,7 +33,7 @@ class ActiveFaultsSection extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Acil Mudahale Bekleyenler',
+                context.l10n.urgentInterventionWaiting,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: colors.onSurface,
@@ -49,7 +50,7 @@ class ActiveFaultsSection extends StatelessWidget {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text('Tumunu Gor'),
+              child: Text(context.l10n.seeAll),
             ),
             activeFaults.maybeWhen(
               data: (faults) => Container(
@@ -60,7 +61,7 @@ class ActiveFaultsSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  '${faults.length} Aktif',
+                  context.l10n.activeFaultsCount(faults.length),
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: colors.primary,
                     fontWeight: FontWeight.w800,
@@ -78,9 +79,9 @@ class ActiveFaultsSection extends StatelessWidget {
               ErrorState(message: e.toString().replaceFirst('Exception: ', '')),
           data: (faults) {
             if (faults.isEmpty) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.check_circle_outline,
-                message: 'Aktif arıza bulunmuyor.',
+                message: context.l10n.noActiveFaults,
               );
             }
 
@@ -121,10 +122,10 @@ class _FaultListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final buildingName = elevator?.buildingName ?? 'Asansor';
+    final buildingName = elevator?.buildingName ?? context.l10n.elevator;
     final description = fault.description.isNotEmpty
         ? fault.description
-        : 'Ariza bildirimi alindi.';
+        : context.l10n.faultReportReceived;
     final isNew = DateTime.now().difference(fault.reportedAt).inMinutes < 30;
 
     return Material(
@@ -208,7 +209,7 @@ class _FaultListItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        isNew ? 'Kritik' : 'Yuksek',
+                        isNew ? context.l10n.critical : context.l10n.high,
                         style: textTheme.labelSmall?.copyWith(
                           color: isNew ? colors.error : colors.warning,
                           fontWeight: FontWeight.w800,
@@ -217,7 +218,7 @@ class _FaultListItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _timeAgo(fault.reportedAt),
+                      _timeAgo(context, fault.reportedAt),
                       style: textTheme.bodySmall?.copyWith(
                         color: colors.outline,
                       ),
@@ -233,12 +234,12 @@ class _FaultListItem extends StatelessWidget {
   }
 }
 
-String _timeAgo(DateTime dt) {
+String _timeAgo(BuildContext context, DateTime dt) {
   final diff = DateTime.now().difference(dt);
-  if (diff.inDays >= 1) return '${diff.inDays} gun once';
-  if (diff.inHours >= 1) return '${diff.inHours} sa once';
-  if (diff.inMinutes >= 1) return '${diff.inMinutes} dk once';
-  return 'Simdi';
+  if (diff.inDays >= 1) return context.l10n.daysAgo(diff.inDays);
+  if (diff.inHours >= 1) return context.l10n.hoursAgo(diff.inHours);
+  if (diff.inMinutes >= 1) return context.l10n.minutesAgo(diff.inMinutes);
+  return context.l10n.justNow;
 }
 
 class FaultCard extends StatelessWidget {
@@ -263,7 +264,7 @@ class FaultCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final description = fault.description.isNotEmpty
         ? fault.description
-        : 'Arıza bildirimi alındı.';
+        : context.l10n.faultReportReceived;
 
     return GestureDetector(
       onTap: onTap,
@@ -294,7 +295,7 @@ class FaultCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        'ACİL ARIZA',
+                        context.l10n.urgentFaultTag,
                         style: textTheme.labelSmall?.copyWith(
                           color: colors.error,
                           fontWeight: FontWeight.w800,
@@ -303,7 +304,7 @@ class FaultCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      _timeAgo(fault.reportedAt),
+                      _timeAgo(context, fault.reportedAt),
                       style: textTheme.bodySmall?.copyWith(
                         color: colors.outline,
                       ),

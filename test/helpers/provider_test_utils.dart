@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:asansor/core/services/read_cache_service.dart';
 import 'package:asansor/core/services/sync/sync_coordinator.dart';
+import 'package:asansor/core/services/sync/sync_remote_writer.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
 import 'package:asansor/features/fault/models/fault_report_model.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
@@ -39,13 +40,21 @@ ProviderContainer createContainer({
 /// readCacheServiceProvider.overrideWithValue(fakeCache)
 /// ```
 class FakeReadCacheService implements ReadCacheService {
+  // ── Modifiable state for tests ──────────────────────────────────────────────
+  List<ElevatorModel> elevators = [];
+  List<FaultReportModel> allFaults = [];
+  List<FaultReportModel> activeFaults = [];
+  List<MaintenanceLogModel> pendingLogs = [];
+
   // ── Elevators ───────────────────────────────────────────────────────────────
   @override
-  bool get hasElevators => false;
+  bool get hasElevators => elevators.isNotEmpty;
   @override
-  List<ElevatorModel> loadElevators() => [];
+  List<ElevatorModel> loadElevators() => elevators;
   @override
-  Future<void> saveElevators(List<ElevatorModel> elevators) async {}
+  Future<void> saveElevators(List<ElevatorModel> elevators) async {
+    this.elevators = elevators;
+  }
 
   // ── Tasks ───────────────────────────────────────────────────────────────────
   @override
@@ -72,23 +81,36 @@ class FakeReadCacheService implements ReadCacheService {
 
   // ── Faults ──────────────────────────────────────────────────────────────────
   @override
-  List<FaultReportModel> loadActiveFaults() => [];
+  List<FaultReportModel> loadActiveFaults() => activeFaults;
   @override
-  Future<void> saveActiveFaults(List<FaultReportModel> faults) async {}
+  Future<void> saveActiveFaults(List<FaultReportModel> faults) async {
+    activeFaults = faults;
+  }
+
   @override
-  List<FaultReportModel> loadAllFaults() => [];
+  List<FaultReportModel> loadAllFaults() => allFaults;
   @override
-  Future<void> saveAllFaults(List<FaultReportModel> faults) async {}
+  Future<void> saveAllFaults(List<FaultReportModel> faults) async {
+    allFaults = faults;
+  }
+
   @override
-  List<FaultReportModel> loadFaultsByElevatorId(String elevatorId) => [];
+  List<FaultReportModel> loadFaultsByElevatorId(String elevatorId) {
+    return allFaults.where((f) => f.elevatorId == elevatorId).toList();
+  }
+
   @override
-  FaultReportModel? loadFaultById(String faultId) => null;
+  FaultReportModel? loadFaultById(String faultId) {
+    return allFaults.where((f) => f.id == faultId).firstOrNull;
+  }
 
   // ── Pending Maintenance ─────────────────────────────────────────────────────
   @override
-  List<MaintenanceLogModel> loadPendingMaintenance() => [];
+  List<MaintenanceLogModel> loadPendingMaintenance() => pendingLogs;
   @override
-  Future<void> savePendingMaintenance(List<MaintenanceLogModel> logs) async {}
+  Future<void> savePendingMaintenance(List<MaintenanceLogModel> logs) async {
+    pendingLogs = logs;
+  }
 
   // ── Completed Today Count ───────────────────────────────────────────────────
   @override
@@ -98,7 +120,12 @@ class FakeReadCacheService implements ReadCacheService {
 
   // ── Cache Cleanup ───────────────────────────────────────────────────────────
   @override
-  Future<void> clearAll() async {}
+  Future<void> clearAll() async {
+    elevators.clear();
+    allFaults.clear();
+    activeFaults.clear();
+    pendingLogs.clear();
+  }
 }
 
 // ── FakeSyncQueueService ──────────────────────────────────────────────────────
@@ -106,6 +133,9 @@ class FakeReadCacheService implements ReadCacheService {
 /// A no-op implementation of [SyncQueueService] that returns empty / zero
 /// values without requiring Hive boxes to be opened.
 class FakeSyncQueueService extends ChangeNotifier implements SyncQueueService {
+  @override
+  set overrideRemoteWriter(SyncRemoteWriter writer) {}
+
   @override
   int get pendingCount => 0;
 

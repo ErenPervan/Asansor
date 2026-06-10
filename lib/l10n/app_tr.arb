@@ -88,5 +88,81 @@
   "faultDetailReopenSuccess": "Arıza yeniden açıldı.",
   "faultListRefresh": "Yenile",
   "faultSidePanelGoToElevator": "Asansör Detayına Git",
-  "mainHiveRecoveryMessage": "Yerel veri önbelleği bozulmuştu. Veriler sıfırlandı, uygulamanız güvenle çalışmaya devam ediyor."
+  "mainHiveRecoveryMessage": "Yerel veri önbelleği bozulmuştu. Veriler sıfırlandı, uygulamanız güvenle çalışmaya devam ediyor.",
+  "urgentFaultTag": "ACİL ARIZA",
+  "faultReportReceived": "Arıza bildirimi alındı.",
+  "activeFaultsCount": "{count} Aktif",
+  "@activeFaultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noActiveFaults": "Aktif arıza bulunmuyor.",
+  "urgentInterventionWaiting": "Acil Müdahale Bekleyenler",
+  "seeAll": "Tümünü Gör",
+  "critical": "Kritik",
+  "high": "Yüksek",
+  "daysAgo": "{days} gün önce",
+  "@daysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{hours} sa önce",
+  "@hoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesAgo": "{minutes} dk önce",
+  "@minutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "justNow": "Şimdi",
+  "elevator": "Asansör",
+  "photoAddError": "Fotoğraf eklenemedi: {error}",
+  "@photoAddError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "photosAddError": "Fotoğraflar eklenemedi: {error}",
+  "@photosAddError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "back": "Geri",
+  "operation": "Operasyon",
+  "monthlyPeriodicMaintenanceForm": "Aylık Periyodik Bakım Formu",
+  "inProgress": "Devam Ediyor",
+  "recordNo": "Kayıt No: {no}",
+  "@recordNo": {
+    "placeholders": {
+      "no": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownError": "Bilinmeyen hata",
+  "preparingInfo": "Bilgileriniz hazırlanıyor",
+  "checkingProfile": "Profil ve yetki bilgileri kontrol ediliyor.",
+  "connectionError": "Bağlantı Hatası",
+  "logout": "Çıkış Yap",
+  "offlineSyncMessage": "Çevrimdışı Mod – Değişiklikler kaydediliyor",
+  "syncingMessage": "Sunucu ile eşitleniyor..."
 }

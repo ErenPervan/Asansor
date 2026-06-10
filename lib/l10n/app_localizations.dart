@@ -417,6 +417,168 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Yerel veri önbelleği bozulmuştu. Veriler sıfırlandı, uygulamanız güvenle çalışmaya devam ediyor.'**
   String get mainHiveRecoveryMessage;
+
+  /// No description provided for @urgentFaultTag.
+  ///
+  /// In tr, this message translates to:
+  /// **'ACİL ARIZA'**
+  String get urgentFaultTag;
+
+  /// No description provided for @faultReportReceived.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arıza bildirimi alındı.'**
+  String get faultReportReceived;
+
+  /// No description provided for @activeFaultsCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} Aktif'**
+  String activeFaultsCount(int count);
+
+  /// No description provided for @noActiveFaults.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aktif arıza bulunmuyor.'**
+  String get noActiveFaults;
+
+  /// No description provided for @urgentInterventionWaiting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Acil Müdahale Bekleyenler'**
+  String get urgentInterventionWaiting;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümünü Gör'**
+  String get seeAll;
+
+  /// No description provided for @critical.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kritik'**
+  String get critical;
+
+  /// No description provided for @high.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yüksek'**
+  String get high;
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{days} gün önce'**
+  String daysAgo(int days);
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{hours} sa önce'**
+  String hoursAgo(int hours);
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{minutes} dk önce'**
+  String minutesAgo(int minutes);
+
+  /// No description provided for @justNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi'**
+  String get justNow;
+
+  /// No description provided for @elevator.
+  ///
+  /// In tr, this message translates to:
+  /// **'Asansör'**
+  String get elevator;
+
+  /// No description provided for @photoAddError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf eklenemedi: {error}'**
+  String photoAddError(String error);
+
+  /// No description provided for @photosAddError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraflar eklenemedi: {error}'**
+  String photosAddError(String error);
+
+  /// No description provided for @back.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri'**
+  String get back;
+
+  /// No description provided for @operation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Operasyon'**
+  String get operation;
+
+  /// No description provided for @monthlyPeriodicMaintenanceForm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık Periyodik Bakım Formu'**
+  String get monthlyPeriodicMaintenanceForm;
+
+  /// No description provided for @inProgress.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam Ediyor'**
+  String get inProgress;
+
+  /// No description provided for @recordNo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt No: {no}'**
+  String recordNo(String no);
+
+  /// No description provided for @unknownError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilinmeyen hata'**
+  String get unknownError;
+
+  /// No description provided for @preparingInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilgileriniz hazırlanıyor'**
+  String get preparingInfo;
+
+  /// No description provided for @checkingProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil ve yetki bilgileri kontrol ediliyor.'**
+  String get checkingProfile;
+
+  /// No description provided for @connectionError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı Hatası'**
+  String get connectionError;
+
+  /// No description provided for @logout.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çıkış Yap'**
+  String get logout;
+
+  /// No description provided for @offlineSyncMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çevrimdışı Mod – Değişiklikler kaydediliyor'**
+  String get offlineSyncMessage;
+
+  /// No description provided for @syncingMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucu ile eşitleniyor...'**
+  String get syncingMessage;
 }
 
 class _AppLocalizationsDelegate

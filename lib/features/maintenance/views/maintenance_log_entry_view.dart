@@ -105,7 +105,9 @@ class _MaintenanceLogEntryViewState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Fotoğraf eklenemedi: $e'),
+          content: Text(
+            AppLocalizations.of(context)!.photoAddError(e.toString()),
+          ),
           duration: AppDurations.snackBarError,
         ),
       );
@@ -130,7 +132,9 @@ class _MaintenanceLogEntryViewState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Fotoğraflar eklenemedi: $e'),
+          content: Text(
+            AppLocalizations.of(context)!.photosAddError(e.toString()),
+          ),
           duration: AppDurations.snackBarError,
         ),
       );
@@ -378,11 +382,11 @@ class _MaintenanceLogEntryViewState
               Icons.arrow_back_rounded,
               color: colors.onSurfaceVariant,
             ),
-            tooltip: 'Geri',
+            tooltip: l10n.back,
             onPressed: maintenanceState.isLoading ? null : () => context.pop(),
           ),
           title: Text(
-            'Asansor',
+            l10n.elevator,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: colors.primaryDark,
               fontWeight: FontWeight.w800,
@@ -394,7 +398,7 @@ class _MaintenanceLogEntryViewState
               padding: const EdgeInsets.only(right: AppSpacing.sm),
               child: Center(
                 child: Text(
-                  'Operasyon',
+                  l10n.operation,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: colors.primaryDark,
                     fontWeight: FontWeight.w800,

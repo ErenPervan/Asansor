@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:asansor/core/services/sync/sync_coordinator.dart';
+import 'package:asansor/core/exceptions/conflict_exception.dart';
 import '../../helpers/test_mocks.dart';
 
 void main() {
@@ -135,10 +139,86 @@ void main() {
         final raw2 = box.get(keys[1]);
 
         expect(jsonDecode(raw1!)['payload']['base_version'], 1);
-        // Wait, enqueue itself doesn't update the version Map, flush does.
-        // So this test just confirms they both get enqueued.
         expect(jsonDecode(raw2!)['payload']['base_version'], 1);
       });
     },
   );
+
+  group('SyncQueueService - Flush & Retry logic with MockRemoteWriter', () {
+    late MockSupabaseClient mockClient;
+    late MockSyncRemoteWriter mockRemoteWriter;
+
+    setUp(() {
+      mockClient = MockSupabaseClient();
+      mockRemoteWriter = MockSyncRemoteWriter();
+      service.overrideRemoteWriter = mockRemoteWriter;
+    });
+
+    test('flush successful updates queue and removes items', () async {
+      await service.enqueue(
+        type: SyncItemType.elevatorUpdate,
+        payload: {'id': 'e1', 'status': 'faulty', 'base_version': 1},
+      );
+
+      when(
+        () => mockRemoteWriter.syncElevatorUpdate(any()),
+      ).thenAnswer((_) async {});
+
+      final result = await service.flush(mockClient);
+
+      expect(result.synced, 1);
+      expect(result.failed, 0);
+      expect(service.pendingCount, 0);
+      expect(box.length, 0);
+    });
+
+    test(
+      'flush conflict throws ConflictException and updates status',
+      () async {
+        await service.enqueue(
+          type: SyncItemType.elevatorUpdate,
+          payload: {'id': 'e1', 'status': 'faulty', 'base_version': 1},
+        );
+
+        when(
+          () => mockRemoteWriter.syncElevatorUpdate(any()),
+        ).thenThrow(ConflictException(remoteState: {'version': 2}));
+
+        final result = await service.flush(mockClient);
+
+        expect(result.synced, 0);
+        expect(result.failed, 1);
+        expect(service.pendingCount, 0);
+        expect(service.conflictCount, 1);
+        expect(box.length, 1);
+
+        final item = jsonDecode(box.getAt(0)!);
+        expect(item['status'], 'conflict_detected');
+        expect(item['remote_state']['version'], 2);
+      },
+    );
+
+    test('flush transient error applies exponential backoff', () async {
+      await service.enqueue(
+        type: SyncItemType.elevatorUpdate,
+        payload: {'id': 'e2', 'status': 'active', 'base_version': 1},
+      );
+
+      // Simulate a transient network error that is terminal
+      when(
+        () => mockRemoteWriter.syncElevatorUpdate(any()),
+      ).thenThrow(Exception('Network disconnected'));
+      when(() => mockRemoteWriter.isTerminalError(any())).thenReturn(false);
+
+      final result = await service.flush(mockClient);
+
+      expect(result.synced, 0);
+      expect(result.failed, 1);
+
+      final item = jsonDecode(box.getAt(0)!);
+      expect(item['retry_count'], 1);
+      expect(item['next_retry_at'], isNotNull);
+      expect(item['status'], 'pending'); // Still pending, just delayed
+    });
+  });
 }

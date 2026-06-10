@@ -87,6 +87,32 @@ void main() {
       );
     });
 
+    test('online hata + cache doluysa cache listesi döner', () async {
+      final elevators = [
+        TestFactories.createElevator(id: 'e1', buildingName: 'Cached Bina'),
+      ];
+      fakeCache.elevators = elevators;
+
+      when(
+        () => mockRepo.getAllElevators(),
+      ).thenThrow(Exception('Supabase bağlantı hatası'));
+
+      final container = createContainer(
+        overrides: [
+          isOnlineProvider.overrideWithValue(true),
+          elevatorRepositoryProvider.overrideWithValue(mockRepo),
+          readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
+        ],
+      );
+
+      final result = await container.read(elevatorsProvider.future);
+      expect(result.length, 1);
+      expect(result[0].buildingName, 'Cached Bina');
+    });
+
     test(
       'elevatorByIdProvider offline → exception fırlatır (cache boş)',
       () async {
@@ -105,6 +131,35 @@ void main() {
           container.read(elevatorByIdProvider('e-unknown').future),
           throwsA(isA<Exception>()),
         );
+      },
+    );
+
+    test(
+      'elevatorByIdProvider online hata + cache doluysa cache döner',
+      () async {
+        final elevators = [
+          TestFactories.createElevator(id: 'e1', buildingName: 'Cached Bina'),
+        ];
+        fakeCache.elevators = elevators;
+
+        when(
+          () => mockRepo.getElevatorById('e1'),
+        ).thenThrow(Exception('Ağ hatası'));
+
+        final container = createContainer(
+          overrides: [
+            isOnlineProvider.overrideWithValue(true),
+            elevatorRepositoryProvider.overrideWithValue(mockRepo),
+            readCacheServiceProvider.overrideWithValue(fakeCache),
+            syncQueueServiceProvider.overrideWith(
+              (ref) => FakeSyncQueueService(),
+            ),
+          ],
+        );
+
+        final result = await container.read(elevatorByIdProvider('e1').future);
+        expect(result.id, 'e1');
+        expect(result.buildingName, 'Cached Bina');
       },
     );
 

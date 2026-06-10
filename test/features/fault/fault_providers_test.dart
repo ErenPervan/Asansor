@@ -86,6 +86,30 @@ void main() {
         throwsA(isA<Exception>()),
       );
     });
+
+    test('online hata + cache doluysa cache listesi döner', () async {
+      final faults = [
+        TestFactories.createFaultReport(id: 'f1', description: 'Cached Arıza'),
+      ];
+      fakeCache.allFaults = faults;
+
+      when(() => mockRepo.getAllFaults()).thenThrow(Exception('Ağ hatası'));
+
+      final container = createContainer(
+        overrides: [
+          isOnlineProvider.overrideWithValue(true),
+          faultRepositoryProvider.overrideWithValue(mockRepo),
+          readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
+        ],
+      );
+
+      final result = await container.read(allFaultsProvider.future);
+      expect(result.length, 1);
+      expect(result[0].description, 'Cached Arıza');
+    });
   });
 
   group('activeFaultsProvider', () {
@@ -136,6 +160,36 @@ void main() {
       expect(result.length, 2);
       expect(result.every((f) => !f.isResolved), isTrue);
       verify(() => mockRepo.getAllActiveFaults()).called(1);
+    });
+
+    test('online hata + cache doluysa cache döner', () async {
+      final faults = [
+        TestFactories.createFaultReport(
+          id: 'f1',
+          description: 'Cached Aktif Arıza',
+          isResolved: false,
+        ),
+      ];
+      fakeCache.activeFaults = faults;
+
+      when(
+        () => mockRepo.getAllActiveFaults(),
+      ).thenThrow(Exception('Ağ hatası'));
+
+      final container = createContainer(
+        overrides: [
+          isOnlineProvider.overrideWithValue(true),
+          faultRepositoryProvider.overrideWithValue(mockRepo),
+          readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
+        ],
+      );
+
+      final result = await container.read(activeFaultsProvider.future);
+      expect(result.length, 1);
+      expect(result[0].description, 'Cached Aktif Arıza');
     });
   });
 }

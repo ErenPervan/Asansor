@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:asansor/core/extensions/l10n_extension.dart';
 import 'package:asansor/core/widgets/app_bottom_nav_bar.dart';
 import 'package:asansor/features/elevator/widgets/home/home_qr_fab.dart';
 import 'package:asansor/core/providers/sync_status_provider.dart';
@@ -28,7 +29,7 @@ class ScaffoldWithNavBar extends ConsumerWidget {
             Icon(Icons.cloud_off_rounded, size: 16, color: colors.warning),
             const SizedBox(width: AppSpacing.sm),
             Text(
-              'Çevrimdışı Mod – Değişiklikler kaydediliyor',
+              context.l10n.offlineSyncMessage,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w500,
                 color: colors.warning,
@@ -54,7 +55,7 @@ class ScaffoldWithNavBar extends ConsumerWidget {
             ),
             const SizedBox(width: AppSpacing.sm),
             Text(
-              'Sunucu ile eşitleniyor...',
+              context.l10n.syncingMessage,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w500,
                 color: colors.primary,

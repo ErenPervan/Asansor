@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asansor/core/extensions/l10n_extension.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
@@ -42,7 +43,7 @@ class MaintenanceFormHero extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          'Aylık Periyodik Bakım Formu',
+          context.l10n.monthlyPeriodicMaintenanceForm,
           style: textTheme.headlineSmall?.copyWith(
             color: colors.primaryDark,
             fontWeight: FontWeight.w900,
@@ -55,12 +56,14 @@ class MaintenanceFormHero extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             MaintenanceStatusChip(
-              label: 'Devam Ediyor',
+              label: context.l10n.inProgress,
               color: colors.warning,
               backgroundColor: colors.surfaceContainerHigh,
             ),
             Text(
-              'Kayıt No: MNT-${DateTime.now().year}-${elevator.id.substring(0, elevator.id.length < 6 ? elevator.id.length : 6).toUpperCase()}',
+              context.l10n.recordNo(
+                'MNT-${DateTime.now().year}-${elevator.id.substring(0, elevator.id.length < 6 ? elevator.id.length : 6).toUpperCase()}',
+              ),
               style: textTheme.bodyMedium?.copyWith(
                 color: colors.onSurfaceVariant,
                 fontWeight: FontWeight.w600,

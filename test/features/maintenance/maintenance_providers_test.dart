@@ -87,6 +87,32 @@ void main() {
         throwsA(isA<Exception>()),
       );
     });
+
+    test('online hata + cache doluysa cache döner', () async {
+      final logs = [
+        TestFactories.createMaintenanceLog(id: 'l1', isApproved: false),
+      ];
+      fakeCache.pendingLogs = logs;
+
+      when(
+        () => mockRepo.getAllPendingLogs(),
+      ).thenThrow(Exception('Ağ hatası'));
+
+      final container = createContainer(
+        overrides: [
+          isOnlineProvider.overrideWithValue(true),
+          maintenanceRepositoryProvider.overrideWithValue(mockRepo),
+          readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
+        ],
+      );
+
+      final result = await container.read(pendingMaintenanceProvider.future);
+      expect(result.length, 1);
+      expect(result[0].id, 'l1');
+    });
   });
 
   group('completedTodayCountProvider', () {

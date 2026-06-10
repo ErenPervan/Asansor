@@ -30,6 +30,9 @@ class SyncCoordinator extends ChangeNotifier {
   SyncRemoteWriter? _remoteWriter;
   SyncConflictResolver? _conflictResolver;
 
+  @visibleForTesting
+  set overrideRemoteWriter(SyncRemoteWriter writer) => _remoteWriter = writer;
+
   SyncCoordinator() : _storage = SyncQueueStorage() {
     _storage.addListener(notifyListeners);
   }

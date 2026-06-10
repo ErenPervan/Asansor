@@ -4,6 +4,7 @@ import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:asansor/features/auth/providers/auth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:asansor/core/extensions/l10n_extension.dart';
 
 class LoadingView extends ConsumerWidget {
   const LoadingView({super.key});
@@ -23,7 +24,8 @@ class LoadingView extends ConsumerWidget {
               constraints: const BoxConstraints(maxWidth: 420),
               child: isError
                   ? _ErrorCard(
-                      message: authState.errorMessage ?? 'Bilinmeyen hata',
+                      message:
+                          authState.errorMessage ?? context.l10n.unknownError,
                       onSignOut: () =>
                           ref.read(authControllerProvider.notifier).signOut(),
                     )
@@ -108,7 +110,7 @@ class _LoadingCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(
-            'Bilgileriniz hazırlanıyor',
+            context.l10n.preparingInfo,
             textAlign: TextAlign.center,
             style: textTheme.headlineSmall?.copyWith(
               color: colors.primaryDark,
@@ -118,7 +120,7 @@ class _LoadingCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'Profil ve yetki bilgileri kontrol ediliyor.',
+            context.l10n.checkingProfile,
             textAlign: TextAlign.center,
             style: textTheme.bodyMedium?.copyWith(
               color: colors.onSurfaceVariant,
@@ -190,7 +192,7 @@ class _ErrorCard extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
-                  'Bağlantı Hatası',
+                  context.l10n.connectionError,
                   textAlign: TextAlign.center,
                   style: textTheme.titleLarge?.copyWith(
                     color: colors.onSurface,
@@ -211,7 +213,7 @@ class _ErrorCard extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: onSignOut,
                   icon: const Icon(Icons.logout_rounded),
-                  label: const Text('Çıkış Yap'),
+                  label: Text(context.l10n.logout),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
                     backgroundColor: colors.error,

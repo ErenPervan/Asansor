@@ -186,4 +186,100 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get mainHiveRecoveryMessage =>
       'Lokaler Datencache war beschädigt. Daten wurden zurückgesetzt, Ihre App läuft sicher weiter.';
+
+  @override
+  String get urgentFaultTag => 'ACİL ARIZA';
+
+  @override
+  String get faultReportReceived => 'Arıza bildirimi alındı.';
+
+  @override
+  String activeFaultsCount(int count) {
+    return '$count Aktif';
+  }
+
+  @override
+  String get noActiveFaults => 'Aktif arıza bulunmuyor.';
+
+  @override
+  String get urgentInterventionWaiting => 'Acil Müdahale Bekleyenler';
+
+  @override
+  String get seeAll => 'Tümünü Gör';
+
+  @override
+  String get critical => 'Kritik';
+
+  @override
+  String get high => 'Yüksek';
+
+  @override
+  String daysAgo(int days) {
+    return '$days gün önce';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '$hours sa önce';
+  }
+
+  @override
+  String minutesAgo(int minutes) {
+    return '$minutes dk önce';
+  }
+
+  @override
+  String get justNow => 'Şimdi';
+
+  @override
+  String get elevator => 'Asansör';
+
+  @override
+  String photoAddError(String error) {
+    return 'Fotoğraf eklenemedi: $error';
+  }
+
+  @override
+  String photosAddError(String error) {
+    return 'Fotoğraflar eklenemedi: $error';
+  }
+
+  @override
+  String get back => 'Geri';
+
+  @override
+  String get operation => 'Operasyon';
+
+  @override
+  String get monthlyPeriodicMaintenanceForm => 'Aylık Periyodik Bakım Formu';
+
+  @override
+  String get inProgress => 'Devam Ediyor';
+
+  @override
+  String recordNo(String no) {
+    return 'Kayıt No: $no';
+  }
+
+  @override
+  String get unknownError => 'Bilinmeyen hata';
+
+  @override
+  String get preparingInfo => 'Bilgileriniz hazırlanıyor';
+
+  @override
+  String get checkingProfile => 'Profil ve yetki bilgileri kontrol ediliyor.';
+
+  @override
+  String get connectionError => 'Bağlantı Hatası';
+
+  @override
+  String get logout => 'Çıkış Yap';
+
+  @override
+  String get offlineSyncMessage =>
+      'Çevrimdışı Mod – Değişiklikler kaydediliyor';
+
+  @override
+  String get syncingMessage => 'Sunucu ile eşitleniyor...';
 }

@@ -11,6 +11,7 @@ import 'package:asansor/features/maintenance/repositories/maintenance_repository
 import 'package:asansor/features/fault/repositories/fault_repository.dart';
 import 'package:asansor/features/auth/repositories/auth_repository.dart';
 import 'package:asansor/core/services/pdf_service.dart';
+import 'package:asansor/core/services/sync/sync_remote_writer.dart';
 
 // ── Supabase Mocks ────────────────────────────────────────────────────────────
 
@@ -29,6 +30,8 @@ class MockPostgrestFilterBuilder extends Mock
 
 class MockPostgrestTransformBuilder<T> extends Mock
     implements PostgrestTransformBuilder<T> {}
+
+class MockSyncRemoteWriter extends Mock implements SyncRemoteWriter {}
 
 // ── Hive Mocks ────────────────────────────────────────────────────────────────
 

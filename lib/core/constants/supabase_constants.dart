@@ -3,14 +3,24 @@
 class SupabaseConstants {
   SupabaseConstants._();
 
-  static const String supabaseUrl = String.fromEnvironment(
-    'SUPABASE_URL',
-    defaultValue: 'https://fuwmrhahwvsouhcxycyr.supabase.co',
-  );
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
 
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1d21yaGFod3Zzb3VoY3h5Y3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTEzMjQsImV4cCI6MjA5MTMyNzMyNH0.ylkeV283PxJhF8C_683njSN7SyONrB-WJrC9xs1c-dA',
   );
+
+  static void validate() {
+    final missing = <String>[
+      if (supabaseUrl.isEmpty) 'SUPABASE_URL',
+      if (supabaseAnonKey.isEmpty) 'SUPABASE_ANON_KEY',
+    ];
+
+    if (missing.isNotEmpty) {
+      throw StateError(
+        'Missing required compile-time environment values: '
+        '${missing.join(', ')}. Pass them with --dart-define or '
+        '--dart-define-from-file=.env.',
+      );
+    }
+  }
 }

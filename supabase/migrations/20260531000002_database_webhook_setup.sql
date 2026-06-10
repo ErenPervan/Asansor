@@ -61,7 +61,11 @@ BEGIN
   -- The function is deployed with --no-verify-jwt, but passing the anon key
   -- keeps the call consistent with Supabase conventions and allows you to
   -- re-enable JWT verification later without changing the trigger.
-  _anon_key := COALESCE(current_setting('app.settings.anon_key', true), '<eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1d21yaGFod3Zzb3VoY3h5Y3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTEzMjQsImV4cCI6MjA5MTMyNzMyNH0.ylkeV283PxJhF8C_683njSN7SyONrB-WJrC9xs1c-dA>');
+  _anon_key := current_setting('app.settings.anon_key', true);
+  IF _anon_key IS NULL OR _anon_key = '' THEN
+    RAISE WARNING '[notify_technician_on_assignment] app.settings.anon_key is not configured. Notification was not sent.';
+    RETURN NEW;
+  END IF;
 
   -- ── Wrap the new row in the standard Supabase webhook envelope ────────────
   -- This matches what Supabase native Database Webhooks send, so the Edge

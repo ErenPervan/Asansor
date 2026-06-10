@@ -122,6 +122,7 @@ Future<void> main() async {
   );
 
   // Environment variables are provided via --dart-define or --dart-define-from-file.
+  SupabaseConstants.validate();
 
   // Firebase must be initialised before any Firebase service is used.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

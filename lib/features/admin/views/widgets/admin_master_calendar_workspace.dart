@@ -119,7 +119,10 @@ class MasterCalendarWorkspace extends StatelessWidget {
                       onPageChanged: onPageChanged,
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    AdminMasterCalendarDayPanel(day: selectedDay, tasks: dayTasks),
+                    AdminMasterCalendarDayPanel(
+                      day: selectedDay,
+                      tasks: dayTasks,
+                    ),
                   ],
                   const SizedBox(height: AppSpacing.lg),
                   Align(

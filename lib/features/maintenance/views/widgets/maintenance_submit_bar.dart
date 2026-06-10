@@ -4,7 +4,11 @@ import 'package:asansor/core/theme/app_spacing.dart';
 import 'package:asansor/l10n/app_localizations.dart';
 
 class MaintenanceSubmitBar extends StatelessWidget {
-  const MaintenanceSubmitBar({super.key, required this.isLoading, required this.onSubmit});
+  const MaintenanceSubmitBar({
+    super.key,
+    required this.isLoading,
+    required this.onSubmit,
+  });
 
   final bool isLoading;
   final VoidCallback onSubmit;

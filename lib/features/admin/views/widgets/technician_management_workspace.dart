@@ -9,7 +9,11 @@ import 'package:asansor/features/admin/views/widgets/technician_management_state
 import 'package:asansor/features/admin/views/widgets/user_management_helpers.dart'; // for panelLine
 
 class TechnicianWorkspace extends StatelessWidget {
-  const TechnicianWorkspace({super.key, required this.stats, required this.onRefresh});
+  const TechnicianWorkspace({
+    super.key,
+    required this.stats,
+    required this.onRefresh,
+  });
 
   final List<TechnicianStats> stats;
   final VoidCallback onRefresh;

@@ -29,7 +29,8 @@ final customerElevatorProvider = FutureProvider.autoDispose<ElevatorModel?>((
 
   try {
     // Fetch the specific elevator
-    final response = await ref.read(supabaseClientProvider)
+    final response = await ref
+        .read(supabaseClientProvider)
         .from('elevators')
         .select()
         .eq('id', elevatorId)
@@ -75,7 +76,8 @@ final customerMaintenanceLogsProvider =
 
       try {
         // Fetch recent maintenance logs for this elevator
-        final response = await ref.read(supabaseClientProvider)
+        final response = await ref
+            .read(supabaseClientProvider)
             .from('maintenance_logs')
             .select()
             .eq('elevator_id', elevatorId)

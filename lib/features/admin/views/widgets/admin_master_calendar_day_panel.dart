@@ -8,7 +8,11 @@ import 'package:asansor/features/admin/models/schedule_with_details.dart';
 import 'package:asansor/features/admin/views/widgets/admin_master_calendar_helpers.dart'; // for panelLine
 
 class AdminMasterCalendarDayPanel extends StatelessWidget {
-  const AdminMasterCalendarDayPanel({super.key, required this.day, required this.tasks});
+  const AdminMasterCalendarDayPanel({
+    super.key,
+    required this.day,
+    required this.tasks,
+  });
 
   final DateTime day;
   final List<ScheduleWithDetails> tasks;

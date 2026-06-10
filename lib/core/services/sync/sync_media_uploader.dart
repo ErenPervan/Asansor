@@ -101,9 +101,7 @@ class SyncMediaUploader {
     return urls.first;
   }
 
-  Future<void> generateUploadAndAttachPdf(
-    Map<String, dynamic> response,
-  ) async {
+  Future<void> generateUploadAndAttachPdf(Map<String, dynamic> response) async {
     try {
       final logModel = MaintenanceLogModel.fromJson(response);
       final checklistDetails =
@@ -173,7 +171,9 @@ class SyncMediaUploader {
               'data': {'route': '/customer/dashboard', 'pdf_url': fileName},
             },
           );
-          debugPrint('[SyncMediaUploader] Customer notification sent to: $customerId');
+          debugPrint(
+            '[SyncMediaUploader] Customer notification sent to: $customerId',
+          );
         } else {
           debugPrint(
             '[SyncMediaUploader] No customer profile found for elevator ${logModel.elevatorId}. Skipping notification.',
@@ -197,10 +197,14 @@ class SyncMediaUploader {
           },
         );
       } catch (e) {
-        debugPrint('[SyncMediaUploader] Admin notification failed (non-fatal): $e');
+        debugPrint(
+          '[SyncMediaUploader] Admin notification failed (non-fatal): $e',
+        );
       }
     } catch (e) {
-      debugPrint('[SyncMediaUploader] Failed to generate or upload PDF report: $e');
+      debugPrint(
+        '[SyncMediaUploader] Failed to generate or upload PDF report: $e',
+      );
       throw Exception('PDF generation/upload failed');
     }
   }

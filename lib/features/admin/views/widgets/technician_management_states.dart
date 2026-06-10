@@ -52,7 +52,11 @@ class TechnicianManagementEmptyBody extends StatelessWidget {
 }
 
 class TechnicianManagementErrorBody extends StatelessWidget {
-  const TechnicianManagementErrorBody({super.key, required this.error, required this.onRetry});
+  const TechnicianManagementErrorBody({
+    super.key,
+    required this.error,
+    required this.onRetry,
+  });
 
   final Object error;
   final VoidCallback onRetry;

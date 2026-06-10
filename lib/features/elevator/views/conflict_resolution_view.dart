@@ -157,7 +157,10 @@ class _ConflictCard extends ConsumerWidget {
                 ),
                 TextButton.icon(
                   onPressed: () async {
-                    await syncQueue.resolveDiscard(ref.read(supabaseClientProvider), key);
+                    await syncQueue.resolveDiscard(
+                      ref.read(supabaseClientProvider),
+                      key,
+                    );
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

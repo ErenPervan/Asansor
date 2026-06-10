@@ -3,7 +3,11 @@ import 'package:asansor/core/theme/app_colors.dart';
 import 'package:asansor/core/theme/app_spacing.dart';
 
 class AdminMasterCalendarErrorView extends StatelessWidget {
-  const AdminMasterCalendarErrorView({super.key, required this.error, required this.onRetry});
+  const AdminMasterCalendarErrorView({
+    super.key,
+    required this.error,
+    required this.onRetry,
+  });
 
   final Object error;
   final VoidCallback onRetry;

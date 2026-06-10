@@ -8,7 +8,8 @@ import 'package:asansor/core/services/sync/sync_media_uploader.dart';
 import 'package:asansor/core/services/sync/sync_remote_writer.dart';
 import 'package:asansor/core/services/sync/sync_conflict_resolver.dart';
 
-export 'package:asansor/core/services/sync/sync_queue_storage.dart' show SyncItemType, syncQueueBoxName;
+export 'package:asansor/core/services/sync/sync_queue_storage.dart'
+    show SyncItemType, syncQueueBoxName;
 
 class SyncResult {
   const SyncResult({required this.synced, required this.failed});
@@ -57,7 +58,11 @@ class SyncCoordinator extends ChangeNotifier {
 
     _mediaUploader ??= SyncMediaUploader(client);
     _remoteWriter ??= SyncRemoteWriter(client, _mediaUploader!, _storage);
-    _conflictResolver ??= SyncConflictResolver(client, _storage, () => flush(client));
+    _conflictResolver ??= SyncConflictResolver(
+      client,
+      _storage,
+      () => flush(client),
+    );
 
     try {
       final keys = _storage.keys;
@@ -139,21 +144,25 @@ class SyncCoordinator extends ChangeNotifier {
   }
 
   Future<void> resolveForceUpdate(SupabaseClient client, String key) async {
-    _conflictResolver ??= SyncConflictResolver(client, _storage, () => flush(client));
+    _conflictResolver ??= SyncConflictResolver(
+      client,
+      _storage,
+      () => flush(client),
+    );
     await _conflictResolver!.resolveForceUpdate(key);
   }
 
   Future<void> resolveFlagDisputed(SupabaseClient client, String key) async {
-    _conflictResolver ??= SyncConflictResolver(client, _storage, () => flush(client));
+    _conflictResolver ??= SyncConflictResolver(
+      client,
+      _storage,
+      () => flush(client),
+    );
     await _conflictResolver!.resolveFlagDisputed(key);
   }
 
   Future<void> resolveDiscard(SupabaseClient client, String key) async {
-    _conflictResolver ??= SyncConflictResolver(
-      client,
-      _storage, 
-      () async {}
-    );
+    _conflictResolver ??= SyncConflictResolver(client, _storage, () async {});
     await _conflictResolver!.resolveDiscard(key);
   }
 }

@@ -317,7 +317,6 @@ class SyncStatusButton extends ConsumerWidget {
     );
   }
 
-
   void _showSyncSheet(BuildContext context, WidgetRef ref) {
     final queue = ref.read(syncQueueServiceProvider);
     final count = queue.pendingCount;

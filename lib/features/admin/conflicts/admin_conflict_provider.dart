@@ -47,7 +47,6 @@ class ConflictReport {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
-
   @override
   Future<List<ConflictReport>> build() => _fetchPending();
 

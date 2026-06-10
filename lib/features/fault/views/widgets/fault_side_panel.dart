@@ -9,7 +9,11 @@ import 'package:asansor/features/fault/models/fault_report_model.dart';
 import 'package:asansor/features/fault/views/widgets/fault_premium_panel.dart';
 
 class FaultSidePanel extends StatelessWidget {
-  const FaultSidePanel({super.key, required this.fault, required this.elevatorAsync});
+  const FaultSidePanel({
+    super.key,
+    required this.fault,
+    required this.elevatorAsync,
+  });
 
   final FaultReportModel fault;
   final AsyncValue<ElevatorModel> elevatorAsync;

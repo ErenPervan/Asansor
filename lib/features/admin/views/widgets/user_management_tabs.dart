@@ -13,7 +13,11 @@ import 'package:asansor/features/admin/views/widgets/user_management_helpers.dar
 import 'package:asansor/features/admin/views/widgets/user_management_sheets.dart';
 
 class UserManagementListTab extends ConsumerWidget {
-  const UserManagementListTab({super.key, required this.role, required this.query});
+  const UserManagementListTab({
+    super.key,
+    required this.role,
+    required this.query,
+  });
 
   final UserRole? role;
   final String query;

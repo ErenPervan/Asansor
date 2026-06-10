@@ -195,9 +195,7 @@ class SyncRemoteWriter {
         );
   }
 
-  Future<void> syncFaultResolve(
-    Map<String, dynamic> payload,
-  ) async {
+  Future<void> syncFaultResolve(Map<String, dynamic> payload) async {
     final faultId = payload['fault_id'] as String;
     final resolutionNotes = payload['resolution_notes'] as String?;
     final resolvedAt = payload['resolved_at'] as String;
@@ -219,9 +217,7 @@ class SyncRemoteWriter {
         );
   }
 
-  Future<void> syncFaultReopen(
-    Map<String, dynamic> payload,
-  ) async {
+  Future<void> syncFaultReopen(Map<String, dynamic> payload) async {
     final faultId = payload['fault_id'] as String;
 
     await _client
@@ -236,9 +232,7 @@ class SyncRemoteWriter {
         );
   }
 
-  Future<void> syncElevatorUpdate(
-    Map<String, dynamic> payload,
-  ) async {
+  Future<void> syncElevatorUpdate(Map<String, dynamic> payload) async {
     final id = payload['id'] as String;
     final baseVersion = payload['base_version'] as int;
     final changes = Map<String, dynamic>.from(payload)

@@ -18,7 +18,8 @@ class ChecklistNotifier
     }
 
     try {
-      final response = await ref.read(supabaseClientProvider)
+      final response = await ref
+          .read(supabaseClientProvider)
           .from('checklist_items')
           .select()
           .order('label', ascending: true);
@@ -51,7 +52,8 @@ class ChecklistNotifier
   Future<void> updateItem(String id, String label, String description) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(supabaseClientProvider)
+      await ref
+          .read(supabaseClientProvider)
           .from('checklist_items')
           .update({'label': label, 'description': description})
           .eq('id', id);
@@ -62,7 +64,8 @@ class ChecklistNotifier
   Future<void> toggleActiveStatus(String id, bool isActive) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(supabaseClientProvider)
+      await ref
+          .read(supabaseClientProvider)
           .from('checklist_items')
           .update({'is_active': isActive})
           .eq('id', id);
@@ -73,7 +76,8 @@ class ChecklistNotifier
   Future<void> deleteItem(String id) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(supabaseClientProvider)
+      await ref
+          .read(supabaseClientProvider)
           .from('checklist_items')
           .delete()
           .eq('id', id);

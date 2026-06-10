@@ -6,7 +6,11 @@ import 'package:asansor/features/admin/models/technician_stats.dart';
 import 'package:asansor/features/admin/views/widgets/user_management_helpers.dart'; // for panelLine
 
 class TechnicianRowCard extends StatelessWidget {
-  const TechnicianRowCard({super.key, required this.stats, required this.onOpenTasks});
+  const TechnicianRowCard({
+    super.key,
+    required this.stats,
+    required this.onOpenTasks,
+  });
 
   final TechnicianStats stats;
   final VoidCallback onOpenTasks;

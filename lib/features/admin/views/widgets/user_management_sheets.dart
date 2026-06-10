@@ -216,7 +216,11 @@ void showAssignElevatorSheet(
 }
 
 class AssignElevatorSheet extends ConsumerStatefulWidget {
-  const AssignElevatorSheet({super.key, required this.customer, required this.elevators});
+  const AssignElevatorSheet({
+    super.key,
+    required this.customer,
+    required this.elevators,
+  });
 
   final ProfileModel customer;
   final List<ElevatorModel> elevators;

@@ -103,19 +103,18 @@ class NotificationService {
   /// Injects Ref so the service can observe auth state changes independently.
   void attachRef(Ref ref) {
     _authSubscription?.close();
-    _authSubscription = ref.listen<AuthStateModel>(
-      appAuthStateProvider,
-      (previous, current) {
-        if (current.status == AuthStatus.authorized) {
-          isAuthorized = true;
-          authState = current;
-        } else {
-          isAuthorized = false;
-          authState = null;
-        }
-      },
-      fireImmediately: true,
-    );
+    _authSubscription = ref.listen<AuthStateModel>(appAuthStateProvider, (
+      previous,
+      current,
+    ) {
+      if (current.status == AuthStatus.authorized) {
+        isAuthorized = true;
+        authState = current;
+      } else {
+        isAuthorized = false;
+        authState = null;
+      }
+    }, fireImmediately: true);
   }
 
   /// True if the user is authenticated and the router has fully processed the auth state.

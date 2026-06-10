@@ -731,7 +731,11 @@ class _MaintenanceLogTile extends ConsumerWidget {
     );
   }
 
-  Future<void> _openPdf(BuildContext context, WidgetRef ref, String pathOrUrl) async {
+  Future<void> _openPdf(
+    BuildContext context,
+    WidgetRef ref,
+    String pathOrUrl,
+  ) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Rapor açılıyor...'),
@@ -743,7 +747,9 @@ class _MaintenanceLogTile extends ConsumerWidget {
       if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
         url = pathOrUrl;
       } else {
-        url = await ref.read(supabaseClientProvider).storage
+        url = await ref
+            .read(supabaseClientProvider)
+            .storage
             .from('maintenance-reports')
             .createSignedUrl(pathOrUrl, 60 * 60);
       }

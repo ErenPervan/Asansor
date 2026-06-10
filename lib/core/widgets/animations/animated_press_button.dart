@@ -20,6 +20,7 @@ class _AnimatedPressButtonState extends State<AnimatedPressButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
+  late final Map<Type, Action<Intent>> _actionMap;
 
   @override
   void initState() {
@@ -34,6 +35,20 @@ class _AnimatedPressButtonState extends State<AnimatedPressButton>
       begin: 1.0,
       end: widget.scaleDown,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _actionMap = <Type, Action<Intent>>{
+      ActivateIntent: CallbackAction<ActivateIntent>(
+        onInvoke: (ActivateIntent intent) {
+          if (widget.onPressed != null) {
+            _controller.forward().then((_) {
+              _controller.reverse();
+              widget.onPressed!();
+            });
+          }
+          return null;
+        },
+      ),
+    };
   }
 
   @override
@@ -67,11 +82,21 @@ class _AnimatedPressButtonState extends State<AnimatedPressButton>
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerDown: _onPointerDown,
-      onPointerUp: _onPointerUp,
-      onPointerCancel: _onPointerCancel,
-      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
+    return Semantics(
+      button: true,
+      enabled: widget.onPressed != null,
+      child: FocusableActionDetector(
+        actions: _actionMap,
+        mouseCursor: widget.onPressed == null
+            ? SystemMouseCursors.basic
+            : SystemMouseCursors.click,
+        child: Listener(
+          onPointerDown: _onPointerDown,
+          onPointerUp: _onPointerUp,
+          onPointerCancel: _onPointerCancel,
+          child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
+        ),
+      ),
     );
   }
 }

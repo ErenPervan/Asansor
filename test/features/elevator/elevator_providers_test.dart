@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:asansor/core/providers/connectivity_providers.dart';
 import 'package:asansor/features/elevator/providers/elevator_providers.dart';
+import 'package:asansor/core/services/sync/sync_coordinator.dart';
 
 import '../../helpers/provider_test_utils.dart';
 import '../../helpers/test_mocks.dart';
@@ -28,6 +29,9 @@ void main() {
           isOnlineProvider.overrideWithValue(false),
           elevatorRepositoryProvider.overrideWithValue(mockRepo),
           readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
         ],
       );
 
@@ -49,6 +53,9 @@ void main() {
           isOnlineProvider.overrideWithValue(true),
           elevatorRepositoryProvider.overrideWithValue(mockRepo),
           readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
         ],
       );
 
@@ -69,6 +76,9 @@ void main() {
           isOnlineProvider.overrideWithValue(true),
           elevatorRepositoryProvider.overrideWithValue(mockRepo),
           readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
         ],
       );
 
@@ -86,6 +96,9 @@ void main() {
             isOnlineProvider.overrideWithValue(false),
             elevatorRepositoryProvider.overrideWithValue(mockRepo),
             readCacheServiceProvider.overrideWithValue(fakeCache),
+            syncQueueServiceProvider.overrideWith(
+              (ref) => FakeSyncQueueService(),
+            ),
           ],
         );
 
@@ -107,6 +120,9 @@ void main() {
           isOnlineProvider.overrideWithValue(true),
           elevatorRepositoryProvider.overrideWithValue(mockRepo),
           readCacheServiceProvider.overrideWithValue(fakeCache),
+          syncQueueServiceProvider.overrideWith(
+            (ref) => FakeSyncQueueService(),
+          ),
         ],
       );
 

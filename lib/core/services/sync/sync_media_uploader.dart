@@ -139,9 +139,13 @@ class SyncMediaUploader {
             ),
           );
 
+      final signedUrl = await _client.storage
+          .from(_maintenanceReportsBucket)
+          .createSignedUrl(fileName, 3600 * 24 * 7); // 7 days
+
       await _client
           .from('maintenance_logs')
-          .update({'pdf_url': fileName})
+          .update({'pdf_url': signedUrl})
           .eq('id', logModel.id)
           .timeout(
             _dbWriteTimeout,
@@ -149,7 +153,9 @@ class SyncMediaUploader {
               '[SyncMediaUploader] DB pdf_url update timed out after ${_dbWriteTimeout.inSeconds}s for log ${logModel.id}',
             ),
           );
-      debugPrint('[SyncMediaUploader] PDF uploaded & linked path: $fileName');
+      debugPrint(
+        '[SyncMediaUploader] PDF uploaded & linked signed url for: $fileName',
+      );
 
       try {
         final customerData = await _client

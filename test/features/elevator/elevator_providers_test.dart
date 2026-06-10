@@ -3,7 +3,6 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:asansor/core/providers/connectivity_providers.dart';
 import 'package:asansor/features/elevator/providers/elevator_providers.dart';
-import 'package:asansor/core/services/sync/sync_coordinator.dart';
 
 import '../../helpers/provider_test_utils.dart';
 import '../../helpers/test_mocks.dart';

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:asansor/core/services/read_cache_service.dart';
-import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/core/services/sync/sync_coordinator.dart';
 
 // ── Connectivity ──────────────────────────────────────────────────────────────
 

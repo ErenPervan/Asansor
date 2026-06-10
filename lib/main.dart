@@ -19,7 +19,7 @@ import 'package:asansor/core/router/app_router.dart'; // also exports: appRouter
 import 'package:asansor/core/services/deep_link_service.dart';
 import 'package:asansor/core/services/notification_service.dart';
 import 'package:asansor/core/services/read_cache_service.dart';
-import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/core/services/sync/sync_coordinator.dart';
 import 'package:asansor/core/theme/app_colors.dart';
 
 // ── Hive Initialization & Recovery Helpers ─────────────────────────────────────

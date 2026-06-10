@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/core/services/sync/sync_coordinator.dart';
 
 void main() {
   late SyncQueueService service;

@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dart:async';
 import 'package:asansor/core/providers/connectivity_providers.dart';
-import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/core/services/sync/sync_coordinator.dart';
 import 'package:asansor/features/fault/models/fault_report_model.dart';
 import 'package:asansor/features/fault/repositories/fault_repository.dart';
 

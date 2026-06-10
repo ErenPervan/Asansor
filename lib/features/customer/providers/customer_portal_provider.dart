@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:asansor/features/elevator/models/elevator_model.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 import 'package:asansor/features/admin/providers/profile_providers.dart';
@@ -30,7 +29,7 @@ final customerElevatorProvider = FutureProvider.autoDispose<ElevatorModel?>((
 
   try {
     // Fetch the specific elevator
-    final response = await Supabase.instance.client
+    final response = await ref.read(supabaseClientProvider)
         .from('elevators')
         .select()
         .eq('id', elevatorId)
@@ -76,7 +75,7 @@ final customerMaintenanceLogsProvider =
 
       try {
         // Fetch recent maintenance logs for this elevator
-        final response = await Supabase.instance.client
+        final response = await ref.read(supabaseClientProvider)
             .from('maintenance_logs')
             .select()
             .eq('elevator_id', elevatorId)

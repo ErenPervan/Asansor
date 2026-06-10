@@ -13,6 +13,7 @@ import 'package:asansor/core/router/app_router.dart'; // exposes appRouter + nav
 import 'package:go_router/go_router.dart';
 import 'package:asansor/core/models/notification_payload.dart';
 import 'package:asansor/features/auth/providers/auth_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Background handler (MUST be a top-level function, not a class method)
@@ -97,6 +98,25 @@ class NotificationService {
 
   NotificationServiceState _state = NotificationServiceState.notStarted;
   StreamSubscription<String>? _tokenRefreshSub;
+  ProviderSubscription? _authSubscription;
+
+  /// Injects Ref so the service can observe auth state changes independently.
+  void attachRef(Ref ref) {
+    _authSubscription?.close();
+    _authSubscription = ref.listen<AuthStateModel>(
+      appAuthStateProvider,
+      (previous, current) {
+        if (current.status == AuthStatus.authorized) {
+          isAuthorized = true;
+          authState = current;
+        } else {
+          isAuthorized = false;
+          authState = null;
+        }
+      },
+      fireImmediately: true,
+    );
+  }
 
   /// True if the user is authenticated and the router has fully processed the auth state.
   bool isAuthorized = false;

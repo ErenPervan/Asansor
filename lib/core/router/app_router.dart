@@ -98,6 +98,7 @@ class RouterNotifier extends ChangeNotifier {
   ProviderSubscription? _subscription;
 
   RouterNotifier(this._ref) {
+    NotificationService.instance.attachRef(_ref);
     _subscription = _ref.listen<AuthStateModel>(appAuthStateProvider, (
       previous,
       current,
@@ -106,14 +107,6 @@ class RouterNotifier extends ChangeNotifier {
       if (previous?.status == AuthStatus.authorized &&
           current.status == AuthStatus.unauthenticated) {
         _clearUserData();
-      }
-
-      if (current.status == AuthStatus.authorized) {
-        NotificationService.instance.isAuthorized = true;
-        NotificationService.instance.authState = current;
-      } else {
-        NotificationService.instance.isAuthorized = false;
-        NotificationService.instance.authState = null;
       }
       notifyListeners();
     }, fireImmediately: true);

@@ -5,7 +5,7 @@ import 'package:path/path.dart' as p;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:asansor/core/providers/connectivity_providers.dart';
-import 'package:asansor/core/services/sync_queue_service.dart';
+import 'package:asansor/core/services/sync/sync_coordinator.dart';
 import 'package:asansor/features/maintenance/models/maintenance_log_model.dart';
 import 'package:asansor/features/maintenance/repositories/maintenance_repository.dart';
 

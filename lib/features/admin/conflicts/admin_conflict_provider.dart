@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:asansor/core/providers/connectivity_providers.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 // Model
 // ─────────────────────────────────────────────────────────────────────────────
@@ -48,13 +47,13 @@ class ConflictReport {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
-  SupabaseClient get _client => Supabase.instance.client;
 
   @override
   Future<List<ConflictReport>> build() => _fetchPending();
 
   Future<List<ConflictReport>> _fetchPending() async {
-    final rows = await _client
+    final client = ref.read(supabaseClientProvider);
+    final rows = await client
         .from('conflict_reports')
         .select('*, elevators(building_name)')
         .eq('status', 'pending')
@@ -67,7 +66,7 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
         .toSet()
         .toList();
 
-    final profilesResponse = await _client
+    final profilesResponse = await client
         .from('profiles')
         .select('id, full_name')
         .inFilter('id', technicianIds);
@@ -92,6 +91,7 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
   /// This updates the target record with the local payload and increments its version.
   Future<void> resolveForceLocal(ConflictReport report) async {
     state = const AsyncLoading();
+    final client = ref.read(supabaseClientProvider);
 
     try {
       final sanitized = Map<String, dynamic>.from(report.localPayload)
@@ -101,7 +101,7 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
 
       final currentVersion = (report.remotePayload['version'] as int?) ?? 1;
 
-      await _client.rpc(
+      await client.rpc(
         'resolve_elevator_conflict',
         params: {
           'p_conflict_id': report.id,
@@ -121,9 +121,10 @@ class AdminConflictNotifier extends AsyncNotifier<List<ConflictReport>> {
   /// Leaves the target record untouched, marks conflict as discarded.
   Future<void> resolveDiscardLocal(ConflictReport report) async {
     state = const AsyncLoading();
+    final client = ref.read(supabaseClientProvider);
 
     try {
-      await _client
+      await client
           .from('conflict_reports')
           .update({'status': 'resolved_discarded'})
           .eq('id', report.id);

@@ -20,13 +20,13 @@ function mockFetch(mockScenario: "admin" | "technician" | "customer" | "invalid_
     // 2. Mock Supabase DB (profiles query)
     if (url.includes("/rest/v1/profiles")) {
       if (url.includes("id=eq.mock-user-id") && init?.method === "GET") {
-        return new Response(JSON.stringify([{ role: mockScenario, fcm_token: "mock-token" }]), { status: 200 });
+        return new Response(JSON.stringify({ role: mockScenario, fcm_token: "mock-token" }), { status: 200 });
       }
       if (url.includes("role=eq.admin") && init?.method === "GET") {
         return new Response(JSON.stringify([{ fcm_token: "admin-token" }]), { status: 200 });
       }
       if (url.includes("id=eq.target-user-id") && init?.method === "GET") {
-        return new Response(JSON.stringify([{ fcm_token: "target-token" }]), { status: 200 });
+        return new Response(JSON.stringify({ fcm_token: "target-token" }), { status: 200 });
       }
       return new Response(JSON.stringify([]), { status: 200 });
     }

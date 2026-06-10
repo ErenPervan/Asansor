@@ -211,23 +211,13 @@ void main() {
       expect(model.isOfflineQueued, isFalse);
     });
 
-    test('fromJson handles null values and missing profiles nested map', () {
+    test('fromJson throws ArgumentError if maintenance_date is missing', () {
       final json = {'id': 'log2'};
 
-      final model = MaintenanceLogModel.fromJson(json);
-
-      expect(model.id, 'log2');
-      expect(model.elevatorId, ''); // Default fallback
-      expect(model.technicianId, ''); // Default fallback
-      expect(model.notes, isNull);
-      expect(model.isApproved, isFalse); // Default fallback
       expect(
-        model.maintenanceDate,
-        DateTime.fromMillisecondsSinceEpoch(0),
-      ); // Sentinel value fallback
-      expect(model.pdfUrl, isNull);
-      expect(model.technicianName, isNull);
-      expect(model.isOfflineQueued, isFalse);
+        () => MaintenanceLogModel.fromJson(json),
+        throwsA(isA<ArgumentError>()),
+      );
     });
 
     test('toJson serializes correctly (excludes technicianName)', () {

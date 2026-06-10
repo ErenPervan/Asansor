@@ -29,9 +29,9 @@ class ChecklistManagementView extends ConsumerWidget {
         title: Text(
           'Kontrol Listesi',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: colors.primaryDark,
-                fontWeight: FontWeight.w900,
-              ),
+            color: colors.primaryDark,
+            fontWeight: FontWeight.w900,
+          ),
         ),
         actions: [
           IconButton(
@@ -72,9 +72,9 @@ class ChecklistManagementView extends ConsumerWidget {
         label: Text(
           'Yeni Kalem',
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: colors.onPrimary,
-                fontWeight: FontWeight.w900,
-              ),
+            color: colors.onPrimary,
+            fontWeight: FontWeight.w900,
+          ),
         ),
       ),
     );
@@ -142,7 +142,9 @@ class ChecklistManagementView extends ConsumerWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: colors.primaryFixed.withValues(alpha: 0.72),
+                              color: colors.primaryFixed.withValues(
+                                alpha: 0.72,
+                              ),
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Icon(
@@ -190,7 +192,8 @@ class ChecklistManagementView extends ConsumerWidget {
                         label: 'Kalem Adı',
                         hint: 'Örn: Fren balata kontrolü',
                         prefixIcon: const Icon(Icons.label_outline_rounded),
-                        validator: (value) => value == null || value.trim().isEmpty
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
                             ? 'Zorunlu alan'
                             : null,
                       ),
@@ -201,7 +204,8 @@ class ChecklistManagementView extends ConsumerWidget {
                         label: 'Açıklama',
                         hint: 'Teknisyen için kontrol talimatı...',
                         prefixIcon: const Icon(Icons.description_outlined),
-                        validator: (value) => value == null || value.trim().isEmpty
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
                             ? 'Zorunlu alan'
                             : null,
                       ),
@@ -212,9 +216,13 @@ class ChecklistManagementView extends ConsumerWidget {
                             child: OutlinedButton(
                               onPressed: () => Navigator.pop(sheetContext),
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 side: BorderSide(
-                                  color: colors.outlineVariant.withValues(alpha: 0.7),
+                                  color: colors.outlineVariant.withValues(
+                                    alpha: 0.7,
+                                  ),
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -236,13 +244,17 @@ class ChecklistManagementView extends ConsumerWidget {
                               onPressed: () {
                                 if (!formKey.currentState!.validate()) return;
                                 if (isEdit) {
-                                  ref.read(checklistProvider.notifier).updateItem(
+                                  ref
+                                      .read(checklistProvider.notifier)
+                                      .updateItem(
                                         item.id,
                                         labelCtrl.text.trim(),
                                         descCtrl.text.trim(),
                                       );
                                 } else {
-                                  ref.read(checklistProvider.notifier).addItem(
+                                  ref
+                                      .read(checklistProvider.notifier)
+                                      .addItem(
                                         labelCtrl.text.trim(),
                                         descCtrl.text.trim(),
                                       );
@@ -264,7 +276,9 @@ class ChecklistManagementView extends ConsumerWidget {
                               ),
                               label: Text(isEdit ? 'Kaydet' : 'Kalemi Ekle'),
                               style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 backgroundColor: colors.primaryDark,
                                 foregroundColor: colors.onPrimary,
                                 textStyle: textTheme.labelLarge?.copyWith(
@@ -401,7 +415,8 @@ class _ChecklistContent extends StatelessWidget {
                       if (inactive.isNotEmpty)
                         _ChecklistSection(
                           title: 'Pasif Kalemler',
-                          subtitle: 'Geçici olarak bakım formundan kaldırılanlar',
+                          subtitle:
+                              'Geçici olarak bakım formundan kaldırılanlar',
                           count: inactive.length,
                           icon: Icons.block_rounded,
                           tone: _SectionTone.inactive,
@@ -475,7 +490,10 @@ class _ProtocolHeader extends StatelessWidget {
                       color: colors.onPrimary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Icon(Icons.checklist_rounded, color: colors.onPrimary),
+                    child: Icon(
+                      Icons.checklist_rounded,
+                      color: colors.onPrimary,
+                    ),
                   ),
                   const Spacer(),
                   _CountBadge(label: 'Toplam', value: totalCount),
@@ -534,9 +552,9 @@ class _CountBadge extends StatelessWidget {
       child: Text(
         '$value $label',
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: colors.onPrimary,
-              fontWeight: FontWeight.w900,
-            ),
+          color: colors.onPrimary,
+          fontWeight: FontWeight.w900,
+        ),
       ),
     );
   }
@@ -564,17 +582,17 @@ class _HeaderChip extends StatelessWidget {
           Text(
             '$value',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: AppColors.accentGold,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: AppColors.accentGold,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(width: 7),
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.onPrimary.withValues(alpha: 0.72),
-                  fontWeight: FontWeight.w800,
-                ),
+              color: colors.onPrimary.withValues(alpha: 0.72),
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),
@@ -667,7 +685,9 @@ class _SummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.28)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.28),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.05),
@@ -695,18 +715,18 @@ class _SummaryCard extends StatelessWidget {
                 Text(
                   value,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                      ),
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   label,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ],
             ),
@@ -745,7 +765,9 @@ class _ChecklistSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final accent = tone == _SectionTone.active ? colors.success : colors.outline;
+    final accent = tone == _SectionTone.active
+        ? colors.success
+        : colors.outline;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -769,17 +791,17 @@ class _ChecklistSection extends StatelessWidget {
                   Text(
                     title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: colors.onSurface,
-                          fontWeight: FontWeight.w900,
-                        ),
+                      color: colors.onSurface,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
@@ -793,9 +815,9 @@ class _ChecklistSection extends StatelessWidget {
               child: Text(
                 '$count',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: accent,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  color: accent,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
           ],
@@ -805,7 +827,8 @@ class _ChecklistSection extends StatelessWidget {
           builder: (context, constraints) {
             final columns = constraints.maxWidth >= 760 ? 2 : 1;
             final spacing = AppSpacing.md;
-            final width = (constraints.maxWidth - spacing * (columns - 1)) / columns;
+            final width =
+                (constraints.maxWidth - spacing * (columns - 1)) / columns;
 
             return Wrap(
               spacing: spacing,
@@ -918,12 +941,15 @@ class _ChecklistCard extends StatelessWidget {
                         children: [
                           Text(
                             item.label,
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                  color:
-                                      muted ? colors.onSurfaceVariant : colors.onSurface,
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(
+                                  color: muted
+                                      ? colors.onSurfaceVariant
+                                      : colors.onSurface,
                                   fontWeight: FontWeight.w900,
-                                  decoration:
-                                      muted ? TextDecoration.lineThrough : null,
+                                  decoration: muted
+                                      ? TextDecoration.lineThrough
+                                      : null,
                                 ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -931,8 +957,11 @@ class _ChecklistCard extends StatelessWidget {
                           const SizedBox(height: 5),
                           Text(
                             item.isActive ? 'Aktif protokol' : 'Pasif protokol',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: muted ? colors.outline : AppColors.accentGold,
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
+                                  color: muted
+                                      ? colors.outline
+                                      : AppColors.accentGold,
                                   fontWeight: FontWeight.w900,
                                 ),
                           ),
@@ -953,10 +982,10 @@ class _ChecklistCard extends StatelessWidget {
                       ? 'Bu kalem için açıklama girilmemiş.'
                       : item.description,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: muted ? colors.outline : colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                        height: 1.45,
-                      ),
+                    color: muted ? colors.outline : colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    height: 1.45,
+                  ),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -1037,7 +1066,9 @@ class _EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.28)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.28),
+        ),
       ),
       child: Column(
         children: [
@@ -1048,24 +1079,28 @@ class _EmptyState extends StatelessWidget {
               color: colors.primaryFixed.withValues(alpha: 0.72),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.playlist_add_rounded, color: colors.primaryDark, size: 38),
+            child: Icon(
+              Icons.playlist_add_rounded,
+              color: colors.primaryDark,
+              size: 38,
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
             'Henüz kontrol kalemi yok',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: colors.onSurface,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: colors.onSurface,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             'Bakım formlarında kullanılacak ilk kontrol adımını ekleyin.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
           FilledButton.icon(
@@ -1104,7 +1139,9 @@ class _ErrorState extends StatelessWidget {
           decoration: BoxDecoration(
             color: colors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.28)),
+            border: Border.all(
+              color: colors.outlineVariant.withValues(alpha: 0.28),
+            ),
           ),
           child: Column(
             children: [
@@ -1113,18 +1150,18 @@ class _ErrorState extends StatelessWidget {
               Text(
                 'Kontrol listesi yüklenemedi',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: colors.onSurface,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 message,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: AppSpacing.lg),
               OutlinedButton.icon(

@@ -111,9 +111,9 @@ class ElevatorActionCard extends StatelessWidget {
                 child: Text(
                   label,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: labelColor,
-                      ),
+                    fontWeight: FontWeight.w800,
+                    color: labelColor,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

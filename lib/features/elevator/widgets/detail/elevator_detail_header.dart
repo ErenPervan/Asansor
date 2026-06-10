@@ -18,7 +18,9 @@ class ElevatorDetailHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.45),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.06),
@@ -237,7 +239,9 @@ class DetailStatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.55)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.55),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.onSurface.withValues(alpha: 0.08),
@@ -258,9 +262,9 @@ class DetailStatusBadge extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.onSurface,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: colors.onSurface,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),

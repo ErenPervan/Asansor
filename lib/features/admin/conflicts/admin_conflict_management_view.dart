@@ -30,9 +30,9 @@ class AdminConflictManagementView extends ConsumerWidget {
         title: Text(
           'Veri Çakışmaları',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: colors.primaryDark,
-                fontWeight: FontWeight.w900,
-              ),
+            color: colors.primaryDark,
+            fontWeight: FontWeight.w900,
+          ),
         ),
         actions: [
           IconButton(
@@ -223,9 +223,9 @@ class _HeroBadge extends StatelessWidget {
           Text(
             hasConflicts ? '$conflictCount Bekleyen' : 'Senkronize',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.onPrimary,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: colors.onPrimary,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -275,17 +275,17 @@ class _StatusPanel extends StatelessWidget {
                 Text(
                   'Senkronizasyon duraklatıldı',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w900,
-                      ),
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   '$conflictCount kayıt manuel karar bekliyor.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),
@@ -293,9 +293,9 @@ class _StatusPanel extends StatelessWidget {
           Text(
             '$conflictCount',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: colors.error,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: colors.error,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -331,7 +331,9 @@ class _ConflictCard extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: colors.outlineVariant.withValues(alpha: 0.3),
+            ),
             boxShadow: [
               BoxShadow(
                 color: colors.primary.withValues(alpha: 0.06),
@@ -378,10 +380,7 @@ class _ConflictCard extends ConsumerWidget {
                       spacing: AppSpacing.md,
                       runSpacing: AppSpacing.xs,
                       children: [
-                        _MetaItem(
-                          icon: Icons.person_rounded,
-                          label: techName,
-                        ),
+                        _MetaItem(icon: Icons.person_rounded, label: techName),
                         _MetaItem(
                           icon: Icons.schedule_rounded,
                           label: _formatDate(report.createdAt),
@@ -447,9 +446,9 @@ class _MetaItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
-              ),
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ],
     );
@@ -469,15 +468,17 @@ class _SeverityBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
-        color: critical ? colors.errorContainer : AppColors.accentGold.withValues(alpha: 0.13),
+        color: critical
+            ? colors.errorContainer
+            : AppColors.accentGold.withValues(alpha: 0.13),
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
       ),
       child: Text(
         critical ? 'Kritik' : 'Orta',
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: critical ? colors.onErrorContainer : colors.warning,
-              fontWeight: FontWeight.w900,
-            ),
+          color: critical ? colors.onErrorContainer : colors.warning,
+          fontWeight: FontWeight.w900,
+        ),
       ),
     );
   }
@@ -496,7 +497,9 @@ class _EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.28)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.28),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.04),
@@ -524,18 +527,18 @@ class _EmptyState extends StatelessWidget {
           Text(
             'Tüm veriler senkronize',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: colors.onSurface,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: colors.onSurface,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             'Bekleyen herhangi bir veri çakışması bulunmuyor.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),

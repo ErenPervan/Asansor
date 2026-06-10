@@ -90,8 +90,8 @@ class _HealthScoreCard extends StatelessWidget {
     final scoreColor = score < 75
         ? colors.error
         : score < 90
-            ? colors.warning
-            : colors.primaryDark;
+        ? colors.warning
+        : colors.primaryDark;
 
     return _PremiumPanel(
       child: Column(
@@ -201,7 +201,8 @@ class _MonitorStatsColumn extends StatelessWidget {
             value: latestFaultAsync.when(
               loading: () => 'Yükleniyor',
               error: (_, _) => 'Yüklenemedi',
-              data: (dt) => dt == null ? 'Arıza kaydı yok' : _fmtDateCompact(dt),
+              data: (dt) =>
+                  dt == null ? 'Arıza kaydı yok' : _fmtDateCompact(dt),
             ),
           ),
         ),
@@ -338,9 +339,9 @@ class SystemStatusIndicator extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: colors.onSurface,
-              ),
+            fontWeight: FontWeight.w700,
+            color: colors.onSurface,
+          ),
         ),
       ],
     );
@@ -374,17 +375,17 @@ class SystemStatChip extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: colors.outline,
-                ),
+              fontWeight: FontWeight.w800,
+              color: colors.outline,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: valueColor,
-                ),
+              fontWeight: FontWeight.w900,
+              color: valueColor,
+            ),
           ),
         ],
       ),
@@ -410,7 +411,9 @@ class _PremiumPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.45),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.04),

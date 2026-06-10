@@ -276,15 +276,13 @@ class _AdminMapViewState extends ConsumerState<AdminMapView> {
 
   int _todayMaintenanceCount(AsyncValue<List<ScheduleModel>> schedules) {
     final today = DateTime.now();
-    return schedules.valueOrNull
-            ?.where((s) {
-              final d = s.scheduledDate.toLocal();
-              return s.status == ScheduleStatus.pending &&
-                  d.year == today.year &&
-                  d.month == today.month &&
-                  d.day == today.day;
-            })
-            .length ??
+    return schedules.valueOrNull?.where((s) {
+          final d = s.scheduledDate.toLocal();
+          return s.status == ScheduleStatus.pending &&
+              d.year == today.year &&
+              d.month == today.month &&
+              d.day == today.day;
+        }).length ??
         0;
   }
 
@@ -712,7 +710,11 @@ class _ElevatorSheet extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final (statusLabel, statusColor, statusIcon) = switch (status) {
-      _MarkerStatus.fault => ('Aktif Arıza', _colorFault, Icons.warning_rounded),
+      _MarkerStatus.fault => (
+        'Aktif Arıza',
+        _colorFault,
+        Icons.warning_rounded,
+      ),
       _MarkerStatus.maintenance => (
         'Bugün Bakım',
         _colorMaintenance,

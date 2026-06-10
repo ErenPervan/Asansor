@@ -117,10 +117,8 @@ class _TechnicianWorkspace extends StatelessWidget {
                       for (var i = 0; i < stats.length; i++) ...[
                         _TechnicianRowCard(
                           stats: stats[i],
-                          onOpenTasks: () => _showDetailSheet(
-                            context,
-                            stats[i],
-                          ),
+                          onOpenTasks: () =>
+                              _showDetailSheet(context, stats[i]),
                         ),
                         if (i != stats.length - 1)
                           const SizedBox(height: AppSpacing.md),
@@ -552,11 +550,7 @@ class _TechnicianStatusChips extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: [
-        _ChipPill(
-          icon: Icons.circle,
-          label: statusLabel,
-          color: statusColor,
-        ),
+        _ChipPill(icon: Icons.circle, label: statusLabel, color: statusColor),
         _ChipPill(
           icon: Icons.assignment_rounded,
           label: 'Bugün $todayTotal görev',
@@ -709,7 +703,9 @@ class _TechnicianActions extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: colors.primary,
             side: BorderSide(color: colors.primary, width: 1.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             minimumSize: const Size(96, 40),
           ),
           child: Text(

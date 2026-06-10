@@ -259,7 +259,9 @@ class _LoginPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.35),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.06),

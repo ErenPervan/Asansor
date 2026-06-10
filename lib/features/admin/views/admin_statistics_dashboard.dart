@@ -39,9 +39,9 @@ class _AdminStatisticsDashboardState
         title: Text(
           'İstatistikler',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: colors.primaryDark,
-                fontWeight: FontWeight.w900,
-              ),
+            color: colors.primaryDark,
+            fontWeight: FontWeight.w900,
+          ),
         ),
         actions: [
           IconButton(
@@ -133,7 +133,9 @@ class _Header extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final totalWork =
-        data.activeFaults + data.pendingMaintenances + data.completedMaintenancesThisMonth;
+        data.activeFaults +
+        data.pendingMaintenances +
+        data.completedMaintenancesThisMonth;
 
     return Container(
       width: double.infinity,
@@ -188,7 +190,10 @@ class _Header extends StatelessWidget {
                       color: colors.onPrimary.withValues(alpha: 0.13),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Icon(Icons.query_stats_rounded, color: colors.onPrimary),
+                    child: Icon(
+                      Icons.query_stats_rounded,
+                      color: colors.onPrimary,
+                    ),
                   ),
                   const Spacer(),
                   _LiveBadge(),
@@ -217,8 +222,14 @@ class _Header extends StatelessWidget {
                 runSpacing: AppSpacing.sm,
                 children: [
                   _HeaderMetric(label: 'Toplam İş', value: '$totalWork'),
-                  _HeaderMetric(label: 'Asansör', value: '${data.totalElevators}'),
-                  _HeaderMetric(label: 'Bekleyen', value: '${data.pendingMaintenances}'),
+                  _HeaderMetric(
+                    label: 'Asansör',
+                    value: '${data.totalElevators}',
+                  ),
+                  _HeaderMetric(
+                    label: 'Bekleyen',
+                    value: '${data.pendingMaintenances}',
+                  ),
                 ],
               ),
             ],
@@ -256,9 +267,9 @@ class _LiveBadge extends StatelessWidget {
           Text(
             'Canlı',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.onPrimary,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: colors.onPrimary,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -288,17 +299,17 @@ class _HeaderMetric extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: AppColors.accentGold,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: AppColors.accentGold,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(width: 7),
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.onPrimary.withValues(alpha: 0.72),
-                  fontWeight: FontWeight.w800,
-                ),
+              color: colors.onPrimary.withValues(alpha: 0.72),
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),
@@ -423,10 +434,13 @@ class _KpiCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final isDark = tone == _KpiTone.navy;
     final accent = _accentColor(tone, colors);
-    final panelColor = isDark ? colors.primaryDark : colors.surfaceContainerLowest;
+    final panelColor = isDark
+        ? colors.primaryDark
+        : colors.surfaceContainerLowest;
     final textColor = isDark ? colors.onPrimary : colors.onSurface;
-    final mutedColor =
-        isDark ? colors.onPrimary.withValues(alpha: 0.7) : colors.onSurfaceVariant;
+    final mutedColor = isDark
+        ? colors.onPrimary.withValues(alpha: 0.7)
+        : colors.onSurfaceVariant;
 
     return Container(
       constraints: const BoxConstraints(minHeight: 166),
@@ -477,16 +491,24 @@ class _KpiCard extends StatelessWidget {
                           : accent.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Icon(icon, color: isDark ? colors.onPrimary : accent),
+                    child: Icon(
+                      icon,
+                      color: isDark ? colors.onPrimary : accent,
+                    ),
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: isDark
                           ? colors.onPrimary.withValues(alpha: 0.12)
                           : colors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusFull,
+                      ),
                     ),
                     child: Text(
                       group,
@@ -634,15 +656,13 @@ class _TrendChartCard extends StatelessWidget {
                       return BarTooltipItem(
                         '${item.month}\n',
                         Theme.of(context).textTheme.labelSmall!.copyWith(
-                              color: colors.surface.withValues(alpha: 0.7),
-                              fontWeight: FontWeight.w700,
-                            ),
+                          color: colors.surface.withValues(alpha: 0.7),
+                          fontWeight: FontWeight.w700,
+                        ),
                         children: [
                           TextSpan(
                             text: '${rod.toY.toInt()} arıza',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
+                            style: Theme.of(context).textTheme.titleSmall
                                 ?.copyWith(
                                   color: colors.surface,
                                   fontWeight: FontWeight.w900,
@@ -667,7 +687,8 @@ class _TrendChartCard extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 10),
                           child: Text(
                             monthlyFaults[i].month,
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
                                   color: colors.onSurfaceVariant,
                                   fontWeight: FontWeight.w800,
                                 ),
@@ -685,7 +706,8 @@ class _TrendChartCard extends StatelessWidget {
                         if (value == 0) return const SizedBox.shrink();
                         return Text(
                           value.toInt().toString(),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
                                 color: colors.outline,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -792,7 +814,9 @@ class _PieChartCard extends StatelessWidget {
                           if (response != null &&
                               response.touchedSection != null &&
                               event.isInterestedForInteractions) {
-                            onTouch(response.touchedSection!.touchedSectionIndex);
+                            onTouch(
+                              response.touchedSection!.touchedSectionIndex,
+                            );
                           } else if (!event.isInterestedForInteractions) {
                             onTouch(-1);
                           }
@@ -822,7 +846,8 @@ class _PieChartCard extends StatelessWidget {
                     children: [
                       Text(
                         '${selected.percent.toInt()}%',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(
                               color: colors.onSurface,
                               fontWeight: FontWeight.w900,
                             ),
@@ -830,9 +855,9 @@ class _PieChartCard extends StatelessWidget {
                       Text(
                         selected.label,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: colors.onSurfaceVariant,
-                              fontWeight: FontWeight.w800,
-                            ),
+                          color: colors.onSurfaceVariant,
+                          fontWeight: FontWeight.w800,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -854,7 +879,10 @@ class _PieChartCard extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 9,
+                  ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? slice.color.withValues(alpha: 0.09)
@@ -875,10 +903,12 @@ class _PieChartCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           slice.label,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
                                 color: colors.onSurface,
-                                fontWeight:
-                                    isSelected ? FontWeight.w900 : FontWeight.w700,
+                                fontWeight: isSelected
+                                    ? FontWeight.w900
+                                    : FontWeight.w700,
                               ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -886,8 +916,11 @@ class _PieChartCard extends StatelessWidget {
                       ),
                       Text(
                         '${slice.percent.toInt()}%',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: isSelected ? slice.color : colors.onSurfaceVariant,
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: isSelected
+                                  ? slice.color
+                                  : colors.onSurfaceVariant,
                               fontWeight: FontWeight.w900,
                             ),
                       ),
@@ -915,10 +948,11 @@ class _ActionStrip extends StatelessWidget {
         final columns = constraints.maxWidth >= 900
             ? 6
             : constraints.maxWidth >= 620
-                ? 3
-                : 2;
+            ? 3
+            : 2;
         final spacing = AppSpacing.md;
-        final width = (constraints.maxWidth - spacing * (columns - 1)) / columns;
+        final width =
+            (constraints.maxWidth - spacing * (columns - 1)) / columns;
         final actions = [
           _ActionItem(
             label: 'Arızalar',
@@ -1000,7 +1034,9 @@ class _ActionCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: colors.outlineVariant.withValues(alpha: 0.3),
+            ),
             boxShadow: [
               BoxShadow(
                 color: colors.primary.withValues(alpha: 0.04),
@@ -1017,9 +1053,9 @@ class _ActionCard extends StatelessWidget {
               Text(
                 action.label,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: colors.onSurface,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w900,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -1065,17 +1101,17 @@ class _PanelHeader extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: colors.onSurface,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
@@ -1101,7 +1137,9 @@ class _PremiumPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.28)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.28),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.06),

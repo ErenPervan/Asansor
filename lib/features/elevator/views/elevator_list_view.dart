@@ -117,14 +117,17 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
         title: Text(
           'ElevatePro',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: colors.primaryDark,
-                fontWeight: FontWeight.w800,
-              ),
+            color: colors.primaryDark,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_none_rounded, color: colors.primaryDark),
+            icon: Icon(
+              Icons.notifications_none_rounded,
+              color: colors.primaryDark,
+            ),
             tooltip: 'Bildirimler',
             onPressed: () {},
           ),
@@ -196,26 +199,25 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                           return SliverGrid(
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: AppSpacing.md,
-                              mainAxisSpacing: AppSpacing.md,
-                              mainAxisExtent: 174,
-                            ),
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final elevator = items[index];
-                                return FadeInSlide(
-                                  index: index,
-                                  child: _ElevatorFleetCard(
-                                    elevator: elevator,
-                                    onTap: () => context.push(
-                                      '/elevator/${elevator.id}',
-                                    ),
-                                  ),
-                                );
-                              },
-                              childCount: items.length,
-                            ),
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: AppSpacing.md,
+                                  mainAxisSpacing: AppSpacing.md,
+                                  mainAxisExtent: 174,
+                                ),
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              final elevator = items[index];
+                              return FadeInSlide(
+                                index: index,
+                                child: _ElevatorFleetCard(
+                                  elevator: elevator,
+                                  onTap: () =>
+                                      context.push('/elevator/${elevator.id}'),
+                                ),
+                              );
+                            }, childCount: items.length),
                           );
                         }
 
@@ -229,9 +231,8 @@ class _ElevatorListViewState extends ConsumerState<ElevatorListView> {
                               index: index,
                               child: _ElevatorFleetCard(
                                 elevator: elevator,
-                                onTap: () => context.push(
-                                  '/elevator/${elevator.id}',
-                                ),
+                                onTap: () =>
+                                    context.push('/elevator/${elevator.id}'),
                               ),
                             );
                           },
@@ -401,7 +402,11 @@ class _StatusFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final filters = <({String label, ElevatorStatus? status, int count})>[
-      (label: 'Tümü', status: null, count: counts.values.fold(0, (a, b) => a + b)),
+      (
+        label: 'Tümü',
+        status: null,
+        count: counts.values.fold(0, (a, b) => a + b),
+      ),
       (
         label: 'Aktif',
         status: ElevatorStatus.active,
@@ -493,10 +498,11 @@ class _StatusFilterChip extends StatelessWidget {
               Text(
                 '$label ($count)',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color:
-                          isSelected ? colors.onPrimary : colors.onSurfaceVariant,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  color: isSelected
+                      ? colors.onPrimary
+                      : colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ],
           ),
@@ -704,9 +710,9 @@ class _StatusPill extends StatelessWidget {
           Text(
             style.label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: style.fg,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: style.fg,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),
@@ -731,9 +737,9 @@ class _FleetMeta extends StatelessWidget {
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colors.outline,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: colors.outline,
+              fontWeight: FontWeight.w600,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

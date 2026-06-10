@@ -36,9 +36,9 @@ class AdminDashboardView extends ConsumerWidget {
               child: Text(
                 'Asansor',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: colors.primaryDark,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  color: colors.primaryDark,
+                  fontWeight: FontWeight.w900,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -54,7 +54,7 @@ class AdminDashboardView extends ConsumerWidget {
 
               return TextButton(
                 onPressed: () {},
-            child: const Text('Operasyon Yönetimi'),
+                child: const Text('Operasyon Yönetimi'),
               );
             },
           ),
@@ -135,9 +135,9 @@ class AdminDashboardView extends ConsumerWidget {
         label: Text(
           'Görev Ata',
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: colors.onPrimary,
-                fontWeight: FontWeight.w800,
-              ),
+            color: colors.onPrimary,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
     );
@@ -217,9 +217,9 @@ class _LiveChip extends StatelessWidget {
           Text(
             isWarning ? '$conflictCount Çakışma' : 'Canlı',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: isWarning ? colors.warning : colors.success,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: isWarning ? colors.warning : colors.success,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -245,7 +245,9 @@ class _ConflictStrip extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.accentGold.withValues(alpha: 0.16),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.accentGold.withValues(alpha: 0.28)),
+          border: Border.all(
+            color: AppColors.accentGold.withValues(alpha: 0.28),
+          ),
         ),
         child: Row(
           children: [
@@ -255,9 +257,9 @@ class _ConflictStrip extends StatelessWidget {
               child: Text(
                 '$count veri çakışması çözüm bekliyor.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colors.onSurface,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
             Icon(Icons.arrow_forward_rounded, color: colors.warning),
@@ -310,7 +312,8 @@ class _KpiSection extends StatelessWidget {
               children: [
                 for (var i = 0; i < cards.length; i++) ...[
                   Expanded(child: cards[i]),
-                  if (i < cards.length - 1) const SizedBox(width: AppSpacing.md),
+                  if (i < cards.length - 1)
+                    const SizedBox(width: AppSpacing.md),
                 ],
               ],
             );
@@ -447,18 +450,24 @@ class _KpiCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: isCritical
                           ? colors.errorContainer.withValues(alpha: 0.72)
                           : colors.surfaceContainer,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusFull,
+                      ),
                     ),
                     child: Text(
                       caption,
                       style: textTheme.labelSmall?.copyWith(
-                        color: isCritical ? colors.error : colors.onSurfaceVariant,
+                        color: isCritical
+                            ? colors.error
+                            : colors.onSurfaceVariant,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -565,10 +574,7 @@ class _ActionBentoGrid extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
-              SizedBox(
-                width: 360,
-                child: _MapActionCard(onTap: onMap),
-              ),
+              SizedBox(width: 360, child: _MapActionCard(onTap: onMap)),
             ],
           );
         }
@@ -672,9 +678,9 @@ class _HeroActionCard extends StatelessWidget {
             Text(
               title,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: fg,
-                    fontWeight: FontWeight.w900,
-                  ),
+                color: fg,
+                fontWeight: FontWeight.w900,
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -682,9 +688,9 @@ class _HeroActionCard extends StatelessWidget {
             Text(
               subtitle,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: fg.withValues(alpha: 0.78),
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: fg.withValues(alpha: 0.78),
+                fontWeight: FontWeight.w700,
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -746,14 +752,15 @@ class _MapActionCard extends StatelessWidget {
                       Text(
                         'Harita',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: colors.onPrimary,
-                              fontWeight: FontWeight.w900,
-                            ),
+                          color: colors.onPrimary,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Canlı saha takibi',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
                               color: colors.onPrimary.withValues(alpha: 0.78),
                               fontWeight: FontWeight.w700,
                             ),
@@ -791,7 +798,8 @@ class _MiniActionGrid extends StatelessWidget {
       builder: (context, constraints) {
         final columns = constraints.maxWidth >= 720 ? 3 : 2;
         final spacing = AppSpacing.md;
-        final width = (constraints.maxWidth - spacing * (columns - 1)) / columns;
+        final width =
+            (constraints.maxWidth - spacing * (columns - 1)) / columns;
 
         return Wrap(
           spacing: spacing,
@@ -800,10 +808,7 @@ class _MiniActionGrid extends StatelessWidget {
             for (var i = 0; i < actions.length; i++)
               SizedBox(
                 width: width,
-                child: _MiniActionCard(
-                  action: actions[i],
-                  onTap: callbacks[i],
-                ),
+                child: _MiniActionCard(action: actions[i], onTap: callbacks[i]),
               ),
           ],
         );
@@ -837,9 +842,9 @@ class _MiniActionCard extends StatelessWidget {
             Text(
               action.title,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w900,
-                  ),
+                color: colors.onSurface,
+                fontWeight: FontWeight.w900,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -879,9 +884,7 @@ class _PressablePanel extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: borderColor ?? Colors.transparent,
-            ),
+            border: Border.all(color: borderColor ?? Colors.transparent),
             boxShadow: [
               BoxShadow(
                 color: colors.primary.withValues(alpha: 0.06),
@@ -913,7 +916,9 @@ class _SchedulesPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.28)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.28),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.04),
@@ -931,9 +936,9 @@ class _SchedulesPanel extends StatelessWidget {
                 child: Text(
                   'Güncel Görevler',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w900,
-                      ),
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
               Icon(Icons.event_note_rounded, color: colors.secondary),
@@ -957,7 +962,9 @@ class _SchedulesPanel extends StatelessWidget {
                       elevator: _findElevator(visible[i].elevatorId, elevators),
                     ),
                     if (i < visible.length - 1)
-                      Divider(color: colors.outlineVariant.withValues(alpha: 0.35)),
+                      Divider(
+                        color: colors.outlineVariant.withValues(alpha: 0.35),
+                      ),
                   ],
                 ],
               );
@@ -988,7 +995,10 @@ class _ScheduleRow extends StatelessWidget {
           Container(
             width: 10,
             height: 10,
-            decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: statusColor,
+              shape: BoxShape.circle,
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -1053,9 +1063,9 @@ class _EmptyTasks extends StatelessWidget {
         'Henüz atanmış görev bulunmuyor.',
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: colors.onSurfaceVariant,
-              fontWeight: FontWeight.w700,
-            ),
+          color: colors.onSurfaceVariant,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -1079,9 +1089,9 @@ class _ErrorPanel extends StatelessWidget {
       child: Text(
         message.replaceFirst('Exception: ', ''),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: colors.onErrorContainer,
-              fontWeight: FontWeight.w700,
-            ),
+          color: colors.onErrorContainer,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -1101,15 +1111,16 @@ class _LoadingBlock extends StatelessWidget {
         color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(22),
       ),
-      child: Center(
-        child: CircularProgressIndicator(color: colors.primary),
-      ),
+      child: Center(child: CircularProgressIndicator(color: colors.primary)),
     );
   }
 }
 
 class _MapPatternPainter extends CustomPainter {
-  const _MapPatternPainter({required this.lineColor, required this.markerColor});
+  const _MapPatternPainter({
+    required this.lineColor,
+    required this.markerColor,
+  });
 
   final Color lineColor;
   final Color markerColor;
@@ -1135,7 +1146,11 @@ class _MapPatternPainter extends CustomPainter {
       Offset(size.width * 0.68, size.height * 0.64),
     ];
     for (final marker in markers) {
-      canvas.drawCircle(marker, 9, Paint()..color = markerColor.withValues(alpha: 0.22));
+      canvas.drawCircle(
+        marker,
+        9,
+        Paint()..color = markerColor.withValues(alpha: 0.22),
+      );
       canvas.drawCircle(marker, 4.5, Paint()..color = markerColor);
     }
   }

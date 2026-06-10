@@ -90,9 +90,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
         title: Text(
           'Asansor',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: colors.primaryDark,
-                fontWeight: FontWeight.w800,
-              ),
+            color: colors.primaryDark,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         centerTitle: true,
         actions: [
@@ -102,9 +102,9 @@ class _FaultDetailScaffoldState extends ConsumerState<_FaultDetailScaffold> {
               child: Text(
                 'Operasyon',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           ),
@@ -341,8 +341,8 @@ class _FaultTitleBlock extends StatelessWidget {
                 fault.isResolved
                     ? 'Çözülmüş Arıza Kaydı'
                     : critical
-                        ? 'Kritik Arıza Bildirimi'
-                        : 'Açık Arıza Bildirimi',
+                    ? 'Kritik Arıza Bildirimi'
+                    : 'Açık Arıza Bildirimi',
                 style: textTheme.labelSmall?.copyWith(
                   color: fault.isResolved
                       ? colors.success
@@ -355,7 +355,9 @@ class _FaultTitleBlock extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          fault.faultType?.isNotEmpty == true ? fault.faultType! : 'Arıza Detayı',
+          fault.faultType?.isNotEmpty == true
+              ? fault.faultType!
+              : 'Arıza Detayı',
           style: textTheme.headlineSmall?.copyWith(
             color: colors.onSurface,
             fontWeight: FontWeight.w900,
@@ -381,10 +383,7 @@ class _FaultTitleBlock extends StatelessWidget {
 }
 
 class _MainFaultColumn extends StatelessWidget {
-  const _MainFaultColumn({
-    required this.fault,
-    required this.notesController,
-  });
+  const _MainFaultColumn({required this.fault, required this.notesController});
 
   final FaultReportModel fault;
   final TextEditingController notesController;
@@ -418,10 +417,10 @@ class _MainFaultColumn extends StatelessWidget {
                       ? fault.description
                       : 'Açıklama girilmedi.',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: colors.onSurface,
-                        height: 1.55,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: colors.onSurface,
+                    height: 1.55,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -444,10 +443,10 @@ class _MainFaultColumn extends StatelessWidget {
                       ? fault.resolutionNotes!
                       : 'Çözüm notu girilmedi.',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: colors.onSurface,
-                        height: 1.5,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: colors.onSurface,
+                    height: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
                 )
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -455,9 +454,9 @@ class _MainFaultColumn extends StatelessWidget {
                     Text(
                       'Müdahale detaylarını ve değiştirilen parçaları buraya giriniz.',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: colors.onSurfaceVariant,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: colors.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     TextField(
@@ -597,10 +596,7 @@ class _DateBlock extends StatelessWidget {
 }
 
 class _ElevatorSidePanel extends StatelessWidget {
-  const _ElevatorSidePanel({
-    required this.fault,
-    required this.elevatorAsync,
-  });
+  const _ElevatorSidePanel({required this.fault, required this.elevatorAsync});
 
   final FaultReportModel fault;
   final AsyncValue<ElevatorModel> elevatorAsync;
@@ -613,10 +609,8 @@ class _ElevatorSidePanel extends StatelessWidget {
       child: elevatorAsync.when(
         loading: () => const LoadingState(isList: false),
         error: (_, _) => const _ElevatorErrorContent(),
-        data: (elevator) => _ElevatorInfoContent(
-          elevator: elevator,
-          fault: fault,
-        ),
+        data: (elevator) =>
+            _ElevatorInfoContent(elevator: elevator, fault: fault),
       ),
     );
   }
@@ -646,10 +640,11 @@ class _ElevatorInfoContent extends StatelessWidget {
         _InfoLine(
           icon: Icons.precision_manufacturing_outlined,
           label: 'Model / Kapasite',
-          value: [
-            if (elevator.model?.isNotEmpty == true) elevator.model!,
-            if (elevator.capacity != null) '${elevator.capacity} kg',
-          ].isEmpty
+          value:
+              [
+                if (elevator.model?.isNotEmpty == true) elevator.model!,
+                if (elevator.capacity != null) '${elevator.capacity} kg',
+              ].isEmpty
               ? 'Belirtilmedi'
               : [
                   if (elevator.model?.isNotEmpty == true) elevator.model!,
@@ -802,7 +797,9 @@ class _FaultActionBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: colors.surface.withValues(alpha: 0.92),
           border: Border(
-            top: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.35)),
+            top: BorderSide(
+              color: colors.outlineVariant.withValues(alpha: 0.35),
+            ),
           ),
         ),
         child: Center(
@@ -815,16 +812,14 @@ class _FaultActionBar extends StatelessWidget {
                     onPressed: isLoading
                         ? null
                         : fault.isResolved
-                            ? onReopen
-                            : () => context.pop(),
+                        ? onReopen
+                        : () => context.pop(),
                     icon: Icon(
                       fault.isResolved
                           ? Icons.refresh_rounded
                           : Icons.arrow_back_rounded,
                     ),
-                    label: Text(
-                      fault.isResolved ? 'Yeniden Aç' : 'Geri Dön',
-                    ),
+                    label: Text(fault.isResolved ? 'Yeniden Aç' : 'Geri Dön'),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(0, 52),
                       foregroundColor: colors.onSurface,
@@ -851,7 +846,9 @@ class _FaultActionBar extends StatelessWidget {
                               ),
                             )
                           : const Icon(Icons.check_circle_outline_rounded),
-                      label: Text(isLoading ? 'Kaydediliyor...' : 'Onarıldı İşaretle'),
+                      label: Text(
+                        isLoading ? 'Kaydediliyor...' : 'Onarıldı İşaretle',
+                      ),
                       style: FilledButton.styleFrom(
                         minimumSize: const Size(0, 52),
                         backgroundColor: colors.primaryDark,
@@ -896,7 +893,9 @@ class _PremiumPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.32)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.32),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.06),
@@ -928,8 +927,9 @@ class _PremiumPanel extends StatelessWidget {
                           width: 34,
                           height: 34,
                           decoration: BoxDecoration(
-                            color: (iconColor ?? colors.primaryDark)
-                                .withValues(alpha: 0.1),
+                            color: (iconColor ?? colors.primaryDark).withValues(
+                              alpha: 0.1,
+                            ),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -988,9 +988,9 @@ class _FaultShell extends StatelessWidget {
         title: Text(
           title,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: colors.onSurface,
-              ),
+            fontWeight: FontWeight.w800,
+            color: colors.onSurface,
+          ),
         ),
       ),
       body: Center(
@@ -1021,16 +1021,16 @@ class _FaultLoadError extends StatelessWidget {
         Text(
           'Arıza yüklenemedi',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: colors.onSurface,
-                fontWeight: FontWeight.w800,
-              ),
+            color: colors.onSurface,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           error,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.lg),
@@ -1054,9 +1054,9 @@ class _ElevatorErrorContent extends StatelessWidget {
           child: Text(
             'Asansör bilgisi yüklenemedi',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.outline,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: colors.outline,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],

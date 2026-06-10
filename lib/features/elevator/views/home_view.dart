@@ -89,7 +89,9 @@ class _HomeViewState extends State<HomeView> {
                     const SizedBox(height: AppSpacing.lg),
                     Consumer(
                       builder: (context, ref, _) {
-                        final profile = ref.watch(currentProfileProvider).valueOrNull;
+                        final profile = ref
+                            .watch(currentProfileProvider)
+                            .valueOrNull;
                         final canViewAdminStats =
                             profile?.can(AppCapability.viewAdminStats) ?? false;
 

@@ -647,10 +647,8 @@ class _MaintenanceSection extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: logs.length,
-                separatorBuilder: (_, _) => Divider(
-                  height: 1,
-                  color: colors.outlineVariant,
-                ),
+                separatorBuilder: (_, _) =>
+                    Divider(height: 1, color: colors.outlineVariant),
                 itemBuilder: (context, index) =>
                     _MaintenanceLogTile(log: logs[index]),
               ),

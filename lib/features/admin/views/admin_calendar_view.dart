@@ -104,9 +104,9 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
             Text(
               'Asansor',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: colors.primaryDark,
-                    fontWeight: FontWeight.w900,
-                  ),
+                color: colors.primaryDark,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ],
         ),
@@ -182,14 +182,15 @@ class _AdminCalendarViewState extends ConsumerState<AdminCalendarView> {
                               selectedEvents[i].technicianId,
                               techs,
                             ),
-                            onCancel: selectedEvents[i].status ==
+                            onCancel:
+                                selectedEvents[i].status ==
                                         ScheduleStatus.pending ||
                                     selectedEvents[i].status ==
                                         ScheduleStatus.inProgress
                                 ? () => _confirmCancel(
-                                      context,
-                                      selectedEvents[i].id,
-                                    )
+                                    context,
+                                    selectedEvents[i].id,
+                                  )
                                 : null,
                           ),
                           if (i < selectedEvents.length - 1)
@@ -261,7 +262,8 @@ class _CalendarPanel extends StatelessWidget {
   final DateTime focusedDay;
   final DateTime selectedDay;
   final List<ScheduleModel> allSchedules;
-  final List<ScheduleModel> Function(DateTime, List<ScheduleModel>) eventsForDay;
+  final List<ScheduleModel> Function(DateTime, List<ScheduleModel>)
+  eventsForDay;
   final void Function(DateTime selected, DateTime focused) onDaySelected;
   final ValueChanged<DateTime> onPageChanged;
 
@@ -275,7 +277,9 @@ class _CalendarPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.32)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.32),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.06),
@@ -309,19 +313,22 @@ class _CalendarPanel extends StatelessWidget {
             color: colors.onSurfaceVariant,
           ),
           titleTextFormatter: (date, locale) => _monthTitle(date),
-          titleTextStyle: textTheme.titleMedium?.copyWith(
+          titleTextStyle:
+              textTheme.titleMedium?.copyWith(
                 color: colors.onSurface,
                 fontWeight: FontWeight.w900,
               ) ??
               const TextStyle(),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
-          weekdayStyle: textTheme.labelSmall?.copyWith(
+          weekdayStyle:
+              textTheme.labelSmall?.copyWith(
                 color: colors.onSurfaceVariant,
                 fontWeight: FontWeight.w800,
               ) ??
               const TextStyle(),
-          weekendStyle: textTheme.labelSmall?.copyWith(
+          weekendStyle:
+              textTheme.labelSmall?.copyWith(
                 color: colors.error,
                 fontWeight: FontWeight.w800,
               ) ??
@@ -329,16 +336,19 @@ class _CalendarPanel extends StatelessWidget {
         ),
         calendarStyle: CalendarStyle(
           outsideDaysVisible: true,
-          outsideTextStyle: textTheme.bodyMedium?.copyWith(
+          outsideTextStyle:
+              textTheme.bodyMedium?.copyWith(
                 color: colors.onSurfaceVariant.withValues(alpha: 0.32),
               ) ??
               const TextStyle(),
-          weekendTextStyle: textTheme.bodyMedium?.copyWith(
+          weekendTextStyle:
+              textTheme.bodyMedium?.copyWith(
                 color: colors.error,
                 fontWeight: FontWeight.w600,
               ) ??
               const TextStyle(),
-          defaultTextStyle: textTheme.bodyMedium?.copyWith(
+          defaultTextStyle:
+              textTheme.bodyMedium?.copyWith(
                 color: colors.onSurface,
                 fontWeight: FontWeight.w600,
               ) ??
@@ -347,7 +357,8 @@ class _CalendarPanel extends StatelessWidget {
             color: colors.primaryFixed.withValues(alpha: 0.6),
             shape: BoxShape.circle,
           ),
-          todayTextStyle: textTheme.bodyMedium?.copyWith(
+          todayTextStyle:
+              textTheme.bodyMedium?.copyWith(
                 color: colors.primaryDark,
                 fontWeight: FontWeight.w900,
               ) ??
@@ -363,7 +374,8 @@ class _CalendarPanel extends StatelessWidget {
               ),
             ],
           ),
-          selectedTextStyle: textTheme.bodyMedium?.copyWith(
+          selectedTextStyle:
+              textTheme.bodyMedium?.copyWith(
                 color: colors.onPrimary,
                 fontWeight: FontWeight.w900,
               ) ??
@@ -421,9 +433,9 @@ class _SelectedDayHeader extends StatelessWidget {
             child: Text(
               _selectedDayTitle(selectedDay),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w900,
-                  ),
+                color: colors.onSurface,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ),
           Container(
@@ -435,9 +447,9 @@ class _SelectedDayHeader extends StatelessWidget {
             child: Text(
               '$count Görev',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: colors.onSurface,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         ],
@@ -469,7 +481,9 @@ class _TaskCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.32)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.32),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.06),
@@ -504,7 +518,9 @@ class _TaskCard extends StatelessWidget {
                     ),
                     child: Icon(
                       _buildingIcon(schedule),
-                      color: completed ? colors.onSurfaceVariant : colors.primary,
+                      color: completed
+                          ? colors.onSurfaceVariant
+                          : colors.primary,
                       size: 23,
                     ),
                   ),
@@ -515,13 +531,15 @@ class _TaskCard extends StatelessWidget {
                       children: [
                         Text(
                           elevator?.buildingName ?? 'Asansör',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
                                 color: completed
                                     ? colors.onSurfaceVariant
                                     : colors.onSurface,
                                 fontWeight: FontWeight.w900,
-                                decoration:
-                                    completed ? TextDecoration.lineThrough : null,
+                                decoration: completed
+                                    ? TextDecoration.lineThrough
+                                    : null,
                               ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -561,17 +579,21 @@ class _TaskCard extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
-                  Icon(Icons.schedule_rounded, color: colors.secondary, size: 19),
+                  Icon(
+                    Icons.schedule_rounded,
+                    color: colors.secondary,
+                    size: 19,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       _timeRange(schedule.scheduledDate),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: completed
-                                ? colors.onSurfaceVariant
-                                : colors.onSurface,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        color: completed
+                            ? colors.onSurfaceVariant
+                            : colors.onSurface,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   if (onCancel != null)
@@ -626,9 +648,9 @@ class _StatusBadge extends StatelessWidget {
           Text(
             _statusLabel(status),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: color,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -650,7 +672,9 @@ class _EmptyDayCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.32)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.32),
+        ),
       ),
       child: Column(
         children: [
@@ -663,17 +687,17 @@ class _EmptyDayCard extends StatelessWidget {
           Text(
             'Bu gün için görev yok.',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: colors.onSurface,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: colors.onSurface,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Yeni görev atamak için + butonunu kullanın.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.lg),

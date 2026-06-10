@@ -25,7 +25,9 @@ class AdminConflictDetailDialog extends ConsumerWidget {
           decoration: BoxDecoration(
             color: colors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.28)),
+            border: Border.all(
+              color: colors.outlineVariant.withValues(alpha: 0.28),
+            ),
             boxShadow: [
               BoxShadow(
                 color: colors.primary.withValues(alpha: 0.18),
@@ -227,17 +229,17 @@ class _PayloadPanel extends StatelessWidget {
                     Text(
                       title,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: colors.onSurface,
-                            fontWeight: FontWeight.w900,
-                          ),
+                        color: colors.onSurface,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: colors.onSurfaceVariant,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        color: colors.onSurfaceVariant,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
@@ -281,9 +283,9 @@ class _NoFields extends StatelessWidget {
       child: Text(
         'Gösterilecek alan yok',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: colors.onSurfaceVariant,
-              fontWeight: FontWeight.w700,
-            ),
+          color: colors.onSurfaceVariant,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -316,17 +318,17 @@ class _PayloadRow extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: accent,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: accent,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurface,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: colors.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -361,7 +363,9 @@ class _DialogActions extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(0, 50),
                 foregroundColor: colors.primaryDark,
-                side: BorderSide(color: colors.primaryDark.withValues(alpha: 0.28)),
+                side: BorderSide(
+                  color: colors.primaryDark.withValues(alpha: 0.28),
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -405,6 +409,5 @@ List<String> _displayKeys(ConflictReport report) {
   return <String>{
     ...report.localPayload.keys,
     ...report.remotePayload.keys,
-  }.where((key) => !excluded.contains(key)).toList()
-    ..sort();
+  }.where((key) => !excluded.contains(key)).toList()..sort();
 }

@@ -147,7 +147,9 @@ class _MaintenanceLogEntryViewState
     );
     final fileName =
         'photo_${DateTime.now().millisecondsSinceEpoch}_${_photoPaths.length}.$extension';
-    final savedFile = await File(photo.path).copy('${targetDir.path}/$fileName');
+    final savedFile = await File(
+      photo.path,
+    ).copy('${targetDir.path}/$fileName');
 
     return savedFile.path;
   }
@@ -244,7 +246,9 @@ class _MaintenanceLogEntryViewState
         'cust',
       );
 
-      final photos = _photoPaths.isEmpty ? null : List<String>.from(_photoPaths);
+      final photos = _photoPaths.isEmpty
+          ? null
+          : List<String>.from(_photoPaths);
 
       await ref
           .read(maintenanceControllerProvider.notifier)
@@ -368,16 +372,19 @@ class _MaintenanceLogEntryViewState
           surfaceTintColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: colors.onSurfaceVariant),
+            icon: Icon(
+              Icons.arrow_back_rounded,
+              color: colors.onSurfaceVariant,
+            ),
             tooltip: 'Geri',
             onPressed: maintenanceState.isLoading ? null : () => context.pop(),
           ),
           title: Text(
             'Asansor',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: colors.primaryDark,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: colors.primaryDark,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           centerTitle: true,
           actions: [
@@ -387,9 +394,9 @@ class _MaintenanceLogEntryViewState
                 child: Text(
                   'Operasyon',
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: colors.primaryDark,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    color: colors.primaryDark,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
             ),
@@ -502,7 +509,11 @@ class _FormHero extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.location_on_outlined, color: colors.onSurfaceVariant, size: 18),
+            Icon(
+              Icons.location_on_outlined,
+              color: colors.onSurfaceVariant,
+              size: 18,
+            ),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
@@ -570,7 +581,9 @@ class _ChecklistProgressCard extends StatelessWidget {
       orElse: () => const <ChecklistItemModel>[],
     );
     final total = activeItems.length;
-    final checked = activeItems.where((item) => checkedItems[item.id] == true).length;
+    final checked = activeItems
+        .where((item) => checkedItems[item.id] == true)
+        .length;
     final progress = total == 0 ? 0.0 : checked / total;
 
     return _PremiumPanel(
@@ -785,9 +798,9 @@ class _PhotoEvidencePanel extends StatelessWidget {
         child: Text(
           '${photoPaths.length} Fotoğraf',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: colors.onSurfaceVariant,
-                fontWeight: FontWeight.w800,
-              ),
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
       child: Column(
@@ -825,9 +838,9 @@ class _PhotoEvidencePanel extends StatelessWidget {
                 l10n.maintenancePhotosEmpty,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -957,9 +970,9 @@ class _NotesPanel extends StatelessWidget {
         minLines: 5,
         maxLines: 7,
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: colors.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
+          color: colors.onSurface,
+          fontWeight: FontWeight.w600,
+        ),
         decoration: InputDecoration(
           hintText: l10n.maintenanceNotesHint,
           filled: true,
@@ -1101,9 +1114,9 @@ class _SignaturePad extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Container(
@@ -1170,7 +1183,9 @@ class _SubmitBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: colors.surface.withValues(alpha: 0.92),
           border: Border(
-            top: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.35)),
+            top: BorderSide(
+              color: colors.outlineVariant.withValues(alpha: 0.35),
+            ),
           ),
         ),
         child: Center(
@@ -1200,8 +1215,8 @@ class _SubmitBar extends StatelessWidget {
                   backgroundColor: colors.primaryDark,
                   foregroundColor: colors.onPrimary,
                   textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+                    fontWeight: FontWeight.w800,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -1272,9 +1287,9 @@ class _PremiumPanel extends StatelessWidget {
                     child: Text(
                       warning!,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: colors.onErrorContainer,
-                            fontWeight: FontWeight.w800,
-                          ),
+                        color: colors.onErrorContainer,
+                        fontWeight: FontWeight.w800,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -1351,9 +1366,9 @@ class _StatusChip extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppThemeColors.of(context).onSurface,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: AppThemeColors.of(context).onSurface,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),

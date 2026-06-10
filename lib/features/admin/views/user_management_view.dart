@@ -587,7 +587,10 @@ class _ProfileCard extends StatelessWidget {
               if (onEditRole != null)
                 TextButton.icon(
                   onPressed: onEditRole,
-                  icon: const Icon(Icons.admin_panel_settings_rounded, size: 17),
+                  icon: const Icon(
+                    Icons.admin_panel_settings_rounded,
+                    size: 17,
+                  ),
                   label: const Text('Rol'),
                 ),
             ],
@@ -744,7 +747,9 @@ class _EditRoleSheetState extends ConsumerState<_EditRoleSheet> {
             _RoleOption(
               role: option,
               selected: _selectedRole == option,
-              onTap: isLoading ? null : () => setState(() => _selectedRole = option),
+              onTap: isLoading
+                  ? null
+                  : () => setState(() => _selectedRole = option),
             ),
             const SizedBox(height: AppSpacing.sm),
           ],
@@ -805,7 +810,9 @@ class _RoleOption extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(13),
         decoration: BoxDecoration(
-          color: selected ? style.fg.withValues(alpha: 0.10) : colors.background,
+          color: selected
+              ? style.fg.withValues(alpha: 0.10)
+              : colors.background,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: selected ? style.fg.withValues(alpha: 0.38) : _panelLine,
@@ -962,7 +969,8 @@ class _AssignElevatorSheetState extends ConsumerState<_AssignElevatorSheet> {
                     selected: _selectedElevatorId == elevator.id,
                     onTap: isLoading
                         ? null
-                        : () => setState(() => _selectedElevatorId = elevator.id),
+                        : () =>
+                              setState(() => _selectedElevatorId = elevator.id),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                 ],
@@ -1371,7 +1379,11 @@ String _shortId(String id) {
   return 'ID: ${id.substring(0, 8)}...${id.substring(id.length - 4)}';
 }
 
-void _showSheetSnack(BuildContext context, String message, {bool isError = false}) {
+void _showSheetSnack(
+  BuildContext context,
+  String message, {
+  bool isError = false,
+}) {
   final colors = AppThemeColors.of(context);
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(

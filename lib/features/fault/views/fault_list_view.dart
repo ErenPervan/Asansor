@@ -74,8 +74,11 @@ class _FaultListViewState extends ConsumerState<FaultListView> {
         loading: () => const LoadingState(),
         error: (e, st) => _ErrorBody(error: e, onRetry: _refresh),
         data: (allFaults) {
-          final elevators = elevatorsAsync.valueOrNull ?? const <ElevatorModel>[];
-          final elevatorMap = {for (final elevator in elevators) elevator.id: elevator};
+          final elevators =
+              elevatorsAsync.valueOrNull ?? const <ElevatorModel>[];
+          final elevatorMap = {
+            for (final elevator in elevators) elevator.id: elevator,
+          };
           final filtered = _filtered(allFaults);
 
           return RefreshIndicator(
@@ -103,9 +106,12 @@ class _FaultListViewState extends ConsumerState<FaultListView> {
                           onSelected: (value) =>
                               setState(() => _filterIndex = value),
                           allCount: allFaults.length,
-                          openCount: allFaults.where((f) => !f.isResolved).length,
-                          resolvedCount:
-                              allFaults.where((f) => f.isResolved).length,
+                          openCount: allFaults
+                              .where((f) => !f.isResolved)
+                              .length,
+                          resolvedCount: allFaults
+                              .where((f) => f.isResolved)
+                              .length,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         if (filtered.isEmpty)
@@ -113,7 +119,9 @@ class _FaultListViewState extends ConsumerState<FaultListView> {
                         else
                           LayoutBuilder(
                             builder: (context, constraints) {
-                              final columns = constraints.maxWidth >= 820 ? 2 : 1;
+                              final columns = constraints.maxWidth >= 820
+                                  ? 2
+                                  : 1;
                               final cardWidth =
                                   (constraints.maxWidth -
                                       ((columns - 1) * AppSpacing.md)) /
@@ -518,7 +526,8 @@ class _FaultCard extends StatelessWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  if (address != null && address.isNotEmpty) ...[
+                                  if (address != null &&
+                                      address.isNotEmpty) ...[
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
@@ -533,7 +542,8 @@ class _FaultCard extends StatelessWidget {
                                             address,
                                             style: textTheme.labelSmall
                                                 ?.copyWith(
-                                                  color: colors.onSurfaceVariant,
+                                                  color:
+                                                      colors.onSurfaceVariant,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                             maxLines: 1,
@@ -583,7 +593,10 @@ class _FaultCard extends StatelessWidget {
                           spacing: AppSpacing.md,
                           runSpacing: AppSpacing.sm,
                           children: [
-                            _MetaItem(icon: Icons.schedule_rounded, label: time),
+                            _MetaItem(
+                              icon: Icons.schedule_rounded,
+                              label: time,
+                            ),
                             _MetaItem(
                               icon: Icons.calendar_today_rounded,
                               label: date,
@@ -721,11 +734,7 @@ class _FaultStatusBadge extends StatelessWidget {
 }
 
 class _MetaItem extends StatelessWidget {
-  const _MetaItem({
-    required this.icon,
-    required this.label,
-    this.color,
-  });
+  const _MetaItem({required this.icon, required this.label, this.color});
 
   final IconData icon;
   final String label;

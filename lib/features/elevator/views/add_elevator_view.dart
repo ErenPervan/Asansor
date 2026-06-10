@@ -103,9 +103,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
           title: Text(
             'Asansör Ekle',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: colors.primaryDark,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: colors.primaryDark,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ),
         body: Form(
@@ -202,11 +202,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                             _lngCtrl.text = point.longitude.toStringAsFixed(6);
                           });
                         },
-                        validateLat: _validateCoord(
-                          'Enlem',
-                          min: -90,
-                          max: 90,
-                        ),
+                        validateLat: _validateCoord('Enlem', min: -90, max: 90),
                         validateLng: _validateCoord(
                           'Boylam',
                           min: -180,
@@ -233,9 +229,7 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
                           minimumSize: const Size(double.infinity, 56),
                           backgroundColor: colors.primaryDark,
                           foregroundColor: colors.onPrimary,
-                          textStyle: Theme.of(context)
-                              .textTheme
-                              .titleSmall
+                          textStyle: Theme.of(context).textTheme.titleSmall
                               ?.copyWith(fontWeight: FontWeight.w900),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -268,7 +262,9 @@ class _AddElevatorViewState extends ConsumerState<AddElevatorView> {
         ? null
         : double.tryParse(_lngCtrl.text.trim());
 
-    ref.read(elevatorCreateControllerProvider.notifier).create(
+    ref
+        .read(elevatorCreateControllerProvider.notifier)
+        .create(
           buildingName: _nameCtrl.text.trim(),
           address: fullAddress,
           status: _status,
@@ -337,7 +333,10 @@ class _HeroHeader extends StatelessWidget {
                   color: colors.onPrimary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(Icons.add_business_rounded, color: colors.onPrimary),
+                child: Icon(
+                  Icons.add_business_rounded,
+                  color: colors.onPrimary,
+                ),
               ),
               const SizedBox(height: AppSpacing.xl),
               Text(
@@ -389,7 +388,9 @@ class _FormSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.28)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.28),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.06),
@@ -437,8 +438,10 @@ class _FormSection extends StatelessWidget {
               ),
               if (badge != null)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.accentGold.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
@@ -513,7 +516,8 @@ class _StatusPicker extends StatelessWidget {
       builder: (context, constraints) {
         final columns = constraints.maxWidth >= 680 ? 4 : 2;
         final spacing = AppSpacing.sm;
-        final width = (constraints.maxWidth - spacing * (columns - 1)) / columns;
+        final width =
+            (constraints.maxWidth - spacing * (columns - 1)) / columns;
 
         return Wrap(
           spacing: spacing,
@@ -558,7 +562,9 @@ class _StatusTile extends StatelessWidget {
     final accent = _statusColor(value, colors);
 
     return Material(
-      color: selected ? accent.withValues(alpha: 0.1) : colors.surfaceContainerLow,
+      color: selected
+          ? accent.withValues(alpha: 0.1)
+          : colors.surfaceContainerLow,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -584,9 +590,9 @@ class _StatusTile extends StatelessWidget {
               Text(
                 label,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: selected ? accent : colors.onSurfaceVariant,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  color: selected ? accent : colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w900,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -639,9 +645,9 @@ class _MaintenanceDayPicker extends StatelessWidget {
                 child: Text(
                   'Bakım günü seçilirse periyodik görev planlamasında kullanılacaktır.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -654,7 +660,10 @@ class _MaintenanceDayPicker extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Aylık Bakım Günü',
             hintText: 'Gün seçin',
-            prefixIcon: Icon(Icons.calendar_month_rounded, color: colors.outline),
+            prefixIcon: Icon(
+              Icons.calendar_month_rounded,
+              color: colors.outline,
+            ),
             filled: true,
             fillColor: colors.surfaceContainerLow,
             border: OutlineInputBorder(
@@ -725,7 +734,7 @@ class _LocationSection extends StatelessWidget {
       subtitle: selectedLatLng == null
           ? 'İsteğe bağlı harita ve koordinat bilgisi'
           : '${selectedLatLng!.latitude.toStringAsFixed(5)}, '
-              '${selectedLatLng!.longitude.toStringAsFixed(5)}',
+                '${selectedLatLng!.longitude.toStringAsFixed(5)}',
       icon: Icons.satellite_alt_rounded,
       child: Column(
         children: [
@@ -743,7 +752,10 @@ class _LocationSection extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.add_location_alt_rounded, color: colors.primaryDark),
+                  Icon(
+                    Icons.add_location_alt_rounded,
+                    color: colors.primaryDark,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
@@ -751,9 +763,9 @@ class _LocationSection extends StatelessWidget {
                           ? 'Haritadan konum seç'
                           : 'Konum pini seçildi',
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: colors.onSurface,
-                            fontWeight: FontWeight.w900,
-                          ),
+                        color: colors.onSurface,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ),
                   Icon(
@@ -782,7 +794,8 @@ class _LocationSection extends StatelessWidget {
                               mapController: mapController,
                               options: MapOptions(
                                 initialCenter:
-                                    selectedLatLng ?? const LatLng(39.9334, 32.8597),
+                                    selectedLatLng ??
+                                    const LatLng(39.9334, 32.8597),
                                 initialZoom: 13,
                                 onTap: (_, point) => onMapTap(point),
                               ),
@@ -816,7 +829,8 @@ class _LocationSection extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             'Haritaya dokunarak konum pinini belirleyin.',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
                                   color: colors.onSurfaceVariant,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -833,9 +847,9 @@ class _LocationSection extends StatelessWidget {
                               icon: Icons.north_rounded,
                               keyboardType:
                                   const TextInputType.numberWithOptions(
-                                decimal: true,
-                                signed: true,
-                              ),
+                                    decimal: true,
+                                    signed: true,
+                                  ),
                               validator: validateLat,
                             );
                             final lngField = _Field(
@@ -845,9 +859,9 @@ class _LocationSection extends StatelessWidget {
                               icon: Icons.east_rounded,
                               keyboardType:
                                   const TextInputType.numberWithOptions(
-                                decimal: true,
-                                signed: true,
-                              ),
+                                    decimal: true,
+                                    signed: true,
+                                  ),
                               validator: validateLng,
                             );
 

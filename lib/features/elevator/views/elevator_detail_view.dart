@@ -40,9 +40,9 @@ class ElevatorDetailView extends ConsumerWidget {
         title: Text(
           'ElevatePro',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: colors.primaryDark,
-              ),
+            fontWeight: FontWeight.w800,
+            color: colors.primaryDark,
+          ),
         ),
         centerTitle: true,
         actions: [
@@ -173,16 +173,16 @@ class _ElevatorNotFoundWidget extends StatelessWidget {
             Text(
               'Asansör Bulunamadı',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: colors.onSurface,
-                  ),
+                fontWeight: FontWeight.w800,
+                color: colors.onSurface,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Bu asansör sistemde kayıtlı değil veya silinmiş.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xl),

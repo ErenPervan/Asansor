@@ -26,9 +26,9 @@ class CustomerNoElevatorView extends ConsumerWidget {
             Text(
               'Asansor',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: colors.primaryDark,
-                    fontWeight: FontWeight.w900,
-                  ),
+                color: colors.primaryDark,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ],
         ),
@@ -39,9 +39,9 @@ class CustomerNoElevatorView extends ConsumerWidget {
             label: Text(
               'Çıkış',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: colors.error,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: colors.error,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -68,8 +68,9 @@ class CustomerNoElevatorView extends ConsumerWidget {
                     _InfoCard(),
                     const SizedBox(height: AppSpacing.xl),
                     FilledButton.icon(
-                      onPressed:
-                          isLoading ? null : () => _confirmSignOut(context, ref),
+                      onPressed: isLoading
+                          ? null
+                          : () => _confirmSignOut(context, ref),
                       icon: isLoading
                           ? SizedBox(
                               width: 18,
@@ -80,14 +81,14 @@ class CustomerNoElevatorView extends ConsumerWidget {
                               ),
                             )
                           : const Icon(Icons.logout_rounded),
-                      label: Text(isLoading ? 'Çıkış yapılıyor...' : 'Oturumu Kapat'),
+                      label: Text(
+                        isLoading ? 'Çıkış yapılıyor...' : 'Oturumu Kapat',
+                      ),
                       style: FilledButton.styleFrom(
                         minimumSize: const Size(double.infinity, 56),
                         backgroundColor: colors.primaryDark,
                         foregroundColor: colors.onPrimary,
-                        textStyle: Theme.of(context)
-                            .textTheme
-                            .titleSmall
+                        textStyle: Theme.of(context).textTheme.titleSmall
                             ?.copyWith(fontWeight: FontWeight.w900),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -286,9 +287,9 @@ class _StatusPill extends StatelessWidget {
           Text(
             isLoading ? 'Oturum kapatılıyor' : 'Atama bekleniyor',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.onPrimary.withValues(alpha: 0.84),
-                  fontWeight: FontWeight.w900,
-                ),
+              color: colors.onPrimary.withValues(alpha: 0.84),
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -332,10 +333,10 @@ class _InfoCard extends StatelessWidget {
             child: Text(
               'Asansör atandıktan sonra bakım, arıza ve durum bilgilerinize otomatik erişebilirsiniz. Atama için bina yöneticiniz veya sistem yetkilisi ile iletişime geçin.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w700,
-                    height: 1.45,
-                  ),
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+                height: 1.45,
+              ),
             ),
           ),
         ],

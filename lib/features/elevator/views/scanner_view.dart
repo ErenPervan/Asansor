@@ -74,7 +74,9 @@ class _ScannerViewState extends ConsumerState<ScannerView>
         await _controller.start();
       }
     } else {
-      await _showInvalidQr('Geçersiz QR kod. Lütfen bir asansör QR kodu tarayın.');
+      await _showInvalidQr(
+        'Geçersiz QR kod. Lütfen bir asansör QR kodu tarayın.',
+      );
       if (!mounted) return;
       setState(() => _isProcessing = false);
       await _controller.start();
@@ -111,7 +113,9 @@ class _ScannerViewState extends ConsumerState<ScannerView>
       await context.push('/elevator/$rawValue/maintenance/new');
       if (mounted) setState(() => _isProcessing = false);
     } else {
-      await _showInvalidQr('Geçersiz QR kod. Lütfen bir asansör QR kodu seçin.');
+      await _showInvalidQr(
+        'Geçersiz QR kod. Lütfen bir asansör QR kodu seçin.',
+      );
       if (mounted) setState(() => _isProcessing = false);
     }
   }
@@ -163,8 +167,8 @@ class _ScannerViewState extends ConsumerState<ScannerView>
                 body: ErrorState(
                   message:
                       error.errorCode == MobileScannerErrorCode.permissionDenied
-                          ? "Kamera izni gerekli. Ayarlar'dan izin verin."
-                          : 'Kamera başlatılamadı: ${error.errorCode.name}',
+                      ? "Kamera izni gerekli. Ayarlar'dan izin verin."
+                      : 'Kamera başlatılamadı: ${error.errorCode.name}',
                 ),
               );
             },
@@ -262,9 +266,9 @@ class _ScannerBottomPanel extends StatelessWidget {
                   Text(
                     isProcessing ? 'QR İşleniyor' : 'QR Kodu Taratın',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                        ),
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -273,10 +277,10 @@ class _ScannerBottomPanel extends StatelessWidget {
                         ? 'Asansör kaydı doğrulanıyor.'
                         : 'Asansör etiketindeki karekodu çerçevenin içine hizalayın.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.72),
-                          fontWeight: FontWeight.w600,
-                          height: 1.35,
-                        ),
+                      color: Colors.white.withValues(alpha: 0.72),
+                      fontWeight: FontWeight.w600,
+                      height: 1.35,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],

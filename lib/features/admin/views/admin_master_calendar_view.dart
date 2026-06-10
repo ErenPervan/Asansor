@@ -318,12 +318,7 @@ class _MasterCalendarWorkspace extends StatelessWidget {
         final wide = constraints.maxWidth >= 980;
 
         return SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            wide ? 24 : 16,
-            20,
-            wide ? 24 : 16,
-            112,
-          ),
+          padding: EdgeInsets.fromLTRB(wide ? 24 : 16, 20, wide ? 24 : 16, 112),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1280),
@@ -717,7 +712,8 @@ class _CalendarPanel extends StatelessWidget {
               formatButtonVisible: false,
               titleTextFormatter: (date, locale) =>
                   DateFormat('MMMM y', locale).format(date),
-              titleTextStyle: textTheme.titleMedium?.copyWith(
+              titleTextStyle:
+                  textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w900,
                     color: colors.onSurface,
                   ) ??
@@ -734,12 +730,14 @@ class _CalendarPanel extends StatelessWidget {
             ),
             daysOfWeekHeight: 38,
             daysOfWeekStyle: DaysOfWeekStyle(
-              weekdayStyle: textTheme.labelMedium?.copyWith(
+              weekdayStyle:
+                  textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: colors.onSurfaceVariant,
                   ) ??
                   const TextStyle(),
-              weekendStyle: textTheme.labelMedium?.copyWith(
+              weekendStyle:
+                  textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: colors.outline,
                   ) ??
@@ -768,22 +766,26 @@ class _CalendarPanel extends StatelessWidget {
                 border: Border.all(color: AppColors.accentGold, width: 1.5),
                 borderRadius: BorderRadius.circular(8),
               ),
-              selectedTextStyle: textTheme.bodyMedium?.copyWith(
+              selectedTextStyle:
+                  textTheme.bodyMedium?.copyWith(
                     color: colors.primary,
                     fontWeight: FontWeight.w900,
                   ) ??
                   const TextStyle(),
-              todayTextStyle: textTheme.bodyMedium?.copyWith(
+              todayTextStyle:
+                  textTheme.bodyMedium?.copyWith(
                     color: AppColors.warning,
                     fontWeight: FontWeight.w900,
                   ) ??
                   const TextStyle(),
-              defaultTextStyle: textTheme.bodyMedium?.copyWith(
+              defaultTextStyle:
+                  textTheme.bodyMedium?.copyWith(
                     color: colors.onSurface,
                     fontWeight: FontWeight.w700,
                   ) ??
                   const TextStyle(),
-              weekendTextStyle: textTheme.bodyMedium?.copyWith(
+              weekendTextStyle:
+                  textTheme.bodyMedium?.copyWith(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
                   ) ??
@@ -1314,9 +1316,9 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               error.toString(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -1355,8 +1357,7 @@ class _FilterSheet extends ConsumerWidget {
     final seen = <String>{};
     final technicians = <MapEntry<String, String>>[];
     for (final schedule in allSchedules) {
-      if (schedule.technicianId.isNotEmpty &&
-          seen.add(schedule.technicianId)) {
+      if (schedule.technicianId.isNotEmpty && seen.add(schedule.technicianId)) {
         technicians.add(
           MapEntry(schedule.technicianId, schedule.technicianName),
         );

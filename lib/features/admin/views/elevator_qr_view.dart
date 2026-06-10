@@ -40,21 +40,25 @@ class ElevatorQrView extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.error_outline_rounded, size: 52, color: colors.error),
+                Icon(
+                  Icons.error_outline_rounded,
+                  size: 52,
+                  color: colors.error,
+                ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   'QR kodu yüklenemedi',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   '$e',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
+                    color: colors.onSurfaceVariant,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.lg),
@@ -96,9 +100,9 @@ class _QrScaffold extends StatelessWidget {
         title: Text(
           'QR Kodu',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: colors.primaryDark,
-                fontWeight: FontWeight.w900,
-              ),
+            color: colors.primaryDark,
+            fontWeight: FontWeight.w900,
+          ),
         ),
         centerTitle: false,
         actions: [
@@ -130,7 +134,8 @@ class _QrScaffold extends StatelessWidget {
                   _QrCard(elevator: elevator, onPrint: () => _printQr(context)),
                   const SizedBox(height: AppSpacing.lg),
                   TextButton.icon(
-                    onPressed: () => context.pushReplacement('/admin/add-elevator'),
+                    onPressed: () =>
+                        context.pushReplacement('/admin/add-elevator'),
                     icon: const Icon(Icons.add_circle_outline_rounded),
                     label: const Text('Yeni Asansör Ekle'),
                     style: TextButton.styleFrom(
@@ -246,7 +251,10 @@ class _QrScaffold extends StatelessWidget {
               pw.SizedBox(height: 6),
               pw.Text(
                 elevator.address!,
-                style: const pw.TextStyle(fontSize: 13, color: PdfColors.grey700),
+                style: const pw.TextStyle(
+                  fontSize: 13,
+                  color: PdfColors.grey700,
+                ),
                 textAlign: pw.TextAlign.center,
               ),
             ],
@@ -346,7 +354,10 @@ class _QrHeroHeader extends StatelessWidget {
                       color: colors.onPrimary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Icon(Icons.elevator_rounded, color: colors.onPrimary),
+                    child: Icon(
+                      Icons.elevator_rounded,
+                      color: colors.onPrimary,
+                    ),
                   ),
                   const Spacer(),
                   _StatusChip(status: elevator.status),
@@ -423,9 +434,9 @@ class _HeroPill extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.onPrimary.withValues(alpha: 0.82),
-                  fontWeight: FontWeight.w900,
-                ),
+              color: colors.onPrimary.withValues(alpha: 0.82),
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -448,7 +459,9 @@ class _QrCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.35),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.06),
@@ -598,7 +611,9 @@ class _QrCard extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
                     foregroundColor: colors.primary,
-                    side: BorderSide(color: colors.primary.withValues(alpha: 0.32)),
+                    side: BorderSide(
+                      color: colors.primary.withValues(alpha: 0.32),
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -746,9 +761,9 @@ class _StatusChip extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: fg,
-                ),
+              fontWeight: FontWeight.w800,
+              color: fg,
+            ),
           ),
         ],
       ),
@@ -761,7 +776,11 @@ class _StatusChip extends StatelessWidget {
   ) {
     switch (s) {
       case ElevatorStatus.active:
-        return ('Aktif', colors.primaryFixed.withValues(alpha: 0.7), colors.primaryDark);
+        return (
+          'Aktif',
+          colors.primaryFixed.withValues(alpha: 0.7),
+          colors.primaryDark,
+        );
       case ElevatorStatus.faulty:
         return ('Arızalı', colors.errorContainer, colors.onErrorContainer);
       case ElevatorStatus.underMaintenance:

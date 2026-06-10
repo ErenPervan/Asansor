@@ -69,7 +69,9 @@ class MaintenanceHistorySectionState
       decoration: BoxDecoration(
         color: colors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.45),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.04),
@@ -199,9 +201,9 @@ class _EmptyTimeline extends StatelessWidget {
           Text(
             'Henüz bakım kaydı yok.',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: colors.outline,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: colors.outline,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -282,7 +284,8 @@ class TimelineCard extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final dateStr = _fmtDate(log.maintenanceDate);
-    final technician = log.technicianName ??
+    final technician =
+        log.technicianName ??
         (log.technicianId.length > 8
             ? log.technicianId.substring(0, 8)
             : log.technicianId);
@@ -293,7 +296,9 @@ class TimelineCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLow.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.32)),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.32),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,7 +331,9 @@ class TimelineCard extends StatelessWidget {
                 bg: log.isApproved
                     ? colors.primaryFixed.withValues(alpha: 0.72)
                     : colors.surfaceContainerHigh,
-                fg: log.isApproved ? colors.primaryDark : colors.onSurfaceVariant,
+                fg: log.isApproved
+                    ? colors.primaryDark
+                    : colors.onSurfaceVariant,
               ),
               StatusChip(
                 label: 'Teknisyen: $technician',
@@ -364,9 +371,9 @@ class StatusChip extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: fg,
-            ),
+          fontWeight: FontWeight.w800,
+          color: fg,
+        ),
       ),
     );
   }

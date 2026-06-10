@@ -942,10 +942,7 @@ class _PickerButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: borderColor,
-              width: hasValue ? 1.5 : 1,
-            ),
+            border: Border.all(color: borderColor, width: hasValue ? 1.5 : 1),
           ),
           child: Row(
             children: [

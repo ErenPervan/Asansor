@@ -56,6 +56,7 @@ export const handler = async (req: Request) => {
     let title = "";
     let bodyText = "";
     let notificationData: Record<string, string> = {};
+    let androidChannelId = "asansor_general"; // default channel
 
     // ── 1. Check Payload Type & Extract Targets ─────────────────────────────
     if (reqBody.type === "INSERT" && reqBody.record) {
@@ -82,7 +83,8 @@ export const handler = async (req: Request) => {
         const record = reqBody.record;
         title = "Yeni Arıza Bildirimi";
         bodyText = record.description || "Yeni bir arıza bildirildi.";
-        notificationData = { route: `/fault/${record.id}` };
+        notificationData = { route: `/fault/${record.id}`, type: "fault" };
+        androidChannelId = "asansor_faults";
 
         // Broadcast to all admins
         const { data: admins, error } = await supabase
@@ -101,7 +103,8 @@ export const handler = async (req: Request) => {
         const record = reqBody.record;
         title = "Yeni Bakım Görevi";
         bodyText = "Size yeni bir asansör bakım görevi atandı.";
-        notificationData = { route: `/home` };
+        notificationData = { route: `/home`, type: "task_assigned" };
+        androidChannelId = "asansor_tasks";
 
         const { data: tech, error } = await supabase
           .from("profiles")
@@ -187,6 +190,17 @@ export const handler = async (req: Request) => {
       notificationData = Object.fromEntries(
         Object.entries(rawData).map(([k, v]) => [k, String(v)])
       );
+
+      // Select the Android channel based on notification type/route.
+      const dataType = notificationData["type"] ?? "";
+      const dataRoute = notificationData["route"] ?? "";
+      if (dataType.includes("fault") || dataRoute.startsWith("/fault")) {
+        androidChannelId = "asansor_faults";
+      } else if (dataType.includes("task") || dataRoute === "/" || dataRoute === "/home" || dataRoute.includes("calendar")) {
+        androidChannelId = "asansor_tasks";
+      } else {
+        androidChannelId = "asansor_general";
+      }
 
       if (reqBody.to_role) {
         const { data: profiles, error } = await supabase
@@ -277,6 +291,7 @@ export const handler = async (req: Request) => {
           android: {
             priority: "high",
             notification: {
+              channel_id: androidChannelId,
               sound: "default",
               click_action: "FLUTTER_NOTIFICATION_CLICK"
             }

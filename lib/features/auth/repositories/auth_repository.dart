@@ -54,9 +54,15 @@ class AuthRepository implements IAuthRepository {
   }
 
   /// Signs the current user out of the session.
+  ///
+  /// Clears the FCM token from the user's profile first so the device
+  /// no longer receives push notifications after sign-out.
   @override
   Future<void> signOut() async {
     try {
+      // Clear FCM token before signing out so the signed-out user does not
+      // continue receiving push notifications on this device.
+      await NotificationService.instance.clearTokenFromSupabase(_client);
       await _client.auth.signOut();
     } on AppException {
       rethrow;

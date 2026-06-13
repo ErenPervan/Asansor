@@ -55,7 +55,7 @@
         <!-- FCM: default notification channel used when the app is in the background -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="asansor_notifications" />
+            android:value="asansor_faults" />
         <!-- FCM: default notification icon (use your own ic_notification in res/drawable) -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

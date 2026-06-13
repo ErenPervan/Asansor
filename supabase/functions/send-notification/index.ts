@@ -305,6 +305,25 @@ export const handler = async (req: Request) => {
 
       if (!fcmResponse.ok) {
         console.warn(`FCM v1 failed for token ${target.fcm_token}:`, JSON.stringify(result));
+
+        // Evict stale/unregistered tokens so they don't accumulate in the DB.
+        // FCM HTTP v1 uses nested error details with an errorCode field.
+        const errorCode: string =
+          result?.error?.details?.[0]?.errorCode ??
+          result?.error?.status ??
+          "";
+        const isStaleToken =
+          errorCode === "UNREGISTERED" ||
+          errorCode === "NOT_FOUND" ||
+          (result?.error?.message ?? "").includes("not a valid FCM registration token");
+
+        if (isStaleToken) {
+          console.log(`[FCM] Evicting stale token: ${target.fcm_token.substring(0, 20)}...`);
+          await supabase
+            .from("profiles")
+            .update({ fcm_token: null })
+            .eq("fcm_token", target.fcm_token);
+        }
       }
     }
 

@@ -290,6 +290,27 @@ class NotificationService {
     }
   }
 
+  /// Clears the FCM token from `profiles.fcm_token` on sign-out so the
+  /// signed-out user no longer receives push notifications on this device.
+  ///
+  /// Also cancels the token-refresh subscription so stale listeners
+  /// do not try to re-save a token after the session ends.
+  Future<void> clearTokenFromSupabase(SupabaseClient client) async {
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return;
+    try {
+      await client
+          .from('profiles')
+          .update({'fcm_token': null})
+          .eq('id', userId);
+      await _tokenRefreshSub?.cancel();
+      _tokenRefreshSub = null;
+      debugPrint('[FCM] Token cleared from Supabase for user $userId ✅');
+    } catch (e) {
+      debugPrint('[FCM] clearTokenFromSupabase error: $e');
+    }
+  }
+
   // ── Dispatch helpers (call Supabase Edge Function) ────────────────────────
 
   /// Sends a push notification to a single [toUserId].
@@ -312,7 +333,9 @@ class NotificationService {
           'data': data,
         },
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[FCM] notifyUser error: $e');
+    }
   }
 
   /// Sends a push notification to every user with `role = 'admin'`.
@@ -327,7 +350,9 @@ class NotificationService {
         'send-notification',
         body: {'to_role': 'admin', 'title': title, 'body': body, 'data': data},
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[FCM] notifyAllAdmins error: $e');
+    }
   }
 
   // ── Message handlers ──────────────────────────────────────────────────────
